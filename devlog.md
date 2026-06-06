@@ -5,6 +5,70 @@
 
 ---
 
+## 2026-06-06 — Oturum 4: Build Hatalarının Çözümü
+
+### Yapılanlar
+- PowerShell ile yazılan 6 dosyadaki UTF-8 encoding hatası giderildi:
+  - `src/app/dashboard/vault/[id]/page.tsx` — yeniden yazıldı (bash heredoc, UTF-8)
+  - `src/app/dashboard/vault/[id]/media/page.tsx` — yeniden yazıldı
+  - `src/app/dashboard/vault/[id]/biography/page.tsx` — yeniden yazıldı
+  - `src/app/dashboard/vault/[id]/heirs/page.tsx` — yeniden yazıldı + schema düzeltmesi
+  - `src/app/memorial/[slug]/page.tsx` — yeniden yazıldı
+  - `src/app/dashboard/billing/page.tsx` — yeniden yazıldı
+- TypeScript hataları düzeltildi:
+  - `createVaultAction` → `Promise<void>` dönüş tipi (form action uyumluluğu)
+  - `inviteHeirAction` → `Promise<void>` dönüş tipi
+  - `heirs/page.tsx` → doğru schema alanları (`heir_email`, `access_level`, `invitation_expires_at`)
+  - `api/qr/[hash]/route.ts` → `Promise.resolve(...).catch()` ile Supabase tip uyumu
+- `npm run build` → temiz, 14 route, TypeScript hatası yok
+
+### Proje Durumu
+```
+[x] PRD yazıldı (proje.md)
+[x] GitHub remote bağlandı
+[x] .env.local yapılandırıldı
+[x] Supabase client dosyaları oluşturuldu
+[x] Middleware auth guard kuruldu
+[x] DB şeması uygulandı (10 tablo, RLS, trigger'lar)
+[x] TypeScript tipleri oluşturuldu
+[x] Landing page (3D animated, slate/blue design)
+[x] Login page (Google OAuth + Magic Link)
+[x] Auth callback + signout route
+[x] Dashboard layout (sidebar)
+[x] Dashboard page (vault list + storage bar)
+[x] Vault CRUD server actions
+[x] Vault detail, biography, media, heirs, settings sayfaları
+[x] Memorial page (ISR, guestbook)
+[x] QR redirect route (Edge Runtime)
+[x] Billing page
+[x] npm run build — temiz, 14 route
+[ ] Google OAuth provider Supabase dashboard'da etkinleştirilmeli
+[ ] SUPABASE_SERVICE_ROLE_KEY .env.local'a eklenmeli
+[ ] Cloudflare R2 media upload entegrasyonu
+[ ] Resend e-posta (heir davet bildirimleri)
+[ ] Stripe ödeme entegrasyonu
+[ ] Admin panel (vefat talepleri, moderasyon)
+```
+
+### Kritik Kararlar / Notlar
+- PowerShell 5.1 `Set-Content -LiteralPath` emoji içeren dosyalarda UTF-16 LE yazar → build başarısız olur. Çözüm: bash heredoc (`cat > file << 'EOF'`) kullan.
+- Server Action form `action` prop'u `void | Promise<void>` bekler; `{ error: string }` döndüren action'lar TypeScript hatasına yol açar.
+- `heirs` tablosunda `full_name` alanı yok, `role` yerine `access_level` kullanılıyor.
+- `subscriptions` tablosunda `plan_id` yok, `tier` kullanılıyor.
+
+### Nerede Kaldık
+`npm run build` temiz geçiyor. Tüm 14 route derleniyor. Proje local'de çalışmaya hazır. Supabase Auth'u aktif etmek için dashboard'a gidip Google OAuth provider'ı ve redirect URL'leri ayarlamak gerekiyor.
+
+### Sıradaki Adım
+1. Supabase dashboard → Authentication → Providers → Google OAuth'u etkinleştir
+2. `.env.local`'e `SUPABASE_SERVICE_ROLE_KEY` ekle (Supabase dashboard → Settings → API)
+3. `npm run dev` ile local'de test et — login flow'u dene
+4. Cloudflare R2 bucket kur ve media upload component'ini yaz
+5. Resend API key al ve heir davet e-postası template'ini yaz
+6. Vercel'e ilk deploy (env vars ekle)
+
+---
+
 ## 2026-06-06 — Oturum 2: Git + Supabase Bağlantısı
 
 ### Yapılanlar
