@@ -5,6 +5,50 @@
 
 ---
 
+## 2026-06-06 — Oturum 2: Git + Supabase Bağlantısı
+
+### Yapılanlar
+- GitHub remote eklendi → `https://github.com/dijivexaWeb/themaradi.git`
+- `master` branch push edildi (tüm commits GitHub'da)
+- `.env.local` oluşturuldu → Supabase URL + anon key + service_role key
+- `npm install @supabase/supabase-js @supabase/ssr` kuruldu
+- `src/lib/supabase/client.ts` → browser client (Client Components için)
+- `src/lib/supabase/server.ts` → server client + service client (Server Components/Actions için)
+- `src/lib/supabase/middleware.ts` → session yenileme + /dashboard auth guard
+- `src/middleware.ts` → Next.js middleware (tüm route'ları kapsar)
+- TypeScript hatası yok (`tsc --noEmit` temiz)
+
+### Proje Durumu
+```
+[x] PRD yazıldı (proje.md)
+[x] GitHub remote bağlandı
+[x] .env.local yapılandırıldı
+[x] Supabase client dosyaları oluşturuldu
+[x] Middleware auth guard kuruldu
+[ ] DB şeması uygulandı (migration — Supabase'de tablolar yok)
+[ ] Supabase Auth kuruldu (Google OAuth + Magic Link)
+[ ] handle_new_user() trigger oluşturuldu
+[ ] Landing page yazıldı
+[ ] Dashboard iskelet kuruldu
+```
+
+### Kritik Kararlar / Notlar
+- `createClient()` → browser/Client Component; `createServiceClient()` → admin işlemler (RLS bypass)
+- Middleware her request'te session yeniliyor — bu Supabase SSR'ın zorunlu adımı
+- `/dashboard` prefix'li tüm sayfalar login gerektiriyor
+- `.env.local` gitignore'da (`.env*` kuralı) — asla commit edilmez
+
+### Nerede Kaldık
+Supabase client altyapısı kuruldu. Veritabanında henüz hiçbir tablo yok.
+
+### Sıradaki Adım
+1. Supabase'de DB migration: `proje.md` Bölüm 5'teki tüm tabloları uygula (profiles, vaults, heirs, media, guestbook, dynamic_qr, death_claims, audit_logs, qr_analytics, subscriptions)
+2. Trigger'ları ekle: `handle_new_user()` + `handle_vault_transition()`
+3. RLS politikalarını etkinleştir
+4. Google OAuth provider'ı Supabase dashboard'da aç
+
+---
+
 ## 2026-06-06 — Oturum 1: Proje Kurulumu & Dokümantasyon
 
 ### Yapılanlar
