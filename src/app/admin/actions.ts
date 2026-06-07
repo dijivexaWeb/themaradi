@@ -441,3 +441,60 @@ export async function banUser(userId: string): Promise<ActionResult> {
   revalidatePath('/admin/users')
   return { success: true }
 }
+
+// ─── Manual Payment ─────────────────────────────────────────────────────────
+
+const manualPaymentSchema = z.object({
+  vault_id: z.string().uuid(),
+  amount: z.coerce.number().positive().max(100000),
+  product_type: z.enum(['memorial_one_time', 'vault_setup', 'vault_monthly']),
+  status: z.enum(['paid', 'pending', 'overdue']),
+  paid_at: z.string().optional(),
+  notes: z.string().max(500).optional(),
+})
+
+export async function addManualPayment(formData: FormData): Promise<ActionResult> {
+  const { user, profile } = await requireAdmin()
+
+  const parsed = manualPaymentSchema.safeParse({
+    vault_id: formData.get('vault_id'),
+    amount: formData.get('amount'),
+    product_type: formData.get('product_type'),
+    status: formData.get('status'),
+    paid_at: formData.get('paid_at') || undefined,
+    notes: formData.get('notes') || undefined,
+  })
+
+  if (!parsed.success) return { success: false, error: 'Geçersiz form verisi: ' + parsed.error.issues[0]?.message }
+
+  const supabase = await createServiceClient()
+
+  // Verify vault exists
+  const { data: vault } = await supabase.from('vaults').select('id, owner_id, display_name').eq('id', parsed.data.vault_id).single()
+  if (!vault) return { success: false, error: 'Vault bulunamadı' }
+
+  const { data: payment, error } = await supabase.from('payments').insert({
+    vault_id: parsed.data.vault_id,
+    user_id: vault.owner_id,
+    amount: parsed.data.amount,
+    currency: 'GEL',
+    product_type: parsed.data.product_type,
+    status: parsed.data.status,
+    paid_at: parsed.data.status === 'paid' && parsed.data.paid_at ? new Date(parsed.data.paid_at).toISOString() : null,
+    notes: parsed.data.notes ?? null,
+  }).select('id').single()
+
+  if (error) return { success: false, error: error.message }
+
+  await logAdminAction({
+    adminId: user.id,
+    adminEmail: user.email ?? profile.email ?? '',
+    action: 'manual_payment_added',
+    entityType: 'payment',
+    entityId: payment?.id,
+    newValue: { vault: vault.display_name, amount: parsed.data.amount, product_type: parsed.data.product_type, status: parsed.data.status },
+  })
+
+  revalidatePath('/admin/kasa')
+  return { success: true }
+}
