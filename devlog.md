@@ -5,6 +5,51 @@
 
 ---
 
+## 2026-06-07 — Oturum 20: Layout Overhaul — PersonHeader + Timeline + Masonry + Sidebar Nav
+
+### Yapılanlar
+- `_PersonHeader.tsx` bileşeni oluşturuldu: kişi avatarı, ad, yaşam yılları ve mevcut bölüm başlığı
+- `biography/page.tsx` — PersonHeader eklendi, vault query genişletildi (cover_photo_url, birth_date, death_date)
+- `profil/page.tsx` — sol sticky sidebar nav + sağ form düzeni (5 bölüm: temel, foto, tarih, mesaj, mezar)
+- `fotolar/page.tsx` — masonry grid (CSS columns-2/3/4, natural aspect ratio images)
+- `anilar/page.tsx` — vertical timeline (gold date markers, absolute line + dots), medya desteği korundu
+- `aile/page.tsx` — card grid (2/3 kolon), centered avatarlar, hover reveal delete
+- `videolar/page.tsx` — PersonHeader + büyük empty state (serif font)
+- `belgeler/page.tsx` — PersonHeader + 8 kategorili belge kasası, kategoriye göre gruplu liste
+- `heirs/page.tsx` — PersonHeader eklendi, vault query genişletildi
+- `gizli-kasa/page.tsx` — PersonHeader eklendi, form düzeni iyileştirildi
+- `settings/page.tsx` — PersonHeader + sol sticky sidebar nav (5 bölüm: slug, genel, qr, yayin, tehlike)
+- Tüm değişiklikler commit edildi ve push edildi (commit: `3cfea54`)
+
+### Proje Durumu
+- [x] Auth sistemi
+- [x] Dashboard + Vault CRUD
+- [x] QR route
+- [x] Warm cream/olive/gold tasarım
+- [x] Tüm alt sayfa layout overhaul (PersonHeader, timeline, masonry, sidebar nav)
+- [x] Anılar medya desteği (foto/video upload + URL)
+- [x] Belgeler kasası (multi-file, 8 kategori)
+- [ ] payments RLS hatası
+- [ ] Login "Kaydınız yoksa" → /satin-al yönlendirmesi
+- [ ] Vefat bildirimi alanı (belgeler'den ayrı)
+
+### Kritik Kararlar / Notlar
+- PersonHeader saf presentational component — hem server hem client componentlarda kullanılabilir
+- Masonry için CSS columns yaklaşımı (Tailwind native: columns-2 sm:columns-3 lg:columns-4)
+- Timeline için absolute positioned line + relative item dots
+- Settings ve profil: sol nav sadece lg: breakpoint'te görünür (sticky top-8)
+- belgeler sayfası eskiden vefat bildirimi içeriyordu; tamamen belge kasasına dönüştürüldü
+
+### Nerede Kaldık
+11 sayfa layout overhaul'ı tamamlandı ve push edildi. Tüm sub-page'ler PersonHeader ile tutarlı görünüm kazandı.
+
+### Sıradaki Adım
+1. `payments` RLS hatası düzeltmesi (ödeme kayıt sorunu)
+2. Login sayfası "Kaydınız yoksa" → `/satin-al` yönlendirmesi
+3. Vefat bildirimi alanının tasarımı ve implementasyonu (belgeler'den ayrı, ayrı bir alan)
+
+---
+
 ## 2026-06-07 — Oturum 19: Anılar — Medya Ekleme + Zorunlu Tarih
 
 ### Yapılanlar
