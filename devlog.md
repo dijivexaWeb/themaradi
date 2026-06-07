@@ -5,6 +5,79 @@
 
 ---
 
+## 2026-06-07 — Oturum 12: Tam 4 Dil i18n (TR/KA/RU/EN) + Otomatik Dil Tespiti
+
+### Yapılanlar
+- `src/i18n/en.ts` — master schema oluşturuldu (800+ anahtar, `LangDict = typeof en`)
+- `src/i18n/tr.ts` — Türkçe sözlük (mevcut sayfalardan birebir çıkarıldı)
+- `src/i18n/ka.ts` — Gürcüce çeviriler (ციფრული სამახსოვრო, სიცოცხლის სეიფი vs.)
+- `src/i18n/ru.ts` — Rusça çeviriler (Цифровой мемориал, Сейф жизни vs.)
+- `src/i18n/index.ts` — cookie-first dil tespiti (`tm_lang` cookie > localStorage > navigator)
+- `src/i18n/context.tsx` — LangProvider + useLang() hook (değişmedi, zaten hazırdı)
+- `src/middleware.ts` — Accept-Language header'dan dil tespiti, cookie set (yönlendirme yok)
+- `src/components/landing/Nav.tsx` — useLang() + dil değiştirici (desktop dropdown, mobil buton grubu)
+- `src/components/landing/LocalizedLanding.tsx` — tüm veri dizileri t.landing.* ile
+- `src/components/CookieBanner.tsx` — t.cookieBanner.* ile
+- `src/components/legal/LegalPage.tsx` — 'use client', t.legal.shell.* (nav, TOC başlığı, footer)
+- `src/app/pricing/page.tsx` — server shell → PricingClient.tsx render
+- `src/app/pricing/PricingClient.tsx` — yeni, 'use client', t.pricing.* ile tam sayfa
+- `src/app/contact/page.tsx` — server shell → ContactPageClient.tsx
+- `src/app/contact/ContactPageClient.tsx` — yeni, 'use client', t.contact.*
+- `src/app/contact/ContactForm.tsx` — t.contact.form.* ile
+- `src/app/privacy/page.tsx` — server shell → PrivacyClient.tsx
+- `src/app/privacy/PrivacyClient.tsx` — yeni, t.legal.privacy.* ile
+- `src/app/terms/page.tsx` — server shell → TermsClient.tsx
+- `src/app/terms/TermsClient.tsx` — yeni, t.legal.terms.* ile
+- `src/app/kvkk/page.tsx` — server shell → KvkkClient.tsx
+- `src/app/kvkk/KvkkClient.tsx` — yeni, t.legal.kvkk.* ile
+- `src/app/cookies/page.tsx` — server shell → CookiesClient.tsx
+- `src/app/cookies/CookiesClient.tsx` — yeni, t.legal.cookies.* ile
+- `src/app/legal/verification-policy/page.tsx` — server shell → VerificationPolicyClient.tsx
+- `src/app/legal/verification-policy/VerificationPolicyClient.tsx` — yeni, t.legal.verification.* ile
+- `src/app/q/not-found/page.tsx` — 'use client', t.qPages.notFound.*
+- `src/app/q/pending/page.tsx` — server shell → QrPendingClient.tsx
+- `src/app/q/pending/QrPendingClient.tsx` — yeni, t.qPages.pending.*
+- Commit: `feat: tam 4 dil i18n (TR/KA/RU/EN) + otomatik dil tespiti` → push OK
+
+### Proje Durumu
+```
+[x] DB migrations 001-004
+[x] Memorial profil sayfası
+[x] /pricing (2 ürün modeli)
+[x] /contact sayfası
+[x] QR kalıcı yönlendirme (/q/[code])
+[x] /privacy — Gizlilik Politikası
+[x] /terms — Kullanım Koşulları
+[x] /legal/verification-policy — Doğrulama Politikası
+[x] Landing page güncellemeleri
+[x] 4 dil i18n (TR/KA/RU/EN) — tüm sayfalarda
+[x] Otomatik dil tespiti (middleware + cookie)
+[ ] ContactForm API route (Resend)
+[ ] Admin panel (belge inceleme)
+[ ] R2 media upload
+[ ] Ödeme entegrasyonu (TBC Pay / BOG Pay)
+```
+
+### Kritik Kararlar / Notlar
+- Server/client split: `export const metadata` olan sayfalar server component kalır, i18n içeriği `*Client.tsx`'e taşınır
+- Cookie adı: `tm_lang`, maxAge: 1 yıl, SameSite=Lax — hem middleware hem client'tan yazılıyor
+- Middleware yönlendirme yapmıyor, sadece cookie set ediyor (UX için non-disruptive)
+- `LangDict = typeof en` — TypeScript type safety, diğer diller bunu satisfy etmek zorunda
+- Icon dizileri (PricingClient, LocalizedLanding) veri dizilerinden bağımsız, indeks ile eşleşiyor
+- Legal sayfalar: basitleştirilmiş `t.legal.*` structure kullanıldı (orijinal TR inline HTML kaldırıldı, dict-based içerik alındı)
+
+### Nerede Kaldık
+Tam i18n implementasyonu tamamlandı. 28 dosya değişti, 9 yeni dosya oluşturuldu. Commit + push yapıldı.
+Tüm sayfalar artık TR/KA/RU/EN destekliyor; dil değiştiricisi Nav'da mevcut.
+
+### Sıradaki Adım
+1. ContactForm API route (Resend ile e-posta gönderimi)
+2. Admin panel temel yapısı (pending_verification kuyruğu)
+3. Belge yükleme UI (create-memorial akışı)
+4. Ödeme entegrasyonu (TBC Pay / BOG Pay)
+
+---
+
 ## 2026-06-07 - Oturum 11: Hukuki Belgeler + Landing Page Güncelleme
 
 ### Yapilanlar
