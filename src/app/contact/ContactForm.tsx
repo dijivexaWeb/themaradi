@@ -3,6 +3,7 @@
 import { ArrowRight } from 'lucide-react'
 import { useState } from 'react'
 import { useLang } from '@/i18n/context'
+import { submitContactMessage } from './actions'
 
 type Status = 'idle' | 'sending' | 'sent' | 'error'
 
@@ -10,13 +11,19 @@ export default function ContactForm() {
   const { t } = useLang()
   const f = t.contact.form
   const [status, setStatus] = useState<Status>('idle')
+  const [errorMsg, setErrorMsg] = useState('')
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
     setStatus('sending')
-    // TODO: Resend / API route integration
-    await new Promise((r) => setTimeout(r, 900))
-    setStatus('sent')
+    const formData = new FormData(e.currentTarget)
+    const result = await submitContactMessage(formData)
+    if (result.success) {
+      setStatus('sent')
+    } else {
+      setErrorMsg(result.error ?? 'Hata oluştu')
+      setStatus('error')
+    }
   }
 
   if (status === 'sent') {
@@ -35,6 +42,12 @@ export default function ContactForm() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
+      {status === 'error' && (
+        <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          {errorMsg}
+        </div>
+      )}
+
       <div className="grid gap-5 sm:grid-cols-2">
         <div>
           <label className="mb-1.5 block text-xs font-semibold uppercase tracking-wider text-[#8a7a64]">
@@ -42,6 +55,7 @@ export default function ContactForm() {
           </label>
           <input
             required
+            name="name"
             type="text"
             placeholder={f.namePlaceholder}
             className="w-full rounded-xl border border-[#e1d5c3] bg-[#fbf8f1] px-4 py-3 text-sm text-[#173d31] placeholder-[#c0b49e] outline-none transition focus:border-[#b08340] focus:ring-2 focus:ring-[#b08340]/15"
@@ -53,6 +67,7 @@ export default function ContactForm() {
           </label>
           <input
             required
+            name="email"
             type="email"
             placeholder={f.emailPlaceholder}
             className="w-full rounded-xl border border-[#e1d5c3] bg-[#fbf8f1] px-4 py-3 text-sm text-[#173d31] placeholder-[#c0b49e] outline-none transition focus:border-[#b08340] focus:ring-2 focus:ring-[#b08340]/15"
@@ -66,12 +81,13 @@ export default function ContactForm() {
         </label>
         <select
           required
+          name="subject"
           defaultValue=""
           className="w-full rounded-xl border border-[#e1d5c3] bg-[#fbf8f1] px-4 py-3 text-sm text-[#173d31] outline-none transition focus:border-[#b08340] focus:ring-2 focus:ring-[#b08340]/15"
         >
           <option value="" disabled>{f.subjectPlaceholder}</option>
           {f.subjectOptions.map((opt) => (
-            <option key={opt}>{opt}</option>
+            <option key={opt} value={opt}>{opt}</option>
           ))}
         </select>
       </div>
@@ -82,6 +98,7 @@ export default function ContactForm() {
         </label>
         <textarea
           required
+          name="message"
           rows={5}
           placeholder={f.messagePlaceholder}
           className="w-full resize-none rounded-xl border border-[#e1d5c3] bg-[#fbf8f1] px-4 py-3 text-sm text-[#173d31] placeholder-[#c0b49e] outline-none transition focus:border-[#b08340] focus:ring-2 focus:ring-[#b08340]/15"

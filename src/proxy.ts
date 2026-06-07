@@ -4,6 +4,12 @@ import { updateSession } from '@/lib/supabase/middleware'
 export async function proxy(request: NextRequest) {
   const response = await updateSession(request)
 
+  // Admin routes: must have admin session (checked at layout level via requireAdmin())
+  // Proxy ensures no unauthenticated caching for /admin/* paths
+  if (request.nextUrl.pathname.startsWith('/admin')) {
+    response.headers.set('Cache-Control', 'no-store, no-cache')
+  }
+
   if (!request.cookies.get('tm_lang')) {
     const acceptLang = request.headers.get('accept-language') ?? ''
     const primary = acceptLang.split(',')[0].slice(0, 2).toLowerCase()

@@ -1,133 +1,123 @@
-import { createClient } from '@/lib/supabase/server'
+import { requireAdmin } from '@/lib/admin/auth'
+import { createServiceClient } from '@/lib/supabase/server'
 import Link from 'next/link'
-import { redirect } from 'next/navigation'
+import { AlertTriangle, Clock, HeartPulse, Mail, ShieldCheck, Wallet } from 'lucide-react'
 
-export default async function AdminPage() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
+export default async function AdminDashboard() {
+  await requireAdmin()
+  const supabase = await createServiceClient()
 
-  const [{ count: vaultCount }, { count: pendingHeirs }, { count: pendingMessages }] = await Promise.all([
-    supabase.from('vaults').select('*', { count: 'exact', head: true }),
-    supabase.from('heirs').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
-    supabase.from('guestbook').select('*', { count: 'exact', head: true }).eq('is_approved', false),
+  const today = new Date().toISOString().split('T')[0]
+  const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString()
+
+  const [
+    { data: vaultStats },
+    { count: openObjections },
+    { count: pendingContacts },
+    { count: overduePayments },
+    { count: openAlerts },
+    { data: recentAudit },
+    { data: monthRevenue },
+  ] = await Promise.all([
+    supabase.from('vaults').select('status'),
+    supabase.from('claim_objections').select('*', { count: 'exact', head: true }).in('status', ['pending', 'open']),
+    supabase.from('contact_messages').select('*', { count: 'exact', head: true }).eq('status', 'new'),
+    supabase.from('payments').select('*', { count: 'exact', head: true }).eq('status', 'overdue').lte('due_date', today),
+    supabase.from('alive_alerts').select('*', { count: 'exact', head: true }).in('status', ['open', 'investigating']),
+    supabase.from('admin_audit_logs').select('action, entity_type, admin_email, created_at').order('created_at', { ascending: false }).limit(10),
+    supabase.from('payments').select('amount').eq('status', 'paid').gte('paid_at', monthStart),
   ])
 
-  const stats = [
-    { label: 'Toplam kasa', value: vaultCount ?? 0, tone: 'navy' },
-    { label: 'Bekleyen davet', value: pendingHeirs ?? 0, tone: 'teal' },
-    { label: 'Moderasyon', value: pendingMessages ?? 0, tone: 'gold' },
+  const byStatus = (status: string) => (vaultStats ?? []).filter((v) => v.status === status).length
+
+  const statCards = [
+    { label: 'Doğrulama Bekliyor', value: byStatus('pending_verification'), color: 'bg-yellow-50 border-yellow-200 text-yellow-800', href: '/admin/verifications', icon: ShieldCheck },
+    { label: 'Açık İtirazlar', value: openObjections ?? 0, color: 'bg-red-50 border-red-200 text-red-800', href: '/admin/objections', icon: AlertTriangle },
+    { label: 'Yeni Mesajlar', value: pendingContacts ?? 0, color: 'bg-blue-50 border-blue-200 text-blue-800', href: '/admin/contacts', icon: Mail },
+    { label: 'Vadesi Geçmiş Ödeme', value: overduePayments ?? 0, color: 'bg-orange-50 border-orange-200 text-orange-800', href: '/admin/kasa', icon: Wallet },
+    { label: 'Ben Yaşıyorum Bildirimi', value: openAlerts ?? 0, color: 'bg-purple-50 border-purple-200 text-purple-800', href: '/admin/alive-alerts', icon: HeartPulse },
+    { label: 'Bu Ay Tahsilat (GEL)', value: (monthRevenue ?? []).reduce((s, p) => s + Number(p.amount), 0).toFixed(2), color: 'bg-emerald-50 border-emerald-200 text-emerald-800', href: '/admin/kasa', icon: Clock },
   ]
 
-  const queues = [
-    {
-      title: 'Vefat talebi inceleme',
-      desc: 'Belge, itiraz penceresi ve executor onaylari tek akista incelenir.',
-      status: 'Taslak',
-    },
-    {
-      title: 'Ziyaretci defteri moderasyonu',
-      desc: 'Spam, hakaret ve hassas veri iceren mesajlar yayinlanmadan tutulur.',
-      status: 'Hazirlanacak',
-    },
-    {
-      title: 'Partner QR yonetimi',
-      desc: 'Mermer atolyesi QR uretimi, eslestirme ve okuma sagligi takip edilir.',
-      status: 'Planlandi',
-    },
+  const vaultSummary = [
+    { label: 'hidden_vault', count: byStatus('hidden_vault'), color: 'bg-slate-100 text-slate-600' },
+    { label: 'pending_verification', count: byStatus('pending_verification'), color: 'bg-yellow-100 text-yellow-700' },
+    { label: 'private_memorial', count: byStatus('private_memorial'), color: 'bg-blue-100 text-blue-700' },
+    { label: 'public_memorial', count: byStatus('public_memorial'), color: 'bg-emerald-100 text-emerald-700' },
+    { label: 'suspended', count: byStatus('suspended'), color: 'bg-red-100 text-red-700' },
   ]
 
   return (
-    <main className="theme-admin min-h-screen bg-[#f5f7fb] text-slate-950">
-      <div className="border-b border-slate-200 bg-white/90 backdrop-blur">
-        <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="font-bold text-xl gradient-text">themaradi</Link>
-          <div className="flex items-center gap-3">
-            <Link href="/dashboard" className="text-sm text-slate-500 hover:text-slate-900 transition-colors">
-              Dashboard
+    <div className="p-6 max-w-7xl mx-auto">
+      <div className="mb-8">
+        <h1 className="text-2xl font-bold text-slate-900">Dashboard</h1>
+        <p className="text-slate-500 text-sm mt-1">Operasyon merkezi — kritik kuyruklar ve son aktivite</p>
+      </div>
+
+      {/* Stat Cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+        {statCards.map((card) => (
+          <Link
+            key={card.label}
+            href={card.href}
+            className={`border rounded-xl p-4 flex flex-col gap-3 hover:shadow-md transition-shadow ${card.color}`}
+          >
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-medium uppercase tracking-wide opacity-70">{card.label}</span>
+              <card.icon className="h-4 w-4 opacity-60" />
+            </div>
+            <span className="text-3xl font-bold">{card.value}</span>
+          </Link>
+        ))}
+      </div>
+
+      <div className="grid lg:grid-cols-[1fr_320px] gap-6">
+        {/* Recent Audit Log */}
+        <div className="bg-white border border-slate-200 rounded-xl shadow-sm">
+          <div className="px-5 py-4 border-b border-slate-100 flex items-center justify-between">
+            <h2 className="font-semibold text-slate-800">Son Admin Aksiyonları</h2>
+            <Link href="/admin/audit" className="text-xs text-emerald-700 hover:underline">Tümünü gör</Link>
+          </div>
+          <div className="divide-y divide-slate-100">
+            {(recentAudit ?? []).length === 0 ? (
+              <p className="text-sm text-slate-400 p-5">Henüz kayıt yok.</p>
+            ) : (
+              (recentAudit ?? []).map((log, i) => (
+                <div key={i} className="px-5 py-3 flex items-center justify-between text-sm">
+                  <div>
+                    <span className="font-medium text-slate-700">{log.action}</span>
+                    <span className="text-slate-400 ml-2">on {log.entity_type}</span>
+                  </div>
+                  <div className="text-right shrink-0 ml-4">
+                    <p className="text-xs text-slate-500">{log.admin_email}</p>
+                    <p className="text-xs text-slate-400">{new Date(log.created_at).toLocaleString('tr-TR')}</p>
+                  </div>
+                </div>
+              ))
+            )}
+          </div>
+        </div>
+
+        {/* Vault Status Summary */}
+        <div className="bg-white border border-slate-200 rounded-xl shadow-sm h-fit">
+          <div className="px-5 py-4 border-b border-slate-100">
+            <h2 className="font-semibold text-slate-800">Vault Durumları</h2>
+          </div>
+          <div className="p-4 space-y-2">
+            {vaultSummary.map((s) => (
+              <div key={s.label} className="flex items-center justify-between">
+                <span className={`text-xs px-2 py-1 rounded-full font-medium ${s.color}`}>{s.label}</span>
+                <span className="text-sm font-bold text-slate-700">{s.count}</span>
+              </div>
+            ))}
+          </div>
+          <div className="px-5 pb-4">
+            <Link href="/admin/memorials" className="text-xs text-emerald-700 hover:underline">
+              Tüm vaultları yönet →
             </Link>
-            <form action="/auth/signout" method="post">
-              <button type="submit" className="text-sm border border-slate-200 bg-white hover:bg-slate-50 px-4 py-2 rounded-lg transition-colors">
-                Cikis
-              </button>
-            </form>
           </div>
         </div>
       </div>
-
-      <div className="max-w-6xl mx-auto px-6 py-10">
-        <div className="mb-8">
-          <p className="text-xs font-semibold uppercase tracking-widest text-teal-700 mb-2">Operasyon Konsolu</p>
-          <h1 className="text-3xl font-bold text-slate-950">Guven, moderasyon ve sureklilik merkezi</h1>
-          <p className="text-slate-600 mt-3 max-w-2xl">
-            Admin yuzeyi; hassas talepleri, QR sagligini, partner islemlerini ve yayin onaylarini sakin ve denetlenebilir bir akista toplar.
-          </p>
-        </div>
-
-        <div className="grid md:grid-cols-3 gap-4 mb-8">
-          {stats.map((stat) => (
-            <div key={stat.label} className="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
-              <div className="text-sm text-slate-500 mb-3">{stat.label}</div>
-              <div className="flex items-end justify-between">
-                <div className="text-3xl font-bold text-slate-950">{stat.value}</div>
-                <div className={`w-10 h-10 rounded-xl ${
-                  stat.tone === 'teal' ? 'bg-teal-50 text-teal-700' :
-                  stat.tone === 'gold' ? 'bg-amber-50 text-amber-700' :
-                  'bg-slate-100 text-slate-700'
-                } flex items-center justify-center`}>
-                  <span className="w-2 h-2 rounded-full bg-current" />
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        <div className="grid lg:grid-cols-[1.4fr_0.8fr] gap-6">
-          <section className="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
-            <div className="flex items-center justify-between mb-5">
-              <h2 className="text-lg font-semibold text-slate-950">Operasyon kuyruklari</h2>
-              <span className="text-xs text-slate-500">Rol bazli yetki sonraki faz</span>
-            </div>
-            <div className="space-y-3">
-              {queues.map((item) => (
-                <div key={item.title} className="border border-slate-200 rounded-xl p-4 hover:border-teal-200 hover:bg-teal-50/30 transition-colors">
-                  <div className="flex items-start justify-between gap-4">
-                    <div>
-                      <h3 className="text-sm font-semibold text-slate-950">{item.title}</h3>
-                      <p className="text-sm text-slate-600 mt-1 leading-relaxed">{item.desc}</p>
-                    </div>
-                    <span className="text-xs whitespace-nowrap border border-slate-200 bg-slate-50 rounded-full px-3 py-1 text-slate-600">
-                      {item.status}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-
-          <aside className="bg-[#123047] text-white rounded-2xl p-6 shadow-sm">
-            <p className="text-xs font-semibold uppercase tracking-widest text-teal-200 mb-3">Tasarim ilkesi</p>
-            <h2 className="text-xl font-bold mb-4">Hassas urun, sakin arayuz</h2>
-            <p className="text-sm text-slate-200 leading-relaxed mb-5">
-              Admin panelde parlak pazarlama dili yerine denetim, izlenebilirlik ve karar guveni one cikmali.
-            </p>
-            <div className="space-y-3 text-sm">
-              <div className="flex items-center justify-between border-t border-white/10 pt-3">
-                <span className="text-slate-300">Ana renk</span>
-                <span className="font-medium">Lacivert</span>
-              </div>
-              <div className="flex items-center justify-between border-t border-white/10 pt-3">
-                <span className="text-slate-300">Aksiyon</span>
-                <span className="font-medium">Teal</span>
-              </div>
-              <div className="flex items-center justify-between border-t border-white/10 pt-3">
-                <span className="text-slate-300">Vurgu</span>
-                <span className="font-medium">Mat altin</span>
-              </div>
-            </div>
-          </aside>
-        </div>
-      </div>
-    </main>
+    </div>
   )
 }
