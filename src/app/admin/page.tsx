@@ -10,8 +10,9 @@ export default async function AdminDashboard() {
   const today = new Date().toISOString().split('T')[0]
   const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString()
 
+  // All queries run in parallel — single round-trip to Supabase
   const [
-    { data: vaultStats },
+    { data: vaultCounts },
     { count: openObjections },
     { count: pendingContacts },
     { count: overduePayments },
@@ -19,7 +20,8 @@ export default async function AdminDashboard() {
     { data: recentAudit },
     { data: monthRevenue },
   ] = await Promise.all([
-    supabase.from('vaults').select('status'),
+    // Aggregate count by status — no full table scan in JS
+    supabase.rpc('vault_status_counts'),
     supabase.from('claim_objections').select('*', { count: 'exact', head: true }).in('status', ['pending', 'open']),
     supabase.from('contact_messages').select('*', { count: 'exact', head: true }).eq('status', 'new'),
     supabase.from('payments').select('*', { count: 'exact', head: true }).eq('status', 'overdue').lte('due_date', today),
@@ -28,7 +30,8 @@ export default async function AdminDashboard() {
     supabase.from('payments').select('amount').eq('status', 'paid').gte('paid_at', monthStart),
   ])
 
-  const byStatus = (status: string) => (vaultStats ?? []).filter((v) => v.status === status).length
+  const counts = (vaultCounts ?? []) as { status: string; count: number }[]
+  const byStatus = (status: string) => counts.find((r) => r.status === status)?.count ?? 0
 
   const statCards = [
     { label: 'Doğrulama Bekliyor', value: byStatus('pending_verification'), color: 'bg-yellow-50 border-yellow-200 text-yellow-800', href: '/admin/verifications', icon: ShieldCheck },
