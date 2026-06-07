@@ -8,6 +8,13 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 )
 
+const supabaseAdmin = process.env.SUPABASE_SERVICE_ROLE_KEY
+  ? createClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.SUPABASE_SERVICE_ROLE_KEY
+    )
+  : null
+
 interface Props { params: Promise<{ hash: string }> }
 
 export async function GET(request: NextRequest, { params }: Props) {
@@ -36,13 +43,21 @@ export async function GET(request: NextRequest, { params }: Props) {
   const city = request.headers.get('x-vercel-ip-city') ?? null
   const device = /Mobile|Android|iPhone|iPad/i.test(ua) ? 'mobile' : 'desktop'
 
-  void Promise.resolve(supabase.from('qr_analytics').insert({
-    qr_hash: hash,
-    user_agent: ua.slice(0, 500),
-    device_type: device,
-    country_code: country,
-    city,
-  })).catch(() => {})
+  if (supabaseAdmin) {
+    void Promise.all([
+      supabaseAdmin.from('qr_analytics').insert({
+        qr_hash: hash,
+        user_agent: ua.slice(0, 500),
+        device_type: device,
+        country_code: country,
+        city,
+      }),
+      supabaseAdmin
+        .from('dynamic_qr')
+        .update({ redirect_count: (qr.redirect_count ?? 0) + 1 })
+        .eq('qr_hash', hash),
+    ]).catch(() => {})
+  }
 
   if (!vault?.slug || vault.status !== 'public_memorial') {
     return NextResponse.redirect(new URL('/', request.url), { status: 302 })

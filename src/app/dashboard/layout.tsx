@@ -37,7 +37,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
   ]
 
   return (
-    <div className="min-h-screen bg-[#060e1e]">
+    <div className="theme-admin min-h-screen bg-[#f5f7fb]">
       <aside className="fixed left-0 top-0 h-full w-60 border-r border-white/[0.06] flex flex-col z-40" style={{ background: 'rgba(8, 16, 36, 0.95)' }}>
         {/* Logo */}
         <div className="px-5 h-14 flex items-center border-b border-white/[0.06]">

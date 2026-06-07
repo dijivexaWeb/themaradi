@@ -1,13 +1,12 @@
 'use client'
 import { createClient } from '@/lib/supabase/client'
-import { useParams, useRouter } from 'next/navigation'
-import { useEffect, useRef, useState } from 'react'
+import { useParams } from 'next/navigation'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
 
 export default function BiographyPage() {
   const { id } = useParams<{ id: string }>()
-  const router = useRouter()
-  const supabase = createClient()
+  const supabase = useMemo(() => createClient(), [])
 
   const [initial, setInitial] = useState('')
   const [content, setContent] = useState('')
@@ -26,7 +25,7 @@ export default function BiographyPage() {
           setContent(data.biography ?? '')
         }
       })
-  }, [id])
+  }, [id, supabase])
 
   const save = async (text: string) => {
     setSaving(true)

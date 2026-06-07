@@ -5,6 +5,133 @@
 
 ---
 
+## 2026-06-07 - Oturum 7: Ana Sayfa Premium Hero Gecisi
+
+### Yapilanlar
+- Ana sayfa hero bolumu gorsel arka planli ilk ekran yapisina cekildi.
+- Hero icinde CTA, guven maddeleri ve sag tarafta mini urun durumu paneli eklendi.
+- "Kasa baslat" ifadesi daha dogal olan "Ani profili olustur" cizgisine cekildi.
+- Nasil calisir kartlari daha belirgin numarali ikon bloklariyla yenilendi.
+- Ozellik kartlarina `lucide-react` ikonlari eklendi.
+- Fiyat kartlarina check ikonlari ve hafif hover davranisi eklendi.
+- Final CTA koyu kurumsal bant olarak yeniden tasarlandi.
+
+### Proje Durumu
+```
+[x] Ana sayfa hero premium gorsel gecis
+[x] Ozellik ve fiyat kartlari gorsel iyilestirme
+[x] npm run lint temiz
+[x] npm run build temiz
+[x] Localhost ana sayfa HTTP 200
+[x] Hero image optimized asset HTTP 200
+[ ] Mobil/desktop screenshot ile manuel gorsel kontrol
+[ ] Admin panel detaylari
+[ ] R2 media upload
+[ ] Resend heir davet e-postalari
+[ ] Stripe odeme
+```
+
+### Kritik Kararlar / Notlar
+- Landing hero artik split kart degil; gercek gorsel arka plan ustunde metin ve aksiyon tasiyor.
+- Kart radius degerleri 8px cizgisinde tutuldu.
+- Browser plugin kontrol araci hala gorunmedigi icin dogrulama lint/build ve localhost HTTP kontrolleriyle yapildi.
+
+### Nerede Kaldik
+Ana sayfa daha kurumsal ve daha premium bir ilk izlenime cekildi. Teknik dogrulama temiz.
+
+### Siradaki Adim
+1. Sayfayi desktop ve mobil viewportta gorsel kontrol et
+2. Nav/hero kontrastini canli goruntuye gore ince ayarla
+3. Admin panelini gercek operasyon paneli diline cek
+
+## 2026-06-07 - Oturum 6: Landing i18n Encoding Temizligi
+
+### Yapilanlar
+- Next.js 16 dokumanindan Server/Client Component ve Image kullanimi kontrol edildi.
+- Landing copy tek bir temiz veri yapisina indirildi ve TR/KA/RU/EN metinler UTF-8 olarak yeniden yazildi.
+- Nav sozlukleri temizlendi:
+  - Dil etiketleri duzeltildi
+  - CTA "ucretsiz" iddiasindan "Basla" cizgisine cekildi
+  - 100/200/400 Lari fiyatlandirma metniyle tutarlilik saglandi
+- Nav icindeki manuel SVG ok ve check ikonlari `lucide-react` ikonlariyla degistirildi.
+- Landing kart radius degerleri daha kurumsal ve kontrollu bir gorsel dile cekildi.
+- Localhost ana sayfa HTTP 200 ve hero image asset HTTP 200 olarak dogrulandi.
+- `src` altinda belirgin mojibake pattern taramasi yapildi.
+
+### Proje Durumu
+```
+[x] Landing/i18n encoding temizligi
+[x] Nav CTA ve dil etiketleri temiz
+[x] npm run lint temiz
+[x] npm run build temiz
+[x] Localhost ana sayfa HTTP 200
+[ ] i18n/Nav untracked dosyalar icin commit karari
+[ ] Gorsel browser screenshot kontrolu
+[ ] Admin panel detaylari
+[ ] R2 media upload
+[ ] Resend heir davet e-postalari
+[ ] Stripe odeme
+```
+
+### Kritik Kararlar / Notlar
+- Ucretsiz plan metni kaldirildi; fiyatlandirma yillik 100 Lari, Premium 200 Lari ve Lifetime 400 Lari olarak tutarli hale getirildi.
+- Browser plugin icin beklenen Node execution araci bu oturumda gorunmedigi icin gorsel kontrol DOM/HTML ve HTTP kontrolleriyle sinirli kaldi.
+- Port 3010 zaten doluydu; mevcut local server uzerinden kontrol yapildi.
+
+### Nerede Kaldik
+Landing metinleri ve nav artik temiz gorunuyor. Lint/build temiz. Localhost HTML yaniti Turkce karakterleri dogru donduruyor ve landing gorselleri erisilebilir.
+
+### Siradaki Adim
+1. In-app browser veya normal browser ile masaustu/mobil screenshot kontrolu yap
+2. Admin paneli gercek tablo/form/list component diline cek
+3. Untracked dosyalari commit kapsaminda netlestir
+4. R2 media upload entegrasyonuna basla
+
+## 2026-06-07 - Oturum 5: Kurumsal Tema ve Next 16 Temizligi
+
+### Yapilanlar
+- Next.js 16 dokumani `node_modules/next/dist/docs/` altindan kontrol edildi.
+- Deprecated `src/middleware.ts`, `src/proxy.ts` dosyasina tasindi ve export adi `proxy` yapildi.
+- Lint hatalari temizlendi; `npm run lint` temiz hale getirildi.
+- `npm run build` temiz hale getirildi.
+- QR route service role varsa analytics ve `redirect_count` yazacak sekilde guclendirildi.
+- Public landing, login, dashboard/admin ve memorial yuzeyleri icin kurumsal tema katmani eklendi:
+  - Acik zemin
+  - Lacivert ana metin
+  - Teal ana aksiyon rengi
+  - Kontrollu altin vurgu
+  - Beyaz/neutral admin panel hissi
+
+### Proje Durumu
+```
+[x] Next 16 proxy uyumlulugu
+[x] npm run lint temiz
+[x] npm run build temiz
+[x] QR analytics service role fallback
+[x] Kurumsal renk temasi ilk gecis
+[ ] UI metin/encoding temizligi
+[ ] i18n/Nav untracked dosyalar icin karar
+[ ] R2 media upload
+[ ] Resend heir davet e-postalari
+[ ] Stripe odeme
+[ ] Admin panel detaylari
+```
+
+### Kritik Kararlar / Notlar
+- Guven verici kurumsal dil icin koyu slate/amber agirligi azaltildi; lacivert + teal + sinirli altin paleti secildi.
+- Mevcut component yapisini yikmadan route wrapper class'lari ve global tema override'lariyla hizli ilk gecis yapildi.
+- Tarayici otomasyon araci bu oturumda Node REPL baglantisini expose etmedigi icin gorsel kontrol build/lint ile sinirli kaldi; local server `http://localhost:3010` zaten acik.
+
+### Nerede Kaldik
+Temel teknik kalite ve ilk kurumsal renk gecisi tamamlandi. Tasarim artik daha acik, daha kurumsal ve admin tarafinda daha dashboard odakli bir zemine cekildi.
+
+### Siradaki Adim
+1. Localhost uzerinde sayfalari gozle kontrol et ve renk kontrastlarini ince ayarla
+2. Admin icin gercek tablo/form/list component dili tasarla
+3. Landing metinlerini daha ciddi ve guven odakli copy ile yenile
+4. Memorial sayfasini daha sakin, saygili ve premium bir gorsel dile cek
+5. Encoding ve i18n kararini netlestir
+
 ## 2026-06-06 — Oturum 4: Build Hatalarının Çözümü
 
 ### Yapılanlar

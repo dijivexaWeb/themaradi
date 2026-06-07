@@ -17,7 +17,7 @@ export default async function SettingsPage({ params }: Props) {
   const { data: linkedQRs } = await supabase.from('dynamic_qr').select('qr_hash, activated_at, redirect_count').eq('target_vault_id', id)
 
   async function update(formData: FormData) { 'use server'; await updateVaultAction(id, formData) }
-  async function del(formData: FormData) { 'use server'; await deleteVaultAction(id) }
+  async function del() { 'use server'; await deleteVaultAction(id) }
   async function linkQR(formData: FormData) { 'use server'; await linkQRToVaultAction(id, formData.get('qr_hash') as string) }
 
   return (

@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import Image from 'next/image'
+import Link from 'next/link'
 
 interface Props { params: Promise<{ slug: string }> }
 
@@ -50,7 +51,7 @@ export default async function MemorialPage({ params }: Props) {
   const deathYear = vault.death_date ? new Date(vault.death_date).getFullYear() : null
 
   return (
-    <div className="min-h-screen bg-[#020817] text-slate-100">
+    <div className="theme-memorial min-h-screen bg-[#f7f5f0] text-slate-950">
       <div className="relative h-72 sm:h-96 bg-slate-900">
         {vault.cover_photo_url ? (
           <Image src={vault.cover_photo_url} alt={vault.display_name} fill className="object-cover opacity-40" />
@@ -116,7 +117,7 @@ export default async function MemorialPage({ params }: Props) {
       </div>
 
       <footer className="text-center py-8 text-xs text-slate-700 border-t border-slate-800/60">
-        <a href="/" className="hover:text-slate-500 transition-colors">themaradi.com</a> ile olusturuldu
+        <Link href="/" className="hover:text-slate-500 transition-colors">themaradi.com</Link> ile olusturuldu
       </footer>
     </div>
   )
