@@ -85,7 +85,7 @@ const faqs = [
   },
   {
     q: 'QR plakanın ömrü ne kadar?',
-    a: 'The Maradi QR kodu slug veya alan adına değil, veritabanındaki benzersiz bir kimliğe bağlıdır. Alan adı değişse bile plaka çalışır. Ayrıca platform minimum 10 yıl aktif tutma taahhüdü kapsamındadır; herhangi bir değişiklikte 12 ay önceden bildirim yapılır.',
+    a: 'The Maradi QR kodu slug veya alan adına değil, veritabanındaki benzersiz bir kimliğe bağlıdır. Alan adı değişse bile plaka çalışır. The Maradi ömür boyu açık kalma taahhüdü kapsamındadır; QR plakalar hiçbir zaman geçersiz hale gelmez.',
   },
   {
     q: 'Neden kimlik belgesi istiyorsunuz?',
@@ -93,7 +93,7 @@ const faqs = [
   },
   {
     q: 'Platform kapanırsa ne olur?',
-    a: 'Minimum 10 yıl aktif hizmet taahhüdümüz var. Platform kapatılacaksa en az 12 ay önceden e-posta bildirimi yapılır ve içeriklerinizi indirmek için 90 gün süre tanınır. QR plakalar yeni konuma yönlendirilir, geçersiz hale gelmez.',
+    a: 'The Maradi ömür boyu açık kalma taahhüdü vermektedir. Oluşturulan Anma Profilleri kalıcıdır; ek ücret, abonelik veya yenileme gerekmez. QR plakalar hiçbir zaman geçersiz hale gelmez — alan adı veya URL değişse bile yönlendirme çalışır.',
   },
   {
     q: 'Aile üyeleri içerik ekleyebilir mi?',
@@ -325,8 +325,8 @@ export default function LocalizedLanding() {
             },
             {
               icon: Clock,
-              title: 'Minimum 10 yıl aktif taahhüdü',
-              text: 'Platform kapatılacaksa en az 12 ay önceden bildirim yapılır. QR plakalar geçersiz hale gelmez. Ömür boyu Anma Profilleri için ek ücret alınmaz.',
+              title: 'Ömür boyu açık kalma taahhüdü',
+              text: 'The Maradi kalıcı çalışmayı taahhüt eder. Anma Profilleri ömür boyu erişilebilir kalır; ek ücret veya yenileme gerekmez. QR plakalar hiçbir zaman geçersiz olmaz.',
             },
           ].map((item) => (
             <div key={item.title} className="rounded-lg border border-[#e1d5c3] bg-[#fffdf8] p-6 shadow-sm">
@@ -424,7 +424,7 @@ export default function LocalizedLanding() {
               şifreleme, erişim izolasyonu ve kalıcı yönlendirme altyapısıyla korunur.
             </p>
             <div className="mt-6 rounded-xl border border-[#d4e8dc] bg-[#edf7f1] p-4 text-sm text-[#2d5c3e]">
-              <strong>Minimum 10 yıl aktif taahhüdü.</strong> Platform kapatılacaksa en az 12 ay önceden e-posta bildirimi yapılır, içeriklerinizi indirmek için 90 gün süre tanınır.
+              <strong>Ömür boyu açık kalma taahhüdü.</strong> Oluşturulan Anma Profilleri kalıcıdır; ek ücret veya yenileme gerekmez. QR plakalar hiçbir zaman geçersiz hale gelmez.
             </div>
             <Link href="/privacy" className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-[#9a7132]">
               Gizlilik politikasını oku <ArrowRight className="h-4 w-4" />
@@ -585,7 +585,7 @@ export default function LocalizedLanding() {
           <div>
             <div className="font-serif text-2xl">The Maradi</div>
             <p className="mt-4 max-w-xs text-sm leading-6 text-[#cfc3ad]">Hatıralar taşta değil, sevgiyle emanet edilir.</p>
-            <p className="mt-4 text-xs text-[#8a7a64]">Minimum 10 yıl aktif hizmet taahhüdü.</p>
+            <p className="mt-4 text-xs text-[#8a7a64]">Ömür boyu açık kalma taahhüdü.</p>
           </div>
           <FooterColumn title="Platform" links={[
             { href: '/', label: 'Ana sayfa' },

@@ -180,33 +180,37 @@ export default function TermsPage() {
       </section>
 
       <section id="sureklilk">
-        <h2>11. Hizmet Sürekliliği Taahhüdü</h2>
+        <h2>11. Hizmet Sürekliliği — Ömür Boyu Taahhüdü</h2>
         <p>
-          Bir anıt profili ya da dijital miras kasası oluştururken en büyük endişelerden biri platformun
-          gelecekte kapatılıp kapatılmayacağıdır. Bu konuda aşağıdaki taahhütleri veriyoruz:
+          Dijital anıt hizmetlerinde en kritik güven unsuru platformun kalıcılığıdır. The Maradi,
+          bu konuda açık ve bağlayıcı bir taahhüt vermektedir:
         </p>
         <ul>
           <li>
-            <strong>Minimum 10 yıl aktif hizmet taahhüdü:</strong> The Maradi olarak 2036 yılına kadar platformu
-            aktif tutmayı taahhüt ediyoruz. Herhangi bir nedenle hizmet sonlandırılacaksa en az{' '}
-            <strong>12 ay önceden</strong> tüm kullanıcılara e-posta ile bildirim yapılır.
+            <strong>Ömür boyu açık kalma taahhüdü:</strong> The Maradi, süresiz olarak aktif kalmayı
+            taahhüt eder. Platform hiçbir zaman &quot;kapatma tarihi&quot; olan bir hizmet olarak
+            tasarlanmamıştır; dijital anıtlar nesiller boyunca erişilebilir kalacak şekilde kurgulanmıştır.
           </li>
           <li>
-            <strong>Veri taşınabilirliği:</strong> Hizmet sonlandığında içeriklerinizi (fotoğraf, video, metin)
-            standart formatlarda (ZIP) indirmeniz için en az 90 gün süre tanınır.
+            <strong>Ömür boyu Anma Profili:</strong> Tek seferlik ücretle oluşturulan Anma Profilleri
+            için hiçbir zaman ek ücret, yenileme veya abonelik talep edilmez. Fiyat artışları yalnızca
+            yeni başvuruları etkiler; mevcut profiller bu değişikliklerden etkilenmez.
           </li>
           <li>
-            <strong>QR yönlendirme:</strong> Alan adı değişikliği ya da hizmet sonlandığında QR kod taramaları
-            verilerin bulunduğu yeni konuma ya da arşiv sayfasına yönlendirilir; eski QR plakalar
-            geçersiz hale getirilmez.
+            <strong>Kalıcı QR yönlendirme:</strong> QR plakalar alan adı veya URL değişikliğinden bağımsız
+            çalışır. QR kodlar fiziksel olarak mezar taşına kazınır ya da yerleştirilir; bu nedenle
+            hiçbir koşulda geçersiz hale getirilmezler.
           </li>
           <li>
-            <strong>Ömür boyu Anma Profili:</strong> Tek seferlik ücretle oluşturulan Anma Profilleri için
-            ek ücret talep edilmez. Fiyat artışları yalnızca yeni başvuruları etkiler.
+            <strong>Olağanüstü hal (force majeure):</strong> Beklenmedik bir durum nedeniyle hizmetin
+            sürdürülmesinin fiilen imkânsız hale gelmesi durumunda kullanıcılara en az{' '}
+            <strong>6 ay önceden</strong> bildirim yapılır ve içerikler standart formatlarda (ZIP)
+            indirilebilir hale getirilir. Bu istisna yalnızca doğal afet, savaş hali veya yasal
+            zorunluluk gibi kontrolümüz dışındaki durumlar için geçerlidir; ticari bir karar değildir.
           </li>
         </ul>
         <p>
-          Bu taahhütler hukuki olarak bağlayıcı bir sözleşme yükümlülüğüdür ve bu Koşullar&apos;ın ayrılmaz bir
+          Bu taahhütler hukuki olarak bağlayıcı sözleşme yükümlülükleridir ve bu Koşullar&apos;ın ayrılmaz
           parçasını oluşturur.
         </p>
       </section>
