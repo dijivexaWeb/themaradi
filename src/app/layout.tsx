@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import { LangProvider } from "@/i18n/context";
+import CookieBanner from "@/components/CookieBanner";
 import "./globals.css";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
@@ -31,6 +32,7 @@ export default function RootLayout({
     >
       <body className="min-h-full flex flex-col bg-zinc-950 text-zinc-100">
         <LangProvider>{children}</LangProvider>
+        <CookieBanner />
       </body>
     </html>
   );
