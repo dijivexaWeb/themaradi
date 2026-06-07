@@ -43,11 +43,11 @@ export default async function AdminDashboard() {
   ]
 
   const vaultSummary = [
-    { label: 'hidden_vault', count: byStatus('hidden_vault'), color: 'bg-slate-100 text-slate-600' },
-    { label: 'pending_verification', count: byStatus('pending_verification'), color: 'bg-yellow-100 text-yellow-700' },
-    { label: 'private_memorial', count: byStatus('private_memorial'), color: 'bg-blue-100 text-blue-700' },
-    { label: 'public_memorial', count: byStatus('public_memorial'), color: 'bg-emerald-100 text-emerald-700' },
-    { label: 'suspended', count: byStatus('suspended'), color: 'bg-red-100 text-red-700' },
+    { label: 'Gizli Kasa', count: byStatus('hidden_vault'), color: 'bg-slate-100 text-slate-600' },
+    { label: 'Doğrulama Bekliyor', count: byStatus('pending_verification'), color: 'bg-yellow-100 text-yellow-700' },
+    { label: 'Özel Anma', count: byStatus('private_memorial'), color: 'bg-blue-100 text-blue-700' },
+    { label: 'Yayında', count: byStatus('public_memorial'), color: 'bg-emerald-100 text-emerald-700' },
+    { label: 'Askıya Alındı', count: byStatus('suspended'), color: 'bg-red-100 text-red-700' },
   ]
 
   return (
