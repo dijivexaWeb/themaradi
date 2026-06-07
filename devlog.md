@@ -5,6 +5,211 @@
 
 ---
 
+## 2026-06-07 - Oturum 11: Hukuki Belgeler + Landing Page Güncelleme
+
+### Yapilanlar
+**Hukuki Belgeler:**
+- `LegalPage.tsx` component yeniden tasarlandı (TOC sidebar, nav, footer, prose içerik)
+- `/privacy` — Gizlilik Politikası (GDPR + Gürcistan KVK + KVKK uyumlu, 13 bölüm, tablolar)
+- `/terms` — Kullanım Koşulları (13 bölüm, Bölüm 11 hizmet sürekliliği taahhüdü: min 10 yıl)
+- `/legal/verification-policy` — Doğrulama & İtiraz Politikası (5 adımlı süreç, itiraz tablosu, acil bildirim)
+- Footer ve nav linkleri doğrulama politikasını içerecek şekilde güncellendi
+
+**Landing Page (LocalizedLanding.tsx) güncellemeleri:**
+- Fiyatlandırma bölümü: 3 paket → 2 ürün (Anma Profili 249₾ + Yaşam Kasası 49₾+12.90₾/ay)
+- SSS: salt metin → tam genişleyebilir accordion (useState, ChevronDown animasyon), 8 soru-cevap
+- Güvenlik bölümü: 4 kart → 6 kart, her birinde spesifik teknik detay (TLS 1.3, AES-256, RLS, bcrypt, QR kalıcılık, doğrulama)
+- "Nasıl çalışır?" bölümü: 4 adım → 2 senaryo kartı (A: Aile sonradan oluşturur / B: Kişi hayattayken kurar)
+- "Neden The Maradi?" bölümü: 5 → 6 kart, son kart "Minimum 10 yıl aktif taahhüdü" eklendi
+- Footer: İstanbul → Batumi, Gürcistan; /kvkk → /legal/verification-policy
+
+### Proje Durumu
+```
+[x] DB migrations 001-004
+[x] Memorial profil sayfası
+[x] /pricing (2 ürün modeli)
+[x] /contact sayfası
+[x] QR kalıcı yönlendirme (/q/[code])
+[x] /privacy — Gizlilik Politikası
+[x] /terms — Kullanım Koşulları
+[x] /legal/verification-policy — Doğrulama Politikası
+[x] Landing page güncellemeleri (accordion FAQ, 2 ürün pricing, güvenlik detayları)
+[ ] ContactForm API route (Resend)
+[ ] Admin panel (belge inceleme)
+[ ] R2 media upload
+[ ] Ödeme entegrasyonu (TBC Pay / BOG Pay)
+```
+
+### Kritik Kararlar / Notlar
+- Terms Bölüm 11 hukuki olarak bağlayıcı taahhüt: min 10 yıl aktif, kapatma öncesi 12 ay bildirim
+- Doğrulama politikası acil "ben yaşıyorum" bildirimi → 4 iş saati yanıt, profil derhal askıya
+- Landing FAQ accordion: openFaq state, null = hepsi kapalı
+- LegalPage component artık children prop alıyor (esnek JSX), sections array kaldırıldı
+
+### Nerede Kaldik
+Tüm hukuki belgeler ve landing page güncellemeleri tamamlandı. Commit atıldı.
+
+### Siradaki Adim
+1. ContactForm API route (Resend ile e-posta gönderimi)
+2. Admin panel temel yapısı (pending_verification kuyruğu)
+3. Belge yükleme UI (create-memorial akışı)
+4. Ödeme entegrasyonu (TBC Pay / BOG Pay)
+
+---
+
+## 2026-06-07 - Oturum 10: QR Kalıcı Yönlendirme + Contact Sayfası
+
+### Yapilanlar
+**QR Routing Sistemi:**
+- DB Migration 004 uygulandı:
+  - `vaults.qr_code VARCHAR(20) UNIQUE` alanı eklendi
+  - `generate_qr_code()` fonksiyonu: `TM-XXXXXXXX` formatı, çakışma kontrolü
+  - `assign_qr_code()` trigger: yeni vault'lara otomatik kod atar
+  - `qr_scan_logs` tablosu: her QR taramasını loglar (vault_id, user_agent, country)
+  - Mevcut vault'lara otomatik kod atandı
+- `/app/q/[code]/route.ts` oluşturuldu:
+  - `qr_code` → DB lookup → 301/302 redirect
+  - `public_memorial` / `private_memorial` → `/memorial/[slug]` (301 kalıcı)
+  - `pending_verification` / `hidden_vault` → `/q/pending` (302 geçici)
+  - Bulunamayan kod → `/q/not-found`
+  - `origin` kullanılır (request.url), hem local hem prod çalışır
+  - Scan log fire-and-forget (yönlendirmeyi bloklamaz)
+- `/app/q/pending/page.tsx` — "Profil hazırlanıyor" sayfası
+- `/app/q/not-found/page.tsx` — "QR kodu tanınmadı" sayfası
+- `.env.local` → `NEXT_PUBLIC_SITE_URL` eklendi
+
+**Contact Sayfası:**
+- `/contact/page.tsx` tamamen yeniden yazıldı
+- `/contact/ContactForm.tsx` client component (konu seçimi, gönderim durumu)
+- İletişim: +995 555 511 884, Petre Bagrationi Str. 220 Batumi, info@themaradi.com
+- Google Maps embed, departman kartları (destek/iş birliği/gizlilik)
+
+### Proje Durumu
+```
+[x] DB migrations 001-004
+[x] Memorial profil sayfası
+[x] /pricing (2 ürün modeli)
+[x] /contact sayfası
+[x] QR kalıcı yönlendirme (/q/[code])
+[x] QR scan log tablosu
+[ ] ContactForm API route (Resend)
+[ ] Hukuki belgeler (Gizlilik, KVKK/GDPR, Kullanım Koşulları)
+[ ] Admin panel (belge inceleme)
+[ ] R2 media upload
+[ ] Ödeme entegrasyonu
+```
+
+### Kritik Kararlar / Notlar
+- QR koda basan URL hiçbir zaman slug içermez → slug değişse bile plaka çalışır
+- `generate_qr_code()` loop ile çakışmayı önler, teorik sonsuz unique kod havuzu
+- Scan log analitik için (ileride hangi mezarlık daha çok tarıyor görebilirsin)
+- `origin` kullanımı: local'de `localhost:3010/q/...`, prod'da `themaradi.com/q/...` otomatik
+
+### Nerede Kaldik
+QR sistemi ve contact sayfası tamamlandı. Sırada hukuki belgeler.
+
+### Siradaki Adim
+1. Gizlilik Politikası (/privacy) — GDPR + Gürcistan KVK + KVKK uyumlu
+2. Kullanım Koşulları (/terms)
+3. ContactForm API route (Resend entegrasyonu)
+4. Admin panel temel yapısı
+
+---
+
+## 2026-06-07 - Oturum 9: Contact Sayfası
+
+### Yapilanlar
+- `/contact/page.tsx` tamamen yeniden yazıldı — önceki iskelet silindi
+- `/contact/ContactForm.tsx` client component oluşturuldu (useState form, konu seçimi, gönderim durumu)
+- İletişim bilgileri:
+  - Telefon: +995 555 511 884 (Gürcistan)
+  - E-posta: info@themaradi.com / support@themaradi.com / privacy@themaradi.com
+  - Adres: Petre Bagrationi Str. 220, Batumi / Gürcistan
+  - Çalışma saatleri: Pzt–Cum 09:00–18:00, Cmt 10:00–14:00
+- Google Haritalar embed (Batumi ofis konumu)
+- 3 departman kartı (Destek / İş birliği / Gizlilik) e-posta linkleriyle
+- Nav ve footer pricing/memorial sayfalarıyla uyumlu
+
+### Proje Durumu
+```
+[x] DB migrations 001-003
+[x] Memorial profil sayfası (/memorial/demo)
+[x] /pricing sayfası (2 ürün modeli)
+[x] /contact sayfası (form + iletişim bilgileri)
+[ ] ContactForm → API route / Resend entegrasyonu
+[ ] Admin panel (belge inceleme kuyruğu)
+[ ] R2 media upload
+[ ] Ödeme entegrasyonu (TBC Pay / BOG Pay)
+[ ] Heir davet e-postaları
+[ ] /dashboard gerçek kullanıcı akışı
+```
+
+### Nerede Kaldik
+Contact sayfası tamamlandı. Form şu an UI seviyesinde (TODO: Resend API route).
+
+### Siradaki Adim
+1. ContactForm için `/api/contact` route yaz (Resend entegrasyonu)
+2. Dashboard — kullanıcı profil oluşturma akışı
+3. Belge yükleme UI (pending_verification için)
+4. Ödeme entegrasyonu
+
+---
+
+## 2026-06-07 - Oturum 8: Fraud Prevention + Pricing 2-Urun Modeli
+
+### Yapilanlar
+- DB Migration 003 uygulandı (proje: qcxsqirqlepjebkezgud):
+  - `vaults.status` CHECK kısıtına `pending_verification` ve `suspended` eklendi
+  - `vaults.product_type` alanı eklendi: `life_vault` | `memorial_profile`
+  - `death_claims` tablosuna `requester_id_document_url`, `deceased_id_document_url`, `objection_count`, `verification_notes` alanları eklendi
+  - `claim_objections` tablosu oluşturuldu (14 günlük itiraz penceresi için), RLS politikaları ile
+  - `subscriptions.tier` CHECK kısıtı güncellendi: `memorial_profile`, `life_vault_monthly`, `life_vault_yearly`
+  - `subscriptions.setup_fee_paid` ve `setup_fee_amount` alanları eklendi
+  - `increment_objection_count()` trigger fonksiyonu eklendi
+- `/pricing` sayfası 2 ürün modeline göre tamamen yeniden yazıldı:
+  - Anma Profili: 249 ₾ tek seferlik (QR plaka dahil, belge doğrulama zorunlu)
+  - Yaşam Kasası: 49 ₾ kurulum + 12.90 ₾/ay veya 99 ₾/yıl
+  - Doğrulama adımları bölümü (5 adım, itiraz penceresi dahil)
+  - Ürün karşılaştırma tablosu (hangi durumda hangisi uygun)
+  - Fraud prevention açıklaması güven inşa eder
+  - TBC Pay, BOG Pay, Visa/MC, banka havalesi ödeme yöntemleri
+  - 6 SSS (sahte profil koruması dahil)
+
+### Proje Durumu
+```
+[x] DB migration 001 — temel tablolar
+[x] DB migration 002 — profil + etkileşim
+[x] DB migration 003 — fraud prevention + pricing şema
+[x] Memorial profil sayfası (/memorial/demo)
+[x] Anasayfa Nav + CTA /pricing'e bağlandı
+[x] /pricing sayfası 2 ürün modeli
+[ ] Admin panel (belge inceleme arayüzü)
+[ ] R2 media upload
+[ ] Ödeme entegrasyonu (TBC Pay / BOG Pay)
+[ ] Heir davet e-postaları (Resend)
+[ ] Pending_verification → belge yükleme UI
+```
+
+### Kritik Kararlar / Notlar
+- Anma Profili tek seferlik (no subscription) — aile kolayca anlayabilsin, hafıza yükü yok
+- Yaşam Kasası aylık/yıllık abonelik — uzun vadeli ilişki, setup fee ile QR plaka maliyeti karşılanır
+- `pending_verification` durumu profili yayından önce tutar, admin onayına kadar görünmez
+- `claim_objections` tablosu 14 günlük pencereyi yönetir; objection_count trigger ile otomatik artar
+- Belge GDPR uyumlu: doğrulama sonrası sistemden silindi açıklaması pricing sayfasına eklendi
+
+### Nerede Kaldik
+`/pricing` sayfası yeni 2 ürün modeli ile tamamlandı. DB şeması fraud prevention için hazır.
+Sırada: admin paneli (belge inceleme), ödeme entegrasyonu, belge yükleme UI.
+
+### Siradaki Adim
+1. `/contact` sayfası veya form oluştur (pricing CTA'ları oraya bağlı)
+2. Belge yükleme UI (`/dashboard/create-memorial` akışı)
+3. Admin panel — pending_verification kuyruğu, belge onay/red
+4. TBC Pay / BOG Pay ödeme entegrasyonu
+5. R2 media upload (fotoğraf/video için)
+
+---
+
 ## 2026-06-07 - Oturum 7: Ana Sayfa Premium Hero Gecisi
 
 ### Yapilanlar
