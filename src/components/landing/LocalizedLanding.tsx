@@ -211,7 +211,7 @@ export default function LocalizedLanding({ pricing }: { pricing: PricingConfig }
             <div className="absolute inset-0 bg-[#06291f]/35" />
             <div className="relative z-10">
               <h2 className="font-serif text-2xl sm:text-3xl">{s.ctaBanner.heading}</h2>
-              <Link href="/contact" className="mt-5 inline-flex items-center justify-center gap-2 rounded-md bg-[#d1a85c] px-7 py-3 text-sm font-semibold text-[#103b2c] shadow-lg shadow-black/10 transition hover:bg-[#e0ba70]">
+              <Link href="/satin-al" className="mt-5 inline-flex items-center justify-center gap-2 rounded-md bg-[#d1a85c] px-7 py-3 text-sm font-semibold text-[#103b2c] shadow-lg shadow-black/10 transition hover:bg-[#e0ba70]">
                 {s.ctaBanner.button} <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
@@ -379,7 +379,7 @@ export default function LocalizedLanding({ pricing }: { pricing: PricingConfig }
                 </li>
               ))}
             </ul>
-            <Link href="/pricing" className="mt-7 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-[#c7a76f] px-5 py-3 text-sm font-semibold text-[#173d31] transition hover:bg-[#f4eee3]">
+            <Link href="/satin-al/anma" className="mt-7 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-[#c7a76f] px-5 py-3 text-sm font-semibold text-[#173d31] transition hover:bg-[#f4eee3]">
               {p.memorialCta} <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
@@ -415,7 +415,7 @@ export default function LocalizedLanding({ pricing }: { pricing: PricingConfig }
                 </li>
               ))}
             </ul>
-            <Link href="/pricing" className="mt-7 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#103b2c] px-5 py-3 text-sm font-semibold text-white shadow-lg transition hover:bg-[#0b2b20]">
+            <Link href="/satin-al/kasa" className="mt-7 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#103b2c] px-5 py-3 text-sm font-semibold text-white shadow-lg transition hover:bg-[#0b2b20]">
               {p.vaultCta} <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
@@ -482,7 +482,7 @@ export default function LocalizedLanding({ pricing }: { pricing: PricingConfig }
             <h2 className="font-serif text-3xl sm:text-4xl">{s.finalCta.heading}</h2>
             <p className="mt-3 text-lg text-[#e8decc]">{s.finalCta.sub}</p>
             <div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row">
-              <Link href="/pricing" className="inline-flex items-center justify-center gap-2 rounded-md bg-[#d1a85c] px-7 py-3 text-sm font-semibold text-[#103b2c] shadow-lg shadow-black/10 transition hover:bg-[#e0ba70]">
+              <Link href="/satin-al" className="inline-flex items-center justify-center gap-2 rounded-md bg-[#d1a85c] px-7 py-3 text-sm font-semibold text-[#103b2c] shadow-lg shadow-black/10 transition hover:bg-[#e0ba70]">
                 {s.finalCta.primaryBtn} <ArrowRight className="h-4 w-4" />
               </Link>
               <Link href="/contact" className="inline-flex items-center justify-center gap-2 rounded-md border border-[#d1a85c] bg-[#103b2c]/25 px-7 py-3 text-sm font-semibold text-white transition hover:bg-[#103b2c]/45">

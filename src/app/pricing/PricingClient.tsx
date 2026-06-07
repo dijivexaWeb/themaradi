@@ -138,7 +138,7 @@ export default function PricingClient({ pricing }: { pricing: PricingConfig }) {
               </div>
 
               <Link
-                href="/contact"
+                href="/satin-al/anma"
                 className="inline-flex w-full items-center justify-center gap-2 rounded-xl border border-[#c7a76f] px-5 py-3.5 text-sm font-semibold text-[#173d31] transition hover:bg-[#f4eee3]"
               >
                 {p.memorial.cta}
@@ -214,7 +214,7 @@ export default function PricingClient({ pricing }: { pricing: PricingConfig }) {
               </ul>
 
               <Link
-                href="/contact"
+                href="/satin-al/kasa"
                 className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#103b2c] px-5 py-3.5 text-sm font-semibold text-white shadow-lg shadow-[#103b2c]/20 transition hover:bg-[#0b2b20]"
               >
                 {p.vault.cta}
