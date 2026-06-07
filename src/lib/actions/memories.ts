@@ -68,6 +68,7 @@ export async function addMemoryAction(vaultId: string, formData: FormData): Prom
   const content = (formData.get('content') as string)?.trim()
   const memoryDate = (formData.get('memory_date') as string) || null
   const isSecret = formData.get('is_secret') === 'true'
+  const section = (formData.get('section') as string) || 'general'
 
   if (!content || !memoryDate) return
 
@@ -79,12 +80,14 @@ export async function addMemoryAction(vaultId: string, formData: FormData): Prom
     content,
     memory_date: memoryDate,
     is_secret: isSecret,
+    section,
     media_url: mediaUrl,
     media_type: mediaType,
   })
 
   revalidatePath(`/dashboard/vault/${vaultId}/anilar`)
   revalidatePath(`/dashboard/vault/${vaultId}/gizli-kasa`)
+  revalidatePath(`/dashboard/vault/${vaultId}/vasiyet`)
   revalidatePath(`/dashboard/vault/${vaultId}`)
 }
 
@@ -123,5 +126,6 @@ export async function deleteMemoryAction(memoryId: string, vaultId: string): Pro
 
   revalidatePath(`/dashboard/vault/${vaultId}/anilar`)
   revalidatePath(`/dashboard/vault/${vaultId}/gizli-kasa`)
+  revalidatePath(`/dashboard/vault/${vaultId}/vasiyet`)
   revalidatePath(`/dashboard/vault/${vaultId}`)
 }

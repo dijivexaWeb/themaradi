@@ -23,7 +23,7 @@ export default async function GizliKasaPage({ params }: Props) {
 
   const { data: secrets } = await supabase
     .from('vault_memories').select('*')
-    .eq('vault_id', id).eq('is_secret', true)
+    .eq('vault_id', id).eq('is_secret', true).eq('section', 'general')
     .order('created_at', { ascending: false })
 
   const { data: secretMedia } = await supabase
