@@ -22,9 +22,17 @@ import BrandLogo from '@/components/BrandLogo'
 
 const paymentIcons = [CreditCard, Sparkles, Sparkles, FileText] as const
 
-export default function PricingClient() {
+import type { PricingConfig } from '@/lib/pricing'
+
+export default function PricingClient({ pricing }: { pricing: PricingConfig }) {
   const { t } = useLang()
   const p = t.pricing
+
+  // Live prices from DB — override dict defaults
+  const memorialPrice = pricing.memorialPrice
+  const vaultSetup = pricing.vaultSetup
+  const vaultMonthly = pricing.vaultMonthly
+  const hasCampaign = pricing.campaignActive && (pricing.campaignMemorial || pricing.campaignVaultSetup)
 
   const comparisonRows = p.comparison.rows.map((label, i) => ({
     label,
@@ -91,8 +99,20 @@ export default function PricingClient() {
               </div>
 
               <div className="mb-6 rounded-xl border border-[#e1d5c3] bg-[#f7f2e9] p-5">
+                {hasCampaign && pricing.campaignLabel && (
+                  <div className="mb-3 inline-block rounded-full bg-[#b08340] px-3 py-1 text-xs font-semibold text-white">
+                    {pricing.campaignLabel}
+                  </div>
+                )}
                 <div className="flex items-end gap-2">
-                  <span className="font-serif text-6xl text-[#173d31]">{p.memorial.price}</span>
+                  {hasCampaign && pricing.campaignMemorial ? (
+                    <>
+                      <span className="font-serif text-4xl text-[#8a7a64] line-through">{memorialPrice}</span>
+                      <span className="font-serif text-6xl text-[#173d31]">{pricing.campaignMemorial}</span>
+                    </>
+                  ) : (
+                    <span className="font-serif text-6xl text-[#173d31]">{memorialPrice}</span>
+                  )}
                   <div className="mb-1.5">
                     <span className="text-2xl font-semibold text-[#b08340]">{p.memorial.currency}</span>
                     <p className="text-sm text-[#8a7a64]">{p.memorial.priceLabel}</p>
@@ -147,7 +167,14 @@ export default function PricingClient() {
                   <div>
                     <p className="text-xs text-[#8a7a64]">{p.vault.setupLabel}</p>
                     <div className="flex items-end gap-1">
-                      <span className="font-serif text-4xl text-[#173d31]">{p.vault.setup}</span>
+                      {hasCampaign && pricing.campaignVaultSetup ? (
+                        <>
+                          <span className="font-serif text-2xl text-[#8a7a64] line-through">{vaultSetup}</span>
+                          <span className="font-serif text-4xl text-[#173d31]">{pricing.campaignVaultSetup}</span>
+                        </>
+                      ) : (
+                        <span className="font-serif text-4xl text-[#173d31]">{vaultSetup}</span>
+                      )}
                       <span className="mb-1 text-xl font-semibold text-[#b08340]">{p.vault.setupCurrency}</span>
                     </div>
                     <p className="text-xs text-[#8a7a64]">{p.vault.setupNote}</p>
@@ -156,7 +183,14 @@ export default function PricingClient() {
                   <div>
                     <p className="text-xs text-[#8a7a64]">{p.vault.monthlyLabel}</p>
                     <div className="flex items-end gap-1">
-                      <span className="font-serif text-4xl text-[#173d31]">{p.vault.monthly}</span>
+                      {hasCampaign && pricing.campaignVaultMonthly ? (
+                        <>
+                          <span className="font-serif text-2xl text-[#8a7a64] line-through">{vaultMonthly}</span>
+                          <span className="font-serif text-4xl text-[#173d31]">{pricing.campaignVaultMonthly}</span>
+                        </>
+                      ) : (
+                        <span className="font-serif text-4xl text-[#173d31]">{vaultMonthly}</span>
+                      )}
                       <span className="mb-1 text-xl font-semibold text-[#b08340]">{p.vault.monthlyCurrency}</span>
                     </div>
                     <p className="text-xs text-[#8a7a64]">{p.vault.monthlyPeriod}</p>

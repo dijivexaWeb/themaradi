@@ -34,7 +34,9 @@ const whyIcons = [BookOpen, QrCode, Users, Heart, ShieldCheck, Clock] as const
 const scenarioAIcons = [BookOpen, ShieldCheck, Clock, QrCode] as const
 const scenarioBIcons = [Heart, Users, Camera, ShieldCheck] as const
 
-export default function LocalizedLanding() {
+import type { PricingConfig } from '@/lib/pricing'
+
+export default function LocalizedLanding({ pricing }: { pricing: PricingConfig }) {
   const { t } = useLang()
   const [openFaq, setOpenFaq] = useState<number | null>(null)
 
@@ -357,7 +359,14 @@ export default function LocalizedLanding() {
             <p className="text-xs font-semibold uppercase tracking-widest text-[#8a7a64]">{p.memorialBadge}</p>
             <h3 className="mt-1 font-serif text-2xl text-[#173d31]">{p.memorialTitle}</h3>
             <div className="my-5 flex items-end gap-2">
-              <span className="font-serif text-5xl text-[#173d31]">249</span>
+              {pricing.campaignActive && pricing.campaignMemorial ? (
+                <>
+                  <span className="font-serif text-3xl text-[#8a7a64] line-through">{pricing.memorialPrice}</span>
+                  <span className="font-serif text-5xl text-[#173d31]">{pricing.campaignMemorial}</span>
+                </>
+              ) : (
+                <span className="font-serif text-5xl text-[#173d31]">{pricing.memorialPrice}</span>
+              )}
               <div className="mb-1.5">
                 <span className="text-xl font-semibold text-[#b08340]">₾</span>
                 <p className="text-sm text-[#8a7a64]">{p.memorialPriceLabel}</p>
@@ -384,13 +393,20 @@ export default function LocalizedLanding() {
             <h3 className="mt-1 font-serif text-2xl text-[#173d31]">{p.vaultTitle}</h3>
             <div className="my-5">
               <div className="flex items-end gap-2">
-                <span className="font-serif text-5xl text-[#173d31]">12,90</span>
+                {pricing.campaignActive && pricing.campaignVaultMonthly ? (
+                  <>
+                    <span className="font-serif text-3xl text-[#8a7a64] line-through">{pricing.vaultMonthly}</span>
+                    <span className="font-serif text-5xl text-[#173d31]">{pricing.campaignVaultMonthly}</span>
+                  </>
+                ) : (
+                  <span className="font-serif text-5xl text-[#173d31]">{pricing.vaultMonthly}</span>
+                )}
                 <div className="mb-1.5">
                   <span className="text-xl font-semibold text-[#b08340]">{p.vaultPriceMonthly}</span>
                   <p className="text-sm text-[#8a7a64]">{p.vaultPriceAlt}</p>
                 </div>
               </div>
-              <p className="text-sm text-[#8a7a64]">{p.vaultSetup}</p>
+              <p className="text-sm text-[#8a7a64]">{p.vaultSetup.replace('49', pricing.vaultSetup)}</p>
             </div>
             <ul className="flex-1 space-y-2.5">
               {p.vaultFeatures.map((f) => (

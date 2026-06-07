@@ -1,14 +1,17 @@
 import LandingNav from '@/components/landing/Nav'
 import LocalizedLanding from '@/components/landing/LocalizedLanding'
+import { fetchPricingConfig } from '@/lib/pricing'
 
-export const dynamic = 'force-static'
-export const revalidate = 86400
+// Revalidates via revalidatePath() when admin changes prices
+export const revalidate = 3600
 
-export default function LandingPage() {
+export default async function LandingPage() {
+  const pricing = await fetchPricingConfig()
+
   return (
     <div className="theme-corporate min-h-screen overflow-x-hidden bg-[#fbf8f1] text-[#173d31]">
       <LandingNav />
-      <LocalizedLanding />
+      <LocalizedLanding pricing={pricing} />
     </div>
   )
 }
