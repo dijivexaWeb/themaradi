@@ -3,13 +3,8 @@ import BrandLogo from '@/components/BrandLogo'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import {
-  CreditCard,
-  Eye,
-  Headphones,
-  Home,
-  LogOut,
-  QrCode,
-  ShieldCheck,
+  CreditCard, Eye, FileText, Headphones, Home,
+  LockKeyhole, LogOut, QrCode, Scroll, Shield, ShieldCheck,
 } from 'lucide-react'
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
@@ -18,28 +13,25 @@ export default async function DashboardLayout({ children }: { children: React.Re
   if (!user) redirect('/login')
 
   const [{ data: profile }, { data: firstArea }] = await Promise.all([
-    supabase
-      .from('profiles')
-      .select('full_name, avatar_url, role')
-      .eq('id', user.id)
-      .single(),
-    supabase
-      .from('vaults')
-      .select('id')
-      .eq('owner_id', user.id)
-      .order('created_at', { ascending: true })
-      .limit(1)
-      .maybeSingle(),
+    supabase.from('profiles').select('full_name, avatar_url, role').eq('id', user.id).single(),
+    supabase.from('vaults').select('id').eq('owner_id', user.id).order('created_at', { ascending: true }).limit(1).maybeSingle(),
   ])
 
   const initial = (profile?.full_name?.[0] ?? user.email?.[0] ?? '?').toUpperCase()
   const areaHref = firstArea ? `/dashboard/vault/${firstArea.id}` : '/dashboard'
+  const v = (path: string) => firstArea ? `/dashboard/vault/${firstArea.id}/${path}` : '/dashboard'
 
-  const navItems = [
-    { href: areaHref, label: 'Anı Alanım', icon: Home },
-    { href: '/dashboard/billing', label: 'Abonelik', icon: CreditCard },
-    { href: firstArea ? `/dashboard/vault/${firstArea.id}/onizleme` : '/dashboard', label: 'Profil Önizleme', icon: Eye },
-    { href: firstArea ? `/dashboard/vault/${firstArea.id}/settings` : '/dashboard', label: 'Yayın ve QR Ayarları', icon: QrCode },
+  const mainNav = [
+    { href: areaHref,          label: 'Anı Alanım', icon: Home },
+    { href: '/dashboard/billing', label: 'Abonelik',   icon: CreditCard },
+  ]
+
+  const privateNav = [
+    { href: v('vasiyet'),    label: 'Vasiyetname',     icon: Scroll },
+    { href: v('gizli-kasa'), label: 'Özel İçerikler',  icon: LockKeyhole },
+    { href: v('heirs'),      label: 'Varis Bilgileri',  icon: Shield },
+    { href: v('belgeler'),   label: 'Belgeler',         icon: FileText },
+    { href: v('settings'),   label: 'Yayın & QR',       icon: QrCode },
   ]
 
   return (
@@ -49,34 +41,62 @@ export default async function DashboardLayout({ children }: { children: React.Re
           <BrandLogo href="/" className="text-[#173d31]" />
         </div>
 
-        <nav className="mt-9 flex-1 space-y-2">
-          {navItems.map(({ href, label, icon: Icon }, index) => (
-            <Link
-              key={label}
-              href={href}
-              className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all ${
-                index === 0
-                  ? 'bg-[#174f35] text-white shadow-[0_14px_35px_rgba(23,79,53,0.22)]'
-                  : 'text-[#23382f] hover:bg-[#f5efdf]'
-              }`}
-            >
-              <Icon className={`h-4 w-4 ${index === 0 ? 'text-[#dfbd72]' : 'text-[#7b837d]'}`} />
+        {/* Ana navigasyon */}
+        <nav className="mt-9 space-y-1.5">
+          {mainNav.map(({ href, label, icon: Icon }) => (
+            <Link key={label} href={href}
+              className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium text-[#23382f] transition-all hover:bg-[#f5efdf]">
+              <Icon className="h-4 w-4 text-[#7b837d]" />
               {label}
             </Link>
           ))}
         </nav>
 
-        {profile?.role === 'admin' && (
-          <Link
-            href="/admin"
-            className="mb-4 flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-xs font-semibold text-emerald-800"
-          >
-            <ShieldCheck className="h-4 w-4" />
-            Admin Paneli
-          </Link>
+        {/* Özel alan */}
+        {firstArea && (
+          <div className="mt-6">
+            <p className="mb-2 px-4 text-[10px] font-bold uppercase tracking-widest text-[#adb5ab]">Özel Alan</p>
+            <nav className="space-y-1">
+              {privateNav.map(({ href, label, icon: Icon }) => (
+                <Link key={label} href={href}
+                  className="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-medium text-[#23382f] transition-all hover:bg-[#f5efdf]">
+                  <Icon className="h-4 w-4 text-[#7b837d]" />
+                  {label}
+                </Link>
+              ))}
+            </nav>
+          </div>
         )}
 
-        <div className="rounded-2xl border border-[#e5dccb] bg-white/70 p-3">
+        <div className="mt-auto space-y-1">
+          {profile?.role === 'admin' && (
+            <Link href="/admin"
+              className="mb-3 flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-xs font-semibold text-emerald-800">
+              <ShieldCheck className="h-4 w-4" />
+              Admin Paneli
+            </Link>
+          )}
+
+          <Link href={v('onizleme')}
+            className="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm text-[#69766f] hover:bg-[#f5efdf] transition-colors">
+            <Eye className="h-4 w-4" />
+            Profil Önizleme
+          </Link>
+          <Link href="/contact"
+            className="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm text-[#69766f] hover:bg-[#f5efdf] transition-colors">
+            <Headphones className="h-4 w-4" />
+            Yardım & Destek
+          </Link>
+          <form action="/auth/signout" method="post">
+            <button type="submit"
+              className="flex w-full items-center gap-3 rounded-xl px-4 py-2.5 text-sm text-[#69766f] hover:bg-[#f5efdf] transition-colors">
+              <LogOut className="h-4 w-4" />
+              Çıkış Yap
+            </button>
+          </form>
+        </div>
+
+        <div className="mt-4 rounded-2xl border border-[#e5dccb] bg-white/70 p-3">
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#174f35] text-sm font-bold text-[#f7df9d]">
               {initial}
@@ -86,19 +106,6 @@ export default async function DashboardLayout({ children }: { children: React.Re
               <div className="truncate text-xs text-[#7b837d]">{user.email}</div>
             </div>
           </div>
-        </div>
-
-        <div className="mt-5 space-y-2">
-          <Link href="/contact" className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm text-[#69766f] hover:bg-[#f5efdf]">
-            <Headphones className="h-4 w-4" />
-            Yardım & Destek
-          </Link>
-          <form action="/auth/signout" method="post">
-            <button type="submit" className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm text-[#69766f] hover:bg-[#f5efdf]">
-              <LogOut className="h-4 w-4" />
-              Çıkış Yap
-            </button>
-          </form>
         </div>
       </aside>
 

@@ -2,24 +2,16 @@ import { createClient } from '@/lib/supabase/server'
 import Image from 'next/image'
 import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
-import {
-  BookOpen, CalendarCheck, Eye, FileText, Heart,
-  ImageIcon, Leaf, LockKeyhole, MessageCircle, QrCode,
-  Scroll, Shield, Users, Video, UserRound,
-} from 'lucide-react'
-import type { ComponentType } from 'react'
+import { Eye, Users, BookOpen, MessageCircle, ImageIcon, Video, UserRound } from 'lucide-react'
 
 interface Props {
   params: Promise<{ id: string }>
   searchParams: Promise<{ purchased?: string }>
 }
 
-type Section = {
-  href: string
-  label: string
-  meta: string
-  done: boolean
-  icon: ComponentType<{ className?: string }>
+const REL_ICONS: Record<string, string> = {
+  mother: '👩', father: '👨', spouse: '💑', son: '👦',
+  daughter: '👧', sibling: '🧑', grandparent: '👴', grandchild: '🧒', other: '👤',
 }
 
 export default async function MemoryAreaPage({ params, searchParams }: Props) {
@@ -35,52 +27,36 @@ export default async function MemoryAreaPage({ params, searchParams }: Props) {
   if (!area) notFound()
 
   const [
-    { count: photoCount },
-    { count: publicPhotoCount },
-    { count: videoCount },
-    { count: publicVideoCount },
-    { count: familyCount },
-    { count: memoriesCount },
-    { count: secretCount },
-    { count: vasiyetCount },
-    { count: heirCount },
-    { count: guestbookCount },
-    { count: documentCount },
+    { data: familyMembers, count: familyCount },
+    { data: recentMemories, count: memoriesCount },
+    { data: recentPhotos, count: photoCount },
+    { data: recentVideos, count: videoCount },
     { data: linkedQRs },
   ] = await Promise.all([
-    supabase.from('media').select('*', { count: 'exact', head: true }).eq('vault_id', id).eq('media_type', 'image'),
-    supabase.from('media').select('*', { count: 'exact', head: true }).eq('vault_id', id).eq('media_type', 'image').eq('is_public', true),
-    supabase.from('media').select('*', { count: 'exact', head: true }).eq('vault_id', id).eq('media_type', 'video'),
-    supabase.from('media').select('*', { count: 'exact', head: true }).eq('vault_id', id).eq('media_type', 'video').eq('is_public', true),
-    supabase.from('vault_family_members').select('*', { count: 'exact', head: true }).eq('vault_id', id),
-    supabase.from('vault_memories').select('*', { count: 'exact', head: true }).eq('vault_id', id).eq('is_secret', false),
-    supabase.from('vault_memories').select('*', { count: 'exact', head: true }).eq('vault_id', id).eq('is_secret', true).eq('section', 'general'),
-    supabase.from('vault_memories').select('*', { count: 'exact', head: true }).eq('vault_id', id).eq('section', 'vasiyet'),
-    supabase.from('heirs').select('*', { count: 'exact', head: true }).eq('vault_id', id).neq('status', 'revoked'),
-    supabase.from('guestbook').select('*', { count: 'exact', head: true }).eq('vault_id', id),
-    supabase.from('vault_documents').select('*', { count: 'exact', head: true }).eq('vault_id', id),
-    supabase.from('dynamic_qr').select('qr_hash, redirect_count').eq('target_vault_id', id),
+    supabase.from('vault_family_members')
+      .select('id, full_name, relationship, photo_url', { count: 'exact' })
+      .eq('vault_id', id).order('sort_order', { ascending: true }).limit(6),
+    supabase.from('vault_memories')
+      .select('id, title, content, memory_date', { count: 'exact' })
+      .eq('vault_id', id).eq('is_secret', false)
+      .order('memory_date', { ascending: false }).limit(3),
+    supabase.from('media')
+      .select('id, thumb_url, original_url', { count: 'exact' })
+      .eq('vault_id', id).eq('media_type', 'image')
+      .order('sort_order', { ascending: true }).limit(8),
+    supabase.from('media')
+      .select('id, original_url, original_filename, taken_at', { count: 'exact' })
+      .eq('vault_id', id).eq('media_type', 'video')
+      .order('sort_order', { ascending: true }).limit(3),
+    supabase.from('dynamic_qr').select('qr_hash').eq('target_vault_id', id),
   ])
 
-  const isMemorial = area.product_type === 'memorial_profile'
   const isLocked = area.status === 'pending_verification'
-  const publicUrl = area.slug ? `themaradi.com/ani-alanim/${area.slug}` : null
+  const isMemorial = area.product_type === 'memorial_profile'
   const qrActive = (linkedQRs?.length ?? 0) > 0
 
-  const checks = [
-    { done: (area.biography?.length ?? 0) > 50, weight: 10 },
-    { done: !!area.birth_date && !!area.death_date, weight: 8 },
-    { done: !!area.tagline?.trim(), weight: 5 },
-    { done: !!area.cover_photo_url, weight: 8 },
-    { done: (photoCount ?? 0) > 0, weight: 10 },
-    { done: (videoCount ?? 0) > 0, weight: 7 },
-    { done: (memoriesCount ?? 0) > 0, weight: 8 },
-    { done: (familyCount ?? 0) > 0, weight: 10 },
-    { done: (documentCount ?? 0) > 0, weight: 7 },
-    { done: (vasiyetCount ?? 0) > 0, weight: 7 },
-    { done: !!area.slug || qrActive, weight: 8 },
-  ]
-  const completion = Math.min(100, Math.round(checks.filter(c => c.done).reduce((sum, c) => sum + c.weight, 0)))
+  const birthYear = area.birth_date ? new Date(area.birth_date).getFullYear() : null
+  const deathYear = area.death_date ? new Date(area.death_date).getFullYear() : null
 
   const statusConfig: Record<string, { label: string; cls: string }> = {
     pending_verification: { label: 'Doğrulama Bekliyor', cls: 'bg-[#fff4dc] text-[#93620f] border-[#ead4a5]' },
@@ -91,36 +67,33 @@ export default async function MemoryAreaPage({ params, searchParams }: Props) {
   }
   const status = statusConfig[area.status ?? 'hidden_vault'] ?? statusConfig.hidden_vault
 
-  const birthYear = area.birth_date ? new Date(area.birth_date).getFullYear() : null
-  const deathYear = area.death_date ? new Date(area.death_date).getFullYear() : null
-
-  const sections: Section[] = [
-    { href: 'profil',     label: 'Kişisel Bilgiler',  meta: area.birth_date ? 'Temel bilgiler var' : 'Tamamlanmalı',                                          done: !!area.birth_date && !!area.tagline, icon: UserRound },
-    { href: 'biography',  label: 'Hayat Hikayesi',    meta: (area.biography?.length ?? 0) > 0 ? `${area.biography!.length} karakter` : 'Henüz yazılmadı',     done: (area.biography?.length ?? 0) > 50, icon: BookOpen },
-    { href: 'aile',       label: 'Aile Bağları',      meta: (familyCount ?? 0) > 0 ? `${familyCount} kişi` : 'Eklenmedi',                                     done: (familyCount ?? 0) > 0, icon: Users },
-    { href: 'heirs',      label: 'Varis Bilgileri',   meta: (heirCount ?? 0) > 0 ? `${heirCount} yetkili` : 'Eklenmedi',                                      done: (heirCount ?? 0) > 0, icon: Shield },
-    { href: 'anilar',     label: 'Anılar',            meta: (memoriesCount ?? 0) > 0 ? `${memoriesCount} anı` : 'Anı yok',                                    done: (memoriesCount ?? 0) > 0, icon: MessageCircle },
-    { href: 'fotolar',    label: 'Fotoğraflar',       meta: (photoCount ?? 0) > 0 ? `${photoCount} fotoğraf · ${publicPhotoCount} açık` : 'Fotoğraf yok',     done: (photoCount ?? 0) > 0, icon: ImageIcon },
-    { href: 'videolar',   label: 'Videolar',          meta: (videoCount ?? 0) > 0 ? `${videoCount} video · ${publicVideoCount} açık` : 'Video yok',           done: (videoCount ?? 0) > 0, icon: Video },
-    { href: 'gizli-kasa', label: 'Özel İçerikler',   meta: (secretCount ?? 0) > 0 ? `${secretCount} içerik` : 'İçerik yok',                                  done: (secretCount ?? 0) > 0, icon: LockKeyhole },
-    { href: 'vasiyet',    label: 'Vasiyetname',       meta: (vasiyetCount ?? 0) > 0 ? `${vasiyetCount} kayıt` : 'Vasiyet girilmedi',                          done: (vasiyetCount ?? 0) > 0, icon: Scroll },
-    { href: 'belgeler',   label: 'Belgeler',          meta: (documentCount ?? 0) > 0 ? `${documentCount} belge` : 'Belge yok',                                done: (documentCount ?? 0) > 0, icon: FileText },
-    { href: 'settings',   label: 'Yayın & QR',        meta: qrActive ? 'QR aktif' : area.slug ? 'Slug var' : 'Ayarlanmadı',                                   done: qrActive || !!area.slug, icon: QrCode },
-  ]
+  const blockCls = 'rounded-3xl border border-[#e5dccb] bg-[#fffdf8] overflow-hidden shadow-[0_4px_24px_rgba(64,48,24,0.05)]'
+  const emptyBlockCls = 'rounded-3xl border-2 border-dashed border-[#e5dccb] bg-white overflow-hidden'
+  const sectionHeaderCls = 'flex items-center justify-between px-6 pt-5 pb-4 border-b border-[#f0ebe0]'
+  const addBtnCls = 'inline-flex items-center gap-1.5 rounded-xl bg-[#174f35] px-4 py-2 text-xs font-semibold text-white shadow-[0_4px_14px_rgba(23,79,53,0.2)] hover:bg-[#123f2b] transition-colors'
+  const editBtnCls = 'text-xs font-medium text-[#174f35] hover:underline transition-colors'
 
   return (
-    <div className="min-h-screen px-4 py-6 sm:px-8">
-      <div className="mx-auto max-w-5xl">
+    <div className="min-h-screen px-5 py-6 sm:px-8">
+      <div className="mx-auto max-w-3xl">
+
         {/* Breadcrumb */}
-        <div className="mb-5 flex items-center gap-2 text-sm text-[#788177]">
-          <Link href="/dashboard" className="transition-colors hover:text-[#174f35]">Anı Alanım</Link>
-          <span>/</span>
-          <span className="font-semibold text-[#22362e]">{area.display_name}</span>
+        <div className="mb-4 flex items-center justify-between">
+          <div className="flex items-center gap-2 text-sm text-[#788177]">
+            <Link href="/dashboard" className="hover:text-[#174f35] transition-colors">Anı Alanım</Link>
+            <span>/</span>
+            <span className="font-semibold text-[#22362e]">{area.display_name}</span>
+          </div>
+          <Link href={`/dashboard/vault/${id}/onizleme`}
+            className="hidden sm:inline-flex items-center gap-1.5 text-xs font-medium text-[#788177] hover:text-[#174f35] transition-colors">
+            <Eye className="h-3.5 w-3.5" />
+            Önizle
+          </Link>
         </div>
 
         {purchased && (
           <div className="mb-4 rounded-2xl border border-[#dfbd72]/40 bg-[#fff7e6] px-5 py-4 text-sm text-[#725212]">
-            Alanınız oluşturuldu. Ödeme doğrulandıktan sonra tüm içerikleri kaydedebilirsiniz.
+            Alanınız oluşturuldu. Ödeme doğrulandıktan sonra içerikleri kaydedebilirsiniz.
           </div>
         )}
         {isLocked && (
@@ -129,123 +102,341 @@ export default async function MemoryAreaPage({ params, searchParams }: Props) {
           </div>
         )}
 
-        {/* Profil başlık kartı — tam genişlik üstte */}
-        <div className="mb-6 rounded-3xl border border-[#e5dccb] bg-[#fffdf8] p-5 shadow-[0_4px_24px_rgba(64,48,24,0.06)] sm:p-7">
-          <div className="flex items-center gap-5">
-            <div className="relative h-20 w-20 shrink-0 rounded-full border-2 border-[#dfbd72] bg-[#f8efd8] shadow-md overflow-hidden">
-              {area.cover_photo_url ? (
-                <Image src={area.cover_photo_url} alt={area.display_name} fill className="object-cover" unoptimized />
-              ) : (
-                <Image src="/images/landing/memorial-hero-cemetery.png" alt="Anı alanı görseli" fill className="object-cover" />
-              )}
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="flex flex-wrap items-center gap-2 mb-1">
-                <h1 className="font-serif text-2xl text-[#1f2d27] sm:text-3xl">{area.display_name}</h1>
-                <span className={`rounded-full border px-2.5 py-0.5 text-xs font-semibold ${status.cls}`}>{status.label}</span>
-                <span className="rounded-full border border-[#eadfca] bg-[#fbf5e8] px-2.5 py-0.5 text-xs font-semibold text-[#9a6b22]">
-                  {isMemorial ? 'Anı Profili' : 'Yaşam Anısı'}
-                </span>
-              </div>
-              {(birthYear || deathYear) && (
-                <p className="font-serif text-sm text-[#788177] mb-1">{birthYear ?? '?'} – {deathYear ?? '...'}</p>
-              )}
-              {area.tagline && (
-                <p className="font-serif text-sm italic text-[#7a7467]">"{area.tagline}"</p>
-              )}
-              {publicUrl && (
-                <Link href={`/memorial/${area.slug}`} target="_blank"
-                  className="mt-1 inline-block text-xs text-[#174f35] font-medium hover:underline">
-                  {publicUrl} →
-                </Link>
-              )}
-            </div>
-            <Link href={`/dashboard/vault/${id}/onizleme`}
-              className="hidden sm:inline-flex shrink-0 items-center gap-2 rounded-xl bg-[#174f35] px-4 py-2.5 text-sm font-semibold text-white shadow-[0_8px_24px_rgba(23,79,53,0.18)] hover:bg-[#123f2b] transition-colors">
-              <Eye className="h-4 w-4" />
-              Önizle
-            </Link>
-          </div>
-          <div className="mt-5 rounded-2xl border border-[#eadfca] bg-white/70 px-4 py-3.5">
-            <div className="flex items-center justify-between mb-2">
-              <p className="text-xs font-semibold text-[#23382f]">Profil Tamamlanma</p>
-              <p className="text-sm font-bold text-[#174f35]">%{completion}</p>
-            </div>
-            <div className="h-2 overflow-hidden rounded-full bg-[#f1eadb]">
-              <div className="h-full rounded-full bg-[#174f35] transition-all" style={{ width: `${Math.max(completion, 4)}%` }} />
-            </div>
-          </div>
-        </div>
+        <div className="space-y-4">
 
-        {/* İki kolon: sol liste + sağ widget'lar */}
-        <div className="flex gap-6 items-start">
-
-          {/* Sol: bölüm listesi */}
-          <div className="flex-1 min-w-0">
-            <p className="text-[10px] font-semibold text-[#adb5ab] uppercase tracking-widest mb-2.5 px-1">Bölümler</p>
-            <div className="rounded-3xl border border-[#e5dccb] bg-[#fffdf8] overflow-hidden shadow-[0_4px_24px_rgba(64,48,24,0.05)]">
-              {sections.map(({ href, label, meta, done, icon: Icon }, i) => (
-                <Link key={href} href={`/dashboard/vault/${id}/${href}`}
-                  className={`group flex items-center gap-3.5 px-5 py-3.5 hover:bg-[#f5efdf] transition-colors ${i !== 0 ? 'border-t border-[#f0ebe0]' : ''}`}>
-                  <span className={`shrink-0 h-2.5 w-2.5 rounded-full ${done ? 'bg-[#174f35]' : 'bg-red-400'}`} />
-                  <span className={`shrink-0 flex h-9 w-9 items-center justify-center rounded-xl ${done ? 'bg-[#174f35]/8 text-[#174f35]' : 'bg-red-50 text-red-400'}`}>
-                    <Icon className="h-[18px] w-[18px]" />
-                  </span>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-[#1f2d27] leading-tight">{label}</p>
-                    <p className={`text-xs mt-0.5 ${done ? 'text-[#174f35] font-medium' : 'text-red-400'}`}>{meta}</p>
-                  </div>
-                  <span className="text-[#c8bfb0] group-hover:text-[#174f35] transition-colors text-sm">›</span>
-                </Link>
-              ))}
-              <Link href={`/dashboard/vault/${id}/onizleme`}
-                className="group flex items-center gap-3.5 px-5 py-3.5 border-t border-[#f0ebe0] hover:bg-[#f5efdf] transition-colors">
-                <span className="shrink-0 h-2.5 w-2.5 rounded-full bg-[#dfbd72]" />
-                <span className="shrink-0 flex h-9 w-9 items-center justify-center rounded-xl bg-[#dfbd72]/10 text-[#b08340]">
-                  <Eye className="h-[18px] w-[18px]" />
-                </span>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-[#1f2d27] leading-tight">Önizleme</p>
-                  <p className="text-xs mt-0.5 text-[#b08340] font-medium">Ziyaretçi bakışı</p>
+          {/* ══ BLOK 1: PROFİL ══ */}
+          {area.cover_photo_url || area.birth_date || area.tagline ? (
+            <div className={blockCls}>
+              <div className={sectionHeaderCls}>
+                <div className="flex items-center gap-2">
+                  <UserRound className="h-4 w-4 text-[#b08340]" />
+                  <span className="text-sm font-semibold text-[#1f2d27]">Profil</span>
                 </div>
-                <span className="text-[#c8bfb0] group-hover:text-[#174f35] transition-colors text-sm">›</span>
-              </Link>
-            </div>
-          </div>
-
-          {/* Sağ: widget'lar */}
-          <div className="hidden lg:flex w-64 shrink-0 flex-col gap-4">
-            <div className="rounded-3xl border border-[#e5dccb] bg-[#fffdf8] p-6 text-center shadow-[0_4px_24px_rgba(64,48,24,0.06)]">
-              <Heart className="mx-auto h-7 w-7 text-[#dfbd72]" />
-              <h2 className="mx-auto mt-5 max-w-[180px] font-serif text-lg leading-snug text-[#1f2d27]">
-                Hatıralar paylaşıldıkça çoğalır.
-              </h2>
-              <div className="mx-auto mt-5 h-px w-14 bg-[#dfbd72]" />
-              <p className="mx-auto mt-5 text-xs leading-6 text-[#5f6b63]">
-                Ödeme onayı veya admin muafiyeti sonrası sayfanız şekillenmeye başlar.
-              </p>
-              <div className="relative mx-auto mt-6 h-44 w-40">
-                <Image src="/images/landing/cta-candle-olive.png" alt="Anı mumu ve zeytin dalı" fill className="object-contain" />
+                <Link href={`/dashboard/vault/${id}/profil`} className={editBtnCls}>Düzenle →</Link>
+              </div>
+              <div className="p-6 flex items-center gap-6">
+                <div className="relative h-24 w-24 shrink-0 rounded-full border-2 border-[#dfbd72] bg-[#f8efd8] overflow-hidden shadow-lg">
+                  {area.cover_photo_url ? (
+                    <Image src={area.cover_photo_url} alt={area.display_name} fill className="object-cover" unoptimized />
+                  ) : (
+                    <div className="h-full w-full flex items-center justify-center font-serif text-3xl text-[#b08340]">
+                      {area.display_name[0]}
+                    </div>
+                  )}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <h1 className="font-serif text-2xl text-[#1f2d27] mb-1">{area.display_name}</h1>
+                  <div className="flex flex-wrap gap-1.5 mb-2">
+                    <span className={`rounded-full border px-2 py-0.5 text-[11px] font-semibold ${status.cls}`}>{status.label}</span>
+                    <span className="rounded-full border border-[#eadfca] bg-[#fbf5e8] px-2 py-0.5 text-[11px] font-semibold text-[#9a6b22]">
+                      {isMemorial ? 'Anı Profili' : 'Yaşam Anısı'}
+                    </span>
+                  </div>
+                  {(birthYear || deathYear) && (
+                    <p className="font-serif text-sm text-[#788177]">{birthYear ?? '?'} – {deathYear ?? '...'}</p>
+                  )}
+                  {area.tagline && (
+                    <p className="font-serif text-sm italic text-[#7a7467] mt-1">"{area.tagline}"</p>
+                  )}
+                  {area.slug && (
+                    <Link href={`/memorial/${area.slug}`} target="_blank"
+                      className="mt-1 inline-block text-xs text-[#174f35] font-medium hover:underline">
+                      themaradi.com/ani-alanim/{area.slug} →
+                    </Link>
+                  )}
+                </div>
               </div>
             </div>
-
-            <div className="rounded-3xl border border-[#e5dccb] bg-[#f7f6ec] p-5 shadow-[0_4px_24px_rgba(64,48,24,0.04)]">
-              <CalendarCheck className="h-5 w-5 text-[#174f35]" />
-              <p className="mt-3 text-xs leading-6 text-[#4e5d55]">
-                Her tamamladığınız bölüm, anı sayfanızı daha da anlamlı kılar.
-              </p>
-              <p className="mt-3 font-serif text-base leading-6 text-[#1f2d27]">
-                Devam edin, birlikte güzelleştirelim.
-              </p>
-            </div>
-
-            {(guestbookCount ?? 0) > 0 && (
-              <div className="rounded-3xl border border-[#e5dccb] bg-[#fffdf8] p-5">
-                <p className="text-xs font-semibold text-[#174f35]">Taziye Defteri</p>
-                <p className="mt-2 text-3xl font-bold text-[#1f2d27]">{guestbookCount}</p>
-                <p className="mt-0.5 text-xs text-[#7b837d]">mesaj bırakıldı</p>
+          ) : (
+            <div className={emptyBlockCls}>
+              <div className={sectionHeaderCls}>
+                <div className="flex items-center gap-2">
+                  <UserRound className="h-4 w-4 text-[#c8bfb0]" />
+                  <span className="text-sm font-semibold text-[#adb5ab]">Profil</span>
+                </div>
+                <Link href={`/dashboard/vault/${id}/profil`} className={addBtnCls}>+ Profil Ekle</Link>
               </div>
-            )}
+              <div className="p-6 flex items-center gap-6">
+                <div className="h-24 w-24 shrink-0 rounded-full bg-[#f0ebe0] flex items-center justify-center">
+                  <UserRound className="h-10 w-10 text-[#c8bfb0]" />
+                </div>
+                <div className="flex-1 space-y-2">
+                  <div className="h-6 w-48 rounded-xl bg-[#f0ebe0]" />
+                  <div className="h-4 w-28 rounded-lg bg-[#f0ebe0]" />
+                  <div className="h-4 w-64 rounded-lg bg-[#f0ebe0]" />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ══ BLOK 2: BİYOGRAFİ ══ */}
+          {(area.biography?.length ?? 0) > 0 ? (
+            <div className={blockCls}>
+              <div className={sectionHeaderCls}>
+                <div className="flex items-center gap-2">
+                  <BookOpen className="h-4 w-4 text-[#b08340]" />
+                  <span className="text-sm font-semibold text-[#1f2d27]">Hayat Hikayesi</span>
+                </div>
+                <Link href={`/dashboard/vault/${id}/biography`} className={editBtnCls}>Düzenle →</Link>
+              </div>
+              <div className="p-6">
+                <p className="text-sm text-[#4a5e55] leading-7 line-clamp-4">{area.biography}</p>
+                {area.biography!.length > 300 && (
+                  <p className="mt-2 text-xs text-[#adb5ab]">{area.biography!.length} karakter — tam metin anma sayfasında görünür</p>
+                )}
+              </div>
+            </div>
+          ) : (
+            <div className={emptyBlockCls}>
+              <div className={sectionHeaderCls}>
+                <div className="flex items-center gap-2">
+                  <BookOpen className="h-4 w-4 text-[#c8bfb0]" />
+                  <span className="text-sm font-semibold text-[#adb5ab]">Hayat Hikayesi</span>
+                </div>
+                <Link href={`/dashboard/vault/${id}/biography`} className={addBtnCls}>+ Hikaye Yaz</Link>
+              </div>
+              <div className="p-6 space-y-2.5">
+                <div className="h-3.5 w-full rounded-full bg-[#f0ebe0]" />
+                <div className="h-3.5 w-full rounded-full bg-[#f0ebe0]" />
+                <div className="h-3.5 w-3/4 rounded-full bg-[#f0ebe0]" />
+                <div className="h-3.5 w-full rounded-full bg-[#f0ebe0]" />
+                <div className="h-3.5 w-5/6 rounded-full bg-[#f0ebe0]" />
+                <p className="pt-1 text-xs text-[#adb5ab]">Hayat hikayesini yazdığınızda anma sayfasında görünecek.</p>
+              </div>
+            </div>
+          )}
+
+          {/* ══ BLOK 3: AİLE BAĞLARI ══ */}
+          {(familyCount ?? 0) > 0 ? (
+            <div className={blockCls}>
+              <div className={sectionHeaderCls}>
+                <div className="flex items-center gap-2">
+                  <Users className="h-4 w-4 text-[#b08340]" />
+                  <span className="text-sm font-semibold text-[#1f2d27]">Aile Bağları</span>
+                  <span className="text-xs text-[#adb5ab]">{familyCount} kişi</span>
+                </div>
+                <Link href={`/dashboard/vault/${id}/aile`} className={editBtnCls}>Düzenle →</Link>
+              </div>
+              <div className="p-6">
+                <div className="flex flex-wrap gap-4">
+                  {familyMembers?.map((m) => (
+                    <div key={m.id} className="flex flex-col items-center gap-1.5 w-16">
+                      <div className="relative h-14 w-14 rounded-full border-2 border-[#e5dccb] bg-[#f5efdf] overflow-hidden">
+                        {m.photo_url ? (
+                          <Image src={m.photo_url} alt={m.full_name} fill className="object-cover" unoptimized />
+                        ) : (
+                          <div className="h-full w-full flex items-center justify-center text-2xl">
+                            {REL_ICONS[m.relationship] ?? '👤'}
+                          </div>
+                        )}
+                      </div>
+                      <p className="text-[11px] text-[#4a5e55] font-medium text-center leading-tight line-clamp-2">{m.full_name.split(' ')[0]}</p>
+                    </div>
+                  ))}
+                  {(familyCount ?? 0) > 6 && (
+                    <div className="flex flex-col items-center gap-1.5 w-16">
+                      <div className="h-14 w-14 rounded-full border-2 border-dashed border-[#e5dccb] bg-[#f5efdf] flex items-center justify-center text-sm font-bold text-[#788177]">
+                        +{(familyCount ?? 0) - 6}
+                      </div>
+                      <p className="text-[11px] text-[#adb5ab] text-center">daha</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </div>
+          ) : (
+            <div className={emptyBlockCls}>
+              <div className={sectionHeaderCls}>
+                <div className="flex items-center gap-2">
+                  <Users className="h-4 w-4 text-[#c8bfb0]" />
+                  <span className="text-sm font-semibold text-[#adb5ab]">Aile Bağları</span>
+                </div>
+                <Link href={`/dashboard/vault/${id}/aile`} className={addBtnCls}>+ Aile Ekle</Link>
+              </div>
+              <div className="p-6 flex gap-4">
+                {[0, 1, 2, 3].map(i => (
+                  <div key={i} className="flex flex-col items-center gap-1.5 w-16">
+                    <div className="h-14 w-14 rounded-full bg-[#f0ebe0]" />
+                    <div className="h-3 w-12 rounded-full bg-[#f0ebe0]" />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* ══ BLOK 4: ANILAR ══ */}
+          {(memoriesCount ?? 0) > 0 ? (
+            <div className={blockCls}>
+              <div className={sectionHeaderCls}>
+                <div className="flex items-center gap-2">
+                  <MessageCircle className="h-4 w-4 text-[#b08340]" />
+                  <span className="text-sm font-semibold text-[#1f2d27]">Anılar</span>
+                  <span className="text-xs text-[#adb5ab]">{memoriesCount} anı</span>
+                </div>
+                <Link href={`/dashboard/vault/${id}/anilar`} className={editBtnCls}>Düzenle →</Link>
+              </div>
+              <div className="relative p-6">
+                <div className="absolute left-9 top-8 bottom-8 w-0.5 rounded-full bg-[#e5dccb]" />
+                <div className="space-y-5">
+                  {recentMemories?.map((m) => (
+                    <div key={m.id} className="relative pl-10">
+                      <div className="absolute left-[5px] top-1.5 h-3.5 w-3.5 rounded-full border-2 border-[#174f35] bg-white shadow-sm" />
+                      {m.memory_date && (
+                        <p className="text-[11px] font-semibold text-[#dfbd72] tracking-wide mb-0.5">
+                          {new Date(m.memory_date).toLocaleDateString('tr-TR', { year: 'numeric', month: 'long', day: 'numeric' })}
+                        </p>
+                      )}
+                      {m.title && <p className="font-serif text-sm font-semibold text-[#1f2d27]">{m.title}</p>}
+                      <p className="text-xs text-[#4a5e55] leading-5 line-clamp-2">{m.content}</p>
+                    </div>
+                  ))}
+                </div>
+                {(memoriesCount ?? 0) > 3 && (
+                  <Link href={`/dashboard/vault/${id}/anilar`}
+                    className="mt-4 block text-center text-xs text-[#174f35] font-medium hover:underline">
+                    Tüm {memoriesCount} anıyı gör →
+                  </Link>
+                )}
+              </div>
+            </div>
+          ) : (
+            <div className={emptyBlockCls}>
+              <div className={sectionHeaderCls}>
+                <div className="flex items-center gap-2">
+                  <MessageCircle className="h-4 w-4 text-[#c8bfb0]" />
+                  <span className="text-sm font-semibold text-[#adb5ab]">Anılar</span>
+                </div>
+                <Link href={`/dashboard/vault/${id}/anilar`} className={addBtnCls}>+ Anı Ekle</Link>
+              </div>
+              <div className="relative p-6">
+                <div className="absolute left-9 top-8 bottom-8 w-0.5 rounded-full bg-[#f0ebe0]" />
+                <div className="space-y-5">
+                  {[0, 1, 2].map(i => (
+                    <div key={i} className="relative pl-10">
+                      <div className="absolute left-[5px] top-1.5 h-3.5 w-3.5 rounded-full border-2 border-[#e5dccb] bg-[#f0ebe0]" />
+                      <div className="h-2.5 w-24 rounded-full bg-[#f0ebe0] mb-1.5" />
+                      <div className="h-3 w-full rounded-full bg-[#f0ebe0] mb-1" />
+                      <div className="h-3 w-3/4 rounded-full bg-[#f0ebe0]" />
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ══ BLOK 5: FOTOĞRAFLAR ══ */}
+          {(photoCount ?? 0) > 0 ? (
+            <div className={blockCls}>
+              <div className={sectionHeaderCls}>
+                <div className="flex items-center gap-2">
+                  <ImageIcon className="h-4 w-4 text-[#b08340]" />
+                  <span className="text-sm font-semibold text-[#1f2d27]">Fotoğraflar</span>
+                  <span className="text-xs text-[#adb5ab]">{photoCount} fotoğraf</span>
+                </div>
+                <Link href={`/dashboard/vault/${id}/fotolar`} className={editBtnCls}>Düzenle →</Link>
+              </div>
+              <div className="p-4">
+                <div className="columns-3 sm:columns-4 gap-2">
+                  {recentPhotos?.map((p) => (
+                    <div key={p.id} className="break-inside-avoid mb-2 overflow-hidden rounded-xl">
+                      <Image
+                        src={p.thumb_url ?? p.original_url}
+                        alt="Fotoğraf"
+                        width={0} height={0}
+                        sizes="(max-width: 640px) 33vw, 25vw"
+                        style={{ width: '100%', height: 'auto' }}
+                        className="rounded-xl"
+                        unoptimized
+                      />
+                    </div>
+                  ))}
+                </div>
+                {(photoCount ?? 0) > 8 && (
+                  <Link href={`/dashboard/vault/${id}/fotolar`}
+                    className="mt-3 block text-center text-xs text-[#174f35] font-medium hover:underline">
+                    Tüm {photoCount} fotoğrafı gör →
+                  </Link>
+                )}
+              </div>
+            </div>
+          ) : (
+            <div className={emptyBlockCls}>
+              <div className={sectionHeaderCls}>
+                <div className="flex items-center gap-2">
+                  <ImageIcon className="h-4 w-4 text-[#c8bfb0]" />
+                  <span className="text-sm font-semibold text-[#adb5ab]">Fotoğraflar</span>
+                </div>
+                <Link href={`/dashboard/vault/${id}/fotolar`} className={addBtnCls}>+ Fotoğraf Ekle</Link>
+              </div>
+              <div className="p-4">
+                <div className="grid grid-cols-4 gap-2">
+                  {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
+                    <div key={i} className={`rounded-xl bg-[#f0ebe0] ${i % 3 === 0 ? 'aspect-[3/4]' : 'aspect-square'}`} />
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* ══ BLOK 6: VİDEOLAR ══ */}
+          {(videoCount ?? 0) > 0 ? (
+            <div className={blockCls}>
+              <div className={sectionHeaderCls}>
+                <div className="flex items-center gap-2">
+                  <Video className="h-4 w-4 text-[#b08340]" />
+                  <span className="text-sm font-semibold text-[#1f2d27]">Videolar</span>
+                  <span className="text-xs text-[#adb5ab]">{videoCount} video</span>
+                </div>
+                <Link href={`/dashboard/vault/${id}/videolar`} className={editBtnCls}>Düzenle →</Link>
+              </div>
+              <div className="p-4 grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {recentVideos?.map((v) => (
+                  <div key={v.id} className="aspect-video rounded-xl bg-[#1f2d27]/10 flex items-center justify-center overflow-hidden relative">
+                    <div className="absolute inset-0 flex items-center justify-center">
+                      <div className="h-10 w-10 rounded-full bg-white/80 flex items-center justify-center shadow">
+                        <span className="text-[#174f35] text-lg ml-0.5">▶</span>
+                      </div>
+                    </div>
+                    {v.taken_at && (
+                      <p className="absolute bottom-1.5 left-2 text-[10px] text-white/70">
+                        {new Date(v.taken_at).getFullYear()}
+                      </p>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : (
+            <div className={emptyBlockCls}>
+              <div className={sectionHeaderCls}>
+                <div className="flex items-center gap-2">
+                  <Video className="h-4 w-4 text-[#c8bfb0]" />
+                  <span className="text-sm font-semibold text-[#adb5ab]">Videolar</span>
+                </div>
+                <Link href={`/dashboard/vault/${id}/videolar`} className={addBtnCls}>+ Video Ekle</Link>
+              </div>
+              <div className="p-4 grid grid-cols-3 gap-3">
+                {[1, 2, 3].map(i => (
+                  <div key={i} className="aspect-video rounded-xl bg-[#f0ebe0] flex items-center justify-center">
+                    <Video className="h-6 w-6 text-[#c8bfb0]" />
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Alt durum */}
+          <div className="rounded-2xl border border-[#e5dccb] bg-white px-5 py-4 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className={`h-2.5 w-2.5 rounded-full ${qrActive || area.slug ? 'bg-[#174f35]' : 'bg-red-400'}`} />
+              <span className="text-sm text-[#4a5e55]">
+                {qrActive ? 'QR aktif' : area.slug ? `themaradi.com/ani-alanim/${area.slug}` : 'Sayfa adresi belirlenmedi'}
+              </span>
+            </div>
+            <Link href={`/dashboard/vault/${id}/settings`}
+              className="text-xs font-medium text-[#174f35] hover:underline">
+              {area.slug || qrActive ? 'Ayarları Düzenle →' : 'Adres Belirle →'}
+            </Link>
           </div>
 
         </div>
