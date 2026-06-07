@@ -23,6 +23,32 @@ export default async function SettingsPage({ params }: Props) {
   async function del() { 'use server'; await deleteVaultAction(id) }
   async function linkQR(formData: FormData) { 'use server'; await linkQRToVaultAction(id, formData.get('qr_hash') as string) }
 
+  async function saveSlug(formData: FormData): Promise<void> {
+    'use server'
+    const sup = await createClient()
+    const { data: { user: u } } = await sup.auth.getUser()
+    if (!u) return
+    const { data: v } = await sup.from('vaults').select('id').eq('id', id).eq('owner_id', u.id).single()
+    if (!v) return
+
+    const raw = (formData.get('slug') as string)?.trim().toLowerCase()
+    if (!raw) return
+    // Türkçe → ASCII + slug temizleme
+    const cleaned = raw
+      .replace(/ş/g, 's').replace(/ğ/g, 'g').replace(/ü/g, 'u')
+      .replace(/ö/g, 'o').replace(/ı/g, 'i').replace(/ç/g, 'c')
+      .replace(/[^a-z0-9-]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '')
+      .substring(0, 60)
+    if (cleaned.length < 3) return
+
+    // Benzersizlik kontrolü (kendi id'si hariç)
+    const { data: existing } = await sup.from('vaults').select('id').eq('slug', cleaned).neq('id', id).maybeSingle()
+    if (existing) return
+
+    await sup.from('vaults').update({ slug: cleaned }).eq('id', id)
+    revalidatePath(`/dashboard/vault/${id}/settings`)
+  }
+
   async function savePubSettings(formData: FormData) {
     'use server'
     const sup = await createClient()
@@ -53,6 +79,56 @@ export default async function SettingsPage({ params }: Props) {
           <span className="text-slate-300">Ayarlar</span>
         </div>
         <h1 className="text-2xl font-bold text-slate-100 mb-6">Kasa Ayarları</h1>
+
+        {/* Sayfa adresi */}
+        <div className="glass border border-slate-800/60 rounded-2xl p-6 mb-5">
+          <h2 className="text-sm font-semibold text-slate-200 mb-1">Sayfa Adresi</h2>
+          <p className="text-xs text-slate-500 mb-4">
+            Anma sayfanızın herkese açık URL'i. Kısa, akılda kalıcı bir adres seçin.
+          </p>
+          {vault.slug && (
+            <div className="mb-4 bg-slate-800/60 border border-emerald-500/20 rounded-xl px-4 py-3 flex items-center gap-3">
+              <span className="text-emerald-400">🔗</span>
+              <div className="flex-1 min-w-0">
+                <p className="text-xs text-slate-500 mb-0.5">Mevcut adres</p>
+                <p className="text-sm font-mono text-emerald-400 truncate">
+                  themaradi.com/memorial/{vault.slug}
+                </p>
+              </div>
+              <Link
+                href={`/memorial/${vault.slug}`}
+                target="_blank"
+                className="text-xs text-slate-500 hover:text-amber-400 transition-colors shrink-0"
+              >
+                Görüntüle →
+              </Link>
+            </div>
+          )}
+          <form action={saveSlug} className="flex gap-3 items-start">
+            <div className="flex-1">
+              <div className="flex items-center bg-slate-800 border border-slate-700 rounded-xl overflow-hidden focus-within:border-amber-500 transition-colors">
+                <span className="text-xs text-slate-600 pl-3 pr-1 shrink-0 hidden sm:block">
+                  .../memorial/
+                </span>
+                <input
+                  type="text"
+                  name="slug"
+                  defaultValue={vault.slug ?? ''}
+                  placeholder="ahmet-yilmaz"
+                  pattern="[a-z0-9-]+"
+                  minLength={3}
+                  maxLength={60}
+                  className="flex-1 bg-transparent text-slate-100 placeholder-slate-600 px-3 py-2.5 text-sm focus:outline-none font-mono"
+                />
+              </div>
+              <p className="text-xs text-slate-600 mt-1.5">Sadece küçük harf, rakam ve tire ( - ) kullanın</p>
+            </div>
+            <button type="submit"
+              className="bg-slate-700 hover:bg-slate-600 text-slate-100 text-sm font-medium px-4 py-2.5 rounded-xl transition-colors shrink-0">
+              Kaydet
+            </button>
+          </form>
+        </div>
 
         <div className="glass border border-slate-800/60 rounded-2xl p-6 mb-5">
           <h2 className="text-sm font-semibold text-slate-200 mb-4">Genel Bilgiler</h2>
