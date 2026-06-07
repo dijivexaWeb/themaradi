@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import AdminLoginForm from './AdminLoginForm'
-import { createServiceClient } from '@/lib/supabase/server'
+import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 
 export const metadata: Metadata = {
@@ -10,10 +10,11 @@ export const metadata: Metadata = {
 
 export default async function AdminLoginPage() {
   // Already logged in and admin? Send straight to panel
-  const supabase = await createServiceClient()
-  const { data: { user } } = await supabase.auth.getUser()
+  const authClient = await createClient()
+  const { data: { user } } = await authClient.auth.getUser()
   if (user) {
-    const { data: profile } = await supabase
+    const service = await createServiceClient()
+    const { data: profile } = await service
       .from('profiles')
       .select('role')
       .eq('id', user.id)
