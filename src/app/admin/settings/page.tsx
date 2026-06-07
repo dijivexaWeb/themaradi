@@ -2,6 +2,8 @@ import { requireAdmin } from '@/lib/admin/auth'
 import { createServiceClient } from '@/lib/supabase/server'
 import PricingSettingsForm from './_PricingSettingsForm'
 import ExemptionForm from './_ExemptionForm'
+import BankSettingsForm from './_BankSettingsForm'
+import PaymentGatewayForm from './_PaymentGatewayForm'
 
 export default async function SettingsPage() {
   await requireAdmin()
@@ -52,6 +54,28 @@ export default async function SettingsPage() {
           Fiyatlar (GEL)
         </h2>
         <PricingSettingsForm settings={s} />
+      </section>
+
+      {/* Bank Settings */}
+      <section>
+        <h2 className="text-base font-semibold text-slate-700 mb-4 flex items-center gap-2">
+          <span className="h-5 w-1 rounded bg-blue-500" />
+          Banka Havale Bilgileri
+        </h2>
+        <p className="text-slate-500 text-xs mb-4">Satın alma sayfasında gösterilen IBAN ve banka bilgileri. Değişiklik anlık olarak yansır.</p>
+        <BankSettingsForm settings={s} />
+      </section>
+
+      {/* Payment Gateway */}
+      <section>
+        <h2 className="text-base font-semibold text-slate-700 mb-4 flex items-center gap-2">
+          <span className="h-5 w-1 rounded bg-violet-500" />
+          Ödeme Entegrasyonu (Kartla Ödeme)
+        </h2>
+        <p className="text-slate-500 text-xs mb-4">
+          PayBall, Stripe veya diğer sağlayıcılar için API anahtarları. Sağlayıcı seçilip aktif edilene kadar satın alma sayfasında "Çok Yakında" gösterilmeye devam eder.
+        </p>
+        <PaymentGatewayForm settings={s} />
       </section>
 
       {/* Exemptions */}

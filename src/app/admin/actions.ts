@@ -538,6 +538,70 @@ export async function updatePricingSettings(formData: FormData): Promise<ActionR
   return { success: true }
 }
 
+// ─── Bank Settings ──────────────────────────────────────────────────────────
+
+export async function updateBankSettings(formData: FormData): Promise<ActionResult> {
+  const { user, profile } = await requireAdmin()
+  const supabase = await createServiceClient()
+
+  const keys = ['bank_iban', 'bank_name', 'bank_recipient']
+  const updates = keys.map((key) => ({
+    key,
+    value: (formData.get(key) ?? '').toString().trim(),
+    updated_at: new Date().toISOString(),
+  }))
+
+  const { error } = await supabase
+    .from('platform_settings')
+    .upsert(updates, { onConflict: 'key' })
+
+  if (error) return { success: false, error: error.message }
+
+  await logAdminAction({
+    adminId: user.id,
+    adminEmail: user.email ?? profile.email ?? '',
+    action: 'bank_settings_updated',
+    entityType: 'platform_settings',
+    newValue: Object.fromEntries(updates.map((u) => [u.key, u.value])),
+  })
+
+  revalidatePath('/admin/settings')
+  revalidatePath('/satin-al/anma')
+  revalidatePath('/satin-al/kasa')
+  return { success: true }
+}
+
+// ─── Payment Gateway Settings ───────────────────────────────────────────────
+
+export async function updateGatewaySettings(formData: FormData): Promise<ActionResult> {
+  const { user, profile } = await requireAdmin()
+  const supabase = await createServiceClient()
+
+  const keys = ['payment_gateway_provider', 'payment_gateway_api_key', 'payment_gateway_secret', 'payment_gateway_enabled']
+  const updates = keys.map((key) => ({
+    key,
+    value: (formData.get(key) ?? '').toString().trim(),
+    updated_at: new Date().toISOString(),
+  }))
+
+  const { error } = await supabase
+    .from('platform_settings')
+    .upsert(updates, { onConflict: 'key' })
+
+  if (error) return { success: false, error: error.message }
+
+  await logAdminAction({
+    adminId: user.id,
+    adminEmail: user.email ?? profile.email ?? '',
+    action: 'gateway_settings_updated',
+    entityType: 'platform_settings',
+    newValue: { provider: formData.get('payment_gateway_provider') },
+  })
+
+  revalidatePath('/admin/settings')
+  return { success: true }
+}
+
 // ─── Pricing Exemptions ─────────────────────────────────────────────────────
 
 const exemptionSchema = z.object({
