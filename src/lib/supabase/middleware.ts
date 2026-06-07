@@ -1,6 +1,9 @@
 import { createServerClient } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
+// These admin paths must NOT require auth (they are the login/logout pages themselves)
+const PUBLIC_ADMIN_PATHS = ['/admin/login', '/admin/signout']
+
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({ request })
 
@@ -25,19 +28,27 @@ export async function updateSession(request: NextRequest) {
     }
   )
 
-  // Session'ı yenile — bu satır silinmemeli
+  // Refresh session — do not remove this line
   const { data: { user } } = await supabase.auth.getUser()
 
   const pathname = request.nextUrl.pathname
+  const isPublicAdminPath = PUBLIC_ADMIN_PATHS.some((p) => pathname.startsWith(p))
 
-  // Giriş gerektiren sayfalar
-  if (!user && (pathname.startsWith('/dashboard') || pathname.startsWith('/admin'))) {
+  // Unauthenticated user on user dashboard → /login
+  if (!user && pathname.startsWith('/dashboard')) {
     const url = request.nextUrl.clone()
     url.pathname = '/login'
     return NextResponse.redirect(url)
   }
 
-  // Giriş yapmış kullanıcı login sayfasına gelirse dashboard'a yönlendir
+  // Unauthenticated user on admin panel (but NOT on login/signout) → /admin/login
+  if (!user && pathname.startsWith('/admin') && !isPublicAdminPath) {
+    const url = request.nextUrl.clone()
+    url.pathname = '/admin/login'
+    return NextResponse.redirect(url)
+  }
+
+  // Logged-in user on /login → dashboard
   if (user && pathname === '/login') {
     const url = request.nextUrl.clone()
     url.pathname = '/dashboard'
