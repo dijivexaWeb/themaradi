@@ -5,6 +5,49 @@
 
 ---
 
+## 2026-06-07 — Oturum 21: Dashboard Redesign + Vasiyetname Sayfası
+
+### Yapılanlar
+- `vault/[id]/page.tsx` (dashboard ana sayfa) yeniden tasarlandı:
+  - Sol: motivasyon widget + numaralı bölüm listesi (kırmızı=boş, yeşil=dolu, meta sayılar)
+  - Sağ sticky: profil kartı (kapak görseli, isim, yıllar, tagline, URL, progress bar, önizle butonu)
+  - Bölüm sırası: profil → biyografi → aile → varis → anılar → fotolar → videolar → özel → vasiyet → belgeler → QR
+- `vault/[id]/vasiyet/page.tsx` yeni sayfa oluşturuldu:
+  - Hem yazılı vasiyet metni (vault_memories, section='vasiyet') hem belge yükleme (vault_documents, category='will')
+  - PersonHeader, locked state, tam CRUD
+- Supabase migration: `vault_memories.section` text kolonu eklendi (default 'general')
+- `gizli-kasa/page.tsx`: section='general' filtresi eklendi (vasiyet kayıtlarını göstermez)
+- `memories.ts` action: section alanı okunup INSERT'e eklendi, vasiyet revalidatePath eklendi
+- Commit: `f4f5c43`
+
+### Proje Durumu
+- [x] Auth sistemi
+- [x] Dashboard ana sayfa redesign (sol liste + sağ profil kartı)
+- [x] Tüm alt sayfa layout overhaul (PersonHeader, timeline, masonry, sidebar nav)
+- [x] Vasiyetname sayfası (metin + belge)
+- [x] Anılar medya desteği
+- [x] Belgeler kasası
+- [ ] payments RLS hatası
+- [ ] Login "Kaydınız yoksa" → /satin-al yönlendirmesi
+- [ ] Rehber/kılavuz sayfası (kişi verilerin nereye gittiğini görecek)
+- [ ] Vefat bildirimi alanı
+
+### Kritik Kararlar / Notlar
+- vault_memories.section kolonu: 'general' (gizli-kasa), 'vasiyet' (vasiyetname) ayrımı
+- Vasiyet belgeler: vault_documents category='will' — belgeler sayfasında da 'Vasiyet' kategorisinde görünür
+- Dashboard profil kartında cover_photo_url yoksa memorial-hero-cemetery görseli görünür (düşük opacity)
+
+### Nerede Kaldık
+Dashboard redesign ve vasiyetname sayfası tamamlandı ve push edildi.
+
+### Sıradaki Adım
+1. Rehber/kılavuz sayfası (/rehber) — verilerin anma sayfasında nerede görüneceğini gösteren kılavuz
+2. payments RLS hatası düzeltmesi
+3. Login sayfası "Kaydınız yoksa" → /satin-al
+4. Vefat bildirimi alanı
+
+---
+
 ## 2026-06-07 — Oturum 20: Layout Overhaul — PersonHeader + Timeline + Masonry + Sidebar Nav
 
 ### Yapılanlar
