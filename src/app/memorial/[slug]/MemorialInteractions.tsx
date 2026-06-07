@@ -1,7 +1,9 @@
-'use client'
+﻿'use client'
 
 import { useState } from 'react'
 import { ArrowRight, Feather, Flame, Heart, X } from 'lucide-react'
+import { type Lang } from '@/i18n'
+import { useLang } from '@/i18n/context'
 
 interface Condolence {
   name: string
@@ -11,32 +13,29 @@ interface Condolence {
 }
 
 type ActionType = 'candle' | 'flower' | 'prayer' | null
+type ActionColor = 'amber' | 'rose' | 'gold'
 
-const ACTION_META = {
-  candle: {
-    emoji: '🕯️',
-    title: 'Mum yakıyorsunuz',
-    desc: 'Yakılan her mum bir hatırayı aydınlatır.',
-    confirmLabel: 'Mumu Yak',
-    color: 'amber' as const,
+const interactionCopy: Record<Lang, any> = {
+  tr: {
+    title: 'Hislerinizi', titleAccent: 'paylaşın.', candle: 'Mum yak', candleDone: 'Mum yaktınız', flower: 'Çiçek bırak', flowerDone: 'Çiçek bıraktınız', prayer: 'Dua et', prayerDone: 'Dua edildi', candleUnit: 'mum', flowerUnit: 'çiçek', prayerUnit: 'dua', ctaTitle: 'Taziye mesajı bırakmak ister misiniz?', ctaText: 'Mesajınız varis onayından geçtikten sonra yayınlanır.', messageButton: 'Mesaj Bırak', formTitle: 'Taziye mesajınız', formText: 'Onaydan sonra sayfada yayınlanacaktır.', name: 'Adınız', namePlaceholder: 'Adınız Soyadınız', relation: 'Yakınlık', relationPlaceholder: 'Komşusu, Öğrencisi, ...', message: 'Mesajınız', messagePlaceholder: 'Taziye mesajınızı buraya yazın...', send: 'Gönder', cancel: 'Vazgeç', optional: 'opsiyonel', contact: 'İletişim', contactOptional: 'opsiyonel · aileye iletilir', contactPlaceholder: 'E-posta veya telefon', contactHelp: 'İletişim bilgisi yalnızca aile ile paylaşılır, sayfada görünmez.', anonymous: 'Anonim olarak devam et',
+    actions: { candle: { emoji: '🕯️', title: 'Mum yakıyorsunuz', desc: 'Yakılan her mum bir hatırayı aydınlatır.', confirmLabel: 'Mumu Yak', color: 'amber' }, flower: { emoji: '🌹', title: 'Çiçek bırakıyorsunuz', desc: 'Bırakılan her çiçek derin bir saygının ifadesidir.', confirmLabel: 'Çiçeği Bırak', color: 'rose' }, prayer: { emoji: '🤲', title: 'Dua ediyorsunuz', desc: 'Her dua bir sevginin, bir özlemin yankısıdır.', confirmLabel: 'Dua Et', color: 'gold' } }
   },
-  flower: {
-    emoji: '🌹',
-    title: 'Çiçek bırakıyorsunuz',
-    desc: 'Bırakılan her çiçek derin bir saygının ifadesidir.',
-    confirmLabel: 'Çiçeği Bırak',
-    color: 'rose' as const,
+  en: {
+    title: 'Share', titleAccent: 'your feelings.', candle: 'Light a candle', candleDone: 'Candle lit', flower: 'Leave a flower', flowerDone: 'Flower left', prayer: 'Say a prayer', prayerDone: 'Prayer sent', candleUnit: 'candles', flowerUnit: 'flowers', prayerUnit: 'prayers', ctaTitle: 'Would you like to leave a condolence message?', ctaText: 'Your message will be published after heir approval.', messageButton: 'Leave Message', formTitle: 'Your condolence message', formText: 'It will appear on the page after approval.', name: 'Your name', namePlaceholder: 'Your full name', relation: 'Relation', relationPlaceholder: 'Neighbor, student, ...', message: 'Your message', messagePlaceholder: 'Write your condolence message here...', send: 'Send', cancel: 'Cancel', optional: 'optional', contact: 'Contact', contactOptional: 'optional · sent to family', contactPlaceholder: 'Email or phone', contactHelp: 'Contact information is shared only with the family and is not shown on the page.', anonymous: 'Continue anonymously',
+    actions: { candle: { emoji: '🕯️', title: 'You are lighting a candle', desc: 'Every candle lights up a memory.', confirmLabel: 'Light Candle', color: 'amber' }, flower: { emoji: '🌹', title: 'You are leaving a flower', desc: 'Every flower is an expression of deep respect.', confirmLabel: 'Leave Flower', color: 'rose' }, prayer: { emoji: '🤲', title: 'You are saying a prayer', desc: 'Every prayer echoes love and longing.', confirmLabel: 'Say Prayer', color: 'gold' } }
   },
-  prayer: {
-    emoji: '🤲',
-    title: 'Dua ediyorsunuz',
-    desc: 'Her dua bir sevginin, bir özlemin yankısıdır.',
-    confirmLabel: 'Dua Et',
-    color: 'gold' as const,
+  ka: {
+    title: 'გააზიარეთ', titleAccent: 'თქვენი გრძნობები.', candle: 'სანთლის დანთება', candleDone: 'სანთელი დაინთო', flower: 'ყვავილის დატოვება', flowerDone: 'ყვავილი დატოვეთ', prayer: 'ლოცვა', prayerDone: 'ლოცვა გაიგზავნა', candleUnit: 'სანთელი', flowerUnit: 'ყვავილი', prayerUnit: 'ლოცვა', ctaTitle: 'გსურთ სამძიმრის შეტყობინების დატოვება?', ctaText: 'თქვენი შეტყობინება მემკვიდრის დამტკიცების შემდეგ გამოქვეყნდება.', messageButton: 'შეტყობინების დატოვება', formTitle: 'თქვენი სამძიმრის შეტყობინება', formText: 'დამტკიცების შემდეგ გვერდზე გამოჩნდება.', name: 'თქვენი სახელი', namePlaceholder: 'სახელი და გვარი', relation: 'კავშირი', relationPlaceholder: 'მეზობელი, მოსწავლე, ...', message: 'შეტყობინება', messagePlaceholder: 'აქ დაწერეთ სამძიმრის შეტყობინება...', send: 'გაგზავნა', cancel: 'გაუქმება', optional: 'არასავალდებულო', contact: 'კონტაქტი', contactOptional: 'არასავალდებულო · გადაეცემა ოჯახს', contactPlaceholder: 'ელფოსტა ან ტელეფონი', contactHelp: 'კონტაქტი მხოლოდ ოჯახს გადაეცემა და გვერდზე არ გამოჩნდება.', anonymous: 'ანონიმურად გაგრძელება',
+    actions: { candle: { emoji: '🕯️', title: 'სანთელს ანთებთ', desc: 'ყოველი სანთელი ერთ მოგონებას ანათებს.', confirmLabel: 'სანთლის დანთება', color: 'amber' }, flower: { emoji: '🌹', title: 'ყვავილს ტოვებთ', desc: 'ყოველი ყვავილი ღრმა პატივისცემის გამოხატულებაა.', confirmLabel: 'ყვავილის დატოვება', color: 'rose' }, prayer: { emoji: '🤲', title: 'ლოცულობთ', desc: 'ყოველი ლოცვა სიყვარულისა და მონატრების გამოძახილია.', confirmLabel: 'ლოცვა', color: 'gold' } }
+  },
+  ru: {
+    title: 'Поделитесь', titleAccent: 'своими чувствами.', candle: 'Зажечь свечу', candleDone: 'Свеча зажжена', flower: 'Оставить цветок', flowerDone: 'Цветок оставлен', prayer: 'Помолиться', prayerDone: 'Молитва отправлена', candleUnit: 'свечей', flowerUnit: 'цветов', prayerUnit: 'молитв', ctaTitle: 'Хотите оставить сообщение с соболезнованием?', ctaText: 'Ваше сообщение будет опубликовано после одобрения наследником.', messageButton: 'Оставить сообщение', formTitle: 'Ваше сообщение с соболезнованием', formText: 'После одобрения оно появится на странице.', name: 'Ваше имя', namePlaceholder: 'Имя и фамилия', relation: 'Связь', relationPlaceholder: 'Сосед, ученик, ...', message: 'Сообщение', messagePlaceholder: 'Напишите соболезнование здесь...', send: 'Отправить', cancel: 'Отмена', optional: 'необязательно', contact: 'Контакт', contactOptional: 'необязательно · передается семье', contactPlaceholder: 'Email или телефон', contactHelp: 'Контактная информация передается только семье и не отображается на странице.', anonymous: 'Продолжить анонимно',
+    actions: { candle: { emoji: '🕯️', title: 'Вы зажигаете свечу', desc: 'Каждая свеча освещает одно воспоминание.', confirmLabel: 'Зажечь свечу', color: 'amber' }, flower: { emoji: '🌹', title: 'Вы оставляете цветок', desc: 'Каждый цветок выражает глубокое уважение.', confirmLabel: 'Оставить цветок', color: 'rose' }, prayer: { emoji: '🤲', title: 'Вы молитесь', desc: 'Каждая молитва звучит любовью и тоской.', confirmLabel: 'Помолиться', color: 'gold' } }
   },
 }
-
 export default function MemorialInteractions({ condolences }: { condolences: Condolence[] }) {
+  const { lang } = useLang()
+  const copy = interactionCopy[lang]
   const [candlesLit, setCandlesLit] = useState(47)
   const [flowersLeft, setFlowersLeft] = useState(23)
   const [prayersSent, setPrayersSent] = useState(91)
@@ -68,6 +67,7 @@ export default function MemorialInteractions({ condolences }: { condolences: Con
       {pendingAction && (
         <ActionModal
           action={pendingAction}
+          copy={copy}
           onConfirm={confirmAction}
           onClose={() => setPendingAction(null)}
         />
@@ -78,22 +78,24 @@ export default function MemorialInteractions({ condolences }: { condolences: Con
           <div className="mb-12 text-center">
             <div className="flex items-center justify-center gap-3 text-[#b08340]">
               <span className="h-px w-10 bg-[#c7a76f]" />
-              <span className="text-xs tracking-[0.2em] uppercase">Taziye Defteri</span>
+              <span className="text-xs tracking-[0.2em] uppercase">
+                {lang === 'tr' ? 'Taziye Defteri' : lang === 'ka' ? 'სამძიმრის წიგნი' : lang === 'ru' ? 'Книга соболезнований' : 'Condolence Book'}
+              </span>
               <span className="h-px w-10 bg-[#c7a76f]" />
             </div>
             <h2 className="mt-3 font-serif text-5xl text-[#173d31]">
-              Hislerinizi<br />
-              <span className="text-[#b08340]">paylaşın.</span>
+              {copy.title}<br />
+              <span className="text-[#b08340]">{copy.titleAccent}</span>
             </h2>
           </div>
 
-          {/* İnteraksiyon butonları */}
+          {/* Ä°nteraksiyon butonlarÄ± */}
           <div className="mb-12 grid grid-cols-3 gap-3 sm:gap-4">
             <InteractionButton
               onClick={() => requestAction('candle')}
               active={userLitCandle}
               count={candlesLit}
-              label={userLitCandle ? 'Mum yaktınız' : 'Mum yak'}
+              label={userLitCandle ? copy.candleDone : copy.candle}
               color="amber"
               icon={
                 <div className="relative flex flex-col items-center">
@@ -107,7 +109,7 @@ export default function MemorialInteractions({ condolences }: { condolences: Con
               onClick={() => requestAction('flower')}
               active={userLeftFlower}
               count={flowersLeft}
-              label={userLeftFlower ? 'Çiçek bıraktınız' : 'Çiçek bırak'}
+              label={userLeftFlower ? copy.flowerDone : copy.flower}
               color="rose"
               icon={
                 <div className={`text-2xl transition-transform duration-300 sm:text-4xl ${userLeftFlower ? 'scale-125' : ''}`}>
@@ -120,7 +122,7 @@ export default function MemorialInteractions({ condolences }: { condolences: Con
               onClick={() => requestAction('prayer')}
               active={userPrayed}
               count={prayersSent}
-              label={userPrayed ? 'Dua edildi' : 'Dua et'}
+              label={userPrayed ? copy.prayerDone : copy.prayer}
               color="gold"
               icon={
                 <div className={`transition-transform duration-300 ${userPrayed ? 'scale-110' : ''}`}>
@@ -130,7 +132,7 @@ export default function MemorialInteractions({ condolences }: { condolences: Con
             />
           </div>
 
-          {/* Taziye kartları */}
+          {/* Taziye kartlarÄ± */}
           <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
             {condolences.map((item) => (
               <div key={item.name} className="rounded-2xl border border-[#e1d5c3] bg-[#fffdf8] p-6 shadow-sm shadow-[#4d3d26]/5">
@@ -151,55 +153,55 @@ export default function MemorialInteractions({ condolences }: { condolences: Con
             ))}
           </div>
 
-          {/* Mesaj bırak CTA / Form */}
+          {/* Mesaj bÄ±rak CTA / Form */}
           <div className="mt-8 overflow-hidden rounded-2xl border border-[#e1d5c3] bg-[#fffdf8]">
             {!showCondolenceForm ? (
               <div className="flex flex-col items-center gap-5 p-8 text-center sm:flex-row sm:justify-between sm:text-left">
                 <div>
-                  <h3 className="font-serif text-2xl text-[#173d31]">Taziye mesajı bırakmak ister misiniz?</h3>
+                  <h3 className="font-serif text-2xl text-[#173d31]">{copy.ctaTitle}</h3>
                   <p className="mt-2 text-sm text-[#665d50]">
-                    Mesajınız varis onayından geçtikten sonra yayınlanır.
+                    {copy.ctaText}
                   </p>
                   <div className="mt-3 flex flex-wrap items-center gap-3 text-xs text-[#8a7a64]">
-                    <span className="flex items-center gap-1.5"><Flame className="h-3.5 w-3.5 text-[#b08340]" />{candlesLit} mum</span>
+                    <span className="flex items-center gap-1.5"><Flame className="h-3.5 w-3.5 text-[#b08340]" />{candlesLit} {copy.candleUnit}</span>
                     <span>·</span>
-                    <span className="flex items-center gap-1.5"><span>🌹</span>{flowersLeft} çiçek</span>
+                    <span className="flex items-center gap-1.5"><span>🌹</span>{flowersLeft} {copy.flowerUnit}</span>
                     <span>·</span>
-                    <span className="flex items-center gap-1.5"><Heart className="h-3.5 w-3.5 text-[#b08340]" />{prayersSent} dua</span>
+                    <span className="flex items-center gap-1.5"><Heart className="h-3.5 w-3.5 text-[#b08340]" />{prayersSent} {copy.prayerUnit}</span>
                   </div>
                 </div>
                 <button
                   onClick={() => setShowCondolenceForm(true)}
                   className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-[#103b2c] px-7 py-3.5 text-sm font-semibold text-white shadow-lg transition hover:bg-[#0b2b20]"
                 >
-                  Mesaj Bırak
+                  {copy.messageButton}
                   <Feather className="h-4 w-4" />
                 </button>
               </div>
             ) : (
               <form className="p-8" onSubmit={(e) => { e.preventDefault(); setShowCondolenceForm(false) }}>
-                <h3 className="font-serif text-2xl text-[#173d31]">Taziye mesajınız</h3>
-                <p className="mt-1 text-sm text-[#665d50]">Onaydan sonra sayfada yayınlanacaktır.</p>
+                <h3 className="font-serif text-2xl text-[#173d31]">{copy.formTitle}</h3>
+                <p className="mt-1 text-sm text-[#665d50]">{copy.formText}</p>
                 <div className="mt-6 grid gap-4 sm:grid-cols-2">
                   <div>
-                    <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-[#665d50]">Adınız</label>
-                    <input type="text" required placeholder="Adınız Soyadınız" className="w-full rounded-lg border border-[#e1d5c3] bg-[#f7f2e9] px-4 py-3 text-sm text-[#173d31] outline-none focus:border-[#b08340] focus:ring-2 focus:ring-[#b08340]/10" />
+                    <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-[#665d50]">{copy.name}</label>
+                    <input type="text" required placeholder={copy.namePlaceholder} className="w-full rounded-lg border border-[#e1d5c3] bg-[#f7f2e9] px-4 py-3 text-sm text-[#173d31] outline-none focus:border-[#b08340] focus:ring-2 focus:ring-[#b08340]/10" />
                   </div>
                   <div>
-                    <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-[#665d50]">Yakınlık</label>
-                    <input type="text" placeholder="Komşusu, Öğrencisi, ..." className="w-full rounded-lg border border-[#e1d5c3] bg-[#f7f2e9] px-4 py-3 text-sm text-[#173d31] outline-none focus:border-[#b08340] focus:ring-2 focus:ring-[#b08340]/10" />
+                    <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-[#665d50]">{copy.relation}</label>
+                    <input type="text" placeholder={copy.relationPlaceholder} className="w-full rounded-lg border border-[#e1d5c3] bg-[#f7f2e9] px-4 py-3 text-sm text-[#173d31] outline-none focus:border-[#b08340] focus:ring-2 focus:ring-[#b08340]/10" />
                   </div>
                 </div>
                 <div className="mt-4">
-                  <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-[#665d50]">Mesajınız</label>
-                  <textarea required rows={4} placeholder="Taziye mesajınızı buraya yazın..." className="w-full rounded-lg border border-[#e1d5c3] bg-[#f7f2e9] px-4 py-3 text-sm text-[#173d31] outline-none focus:border-[#b08340] focus:ring-2 focus:ring-[#b08340]/10" />
+                  <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-[#665d50]">{copy.message}</label>
+                  <textarea required rows={4} placeholder={copy.messagePlaceholder} className="w-full rounded-lg border border-[#e1d5c3] bg-[#f7f2e9] px-4 py-3 text-sm text-[#173d31] outline-none focus:border-[#b08340] focus:ring-2 focus:ring-[#b08340]/10" />
                 </div>
                 <div className="mt-5 flex gap-3">
                   <button type="submit" className="inline-flex items-center gap-2 rounded-xl bg-[#103b2c] px-7 py-3 text-sm font-semibold text-white shadow-lg transition hover:bg-[#0b2b20]">
-                    Gönder <ArrowRight className="h-4 w-4" />
+                    {copy.send} <ArrowRight className="h-4 w-4" />
                   </button>
                   <button type="button" onClick={() => setShowCondolenceForm(false)} className="rounded-xl border border-[#e1d5c3] px-6 py-3 text-sm font-semibold text-[#665d50] transition hover:bg-[#f7f2e9]">
-                    Vazgeç
+                    {copy.cancel}
                   </button>
                 </div>
               </form>
@@ -213,10 +215,12 @@ export default function MemorialInteractions({ condolences }: { condolences: Con
 
 function ActionModal({
   action,
+  copy,
   onConfirm,
   onClose,
 }: {
   action: ActionType
+  copy: typeof interactionCopy.tr
   onConfirm: (name: string, contact: string) => void
   onClose: () => void
 }) {
@@ -224,7 +228,13 @@ function ActionModal({
   const [contact, setContact] = useState('')
 
   if (!action) return null
-  const meta = ACTION_META[action]
+  const meta = copy.actions[action] as {
+    emoji: string
+    title: string
+    desc: string
+    confirmLabel: string
+    color: ActionColor
+  }
 
   const activeStyles = {
     amber: 'bg-[#fffbeb] border-[#f59e0b]/30',
@@ -254,7 +264,7 @@ function ActionModal({
             <X className="h-4 w-4" />
           </button>
 
-          {/* Başlık */}
+          {/* BaÅŸlÄ±k */}
           <div className="text-center">
             <div className="text-5xl">{meta.emoji}</div>
             <h3 className="mt-3 font-serif text-2xl text-[#173d31]">{meta.title}</h3>
@@ -265,31 +275,31 @@ function ActionModal({
           <div className="mt-6 space-y-4">
             <div>
               <label className="mb-1.5 flex items-center justify-between text-xs font-semibold uppercase tracking-wide text-[#665d50]">
-                <span>Ad Soyad</span>
-                <span className="normal-case font-normal text-[#8a7a64]">opsiyonel</span>
+                <span>{copy.name}</span>
+                <span className="normal-case font-normal text-[#8a7a64]">{copy.optional}</span>
               </label>
               <input
                 type="text"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder="Adınız Soyadınız"
+                placeholder={copy.namePlaceholder}
                 className="w-full rounded-lg border border-[#e1d5c3] bg-white/80 px-4 py-2.5 text-sm text-[#173d31] outline-none focus:border-[#b08340] focus:ring-2 focus:ring-[#b08340]/10"
               />
             </div>
             <div>
               <label className="mb-1.5 flex items-center justify-between text-xs font-semibold uppercase tracking-wide text-[#665d50]">
-                <span>İletişim</span>
-                <span className="normal-case font-normal text-[#8a7a64]">opsiyonel · aileye iletilir</span>
+                <span>{copy.contact}</span>
+                <span className="normal-case font-normal text-[#8a7a64]">{copy.contactOptional}</span>
               </label>
               <input
                 type="text"
                 value={contact}
                 onChange={(e) => setContact(e.target.value)}
-                placeholder="E-posta veya telefon"
+                placeholder={copy.contactPlaceholder}
                 className="w-full rounded-lg border border-[#e1d5c3] bg-white/80 px-4 py-2.5 text-sm text-[#173d31] outline-none focus:border-[#b08340] focus:ring-2 focus:ring-[#b08340]/10"
               />
               <p className="mt-1.5 text-[11px] text-[#8a7a64]">
-                İletişim bilgisi yalnızca aile ile paylaşılır, sayfada görünmez.
+                {copy.contactHelp}
               </p>
             </div>
           </div>
@@ -307,7 +317,7 @@ function ActionModal({
               onClick={() => onConfirm('', '')}
               className="w-full rounded-xl border border-[#e1d5c3] bg-white/60 py-2.5 text-sm text-[#665d50] transition hover:bg-white"
             >
-              Anonim olarak devam et
+              {copy.anonymous}
             </button>
           </div>
         </div>
@@ -331,6 +341,8 @@ function InteractionButton({
   icon: React.ReactNode
   color: 'amber' | 'rose' | 'gold'
 }) {
+  const { lang } = useLang()
+
   const activeStyles = {
     amber: 'border-[#f59e0b]/40 bg-[#fffbeb]',
     rose: 'border-[#f43f5e]/30 bg-[#fff1f2]',
@@ -349,7 +361,7 @@ function InteractionButton({
     >
       <div className="flex h-10 items-end justify-center sm:h-16">{icon}</div>
       <div>
-        <div className="font-serif text-xl text-[#173d31] sm:text-3xl">{count.toLocaleString('tr-TR')}</div>
+        <div className="font-serif text-xl text-[#173d31] sm:text-3xl">{count.toLocaleString(lang === 'ka' ? 'ka-GE' : lang === 'ru' ? 'ru-RU' : lang === 'en' ? 'en-US' : 'tr-TR')}</div>
         <div className="mt-0.5 text-xs text-[#665d50] sm:mt-1 sm:text-sm">{label}</div>
       </div>
     </button>
