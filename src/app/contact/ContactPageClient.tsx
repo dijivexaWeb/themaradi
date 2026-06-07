@@ -1,9 +1,10 @@
 'use client'
 
 import Link from 'next/link'
-import { Clock, Feather, Mail, MapPin, Phone } from 'lucide-react'
+import { Clock, Mail, MapPin, Phone } from 'lucide-react'
 import ContactForm from './ContactForm'
 import { useLang } from '@/i18n/context'
+import BrandLogo from '@/components/BrandLogo'
 
 export default function ContactPageClient() {
   const { t } = useLang()
@@ -67,12 +68,7 @@ export default function ContactPageClient() {
       {/* NAV */}
       <nav className="fixed inset-x-0 top-0 z-50 border-b border-[#e6dccb] bg-[#fbf8f1]/92 shadow-sm backdrop-blur">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5 sm:px-8">
-          <Link href="/" className="flex items-center gap-3 text-[#173d31]">
-            <span className="flex h-9 w-9 items-center justify-center rounded-full border border-[#c7a76f] bg-[#f4eee3] text-[#9a7132]">
-              <Feather className="h-5 w-5" />
-            </span>
-            <span className="font-serif text-2xl">The Maradi</span>
-          </Link>
+          <BrandLogo />
           <div className="hidden items-center gap-7 text-sm text-[#4c463c] lg:flex">
             <Link href="/" className="hover:text-[#9a7132]">{c.nav.home}</Link>
             <Link href="/pricing" className="hover:text-[#9a7132]">{c.nav.pricing}</Link>

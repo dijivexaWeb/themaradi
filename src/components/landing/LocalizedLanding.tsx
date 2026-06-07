@@ -25,6 +25,7 @@ import {
   Users,
 } from 'lucide-react'
 import { useLang } from '@/i18n/context'
+import { BrandMark } from '@/components/BrandLogo'
 
 const stepIcons = [QrCode, BookOpen, Users] as const
 const securityIcons = [LockKeyhole, Database, Server, Key, QrCode, ShieldCheck] as const
@@ -480,7 +481,10 @@ export default function LocalizedLanding() {
       <footer className="bg-[#0c3327] px-5 py-12 text-[#efe7d8] sm:px-8">
         <div className="mx-auto grid max-w-7xl gap-10 md:grid-cols-[1.4fr_1fr_1fr_1fr_1.2fr]">
           <div>
-            <div className="font-serif text-2xl">The Maradi</div>
+            <div className="flex items-center gap-3 font-serif text-2xl">
+              <BrandMark className="h-10 w-10" />
+              The Maradi
+            </div>
             <p className="mt-4 max-w-xs text-sm leading-6 text-[#cfc3ad]">{s.footer.tagline}</p>
             <p className="mt-4 text-xs text-[#8a7a64]">{s.footer.commitment}</p>
           </div>

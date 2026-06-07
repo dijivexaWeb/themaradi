@@ -1,10 +1,11 @@
 'use client'
 
 import Link from 'next/link'
-import { ArrowRight, ChevronDown, Feather, Menu, X } from 'lucide-react'
+import { ArrowRight, ChevronDown, Menu, X } from 'lucide-react'
 import { useState, useRef, useEffect } from 'react'
 import { useLang } from '@/i18n/context'
 import { langs } from '@/i18n/index'
+import BrandLogo from '@/components/BrandLogo'
 
 export default function Nav() {
   const { t, lang, setLang } = useLang()
@@ -38,12 +39,7 @@ export default function Nav() {
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5 sm:px-8">
 
         {/* LOGO */}
-        <Link href="/" className="flex items-center gap-3 text-[#173d31]">
-          <span className="flex h-9 w-9 items-center justify-center rounded-full border border-[#c7a76f] bg-[#f4eee3] text-[#9a7132]">
-            <Feather className="h-5 w-5" />
-          </span>
-          <span className="font-serif text-2xl">The Maradi</span>
-        </Link>
+        <BrandLogo />
 
         {/* DESKTOP LINKS */}
         <div className="hidden items-center gap-8 text-sm font-medium text-[#4c463c] lg:flex">

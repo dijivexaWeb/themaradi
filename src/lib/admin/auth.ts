@@ -5,7 +5,7 @@ export async function requireAdmin() {
   const supabase = await createServiceClient()
   const { data: { user }, error } = await supabase.auth.getUser()
 
-  if (error || !user) redirect('/login?redirect=/admin')
+  if (error || !user) redirect('/admin/login')
 
   const { data: profile } = await supabase
     .from('profiles')

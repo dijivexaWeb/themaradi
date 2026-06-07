@@ -73,24 +73,24 @@ export default function MemorialInteractions({ condolences }: { condolences: Con
         />
       )}
 
-      <section id="taziye" className="border-y border-[#e6dccb] bg-[#f7f2e9] px-5 py-16 sm:px-8">
-        <div className="mx-auto max-w-7xl">
-          <div className="mb-12 text-center">
-            <div className="flex items-center justify-center gap-3 text-[#b08340]">
+      <section id="taziye" className="border-y border-[#172d25] bg-[#091712] px-5 py-12 text-[#efe7d8] sm:px-8">
+        <div className="mx-auto max-w-5xl">
+          <div className="mb-7 text-center">
+            <div className="flex items-center justify-center gap-3 text-[#c7a76f]">
               <span className="h-px w-10 bg-[#c7a76f]" />
               <span className="text-xs tracking-[0.2em] uppercase">
                 {lang === 'tr' ? 'Taziye Defteri' : lang === 'ka' ? 'სამძიმრის წიგნი' : lang === 'ru' ? 'Книга соболезнований' : 'Condolence Book'}
               </span>
               <span className="h-px w-10 bg-[#c7a76f]" />
             </div>
-            <h2 className="mt-3 font-serif text-5xl text-[#173d31]">
+            <h2 className="mt-3 font-serif text-4xl text-white sm:text-5xl">
               {copy.title}<br />
-              <span className="text-[#b08340]">{copy.titleAccent}</span>
+              <span className="text-[#c7a76f]">{copy.titleAccent}</span>
             </h2>
           </div>
 
           {/* Ä°nteraksiyon butonlarÄ± */}
-          <div className="mb-12 grid grid-cols-3 gap-3 sm:gap-4">
+          <div className="mb-7 grid grid-cols-3 gap-2 sm:gap-3">
             <InteractionButton
               onClick={() => requestAction('candle')}
               active={userLitCandle}
@@ -132,37 +132,50 @@ export default function MemorialInteractions({ condolences }: { condolences: Con
             />
           </div>
 
-          {/* Taziye kartlarÄ± */}
-          <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
-            {condolences.map((item) => (
-              <div key={item.name} className="rounded-2xl border border-[#e1d5c3] bg-[#fffdf8] p-6 shadow-sm shadow-[#4d3d26]/5">
-                <div className="font-serif text-5xl leading-none text-[#c7a76f]/40">"</div>
-                <p className="mt-2 text-sm italic leading-7 text-[#4c463c]">{item.text}</p>
-                <div className="mt-5 border-t border-[#e1d5c3] pt-4">
-                  <div className="flex items-center gap-2">
-                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#f4eee3] text-xs font-semibold text-[#b08340]">
-                      {item.name[0]}
-                    </div>
-                    <div>
-                      <div className="font-serif text-sm text-[#173d31]">{item.name}</div>
-                      <div className="text-[11px] text-[#8a7a64]">{item.relation} · {item.date}</div>
+          <div className="grid gap-5 lg:grid-cols-[1fr_340px]">
+            <div className="overflow-hidden rounded-2xl border border-white/10 bg-[#0d1412] shadow-2xl shadow-black/25">
+              <div className="flex gap-1 border-b border-white/10 bg-white/[0.03] p-2 text-xs font-semibold text-[#cfc3ad]">
+                <button className="flex-1 rounded-lg bg-[#c7a76f] px-3 py-2.5 text-[#091712]">
+                  {lang === 'tr' ? 'Onaylanmış Mesajlar' : lang === 'ka' ? 'დამტკიცებული' : lang === 'ru' ? 'Одобренные' : 'Approved'}
+                </button>
+                <button className="flex-1 rounded-lg px-3 py-2.5 transition hover:bg-white/[0.06]">
+                  {lang === 'tr' ? 'Bekleyen Mesajlar' : lang === 'ka' ? 'მოლოდინში' : lang === 'ru' ? 'Ожидающие' : 'Pending'}
+                </button>
+              </div>
+
+              <div className="divide-y divide-white/8">
+                {condolences.map((item) => (
+                  <div key={item.name} className="p-4 transition hover:bg-white/[0.035] sm:p-5">
+                    <div className="flex items-start gap-3">
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#c7a76f]/35 bg-[#f4eee3] text-xs font-semibold text-[#173d31]">
+                        {item.name[0]}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex flex-wrap items-baseline justify-between gap-2">
+                          <div>
+                            <div className="font-serif text-base text-white">{item.name}</div>
+                            <div className="text-[11px] text-[#8f9f96]">{item.relation} · {item.date}</div>
+                          </div>
+                          <span className="text-xs text-[#c7a76f]">♥ {item.name.length + 7}</span>
+                        </div>
+                        <p className="mt-3 text-sm leading-7 text-[#d8ccba]">{item.text}</p>
+                      </div>
                     </div>
                   </div>
-                </div>
+                ))}
               </div>
-            ))}
-          </div>
+            </div>
 
           {/* Mesaj bÄ±rak CTA / Form */}
-          <div className="mt-8 overflow-hidden rounded-2xl border border-[#e1d5c3] bg-[#fffdf8]">
+          <div className="overflow-hidden rounded-2xl border border-white/10 bg-[#0d1412] shadow-2xl shadow-black/25">
             {!showCondolenceForm ? (
-              <div className="flex flex-col items-center gap-5 p-8 text-center sm:flex-row sm:justify-between sm:text-left">
+              <div className="flex h-full flex-col justify-between gap-5 p-6 text-center lg:text-left">
                 <div>
-                  <h3 className="font-serif text-2xl text-[#173d31]">{copy.ctaTitle}</h3>
-                  <p className="mt-2 text-sm text-[#665d50]">
+                  <h3 className="font-serif text-2xl text-white">{copy.ctaTitle}</h3>
+                  <p className="mt-2 text-sm leading-6 text-[#b8aa93]">
                     {copy.ctaText}
                   </p>
-                  <div className="mt-3 flex flex-wrap items-center gap-3 text-xs text-[#8a7a64]">
+                  <div className="mt-4 flex flex-wrap justify-center gap-3 text-xs text-[#8f9f96] lg:justify-start">
                     <span className="flex items-center gap-1.5"><Flame className="h-3.5 w-3.5 text-[#b08340]" />{candlesLit} {copy.candleUnit}</span>
                     <span>·</span>
                     <span className="flex items-center gap-1.5"><span>🌹</span>{flowersLeft} {copy.flowerUnit}</span>
@@ -172,40 +185,41 @@ export default function MemorialInteractions({ condolences }: { condolences: Con
                 </div>
                 <button
                   onClick={() => setShowCondolenceForm(true)}
-                  className="inline-flex shrink-0 items-center gap-2 rounded-xl bg-[#103b2c] px-7 py-3.5 text-sm font-semibold text-white shadow-lg transition hover:bg-[#0b2b20]"
+                  className="inline-flex w-full shrink-0 items-center justify-center gap-2 rounded-xl bg-[#c7a76f] px-7 py-3.5 text-sm font-semibold text-[#091712] shadow-lg transition hover:bg-[#d4b87c]"
                 >
                   {copy.messageButton}
                   <Feather className="h-4 w-4" />
                 </button>
               </div>
             ) : (
-              <form className="p-8" onSubmit={(e) => { e.preventDefault(); setShowCondolenceForm(false) }}>
-                <h3 className="font-serif text-2xl text-[#173d31]">{copy.formTitle}</h3>
-                <p className="mt-1 text-sm text-[#665d50]">{copy.formText}</p>
+              <form className="p-6" onSubmit={(e) => { e.preventDefault(); setShowCondolenceForm(false) }}>
+                <h3 className="font-serif text-2xl text-white">{copy.formTitle}</h3>
+                <p className="mt-1 text-sm text-[#b8aa93]">{copy.formText}</p>
                 <div className="mt-6 grid gap-4 sm:grid-cols-2">
                   <div>
-                    <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-[#665d50]">{copy.name}</label>
-                    <input type="text" required placeholder={copy.namePlaceholder} className="w-full rounded-lg border border-[#e1d5c3] bg-[#f7f2e9] px-4 py-3 text-sm text-[#173d31] outline-none focus:border-[#b08340] focus:ring-2 focus:ring-[#b08340]/10" />
+                    <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-[#8f9f96]">{copy.name}</label>
+                    <input type="text" required placeholder={copy.namePlaceholder} className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-white outline-none placeholder:text-[#6b756f] focus:border-[#c7a76f] focus:ring-2 focus:ring-[#c7a76f]/10" />
                   </div>
                   <div>
-                    <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-[#665d50]">{copy.relation}</label>
-                    <input type="text" placeholder={copy.relationPlaceholder} className="w-full rounded-lg border border-[#e1d5c3] bg-[#f7f2e9] px-4 py-3 text-sm text-[#173d31] outline-none focus:border-[#b08340] focus:ring-2 focus:ring-[#b08340]/10" />
+                    <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-[#8f9f96]">{copy.relation}</label>
+                    <input type="text" placeholder={copy.relationPlaceholder} className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-white outline-none placeholder:text-[#6b756f] focus:border-[#c7a76f] focus:ring-2 focus:ring-[#c7a76f]/10" />
                   </div>
                 </div>
                 <div className="mt-4">
-                  <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-[#665d50]">{copy.message}</label>
-                  <textarea required rows={4} placeholder={copy.messagePlaceholder} className="w-full rounded-lg border border-[#e1d5c3] bg-[#f7f2e9] px-4 py-3 text-sm text-[#173d31] outline-none focus:border-[#b08340] focus:ring-2 focus:ring-[#b08340]/10" />
+                  <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-[#8f9f96]">{copy.message}</label>
+                  <textarea required rows={4} placeholder={copy.messagePlaceholder} className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-white outline-none placeholder:text-[#6b756f] focus:border-[#c7a76f] focus:ring-2 focus:ring-[#c7a76f]/10" />
                 </div>
                 <div className="mt-5 flex gap-3">
-                  <button type="submit" className="inline-flex items-center gap-2 rounded-xl bg-[#103b2c] px-7 py-3 text-sm font-semibold text-white shadow-lg transition hover:bg-[#0b2b20]">
+                  <button type="submit" className="inline-flex items-center gap-2 rounded-xl bg-[#c7a76f] px-7 py-3 text-sm font-semibold text-[#091712] shadow-lg transition hover:bg-[#d4b87c]">
                     {copy.send} <ArrowRight className="h-4 w-4" />
                   </button>
-                  <button type="button" onClick={() => setShowCondolenceForm(false)} className="rounded-xl border border-[#e1d5c3] px-6 py-3 text-sm font-semibold text-[#665d50] transition hover:bg-[#f7f2e9]">
+                  <button type="button" onClick={() => setShowCondolenceForm(false)} className="rounded-xl border border-white/10 px-6 py-3 text-sm font-semibold text-[#cfc3ad] transition hover:bg-white/[0.06]">
                     {copy.cancel}
                   </button>
                 </div>
               </form>
             )}
+          </div>
           </div>
         </div>
       </section>
@@ -344,25 +358,25 @@ function InteractionButton({
   const { lang } = useLang()
 
   const activeStyles = {
-    amber: 'border-[#f59e0b]/40 bg-[#fffbeb]',
-    rose: 'border-[#f43f5e]/30 bg-[#fff1f2]',
-    gold: 'border-[#b08340]/40 bg-[#fdf8ee]',
+    amber: 'border-[#f59e0b]/45 bg-[#f59e0b]/12',
+    rose: 'border-[#f43f5e]/35 bg-[#f43f5e]/10',
+    gold: 'border-[#c7a76f]/45 bg-[#c7a76f]/12',
   }
 
   return (
     <button
       onClick={onClick}
       disabled={active}
-      className={`flex flex-col items-center gap-2 rounded-xl border p-3 text-center shadow-sm transition sm:gap-4 sm:rounded-2xl sm:p-7 ${
+      className={`flex flex-col items-center gap-2 rounded-xl border p-3 text-center shadow-sm transition sm:gap-3 sm:p-5 ${
         active
           ? activeStyles[color]
-          : 'border-[#e1d5c3] bg-[#fffdf8] hover:border-[#c7a76f]/40 hover:shadow-md'
+          : 'border-white/10 bg-white/[0.035] hover:border-[#c7a76f]/40 hover:bg-white/[0.055]'
       } ${active ? 'cursor-default' : 'cursor-pointer'}`}
     >
       <div className="flex h-10 items-end justify-center sm:h-16">{icon}</div>
       <div>
-        <div className="font-serif text-xl text-[#173d31] sm:text-3xl">{count.toLocaleString(lang === 'ka' ? 'ka-GE' : lang === 'ru' ? 'ru-RU' : lang === 'en' ? 'en-US' : 'tr-TR')}</div>
-        <div className="mt-0.5 text-xs text-[#665d50] sm:mt-1 sm:text-sm">{label}</div>
+        <div className="font-serif text-xl text-white sm:text-2xl">{count.toLocaleString(lang === 'ka' ? 'ka-GE' : lang === 'ru' ? 'ru-RU' : lang === 'en' ? 'en-US' : 'tr-TR')}</div>
+        <div className="mt-0.5 text-xs text-[#b8aa93] sm:mt-1">{label}</div>
       </div>
     </button>
   )

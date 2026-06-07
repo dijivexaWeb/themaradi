@@ -1,4 +1,4 @@
-import { requireAdmin } from '@/lib/admin/auth'
+import { getAdminContext } from '@/lib/admin/auth'
 import AdminSidebar from './AdminSidebar'
 
 export default async function AdminLayout({
@@ -6,14 +6,22 @@ export default async function AdminLayout({
 }: {
   children: React.ReactNode
 }) {
-  const { user, profile } = await requireAdmin()
+  // Soft check — no redirect. Each protected page calls requireAdmin() which does the redirect.
+  // This way /admin/login is never caught in an infinite redirect loop.
+  const ctx = await getAdminContext()
+
+  if (!ctx) {
+    // Unauthenticated or non-admin: render bare (page will redirect)
+    return <div className="min-h-screen bg-slate-950">{children}</div>
+  }
 
   return (
-    <div className="flex h-screen bg-slate-50 text-slate-900 overflow-hidden">
-      <AdminSidebar adminEmail={user.email ?? ''} adminName={profile.full_name ?? ''} />
-      <main className="flex-1 overflow-y-auto">
-        {children}
-      </main>
+    <div className="flex h-screen overflow-hidden bg-slate-50 text-slate-900">
+      <AdminSidebar
+        adminEmail={ctx.user.email ?? ''}
+        adminName={(ctx.profile as { full_name?: string }).full_name ?? 'Admin'}
+      />
+      <main className="flex-1 overflow-y-auto">{children}</main>
     </div>
   )
 }

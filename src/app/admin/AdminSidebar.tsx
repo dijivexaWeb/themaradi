@@ -95,7 +95,7 @@ export default function AdminSidebar({ adminEmail, adminName }: Props) {
           <p className="text-xs font-medium text-white truncate">{adminName || 'Admin'}</p>
           <p className="text-xs text-slate-400 truncate">{adminEmail}</p>
         </div>
-        <form action="/auth/signout" method="post">
+        <form action="/admin/signout" method="post">
           <button
             type="submit"
             className="flex items-center gap-2 w-full px-3 py-2 rounded-lg text-sm text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"

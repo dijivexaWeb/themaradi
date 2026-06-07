@@ -1,8 +1,9 @@
 'use client'
 
 import Link from 'next/link'
-import { Feather, QrCode } from 'lucide-react'
+import { QrCode } from 'lucide-react'
 import { useLang } from '@/i18n/context'
+import BrandLogo from '@/components/BrandLogo'
 
 export default function QrNotFoundPage() {
   const { t } = useLang()
@@ -35,10 +36,7 @@ export default function QrNotFoundPage() {
         </Link>
       </div>
 
-      <Link href="/" className="mt-10 flex items-center gap-2 text-sm text-[#8a7a64] hover:text-[#173d31]">
-        <Feather className="h-4 w-4" />
-        The Maradi
-      </Link>
+      <BrandLogo className="mt-10 scale-90 text-[#8a7a64] hover:text-[#173d31]" />
     </div>
   )
 }

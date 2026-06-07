@@ -1,5 +1,6 @@
 ﻿'use client'
 
+import { useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import {
@@ -14,12 +15,12 @@ import {
   Navigation,
   PenLine,
   Play,
-  QrCode,
   Users,
 } from 'lucide-react'
 import MemorialInteractions from './MemorialInteractions'
 import { langs, type Lang } from '@/i18n'
 import { useLang } from '@/i18n/context'
+import BrandLogo, { BrandMark } from '@/components/BrandLogo'
 
 const DEATH_DATE = new Date('2020-05-14')
 const BIRTH_DATE = new Date('1940-03-22')
@@ -48,6 +49,10 @@ const memorialCopyBase = {
       qr: 'QR ile eriş',
       badge: 'Dijital Anıt Profili',
       motto: 'Sevgiyle yaşadı, sevgiyle hatırlanıyor.',
+      familyTitle: 'Ailesinden',
+      familyNote: 'Saygıyla anıyoruz. Bize bıraktığı sabır, iyilik ve sevgi bugün hâlâ yolumuzu aydınlatıyor. Her duada, her sofrada ve her güzel hatırada bizimle.',
+      messageTitle: 'Ondan kalan söz',
+      messageNote: 'Hayatta en kıymetli şeyin sevgi olduğunu öğrendim. Birbirinize iyi davranın, kırmadan konuşun ve iyiliğin peşinden gidin.',
       sinceLabel: 'Ebediyete yürüyeli',
       sinceSuffix: 'gün oldu',
       book: 'Anı Defteri',
@@ -159,6 +164,10 @@ const memorialCopyBase = {
       qr: 'Access with QR',
       badge: 'Digital Memorial Profile',
       motto: 'He lived with love and is remembered with love.',
+      familyTitle: 'From his family',
+      familyNote: 'We remember him with respect. The patience, kindness and love he left us still light our way. He is with us in every prayer, every table and every good memory.',
+      messageTitle: 'His words',
+      messageNote: 'I learned that the most precious thing in life is love. Be kind to one another, speak without hurting, and follow what is good.',
       sinceLabel: 'Since passing',
       sinceSuffix: 'days',
       book: 'Memory Book',
@@ -270,7 +279,7 @@ const memorialCopy: Record<Lang, typeof memorialCopyBase.tr> = {
   ka: {
     ...memorialCopyBase.en,
     nav: { home: 'მთავარი', how: 'როგორ მუშაობს', memorials: 'ციფრული მემორიალები', contact: 'კონტაქტი', start: 'დაწყება' },
-    hero: { imageAlt: 'მემორიალური სივრცე', portraitAlt: 'აჰმეთ ილმაზი', qr: 'QR-ით წვდომა', badge: 'ციფრული სამახსოვრო პროფილი', motto: 'სიყვარულით იცხოვრა და სიყვარულით გვახსოვს.', sinceLabel: 'გარდაცვალებიდან', sinceSuffix: 'დღე გავიდა', book: 'მოგონებების წიგნი', explore: 'მოგონებების ნახვა', scroll: 'ჩამოსქროლეთ', yearsLine: 'სავსე და მადლიანი ცხოვრების წელი' },
+    hero: { imageAlt: 'მემორიალური სივრცე', portraitAlt: 'აჰმეთ ილმაზი', qr: 'QR-ით წვდომა', badge: 'ციფრული სამახსოვრო პროფილი', motto: 'სიყვარულით იცხოვრა და სიყვარულით გვახსოვს.', familyTitle: 'ოჯახისგან', familyNote: 'პატივისცემით ვიხსენებთ. მოთმინება, სიკეთე და სიყვარული, რომელიც დაგვიტოვა, დღესაც გვინათებს გზას. ის ჩვენთან არის ყოველ ლოცვაში, სუფრასთან და თბილ მოგონებაში.', messageTitle: 'მისი სიტყვები', messageNote: 'ვისწავლე, რომ ცხოვრებაში ყველაზე ძვირფასი სიყვარულია. იყავით კეთილები ერთმანეთის მიმართ, ილაპარაკეთ ტკივილის გარეშე და მიჰყევით სიკეთეს.', sinceLabel: 'გარდაცვალებიდან', sinceSuffix: 'დღე გავიდა', book: 'მოგონებების წიგნი', explore: 'მოგონებების ნახვა', scroll: 'ჩამოსქროლეთ', yearsLine: 'სავსე და მადლიანი ცხოვრების წელი' },
     stats: [
       { suffix: 'წელი', label: 'მადლიანი ცხოვრება' },
       { number: '55', suffix: 'წელი', label: 'ქორწინება' },
@@ -338,7 +347,7 @@ const memorialCopy: Record<Lang, typeof memorialCopyBase.tr> = {
   ru: {
     ...memorialCopyBase.en,
     nav: { home: 'Главная', how: 'Как это работает', memorials: 'Цифровые мемориалы', contact: 'Контакты', start: 'Начать' },
-    hero: { imageAlt: 'Мемориальное место', portraitAlt: 'Ахмет Йылмаз', qr: 'Доступ по QR', badge: 'Цифровой мемориальный профиль', motto: 'Он жил с любовью и с любовью вспоминается.', sinceLabel: 'С момента ухода', sinceSuffix: 'дней', book: 'Книга памяти', explore: 'Смотреть воспоминания', scroll: 'Прокрутите', yearsLine: 'лет полной и благословенной жизни' },
+    hero: { imageAlt: 'Мемориальное место', portraitAlt: 'Ахмет Йылмаз', qr: 'Доступ по QR', badge: 'Цифровой мемориальный профиль', motto: 'Он жил с любовью и с любовью вспоминается.', familyTitle: 'От семьи', familyNote: 'Мы вспоминаем его с уважением. Терпение, доброта и любовь, которые он оставил нам, до сих пор освещают наш путь. Он с нами в каждой молитве, за каждым столом и в каждом добром воспоминании.', messageTitle: 'Его слова', messageNote: 'Я понял, что самое ценное в жизни - любовь. Будьте добры друг к другу, говорите не раня и следуйте за добром.', sinceLabel: 'С момента ухода', sinceSuffix: 'дней', book: 'Книга памяти', explore: 'Смотреть воспоминания', scroll: 'Прокрутите', yearsLine: 'лет полной и благословенной жизни' },
     stats: [
       { suffix: 'лет', label: 'Благословенная жизнь' },
       { number: '55', suffix: 'лет', label: 'Брак' },
@@ -492,6 +501,7 @@ const condolences = [
 
 export default function MemorialPage() {
   const { lang, setLang } = useLang()
+  const [selectedTimeline, setSelectedTimeline] = useState(0)
   const copy = memorialCopy[lang]
   const daysSince = getDaysSince()
   const yearsLived = getYearsLived()
@@ -511,8 +521,101 @@ export default function MemorialPage() {
   ]
   const voiceMemories = voiceMemoryBars.map((item, index) => ({ ...item, ...copy.voiceMemories[index] }))
   const timelineEvents = copy.timelineEvents
+  const timelineMedia = [
+    '/images/landing/memorial-family-old.png',
+    '/images/landing/memorial-family-dinner.png',
+    '/images/landing/memorial-georgia.png',
+    '/images/landing/memorial-family-main.png',
+    '/images/landing/memorial-hero-cemetery.png',
+    '/images/landing/memorial-ahmet.png',
+  ]
+  const selectedEvent = timelineEvents[selectedTimeline]
   const featuredMemories = copy.featuredMemories
   const condolences = copy.condolences
+  const journeyUi = {
+    tr: { title: 'Zaman Yolculuğu', timeline: 'Zaman Çizgisi', slideshow: 'Slayt Gösterisi', age: 'Yaş Seçimi', years: 'yıllık hikaye', chapter: 'Dönüm noktası', cta: 'Anıları aç' },
+    en: { title: 'Time Journey', timeline: 'Timeline', slideshow: 'Slideshow', age: 'Age Selection', years: 'years of story', chapter: 'Milestone', cta: 'Open memories' },
+    ka: { title: 'დროის მოგზაურობა', timeline: 'დროის ხაზი', slideshow: 'სლაიდები', age: 'ასაკის არჩევა', years: 'წლის ისტორია', chapter: 'მნიშვნელოვანი ეტაპი', cta: 'მოგონებების ნახვა' },
+    ru: { title: 'Путешествие во времени', timeline: 'Линия времени', slideshow: 'Слайд-шоу', age: 'Выбор возраста', years: 'лет истории', chapter: 'Важный этап', cta: 'Открыть воспоминания' },
+  }[lang]
+  const familyUi = {
+    tr: {
+      label: 'Aile Bağları',
+      titleA: 'Köklerden',
+      titleB: 'yeni nesillere.',
+      tabTree: 'Aile Ağacı',
+      tabClose: 'Yakın Aile',
+      generation: 'kuşak',
+      protected: 'Bu aile bağı The Maradi ile korunur.',
+      people: [
+        { name: 'Mehmet Yılmaz', relation: 'Babası', years: '1915 - 1988', initials: 'MY', image: '/images/landing/profile-family-old.png', position: '35% 32%' },
+        { name: 'Ayşe Yılmaz', relation: 'Annesi', years: '1918 - 1995', initials: 'AY', image: '/images/landing/profile-family-old.png', position: '68% 34%' },
+        { name: 'Ahmet Yılmaz', relation: 'Kendisi', years: '1940 - 2020', initials: 'AY', image: '/images/landing/memorial-ahmet.png', position: '50% 18%', featured: true },
+        { name: 'Fatma Yılmaz', relation: 'Eşi', years: '1945 -', initials: 'FY', image: '/images/landing/profile-family-main.png', position: '62% 28%' },
+        { name: 'Hasan Yılmaz', relation: 'Oğlu', years: '1966 -', initials: 'HY', image: '/images/landing/profile-family-dinner.png', position: '35% 28%' },
+        { name: 'Zeynep Yılmaz', relation: 'Kızı', years: '1968 -', initials: 'ZY', image: '/images/landing/profile-georgia.png', position: '58% 26%' },
+        { name: 'Elif Yılmaz', relation: 'Torunu', years: '1995 -', initials: 'EY', image: '/images/landing/profile-family-main.png', position: '34% 30%' },
+        { name: 'Kerem Yılmaz', relation: 'Torunu', years: '1998 -', initials: 'KY', image: '/images/landing/profile-georgia.png', position: '42% 28%' },
+      ],
+    },
+    en: {
+      label: 'Family Bonds',
+      titleA: 'From roots',
+      titleB: 'to new generations.',
+      tabTree: 'Family Tree',
+      tabClose: 'Close Family',
+      generation: 'generations',
+      protected: 'This family bond is preserved with The Maradi.',
+      people: [
+        { name: 'Mehmet Yilmaz', relation: 'Father', years: '1915 - 1988', initials: 'MY', image: '/images/landing/profile-family-old.png', position: '35% 32%' },
+        { name: 'Ayse Yilmaz', relation: 'Mother', years: '1918 - 1995', initials: 'AY', image: '/images/landing/profile-family-old.png', position: '68% 34%' },
+        { name: 'Ahmet Yilmaz', relation: 'Profile', years: '1940 - 2020', initials: 'AY', image: '/images/landing/memorial-ahmet.png', position: '50% 18%', featured: true },
+        { name: 'Fatma Yilmaz', relation: 'Wife', years: '1945 -', initials: 'FY', image: '/images/landing/profile-family-main.png', position: '62% 28%' },
+        { name: 'Hasan Yilmaz', relation: 'Son', years: '1966 -', initials: 'HY', image: '/images/landing/profile-family-dinner.png', position: '35% 28%' },
+        { name: 'Zeynep Yilmaz', relation: 'Daughter', years: '1968 -', initials: 'ZY', image: '/images/landing/profile-georgia.png', position: '58% 26%' },
+        { name: 'Elif Yilmaz', relation: 'Granddaughter', years: '1995 -', initials: 'EY', image: '/images/landing/profile-family-main.png', position: '34% 30%' },
+        { name: 'Kerem Yilmaz', relation: 'Grandson', years: '1998 -', initials: 'KY', image: '/images/landing/profile-georgia.png', position: '42% 28%' },
+      ],
+    },
+    ka: {
+      label: 'ოჯახური კავშირები',
+      titleA: 'ფესვებიდან',
+      titleB: 'ახალ თაობებამდე.',
+      tabTree: 'ოჯახის ხე',
+      tabClose: 'ახლო ოჯახი',
+      generation: 'თაობა',
+      protected: 'ეს ოჯახური კავშირი The Maradi-სთან ინახება.',
+      people: [
+        { name: 'მეჰმეთ ილმაზი', relation: 'მამა', years: '1915 - 1988', initials: 'MY', image: '/images/landing/profile-family-old.png', position: '35% 32%' },
+        { name: 'აიშე ილმაზი', relation: 'დედა', years: '1918 - 1995', initials: 'AY', image: '/images/landing/profile-family-old.png', position: '68% 34%' },
+        { name: 'აჰმეთ ილმაზი', relation: 'პროფილი', years: '1940 - 2020', initials: 'AY', image: '/images/landing/memorial-ahmet.png', position: '50% 18%', featured: true },
+        { name: 'ფატმა ილმაზი', relation: 'მეუღლე', years: '1945 -', initials: 'FY', image: '/images/landing/profile-family-main.png', position: '62% 28%' },
+        { name: 'ჰასან ილმაზი', relation: 'ვაჟი', years: '1966 -', initials: 'HY', image: '/images/landing/profile-family-dinner.png', position: '35% 28%' },
+        { name: 'ზეინეფ ილმაზი', relation: 'ქალიშვილი', years: '1968 -', initials: 'ZY', image: '/images/landing/profile-georgia.png', position: '58% 26%' },
+        { name: 'ელიფ ილმაზი', relation: 'შვილიშვილი', years: '1995 -', initials: 'EY', image: '/images/landing/profile-family-main.png', position: '34% 30%' },
+        { name: 'ქერემ ილმაზი', relation: 'შვილიშვილი', years: '1998 -', initials: 'KY', image: '/images/landing/profile-georgia.png', position: '42% 28%' },
+      ],
+    },
+    ru: {
+      label: 'Семейные связи',
+      titleA: 'От корней',
+      titleB: 'к новым поколениям.',
+      tabTree: 'Семейное дерево',
+      tabClose: 'Близкая семья',
+      generation: 'поколения',
+      protected: 'Эта семейная связь сохранена с The Maradi.',
+      people: [
+        { name: 'Мехмет Йылмаз', relation: 'Отец', years: '1915 - 1988', initials: 'MY', image: '/images/landing/profile-family-old.png', position: '35% 32%' },
+        { name: 'Айше Йылмаз', relation: 'Мать', years: '1918 - 1995', initials: 'AY', image: '/images/landing/profile-family-old.png', position: '68% 34%' },
+        { name: 'Ахмет Йылмаз', relation: 'Профиль', years: '1940 - 2020', initials: 'AY', image: '/images/landing/memorial-ahmet.png', position: '50% 18%', featured: true },
+        { name: 'Фатма Йылмаз', relation: 'Жена', years: '1945 -', initials: 'FY', image: '/images/landing/profile-family-main.png', position: '62% 28%' },
+        { name: 'Хасан Йылмаз', relation: 'Сын', years: '1966 -', initials: 'HY', image: '/images/landing/profile-family-dinner.png', position: '35% 28%' },
+        { name: 'Зейнеп Йылмаз', relation: 'Дочь', years: '1968 -', initials: 'ZY', image: '/images/landing/profile-georgia.png', position: '58% 26%' },
+        { name: 'Элиф Йылмаз', relation: 'Внучка', years: '1995 -', initials: 'EY', image: '/images/landing/profile-family-main.png', position: '34% 30%' },
+        { name: 'Керем Йылмаз', relation: 'Внук', years: '1998 -', initials: 'KY', image: '/images/landing/profile-georgia.png', position: '42% 28%' },
+      ],
+    },
+  }[lang]
 
   return (
     <div className="min-h-screen bg-[#fbf8f1] text-[#173d31]">
@@ -529,93 +632,84 @@ export default function MemorialPage() {
         />
         <div className="absolute inset-0 bg-gradient-to-r from-[#0c3327] via-[#0c3327]/85 to-[#0c3327]/20" />
 
-        <div className="relative mx-auto grid w-full max-w-7xl items-center gap-10 px-5 pt-20 pb-16 sm:px-8 lg:grid-cols-[1fr_400px] lg:pt-0 lg:pb-0">
-          <div>
-            {/* Mobil portre â€” sadece kÃ¼Ã§Ã¼k ekranlarda */}
-            <div className="mb-8 flex justify-start lg:hidden">
-              <div className="relative overflow-hidden rounded-2xl border-4 border-[#c7a76f]/30 shadow-2xl shadow-black/40">
-                <Image
-                  src="/images/landing/memorial-ahmet.png"
-                  alt={copy.hero.portraitAlt}
-                  width={240}
-                  height={310}
-                  className="h-[270px] w-[200px] object-cover object-top"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-[#0c3327]/60 to-transparent" />
-                <div className="absolute bottom-3 left-0 right-0 flex justify-center">
-                  <div className="flex items-center gap-1.5 rounded-full border border-[#c7a76f]/40 bg-[#fbf8f1]/90 px-3 py-1.5 shadow">
-                    <QrCode className="h-3.5 w-3.5 text-[#173d31]" />
-                    <span className="text-[10px] text-[#665d50]">{copy.hero.qr}</span>
-                  </div>
-                </div>
-              </div>
+        <div className="relative mx-auto grid w-full max-w-7xl items-center gap-5 px-5 pt-22 pb-12 sm:px-8 sm:pt-24 sm:pb-16 lg:grid-cols-[1fr_380px_1fr] lg:gap-10 lg:pt-20 lg:pb-20">
+          <div className="order-2 rounded-2xl border border-[#c7a76f]/20 bg-[#091712]/55 p-5 shadow-2xl shadow-black/20 backdrop-blur-sm sm:p-6 lg:order-1">
+            <div className="mb-3 flex items-center gap-3 text-[#c7a76f] sm:mb-4">
+              <span className="h-px w-8 bg-[#c7a76f] sm:w-10" />
+              <span className="text-xs tracking-[0.22em] uppercase">{copy.hero.familyTitle}</span>
             </div>
+            <p className="font-serif text-lg leading-8 text-white sm:text-2xl sm:leading-9">
+              {copy.hero.familyNote}
+            </p>
+            <a href="#taziye" className="mt-5 inline-flex items-center gap-2 rounded-lg bg-[#c7a76f] px-4 py-2.5 text-xs font-semibold text-[#0c3327] transition hover:bg-[#d4b87c] sm:mt-6 sm:px-5 sm:py-3">
+              {copy.hero.book}
+              <PenLine className="h-4 w-4" />
+            </a>
+          </div>
 
-            <div className="mb-5 flex items-center gap-3 text-[#c7a76f]">
-              <span className="h-px w-14 bg-[#c7a76f]" />
+          <div className="order-1 text-center lg:order-2">
+            <div className="mx-auto mb-4 flex w-fit items-center gap-3 text-[#c7a76f] sm:mb-5">
+              <span className="h-px w-8 bg-[#c7a76f] sm:w-10" />
               <span className="text-xs tracking-[0.25em] uppercase">{copy.hero.badge}</span>
+              <span className="h-px w-8 bg-[#c7a76f] sm:w-10" />
             </div>
 
-            <h1 className="font-serif text-[52px] leading-[0.9] text-white sm:text-[72px] lg:text-[108px]">
-              Ahmet
-              <span className="block text-[#c7a76f]">{copy.hero.portraitAlt.split(' ').slice(1).join(' ')}</span>
-            </h1>
+            <div className="relative mx-auto h-[210px] w-[210px] overflow-hidden rounded-full border-[5px] border-[#c7a76f]/35 bg-[#0c3327] shadow-[0_24px_70px_rgba(0,0,0,0.45)] sm:h-[310px] sm:w-[310px] sm:border-[6px]">
+              <Image
+                src="/images/landing/memorial-ahmet.png"
+                alt={copy.hero.portraitAlt}
+                fill
+                priority
+                sizes="310px"
+                className="object-cover object-top"
+              />
+              <div className="absolute inset-0 rounded-full ring-1 ring-inset ring-white/15" />
+            </div>
 
-            <div className="mt-5 flex items-center gap-4 font-serif text-2xl text-[#efe7d8]/80">
+            <h1 className="mt-5 font-serif text-4xl leading-none text-white sm:mt-7 sm:text-6xl">
+              {copy.hero.portraitAlt}
+            </h1>
+            <div className="mt-3 flex items-center justify-center gap-4 font-serif text-lg text-[#efe7d8]/80 sm:text-xl">
               <span>1940</span>
               <Feather className="h-4 w-4 text-[#c7a76f]" />
               <span>2020</span>
             </div>
-
-            <p className="mt-5 max-w-sm font-serif text-xl italic leading-8 text-[#cfc3ad]">
+            <p className="mx-auto mt-3 max-w-sm font-serif text-base italic leading-7 text-[#cfc3ad] sm:text-lg sm:leading-8">
               {copy.hero.motto}
             </p>
 
-            <div className="mt-8 inline-flex flex-col gap-1 rounded-xl border border-[#c7a76f]/25 bg-white/5 px-6 py-4 backdrop-blur-sm">
-              <span className="text-[10px] tracking-[0.2em] text-[#c7a76f] uppercase">{copy.hero.sinceLabel}</span>
-              <span className="font-serif text-[40px] leading-none text-white sm:text-[52px]">
-                {daysSince.toLocaleString(localeByLang[lang])}
-              </span>
-              <span className="text-sm text-[#cfc3ad]">{copy.hero.sinceSuffix}</span>
+            <div className="mt-5 grid grid-cols-2 gap-3 sm:mt-6">
+              <div className="rounded-xl border border-[#c7a76f]/25 bg-white/5 px-3 py-3 backdrop-blur-sm sm:px-4 sm:py-4">
+                <div className="font-serif text-2xl text-white sm:text-3xl">{yearsLived}</div>
+                <div className="mt-1 text-xs text-[#c7a76f]">{copy.stats[0].suffix}</div>
+              </div>
+              <div className="rounded-xl border border-[#c7a76f]/25 bg-white/5 px-3 py-3 backdrop-blur-sm sm:px-4 sm:py-4">
+                <div className="font-serif text-2xl text-white sm:text-3xl">{daysSince.toLocaleString(localeByLang[lang])}</div>
+                <div className="mt-1 text-xs text-[#c7a76f]">{copy.hero.sinceSuffix}</div>
+              </div>
             </div>
-
-            <div className="mt-8 flex flex-wrap gap-3">
-              <a href="#taziye" className="inline-flex items-center gap-2 rounded-md bg-[#c7a76f] px-6 py-3 text-sm font-semibold text-[#0c3327] transition hover:bg-[#d4b87c]">
-                {copy.hero.book}
-                <PenLine className="h-4 w-4" />
-              </a>
-              <a href="#fotograflar" className="inline-flex items-center gap-2 rounded-md border border-[#c7a76f]/40 bg-white/5 px-6 py-3 text-sm font-semibold text-white backdrop-blur-sm transition hover:bg-white/10">
-                {copy.hero.explore}
-                <ArrowRight className="h-4 w-4" />
-              </a>
+            <div className="mt-3 rounded-xl border border-[#c7a76f]/25 bg-white/5 px-3 py-2.5 text-[10px] uppercase tracking-[0.16em] text-[#c7a76f] backdrop-blur-sm sm:px-4 sm:py-3 sm:text-xs sm:tracking-[0.18em]">
+              {copy.hero.sinceLabel}
             </div>
           </div>
 
-          <div className="relative hidden lg:block">
-            <div className="relative overflow-hidden rounded-2xl border-4 border-[#c7a76f]/20 shadow-[0_32px_80px_rgba(0,0,0,0.5)]">
-              <Image
-                src="/images/landing/memorial-ahmet.png"
-                alt={copy.hero.portraitAlt}
-                width={400}
-                height={540}
-                className="h-[540px] w-full object-cover object-top"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-[#0c3327]/70 via-transparent to-transparent" />
-              <div className="absolute bottom-5 left-5 right-5 flex items-end justify-between">
-                <div>
-                  <p className="font-serif text-lg text-white">{copy.hero.portraitAlt}</p>
-                  <p className="text-xs text-[#c7a76f]">{yearsLived} {copy.hero.yearsLine}</p>
-                </div>
-                <div className="flex flex-col items-center rounded-xl border border-[#c7a76f]/30 bg-[#fbf8f1]/90 p-2.5 shadow-xl">
-                  <QrCode className="h-8 w-8 text-[#173d31]" />
-                  <span className="mt-1 text-[9px] text-[#665d50]">{copy.hero.qr}</span>
-                </div>
-              </div>
+          <div className="order-3 rounded-2xl border border-[#c7a76f]/20 bg-[#091712]/55 p-5 shadow-2xl shadow-black/20 backdrop-blur-sm sm:p-6">
+            <div className="mb-3 flex items-center gap-3 text-[#c7a76f] sm:mb-4">
+              <span className="h-px w-8 bg-[#c7a76f] sm:w-10" />
+              <span className="text-xs tracking-[0.22em] uppercase">{copy.hero.messageTitle}</span>
             </div>
+            <div className="font-serif text-5xl leading-none text-[#c7a76f]/35 sm:text-6xl">"</div>
+            <p className="mt-1 font-serif text-lg italic leading-8 text-white sm:text-2xl sm:leading-9">
+              {copy.hero.messageNote}
+            </p>
+            <a href="#son-mesaj" className="mt-5 inline-flex items-center gap-2 rounded-lg border border-[#c7a76f]/40 bg-white/5 px-4 py-2.5 text-xs font-semibold text-white transition hover:bg-white/10 sm:mt-6 sm:px-5 sm:py-3">
+              {copy.hero.explore}
+              <ArrowRight className="h-4 w-4" />
+            </a>
           </div>
         </div>
 
-        <div className="absolute bottom-8 left-1/2 flex -translate-x-1/2 flex-col items-center gap-2">
+        <div className="absolute bottom-8 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-2 lg:flex">
           <span className="text-[10px] tracking-[0.2em] text-[#c7a76f]/50 uppercase">{copy.hero.scroll}</span>
           <div className="h-10 w-px bg-gradient-to-b from-[#c7a76f]/50 to-transparent" />
         </div>
@@ -687,33 +781,109 @@ export default function MemorialPage() {
         </div>
       </section>
 
-      {/* â”€â”€ KRONOLOJÄ° â”€â”€ */}
-      <section id="kronoloji" className="border-y border-[#e6dccb] bg-[#f7f2e9] px-5 py-16 sm:px-8">
-        <div className="mx-auto max-w-5xl">
-          <div className="mb-12 text-center">
-            <SectionLabel text={copy.timelineLabel} />
-            <h2 className="mt-3 font-serif text-5xl text-[#173d31]">{copy.timelineTitleA}<br />{copy.timelineTitleB}</h2>
+      {/* Time journey */}
+      <section id="kronoloji" className="border-y border-[#172d25] bg-[#091712] px-5 py-16 text-[#efe7d8] sm:px-8">
+        <div className="mx-auto max-w-7xl">
+          <div className="mb-9 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
+            <div>
+              <SectionLabel text={copy.timelineLabel} light />
+              <h2 className="mt-3 font-serif text-5xl text-white">{journeyUi.title}</h2>
+              <p className="mt-4 max-w-xl text-sm leading-7 text-[#b8aa93]">
+                {copy.timelineTitleA} {copy.timelineTitleB} {yearsLived} {journeyUi.years}.
+              </p>
+            </div>
+            <div className="flex w-full gap-1 rounded-xl border border-white/10 bg-white/[0.04] p-1 text-xs font-semibold text-[#cfc3ad] sm:w-auto">
+              {[journeyUi.timeline, journeyUi.slideshow, journeyUi.age].map((label, index) => (
+                <button
+                  key={label}
+                  className={`flex-1 rounded-lg px-4 py-2.5 transition sm:flex-none ${
+                    index === 0 ? 'bg-[#c7a76f] text-[#091712] shadow-lg shadow-black/20' : 'hover:bg-white/[0.06]'
+                  }`}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
           </div>
 
-          <div className="relative">
-            <div className="absolute left-1/2 hidden h-full w-px -translate-x-1/2 bg-gradient-to-b from-transparent via-[#c7a76f]/40 to-transparent md:block" />
+          <div className="overflow-hidden rounded-2xl border border-white/10 bg-[#0d1412] shadow-2xl shadow-black/30">
+            <div className="grid lg:grid-cols-[1fr_360px]">
+              <div className="relative px-5 py-7 sm:px-8 lg:px-10 lg:py-10">
+                <div className="absolute bottom-10 left-[2.15rem] top-10 w-px bg-gradient-to-b from-[#c7a76f]/20 via-[#c7a76f] to-[#c7a76f]/20 sm:left-[3.15rem] lg:left-[3.65rem]" />
+                <div className="space-y-7">
+                  {timelineEvents.map((event, i) => {
+                    const active = selectedTimeline === i
 
-            <div className="space-y-0">
-              {timelineEvents.map((event, i) => (
-                <div key={event.year} className={`relative grid gap-6 pb-10 md:grid-cols-2 ${i % 2 === 0 ? '' : 'md:[&>*:first-child]:order-last'}`}>
-                  <div className={`flex flex-col justify-center ${i % 2 === 0 ? 'md:pr-14 md:text-right' : 'md:pl-14'}`}>
-                    <div className={`mb-2 font-serif text-4xl text-[#b08340] ${i % 2 === 0 ? 'md:text-right' : 'md:text-left'}`}>
-                      {event.year}
-                    </div>
-                    <h3 className="font-serif text-2xl text-[#173d31]">{event.title}</h3>
-                    <p className="mt-2 text-sm leading-7 text-[#5b5245]">{event.desc}</p>
-                  </div>
+                    return (
+                    <article key={event.year} className="relative grid grid-cols-[44px_1fr] gap-4 sm:grid-cols-[56px_1fr]">
+                      <div className="relative z-10 flex justify-center pt-1">
+                        <span className={`flex h-5 w-5 items-center justify-center rounded-full border-2 border-[#c7a76f] shadow-[0_0_0_5px_rgba(199,167,111,0.12)] ${active ? 'bg-[#c7a76f]' : 'bg-[#0d1412]'}`}>
+                          <span className={`h-1.5 w-1.5 rounded-full ${active ? 'bg-[#091712]' : 'bg-[#c7a76f]'}`} />
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setSelectedTimeline(i)}
+                        className={`grid w-full gap-4 rounded-xl border p-4 text-left transition sm:grid-cols-[1fr_104px] sm:p-5 ${
+                          active
+                            ? 'border-[#c7a76f]/65 bg-[#c7a76f]/10 shadow-lg shadow-black/20'
+                            : 'border-white/8 bg-white/[0.035] hover:border-[#c7a76f]/35 hover:bg-white/[0.055]'
+                        }`}
+                      >
+                        <div>
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className="font-serif text-3xl leading-none text-[#c7a76f]">{event.year}</span>
+                            <span className={`rounded-full border px-2.5 py-1 text-[10px] uppercase tracking-widest ${active ? 'border-[#c7a76f]/35 text-[#efe7d8]' : 'border-white/10 text-[#8f9f96]'}`}>
+                              {journeyUi.chapter}
+                            </span>
+                          </div>
+                          <h3 className="mt-2 font-serif text-2xl text-white">{event.title}</h3>
+                          <p className="mt-2 max-w-2xl text-sm leading-7 text-[#cfc3ad]">{event.desc}</p>
+                        </div>
+                        <div className="relative min-h-[104px] overflow-hidden rounded-xl border border-[#c7a76f]/25 bg-[#17251f] sm:h-[104px]">
+                          <Image
+                            src={timelineMedia[i]}
+                            alt={event.title}
+                            fill
+                            sizes="120px"
+                            className="object-cover"
+                          />
+                          <div className="absolute inset-0 ring-1 ring-inset ring-white/10" />
+                        </div>
+                      </button>
+                    </article>
+                    )
+                  })}
+                </div>
+              </div>
 
-                  <div className="hidden md:flex md:items-center md:justify-center">
-                    <div className="relative z-10 flex h-5 w-5 items-center justify-center rounded-full border-4 border-[#c7a76f] bg-[#f7f2e9] shadow-[0_0_0_4px_rgba(199,167,111,0.2)]" />
+              <aside className="border-t border-white/10 bg-[#111b17] p-5 lg:border-l lg:border-t-0 lg:p-6">
+                <div className="flex h-full flex-col gap-4">
+                <div className="relative h-[320px] overflow-hidden rounded-2xl border border-[#c7a76f]/35 bg-[#0b1210] shadow-2xl shadow-black/30 sm:h-[420px] lg:h-[430px]">
+                  <Image
+                    key={timelineMedia[selectedTimeline]}
+                    src={timelineMedia[selectedTimeline]}
+                    alt={selectedEvent.title}
+                    fill
+                    sizes="360px"
+                    className="scale-105 object-cover object-center opacity-90 transition duration-500"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-[#091712] via-[#091712]/25 to-transparent" />
+                  <div className="absolute bottom-0 left-0 right-0 p-5">
+                    <p className="font-serif text-5xl leading-none text-[#c7a76f]">{selectedEvent.year}</p>
+                    <h3 className="mt-2 font-serif text-3xl text-white">{selectedEvent.title}</h3>
                   </div>
                 </div>
-              ))}
+                <div className="rounded-2xl border border-white/10 bg-[#0d1412] p-5">
+                  <p className="text-xs font-semibold uppercase tracking-[0.22em] text-[#c7a76f]">{journeyUi.chapter}</p>
+                  <p className="mt-3 text-sm leading-7 text-[#cfc3ad]">{selectedEvent.desc}</p>
+                  <a href="#fotograflar" className="mt-5 inline-flex items-center gap-2 rounded-lg bg-[#c7a76f] px-4 py-2.5 text-xs font-semibold text-[#091712] transition hover:bg-[#d4b87c]">
+                    {journeyUi.cta}
+                    <ArrowRight className="h-4 w-4" />
+                  </a>
+                </div>
+                </div>
+              </aside>
             </div>
           </div>
         </div>
@@ -925,6 +1095,93 @@ export default function MemorialPage() {
       {/* â”€â”€ TAZÄ°YE + Ä°NTERAKSÄ°YON (client) â”€â”€ */}
       <MemorialInteractions condolences={condolences} />
 
+      <section id="aile-baglari" className="bg-[#091712] px-5 py-12 text-[#efe7d8] sm:px-8">
+        <div className="mx-auto max-w-5xl">
+          <div className="mb-7 flex flex-col gap-5 text-center lg:flex-row lg:items-end lg:justify-between lg:text-left">
+            <div>
+              <SectionLabel text={familyUi.label} light />
+              <h2 className="mt-3 font-serif text-4xl text-white sm:text-5xl">
+                {familyUi.titleA}<br />
+                <span className="text-[#c7a76f]">{familyUi.titleB}</span>
+              </h2>
+            </div>
+            <div className="mx-auto flex w-full max-w-sm gap-1 rounded-xl border border-white/10 bg-white/[0.04] p-1 text-xs font-semibold text-[#cfc3ad] lg:mx-0">
+              <button className="flex-1 rounded-lg bg-[#c7a76f] px-4 py-2.5 text-[#091712] shadow-lg shadow-black/20">
+                {familyUi.tabTree}
+              </button>
+              <button className="flex-1 rounded-lg px-4 py-2.5 transition hover:bg-white/[0.06]">
+                {familyUi.tabClose}
+              </button>
+            </div>
+          </div>
+
+          <div className="overflow-hidden rounded-2xl border border-white/10 bg-[#0d1412] shadow-2xl shadow-black/30">
+            <div className="relative p-4 sm:p-6 lg:p-8">
+              <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(199,167,111,0.12),transparent_42%)]" />
+              <div className="pointer-events-none absolute inset-x-12 top-[118px] hidden h-px bg-[#c7a76f]/45 lg:block" />
+              <div className="pointer-events-none absolute left-1/2 top-[118px] hidden h-[92px] w-px -translate-x-1/2 bg-[#c7a76f]/45 lg:block" />
+              <div className="pointer-events-none absolute left-[38%] right-[38%] top-[210px] hidden h-px bg-[#c7a76f]/45 lg:block" />
+              <div className="pointer-events-none absolute left-1/2 top-[210px] hidden h-[92px] w-px -translate-x-1/2 bg-[#c7a76f]/45 lg:block" />
+              <div className="pointer-events-none absolute left-[31%] right-[31%] top-[302px] hidden h-px bg-[#c7a76f]/45 lg:block" />
+              <div className="pointer-events-none absolute left-1/2 top-[302px] hidden h-[92px] w-px -translate-x-1/2 bg-[#c7a76f]/45 lg:block" />
+              <div className="pointer-events-none absolute left-[38%] right-[38%] top-[394px] hidden h-px bg-[#c7a76f]/45 lg:block" />
+
+              <div className="relative grid gap-4 lg:hidden">
+                <div className="grid grid-cols-2 gap-4">
+                  <FamilyCard person={familyUi.people[0]} />
+                  <FamilyCard person={familyUi.people[1]} />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <FamilyCard person={familyUi.people[2]} featured />
+                  <FamilyCard person={familyUi.people[3]} />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <FamilyCard person={familyUi.people[4]} />
+                  <FamilyCard person={familyUi.people[5]} />
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <FamilyCard person={familyUi.people[6]} />
+                  <FamilyCard person={familyUi.people[7]} />
+                </div>
+              </div>
+
+              <div className="relative hidden min-h-[530px] lg:block">
+                <div className="absolute left-[18%] top-0 w-[145px] -translate-x-1/2">
+                  <FamilyCard person={familyUi.people[0]} />
+                </div>
+                <div className="absolute left-[82%] top-0 w-[145px] -translate-x-1/2">
+                  <FamilyCard person={familyUi.people[1]} />
+                </div>
+                <div className="absolute left-[42%] top-[145px] w-[155px] -translate-x-1/2">
+                  <FamilyCard person={familyUi.people[2]} featured />
+                </div>
+                <div className="absolute left-[62%] top-[145px] w-[145px] -translate-x-1/2">
+                  <FamilyCard person={familyUi.people[3]} />
+                </div>
+                <div className="absolute left-[36%] top-[290px] w-[145px] -translate-x-1/2">
+                  <FamilyCard person={familyUi.people[4]} />
+                </div>
+                <div className="absolute left-[64%] top-[290px] w-[145px] -translate-x-1/2">
+                  <FamilyCard person={familyUi.people[5]} />
+                </div>
+                <div className="absolute left-[42%] top-[435px] w-[145px] -translate-x-1/2">
+                  <FamilyCard person={familyUi.people[6]} />
+                </div>
+                <div className="absolute left-[58%] top-[435px] w-[145px] -translate-x-1/2">
+                  <FamilyCard person={familyUi.people[7]} />
+                </div>
+              </div>
+
+              <div className="relative mt-8 rounded-xl border border-[#c7a76f]/20 bg-[#111b17]/90 px-4 py-3 text-center text-xs text-[#b8aa93] backdrop-blur">
+                <span className="font-serif text-[#c7a76f]">4 {familyUi.generation}</span>
+                <span className="mx-2 text-white/20">/</span>
+                {familyUi.protected}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* â”€â”€ ZÄ°YARET BÄ°LGÄ°SÄ° â”€â”€ */}
       <section id="ziyaret" className="border-t border-[#e6dccb] px-5 py-16 sm:px-8">
         <div className="mx-auto max-w-7xl">
@@ -1006,12 +1263,7 @@ function MemorialNav({
   return (
     <nav className="fixed inset-x-0 top-0 z-50 border-b border-[#e6dccb]/50 bg-[#fbf8f1]/90 shadow-sm backdrop-blur">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5 sm:px-8">
-        <Link href="/" className="flex items-center gap-3 text-[#173d31]">
-          <span className="flex h-9 w-9 items-center justify-center rounded-t-full border border-[#c7a76f] bg-[#f4eee3] text-[#9a7132]">
-            <Feather className="h-5 w-5" />
-          </span>
-          <span className="font-serif text-2xl">The Maradi</span>
-        </Link>
+        <BrandLogo />
         <div className="hidden items-center gap-7 text-sm font-medium text-[#4c463c] lg:flex">
           <Link href="/" className="transition hover:text-[#9a7132]">{copy.home}</Link>
           <Link href="/#nasil-calisir" className="transition hover:text-[#9a7132]">{copy.how}</Link>
@@ -1086,13 +1338,54 @@ function InfoRow({ icon: Icon, label, value }: { icon: typeof MapPin; label: str
   )
 }
 
+function FamilyCard({
+  person,
+  featured = false,
+}: {
+  person: {
+    name: string
+    relation: string
+    years: string
+    initials: string
+    image?: string
+    position?: string
+  }
+  featured?: boolean
+}) {
+  return (
+    <div
+      className={`relative overflow-hidden rounded-xl border bg-[#121b17] p-3 text-center shadow-xl shadow-black/20 ${
+        featured ? 'border-[#c7a76f] ring-4 ring-[#c7a76f]/10' : 'border-white/10'
+      }`}
+    >
+      <div className="mx-auto flex h-16 w-16 items-center justify-center overflow-hidden rounded-full border-2 border-[#c7a76f]/55 bg-[#f4eee3] text-sm font-semibold text-[#173d31] shadow-lg shadow-black/20">
+        {person.image ? (
+          <Image
+            src={person.image}
+            alt={person.name}
+            width={96}
+            height={96}
+            className="h-full w-full object-cover"
+            style={{ objectPosition: person.position ?? '50% 25%' }}
+          />
+        ) : (
+          person.initials
+        )}
+      </div>
+      <div className="mt-2 font-serif text-sm leading-tight text-white sm:text-base">{person.name}</div>
+      <div className="mt-1 text-[11px] uppercase tracking-widest text-[#c7a76f]">{person.relation}</div>
+      <div className="mt-1 text-xs text-[#8f9f96]">{person.years}</div>
+    </div>
+  )
+}
+
 function MemorialFooter({ copy }: { copy: typeof memorialCopy.tr.footer }) {
   return (
     <footer className="bg-[#0c3327] px-5 py-12 text-[#efe7d8] sm:px-8">
       <div className="mx-auto grid max-w-7xl gap-10 md:grid-cols-[1.5fr_1fr_1fr_1fr]">
         <div>
           <div className="flex items-center gap-3 font-serif text-2xl">
-            <Feather className="h-6 w-6 text-[#c7a76f]" />
+            <BrandMark className="h-10 w-10" />
             The Maradi
           </div>
           <p className="mt-4 max-w-xs font-serif text-lg italic leading-7 text-[#cfc3ad]">
