@@ -5,6 +5,78 @@
 
 ---
 
+## 2026-06-07 — Oturum 14: Admin Login, Kasa Geliştirme, DB Fiyat Yönetimi
+
+### Yapılanlar
+
+**Admin Login & Güvenlik:**
+- `src/app/admin/login/page.tsx` + `AdminLoginForm.tsx` + `actions.ts` — ayrı admin login sayfası (`/admin/login`), `/auth/login`'den tamamen bağımsız
+- Login sonrası rol kontrolü: `role !== 'admin'` ise anında `signOut()` + audit log
+- `src/app/admin/signout/route.ts` — admin çıkış route'u (logout audit log dahil)
+- `src/lib/supabase/middleware.ts` — `/admin/login` ve `/admin/signout` middleware'den muaf tutuldu; korumalı admin sayfaları artık `/admin/login`'e yönleniyor (`/login`'e değil)
+- `src/app/admin/layout.tsx` — `getAdminContext()` (soft check) kullanacak şekilde yeniden yazıldı; sonsuz redirect döngüsü engellendi
+- `src/lib/admin/auth.ts` — `cache()` ile deduplicate: layout + page aynı auth sonucunu paylaşıyor (4 DB round-trip → 2'ye düştü)
+- `admin@themaradi.com` kullanıcısı Supabase'e SQL ile oluşturuldu, `role = 'admin'` atandı
+- `/dashboard` layout'una admin ise "Admin Paneli" kısayol linki eklendi
+
+**Kasa Geliştirme:**
+- `src/app/admin/kasa/page.tsx` — ödeme listesine kullanıcı adı + e-posta eklendi (vault → profiles join)
+- `src/app/admin/kasa/_ManualPaymentForm.tsx` — vault arama + manuel ödeme ekleme modalı
+- `actions.ts → addManualPayment()` — Zod validasyonlu, audit loglu server action
+
+**Performans:**
+- `src/lib/admin/auth.ts` — `cache()` ile auth deduplication
+- `src/app/admin/page.tsx` — `vaults` tam tablo yerine `vault_status_counts()` RPC ile GROUP BY sorgusu
+- Migration 011: `vault_status_counts()` PostgreSQL fonksiyonu
+
+**Fiyat & Kampanya Yönetimi:**
+- Migration 012: `platform_settings` tablosu (fiyatlar, kampanya config) + `pricing_exemptions` tablosu (ücretsiz/indirimli muafiyetler)
+- `src/lib/pricing.ts` — `fetchPricingConfig()` utility, fallback değerli
+- `src/app/page.tsx` — server component olarak fiyat çekip `LocalizedLanding`'e prop geçiriyor
+- `src/app/pricing/page.tsx` — aynı şekilde `PricingClient`'a prop geçiriyor
+- `src/components/landing/LocalizedLanding.tsx` — `pricing` prop kabul ediyor, kampanya varsa üzeri çizili eski fiyat + büyük yeni fiyat gösteriyor
+- `src/app/pricing/PricingClient.tsx` — aynı kampanya mantığı
+- `src/app/admin/settings/page.tsx` — fiyat yönetim sayfası (tam işlevsel)
+- `src/app/admin/settings/_PricingSettingsForm.tsx` — fiyat güncelleme formu + kampanya toggle
+- `src/app/admin/settings/_ExemptionForm.tsx` — ücretsiz/indirimli muafiyet ekleme modalı
+- `actions.ts → updatePricingSettings()`, `addPricingExemption()` — server actions
+
+### Proje Durumu
+```
+[x] DB migrations 001-012
+[x] Admin panel — 13 sayfa (dashboard, verifications, kasa, memorials, objections, vb.)
+[x] Admin login — ayrı URL (/admin/login), rol doğrulama, audit log
+[x] Admin auth cache() optimizasyonu
+[x] Kasa — kullanıcı bilgileri + manuel ödeme ekleme
+[x] Fiyat yönetimi — DB'den okuma, admin panelinden güncelleme
+[x] Kampanya sistemi — toggle, indirimli fiyat, bitiş tarihi
+[x] Ücretsiz muafiyet sistemi (şehitler, ünlüler, özel kişiler)
+[x] 4 dil i18n (TR/KA/RU/EN)
+[ ] ContactForm API route (Resend)
+[ ] Ödeme entegrasyonu (TBC Pay / BOG Pay)
+[ ] R2 media upload
+[ ] Admin panel — pricing exemptions ödeme akışına entegre edilmeli
+[ ] Admin panel — kullanıcı oluşturma UI (şu an SQL ile yapılıyor)
+```
+
+### Kritik Kararlar / Notlar
+- Admin login `/admin/login`'de, kullanıcı login `/auth/login`'de (henüz yok) — tamamen ayrı
+- `cache()` pattern: React request-scope cache ile aynı request'te birden fazla `requireAdmin()` çağrısı tek DB round-trip'e iniyor
+- `platform_settings` key-value tablosu: fiyat değişikliklerinde `revalidatePath('/')` ve `revalidatePath('/pricing')` çağrılıyor → ISR anında revalidate oluyor
+- Muafiyetler şu an sadece kayıt altında — ödeme akışına henüz entegre değil (ileride kontrol edilecek)
+
+### Nerede Kaldık
+Admin paneli temel işlevleriyle çalışıyor. Fiyatlar DB'den okunuyor, admin panelinden güncellenebiliyor. Kampanya sistemi hazır. Manuel ödeme kaydı yapılabiliyor.
+
+### Sıradaki Adım
+1. ContactForm Resend entegrasyonu (e-posta gönderimi)
+2. Ödeme entegrasyonu — TBC Pay veya BOG Pay
+3. R2 media upload (vault içeriği için)
+4. Pricing exemption → ödeme akışında kontrol (ücretsiz kullanıcı vault oluştururken muafiyet kontrolü)
+5. Admin'den kullanıcı oluşturma UI (şu an SQL gerekiyor)
+
+---
+
 ## 2026-06-07 — Oturum 13: Tam Admin Panel — Dashboard, Doğrulama, Kasa, Güvenlik, Audit Log
 
 ### Yapılanlar
