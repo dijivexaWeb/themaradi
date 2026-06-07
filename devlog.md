@@ -5,6 +5,76 @@
 
 ---
 
+## 2026-06-07 — Oturum 13: Tam Admin Panel — Dashboard, Doğrulama, Kasa, Güvenlik, Audit Log
+
+### Yapılanlar
+- **6 DB Migration** (mcp__supabase-themaradi):
+  - 005: `payments` tablosu (GEL, product_type, overdue tracking)
+  - 006: `contact_messages` tablosu (anon insert politikası)
+  - 007: `admin_audit_logs` tablosu (tüm admin aksiyonlarının kaydı)
+  - 008: `alive_alerts` tablosu (yaşıyorum bildirimleri)
+  - 009: `gdpr_requests` tablosu (30 gün SLA trigger)
+  - 010: `profiles.role` kolonu + `is_admin()` fonksiyonu + `guestbook_entries` tablosu
+- **`src/lib/admin/auth.ts`** — `requireAdmin()` + `getAdminContext()` server-side auth utilities
+- **`src/lib/admin/audit.ts`** — `logAdminAction()` her mutasyonda admin_audit_logs'a kayıt
+- **`src/app/admin/layout.tsx`** — requireAdmin korumalı server layout, AdminSidebar'a adminEmail/Name iletir
+- **`src/app/admin/AdminSidebar.tsx`** — 13 nav item, mobile hamburger drawer, slate-900 dark sidebar
+- **`src/app/admin/actions.ts`** — 11 server action: approveVault, rejectVault, changeVaultStatus, resolveObjection, updateContactStatus, updatePaymentStatus, resolveAliveAlert, resolveGdprRequest, moderateGuestbook, updateUserRole, banUser
+- **13 admin sayfası** (hepsi server component + requireAdmin):
+  - `/admin` — Dashboard (6 stat kart, vault durum özeti, son audit log)
+  - `/admin/verifications` — Doğrulama kuyruğu, gün sayacı, 14 gün pencere
+  - `/admin/kasa` — Ödeme özeti (MRR, tahsilat, vadeli), payment status değiştirme
+  - `/admin/memorials` — Tüm vaultlar, filtreleme, pagination (25/sayfa)
+  - `/admin/memorials/[id]` — Vault detay, heir listesi, payment geçmişi, durum değiştirme
+  - `/admin/objections` — İtiraz kuyruğu, upheld/dismissed çözümleme
+  - `/admin/contacts` — Contact mesaj kuyruğu, accordion expand, status/note güncelleme
+  - `/admin/heirs` — Bekleyen varis davetleri, gün takibi
+  - `/admin/alive-alerts` — Ben yaşıyorum bildirimleri, inceleme/çözme/reddetme
+  - `/admin/guestbook` — Pending guestbook_entries moderasyonu, bulk approve/reject/spam
+  - `/admin/users` — Kullanıcı listesi, rol değiştirme, ban (Supabase Admin API)
+  - `/admin/gdpr` — GDPR talepleri, 30 gün SLA takibi, overdue highlight
+  - `/admin/audit` — Salt okunur audit log, admin/action/tarih filtresi
+  - `/admin/settings` — Placeholder UI (bakım modu, dosya boyutu, dil)
+- **`src/app/contact/actions.ts`** — `submitContactMessage` server action (Zod validated, contact_messages tablosuna kayıt)
+- **`src/app/contact/ContactForm.tsx`** — Gerçek DB kaydı yapan form (name attr'ları eklendi, error state)
+- **`src/proxy.ts`** — /admin/* için `Cache-Control: no-store, no-cache`
+
+### Proje Durumu
+- [x] Supabase altyapısı ve middleware
+- [x] Auth (login, signout, callback)
+- [x] Dashboard
+- [x] Vault CRUD
+- [x] Memorial sayfası + QR route
+- [x] i18n (TR/KA/RU/EN)
+- [x] Landing page (yeniden tasarlandı)
+- [x] Yasal sayfalar (terms, privacy, kvkk, legal)
+- [x] Admin panel — tam, production-ready
+- [x] DB: payments, contact_messages, admin_audit_logs, alive_alerts, gdpr_requests, guestbook_entries, profiles.role
+- [ ] E-posta altyapısı (Resend entegrasyonu)
+- [ ] Ödeme altyapısı (gerçek ödeme geçidi)
+- [ ] Dosya yükleme (R2)
+- [ ] Admin ayarlar backend
+
+### Kritik Kararlar / Notlar
+- `createServiceClient()` admin tarafında kullanılıyor (RLS bypass) — client'e service key asla gönderilmiyor
+- `admin_audit_logs` tablosu orijinal `audit_logs` ile karışmaması için ayrı isimlendirildi
+- `guestbook_entries` orijinal `guestbook` tablosundan ayrı — admin için yeni moderation tablosu
+- `claim_objections` tablosu zaten vardı (farklı schema), migration 010'da yeni eklenmedi
+- Form action pattern'leri Next.js App Router uyumlu — void return için client button component'leri kullanıldı
+- Build zero TypeScript hata ile geçti (`npx tsc --noEmit` ve `npx next build` temiz)
+
+### Nerede Kaldık
+Tam admin panel tamamlandı ve master'a push edildi (commit: 2b94494). Tüm sayfalar `requireAdmin()` ile korunuyor, tüm mutasyonlar `logAdminAction()` ile audit_logs'a yazılıyor. Migrations 005-010 Supabase production'a apply edildi.
+
+### Sıradaki Adım
+1. E-posta altyapısı: Resend entegrasyonu (heir invitation, contact autoresponse, payment reminder)
+2. Dosya yükleme: R2 bucket + presigned URL — media tablosu entegrasyonu
+3. Admin settings backend: key-value store tablosu, maintenance mode middleware
+4. Gerçek ödeme geçidi: GEL için yerel Gürcistan ödeme sağlayıcısı araştırılması
+5. Alive alert → vault status değiştirme mantığını tamamla (admin resolve → vault suspend)
+
+---
+
 ## 2026-06-07 — Oturum 12: Tam 4 Dil i18n (TR/KA/RU/EN) + Otomatik Dil Tespiti
 
 ### Yapılanlar
