@@ -5,6 +5,50 @@
 
 ---
 
+## 2026-06-07 — Oturum 22: Inline Edit + Aile Fotoğraf Yükleme
+
+### Yapılanlar
+- `anilar/page.tsx` — `searchParams` prop eklendi; hover'da `Düzenle · Sil` butonları çıkıyor; `?edit=<id>` ile inline edit form açılıyor
+- `gizli-kasa/page.tsx` — aynı edit pattern eklendi
+- `vasiyet/page.tsx` — yazılı vasiyetler için aynı edit pattern eklendi
+- `aile/page.tsx` — edit pattern eklendi; kart görünümü avatar+satır düzenine çevrildi; `photo_file` dosya yükleme eklendi (URL yanında)
+- `memories.ts` — `updateMemoryAction` imzası değişti: `redirectTo: string` parametresi eklendi, action sonunda `redirect()` çağrısı yapılıyor
+- `family.ts` — `uploadFamilyPhoto()` yardımcı fonksiyonu eklendi (vault-media/family/ bucket); `addFamilyMemberAction` ve `updateFamilyMemberAction` fotoğraf yüklemeyi destekliyor; `updateFamilyMemberAction` redirect ekli; `revalidatePath` vault ana sayfasına da eklendi
+- Commit: `482ed69`
+
+### Proje Durumu
+- [x] Auth sistemi
+- [x] Dashboard ana sayfa — 6 görsel blok (sayfa inşa et konsepti)
+- [x] Sol sidebar — Ana nav + Özel Alan grubu
+- [x] Tüm alt sayfa layout overhaul (PersonHeader)
+- [x] Vasiyetname sayfası (metin + belge)
+- [x] Anılar — edit + sil
+- [x] Gizli kasa — edit + sil
+- [x] Aile bağları — edit + sil + fotoğraf yükleme
+- [x] Belgeler kasası — sil (belgeler için edit gerekmez, silip tekrar yükle)
+- [x] Varis bilgileri — kaldır (edit gerekmez)
+- [ ] payments RLS hatası
+- [ ] Login "Kaydınız yoksa" → /satin-al yönlendirmesi
+- [ ] Rehber/kılavuz sayfası
+- [ ] Vefat bildirimi alanı
+
+### Kritik Kararlar / Notlar
+- Edit pattern: `?edit=<id>` URL param → server component searchParams → inline form; submit → redirect temiz URL'ye
+- `updateMemoryAction` artık `redirectTo` 3. parametre olarak alıyor — bind: `.bind(null, memoryId, vaultId, pageUrl)`
+- Aile fotoğrafı: `photo_file` (File) varsa storage'a yükle, yoksa `photo_url` (text) kullan; boş bırakılırsa mevcut URL korunur
+- Formlar `encType="multipart/form-data"` gerektiriyor (dosya yükleme olan tüm formlarda)
+
+### Nerede Kaldık
+Edit ve fotoğraf yükleme özellikleri tamamlandı, build başarılı, push edildi.
+
+### Sıradaki Adım
+1. Rehber/kılavuz sayfası (`/dashboard/vault/[id]/rehber`) — kişi verilerin anma sayfasında nerede göründüğünü gösterir
+2. payments RLS hatası düzeltmesi
+3. Login sayfası "Kaydınız yoksa" → /satin-al yönlendirmesi
+4. Vefat bildirimi alanı
+
+---
+
 ## 2026-06-07 — Oturum 21: Dashboard Redesign + Vasiyetname Sayfası
 
 ### Yapılanlar
