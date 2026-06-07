@@ -27,7 +27,7 @@ export default async function OnizlemePage({ params }: Props) {
     { data: familyMembers },
     { data: secretCount },
   ] = await Promise.all([
-    supabase.from('media').select('*').eq('vault_id', id).eq('media_type', 'image').eq('is_public', true).order('sort_order').limit(12),
+    supabase.from('media').select('*').eq('vault_id', id).eq('media_type', 'image').eq('is_public', true).order('taken_at', { ascending: false }).limit(12),
     supabase.from('media').select('*').eq('vault_id', id).eq('media_type', 'video').eq('is_public', true).limit(4),
     supabase.from('vault_memories').select('*').eq('vault_id', id).eq('is_secret', false).order('memory_date', { ascending: false }).limit(5),
     supabase.from('vault_family_members').select('*').eq('vault_id', id).order('sort_order'),
@@ -157,10 +157,22 @@ export default async function OnizlemePage({ params }: Props) {
         {photos && photos.length > 0 && (
           <section>
             <p className="text-[#c7a76f] text-xs uppercase tracking-[0.2em] mb-4">Fotoğraf Arşivi ({photos.length})</p>
-            <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
               {photos.map((p) => (
-                <div key={p.id} className="aspect-square rounded-xl overflow-hidden relative bg-[#0d1f1a]">
-                  <Image src={p.thumb_url ?? p.original_url} alt={p.original_filename ?? ''} fill className="object-cover" unoptimized />
+                <div key={p.id} className="rounded-xl overflow-hidden bg-[#0d1f1a] border border-[#c7a76f]/10">
+                  <div className="aspect-square relative">
+                    <Image src={p.thumb_url ?? p.original_url} alt={p.original_filename ?? ''} fill className="object-cover" unoptimized />
+                  </div>
+                  <div className="p-3">
+                    {p.taken_at && (
+                      <p className="text-[11px] text-[#c7a76f]/70 mb-1">
+                        {new Date(p.taken_at).toLocaleString('tr-TR', { dateStyle: 'medium', timeStyle: 'short' })}
+                      </p>
+                    )}
+                    {p.caption && (
+                      <p className="text-xs text-[#cfc3ad] leading-5 line-clamp-3">{p.caption}</p>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>
@@ -179,7 +191,7 @@ export default async function OnizlemePage({ params }: Props) {
         {/* Secret vault note for life_vault */}
         {isLifeVault && (
           <section className="bg-[#c7a76f]/5 border border-[#c7a76f]/20 rounded-2xl p-5 text-center">
-            <p className="text-[#c7a76f] text-sm">🔐 Gizli Kasa</p>
+            <p className="text-[#c7a76f] text-sm">🔐 Özel İçerikler</p>
             <p className="text-slate-500 text-xs mt-1">
               {(secretCount as unknown as { count: number })?.count ?? 0} gizli öğe sadece varisleriniz tarafından görülebilecek
             </p>

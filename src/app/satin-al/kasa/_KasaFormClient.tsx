@@ -94,9 +94,9 @@ export default function KasaFormClient({ bank, setupAmount, monthlyAmount }: { b
               <form action={action} className="space-y-4">
                 <div>
                   <label className="block text-xs text-slate-400 mb-1.5 font-medium">
-                    Kasa adı <span className="text-emerald-400">*</span>
+                    Anı alanı adı <span className="text-emerald-400">*</span>
                   </label>
-                  <input type="text" name="display_name" placeholder="Örn: Benim Kasam veya kendi adınız" required className={inp} />
+                  <input type="text" name="display_name" placeholder="Örn: Mehmet'in Anı Alanı veya kendi adınız" required className={inp} />
                 </div>
                 <div>
                   <label className="block text-xs text-slate-400 mb-1.5 font-medium">
@@ -110,12 +110,29 @@ export default function KasaFormClient({ bank, setupAmount, monthlyAmount }: { b
                   </label>
                   <input type="email" name="sender_email" placeholder="Bildirim gönderilecek adres" required className={inp} />
                 </div>
+                <div className="grid sm:grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-xs text-slate-400 mb-1.5 font-medium">
+                      Şifre <span className="text-emerald-400">*</span>
+                    </label>
+                    <input type="password" name="password" placeholder="En az 6 karakter" required minLength={6} className={inp} />
+                  </div>
+                  <div>
+                    <label className="block text-xs text-slate-400 mb-1.5 font-medium">
+                      Şifre tekrar <span className="text-emerald-400">*</span>
+                    </label>
+                    <input type="password" name="password_confirm" placeholder="Şifrenizi tekrar yazın" required minLength={6} className={inp} />
+                  </div>
+                </div>
+                <p className="text-xs text-slate-600 leading-5">
+                  Bu e-posta ve şifreyle hesabınız oluşturulur. Ödeme onaylandıktan sonra aynı bilgilerle panelinize giriş yapabilirsiniz.
+                </p>
                 {state?.error && (
                   <p className="text-red-400 text-sm bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3">{state.error}</p>
                 )}
                 <button type="submit" disabled={pending}
                   className="w-full bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white font-semibold py-3 rounded-xl transition-colors text-sm">
-                  {pending ? 'İşleniyor...' : 'Havale Yaptım, Kasayı Oluştur →'}
+                  {pending ? 'İşleniyor...' : 'Havale Yaptım, Anı Alanımı Oluştur →'}
                 </button>
               </form>
 

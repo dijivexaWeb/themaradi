@@ -33,7 +33,6 @@ export default async function SettingsPage({ params }: Props) {
 
     const raw = (formData.get('slug') as string)?.trim().toLowerCase()
     if (!raw) return
-    // Türkçe → ASCII + slug temizleme
     const cleaned = raw
       .replace(/ş/g, 's').replace(/ğ/g, 'g').replace(/ü/g, 'u')
       .replace(/ö/g, 'o').replace(/ı/g, 'i').replace(/ç/g, 'c')
@@ -41,7 +40,6 @@ export default async function SettingsPage({ params }: Props) {
       .substring(0, 60)
     if (cleaned.length < 3) return
 
-    // Benzersizlik kontrolü (kendi id'si hariç)
     const { data: existing } = await sup.from('vaults').select('id').eq('slug', cleaned).neq('id', id).maybeSingle()
     if (existing) return
 
@@ -68,37 +66,39 @@ export default async function SettingsPage({ params }: Props) {
     revalidatePath(`/dashboard/vault/${id}/settings`)
   }
 
+  const inputCls = `w-full rounded-xl border border-[#e5dccb] bg-white px-4 py-3 text-sm text-[#1f2d27] placeholder-[#adb5ab] outline-none focus:border-[#174f35] focus:ring-2 focus:ring-[#174f35]/10`
+  const labelCls = `mb-1.5 block text-xs font-semibold text-[#4a5e55]`
+  const cardCls = `rounded-3xl border border-[#e5dccb] bg-[#fffdf8] p-6 shadow-[0_16px_50px_rgba(64,48,24,0.06)]`
+
   return (
-    <div className="p-8">
+    <div className="px-5 py-8 sm:px-8">
       <div className="max-w-2xl mx-auto">
-        <div className="flex items-center gap-2 text-sm text-slate-500 mb-6">
-          <Link href="/dashboard" className="hover:text-slate-300">Kasalar</Link>
-          <span>/</span>
-          <Link href={`/dashboard/vault/${id}`} className="hover:text-slate-300">{vault.display_name}</Link>
-          <span>/</span>
-          <span className="text-slate-300">Ayarlar</span>
+        <div className="flex items-center gap-2 text-sm mb-6">
+          <Link href="/dashboard" className="text-[#788177] hover:text-[#174f35] transition-colors">Anı Alanım</Link>
+          <span className="text-[#c8bfb0]">/</span>
+          <Link href={`/dashboard/vault/${id}`} className="text-[#788177] hover:text-[#174f35] transition-colors">{vault.display_name}</Link>
+          <span className="text-[#c8bfb0]">/</span>
+          <span className="font-semibold text-[#22362e]">Ayarlar</span>
         </div>
-        <h1 className="text-2xl font-bold text-slate-100 mb-6">Kasa Ayarları</h1>
+        <h1 className="font-serif text-3xl text-[#1f2d27] mb-7">Yayın & Ayarlar</h1>
 
         {/* Sayfa adresi */}
-        <div className="glass border border-slate-800/60 rounded-2xl p-6 mb-5">
-          <h2 className="text-sm font-semibold text-slate-200 mb-1">Sayfa Adresi</h2>
-          <p className="text-xs text-slate-500 mb-4">
+        <div className={`${cardCls} mb-5`}>
+          <h2 className="text-sm font-semibold text-[#1f2d27] mb-1">Sayfa Adresi</h2>
+          <p className="text-xs text-[#788177] mb-5">
             Anma sayfanızın herkese açık URL'i. Kısa, akılda kalıcı bir adres seçin.
           </p>
           {vault.slug && (
-            <div className="mb-4 bg-slate-800/60 border border-emerald-500/20 rounded-xl px-4 py-3 flex items-center gap-3">
-              <span className="text-emerald-400">🔗</span>
+            <div className="mb-4 rounded-xl border border-[#174f35]/20 bg-[#f0fdf4] px-4 py-3 flex items-center gap-3">
+              <span className="text-[#174f35]">🔗</span>
               <div className="flex-1 min-w-0">
-                <p className="text-xs text-slate-500 mb-0.5">Mevcut adres</p>
-                <p className="text-sm font-mono text-emerald-400 truncate">
-                  themaradi.com/memorial/{vault.slug}
-                </p>
+                <p className="text-xs text-[#788177] mb-0.5">Mevcut adres</p>
+                <p className="text-sm font-mono text-[#174f35] truncate">themaradi.com/ani-alanim/{vault.slug}</p>
               </div>
               <Link
-                href={`/memorial/${vault.slug}`}
+                href={`/ani-alanim/${vault.slug}`}
                 target="_blank"
-                className="text-xs text-slate-500 hover:text-amber-400 transition-colors shrink-0"
+                className="text-xs text-[#788177] hover:text-[#174f35] transition-colors shrink-0"
               >
                 Görüntüle →
               </Link>
@@ -106,10 +106,8 @@ export default async function SettingsPage({ params }: Props) {
           )}
           <form action={saveSlug} className="flex gap-3 items-start">
             <div className="flex-1">
-              <div className="flex items-center bg-slate-800 border border-slate-700 rounded-xl overflow-hidden focus-within:border-amber-500 transition-colors">
-                <span className="text-xs text-slate-600 pl-3 pr-1 shrink-0 hidden sm:block">
-                  .../memorial/
-                </span>
+              <div className="flex items-center rounded-xl border border-[#e5dccb] bg-white overflow-hidden focus-within:border-[#174f35] focus-within:ring-2 focus-within:ring-[#174f35]/10 transition-all">
+                <span className="text-xs text-[#adb5ab] pl-3 pr-1 shrink-0 hidden sm:block">.../ani-alanim/</span>
                 <input
                   type="text"
                   name="slug"
@@ -118,111 +116,131 @@ export default async function SettingsPage({ params }: Props) {
                   pattern="[a-z0-9-]+"
                   minLength={3}
                   maxLength={60}
-                  className="flex-1 bg-transparent text-slate-100 placeholder-slate-600 px-3 py-2.5 text-sm focus:outline-none font-mono"
+                  className="flex-1 bg-transparent text-[#1f2d27] placeholder-[#adb5ab] px-3 py-3 text-sm focus:outline-none font-mono"
                 />
               </div>
-              <p className="text-xs text-slate-600 mt-1.5">Sadece küçük harf, rakam ve tire ( - ) kullanın</p>
+              <p className="text-xs text-[#adb5ab] mt-1.5">Sadece küçük harf, rakam ve tire ( - ) kullanın</p>
             </div>
-            <button type="submit"
-              className="bg-slate-700 hover:bg-slate-600 text-slate-100 text-sm font-medium px-4 py-2.5 rounded-xl transition-colors shrink-0">
+            <button
+              type="submit"
+              className="rounded-xl border border-[#e5dccb] bg-white px-4 py-3 text-sm font-medium text-[#4a5e55] hover:bg-[#f5efdf] transition-colors shrink-0"
+            >
               Kaydet
             </button>
           </form>
         </div>
 
-        <div className="glass border border-slate-800/60 rounded-2xl p-6 mb-5">
-          <h2 className="text-sm font-semibold text-slate-200 mb-4">Genel Bilgiler</h2>
+        {/* Genel Bilgiler */}
+        <div className={`${cardCls} mb-5`}>
+          <h2 className="text-sm font-semibold text-[#1f2d27] mb-4">Genel Bilgiler</h2>
           <form action={update} className="space-y-4">
             <div>
-              <label className="block text-xs text-slate-400 mb-1.5">Kasa Adı</label>
-              <input type="text" name="display_name" defaultValue={vault.display_name} required
-                className="w-full bg-slate-800 border border-slate-700 text-slate-100 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-amber-500" />
+              <label className={labelCls}>Anı Alanı Adı</label>
+              <input type="text" name="display_name" defaultValue={vault.display_name} required className={inputCls} />
             </div>
             <div className="grid grid-cols-2 gap-4">
               <div>
-                <label className="block text-xs text-slate-400 mb-1.5">Doğum Tarihi</label>
-                <input type="date" name="birth_date" defaultValue={vault.birth_date ?? ''}
-                  className="w-full bg-slate-800 border border-slate-700 text-slate-100 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-amber-500" />
+                <label className={labelCls}>Doğum Tarihi</label>
+                <input type="date" name="birth_date" defaultValue={vault.birth_date ?? ''} className={inputCls} />
               </div>
               <div>
-                <label className="block text-xs text-slate-400 mb-1.5">Vefat Tarihi</label>
-                <input type="date" name="death_date" defaultValue={vault.death_date ?? ''}
-                  className="w-full bg-slate-800 border border-slate-700 text-slate-100 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-amber-500" />
+                <label className={labelCls}>Vefat Tarihi</label>
+                <input type="date" name="death_date" defaultValue={vault.death_date ?? ''} className={inputCls} />
               </div>
             </div>
-            <button type="submit" className="bg-amber-500 hover:bg-amber-400 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-colors">
+            <button
+              type="submit"
+              className="rounded-xl bg-[#174f35] px-5 py-2.5 text-sm font-semibold text-white shadow-[0_14px_35px_rgba(23,79,53,0.18)] hover:bg-[#123f2b] transition-colors"
+            >
               Kaydet
             </button>
           </form>
         </div>
 
-        <div className="glass border border-slate-800/60 rounded-2xl p-6 mb-5">
-          <h2 className="text-sm font-semibold text-slate-200 mb-1">QR Kod Eşleştirme</h2>
-          <p className="text-xs text-slate-500 mb-4">Mermer atölyesinden aldığınız QR hash kodunu girerek mezar taşı QR kodunu bu kasaya bağlayın.</p>
+        {/* QR Kod */}
+        <div className={`${cardCls} mb-5`}>
+          <h2 className="text-sm font-semibold text-[#1f2d27] mb-1">QR Kod Eşleştirme</h2>
+          <p className="text-xs text-[#788177] mb-4">
+            Mermer atölyesinden aldığınız QR hash kodunu girerek mezar taşı QR kodunu bu anı alanına bağlayın.
+          </p>
           {linkedQRs && linkedQRs.length > 0 && (
             <div className="mb-4 space-y-2">
               {linkedQRs.map((qr) => (
-                <div key={qr.qr_hash} className="flex items-center gap-3 bg-slate-800/60 rounded-xl px-4 py-3">
+                <div key={qr.qr_hash} className="flex items-center gap-3 rounded-xl border border-[#e5dccb] bg-white px-4 py-3">
                   <span className="text-lg">📱</span>
                   <div className="flex-1">
-                    <div className="text-xs font-mono text-slate-300">{qr.qr_hash}</div>
-                    <div className="text-xs text-slate-500">{qr.redirect_count ?? 0} okuma</div>
+                    <div className="text-xs font-mono text-[#1f2d27]">{qr.qr_hash}</div>
+                    <div className="text-xs text-[#788177]">{qr.redirect_count ?? 0} okuma</div>
                   </div>
-                  <div className="w-2 h-2 bg-emerald-400 rounded-full" />
+                  <div className="w-2 h-2 bg-[#174f35] rounded-full" />
                 </div>
               ))}
             </div>
           )}
           <form action={linkQR} className="flex gap-3">
-            <input type="text" name="qr_hash" placeholder="QR hash kodu..." required
-              className="flex-1 bg-slate-800 border border-slate-700 text-slate-100 placeholder-slate-500 rounded-xl px-4 py-2.5 text-sm font-mono focus:outline-none focus:border-amber-500" />
-            <button type="submit" className="bg-slate-700 hover:bg-slate-600 text-slate-100 text-sm font-medium px-4 py-2.5 rounded-xl transition-colors">
+            <input
+              type="text"
+              name="qr_hash"
+              placeholder="QR hash kodu..."
+              required
+              className="flex-1 rounded-xl border border-[#e5dccb] bg-white px-4 py-3 text-sm text-[#1f2d27] placeholder-[#adb5ab] font-mono outline-none focus:border-[#174f35] focus:ring-2 focus:ring-[#174f35]/10"
+            />
+            <button
+              type="submit"
+              className="rounded-xl border border-[#e5dccb] bg-white px-4 py-3 text-sm font-medium text-[#4a5e55] hover:bg-[#f5efdf] transition-colors"
+            >
               Eşleştir
             </button>
           </form>
         </div>
 
-        {/* pub_settings — post-death publication preferences */}
-        <div className="glass border border-slate-800/60 rounded-2xl p-6 mb-5">
-          <h2 className="text-sm font-semibold text-slate-200 mb-1">Ölüm Sonrası Yayın Ayarları</h2>
-          <p className="text-xs text-slate-500 mb-4">
+        {/* Yayın Ayarları */}
+        <div className={`${cardCls} mb-5`}>
+          <h2 className="text-sm font-semibold text-[#1f2d27] mb-1">Ölüm Sonrası Yayın Ayarları</h2>
+          <p className="text-xs text-[#788177] mb-5">
             Vefatınızdan sonra anma sayfanızın nasıl yayınlanacağını önceden belirleyin.
           </p>
           <form action={savePubSettings} className="space-y-3">
             {([
               ['auto_publish_on_death', 'Ölümümden sonra otomatik olarak yayınla', pub.auto_publish_on_death],
-              ['require_heir_approval', 'Yayınlamadan önce varis onayı iste', pub.require_heir_approval !== false],
+              ['require_heir_approval', 'Yayınlamadan önce yetkili onayı iste', pub.require_heir_approval !== false],
               ['show_biography', 'Hayat hikayemi göster', pub.show_biography !== false],
-              ['show_family_tree', 'Aile ağacımı göster', pub.show_family_tree !== false],
+              ['show_family_tree', 'Aile bağlarımı göster', pub.show_family_tree !== false],
               ['show_memories', 'Anılarımı göster', pub.show_memories !== false],
               ['show_media', 'Fotoğraf ve videolarımı göster', pub.show_media !== false],
             ] as [string, string, boolean][]).map(([name, label, defaultVal]) => (
-              <label key={name} className="flex items-center gap-3 cursor-pointer group">
-                <div className="relative">
-                  <input type="checkbox" name={name} defaultChecked={defaultVal}
-                    className="sr-only peer" />
-                  <div className="w-9 h-5 bg-slate-700 peer-checked:bg-amber-500 rounded-full transition-colors" />
-                  <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full transition-all peer-checked:translate-x-4" />
+              <label key={name} className="flex items-center gap-3 cursor-pointer group py-1">
+                <div className="relative shrink-0">
+                  <input type="checkbox" name={name} defaultChecked={defaultVal} className="sr-only peer" />
+                  <div className="w-9 h-5 bg-[#e5dccb] peer-checked:bg-[#174f35] rounded-full transition-colors" />
+                  <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full transition-all peer-checked:translate-x-4 shadow-sm" />
                 </div>
-                <span className="text-sm text-slate-300 group-hover:text-slate-100 transition-colors">{label}</span>
+                <span className="text-sm text-[#4a5e55] group-hover:text-[#1f2d27] transition-colors">{label}</span>
               </label>
             ))}
             <div className="pt-2">
-              <button type="submit" className="bg-amber-500 hover:bg-amber-400 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-colors">
+              <button
+                type="submit"
+                className="rounded-xl bg-[#174f35] px-5 py-2.5 text-sm font-semibold text-white shadow-[0_14px_35px_rgba(23,79,53,0.18)] hover:bg-[#123f2b] transition-colors"
+              >
                 Yayın Ayarlarını Kaydet
               </button>
             </div>
           </form>
         </div>
 
-        <div className="border border-red-500/20 bg-red-500/5 rounded-2xl p-6">
-          <h2 className="text-sm font-semibold text-red-400 mb-2">Tehlikeli Alan</h2>
-          <p className="text-xs text-slate-500 mb-4">
-            Kasayı silmek geri alınamaz. Tüm medya, varis bilgileri ve mesajlar kalıcı olarak silinir.
+        {/* Tehlikeli Alan */}
+        <div className="rounded-3xl border border-red-200 bg-red-50/50 p-6">
+          <h2 className="text-sm font-semibold text-red-600 mb-2">Tehlikeli Alan</h2>
+          <p className="text-xs text-[#788177] mb-4">
+            Anı alanını silmek geri alınamaz. Tüm medya, yetkili kişi bilgileri ve mesajlar kalıcı olarak silinir.
           </p>
           <form action={del}>
-            <button type="submit" className="bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 text-red-400 text-sm font-medium px-5 py-2.5 rounded-xl transition-colors">
-              Kasayı Kalıcı Olarak Sil
+            <button
+              type="submit"
+              className="rounded-xl border border-red-200 bg-white text-red-500 text-sm font-medium px-5 py-2.5 hover:bg-red-50 transition-colors"
+            >
+              Anı Alanını Kalıcı Olarak Sil
             </button>
           </form>
         </div>

@@ -202,6 +202,7 @@ export type Database = {
       media: {
         Row: {
           ai_tags: string[] | null
+          caption: string | null
           created_at: string | null
           file_size_bytes: number | null
           id: string
@@ -212,13 +213,18 @@ export type Database = {
           original_filename: string | null
           original_url: string
           sort_order: number | null
+          source_type: string | null
+          storage_bucket: string | null
+          storage_path: string | null
           taken_at: string | null
           thumb_url: string | null
           uploader_id: string | null
           vault_id: string
+          visibility: string | null
         }
         Insert: {
           ai_tags?: string[] | null
+          caption?: string | null
           created_at?: string | null
           file_size_bytes?: number | null
           id?: string
@@ -229,13 +235,18 @@ export type Database = {
           original_filename?: string | null
           original_url: string
           sort_order?: number | null
+          source_type?: string | null
+          storage_bucket?: string | null
+          storage_path?: string | null
           taken_at?: string | null
           thumb_url?: string | null
           uploader_id?: string | null
           vault_id: string
+          visibility?: string | null
         }
         Update: {
           ai_tags?: string[] | null
+          caption?: string | null
           created_at?: string | null
           file_size_bytes?: number | null
           id?: string
@@ -246,10 +257,14 @@ export type Database = {
           original_filename?: string | null
           original_url?: string
           sort_order?: number | null
+          source_type?: string | null
+          storage_bucket?: string | null
+          storage_path?: string | null
           taken_at?: string | null
           thumb_url?: string | null
           uploader_id?: string | null
           vault_id?: string
+          visibility?: string | null
         }
       }
       profiles: {

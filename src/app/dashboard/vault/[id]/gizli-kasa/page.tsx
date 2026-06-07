@@ -14,7 +14,6 @@ export default async function GizliKasaPage({ params }: Props) {
   const { data: vault } = await supabase.from('vaults').select('id, display_name, status, product_type').eq('id', id).eq('owner_id', user.id).single()
   if (!vault) notFound()
 
-  // Sadece life_vault'ta gizli kasa var
   if (vault.product_type === 'memorial_profile') {
     redirect(`/dashboard/vault/${id}`)
   }
@@ -36,52 +35,68 @@ export default async function GizliKasaPage({ params }: Props) {
   const isLocked = vault.status === 'pending_verification'
   const addAction = addMemoryAction.bind(null, id)
 
+  const inputCls = `w-full rounded-xl border border-[#e5dccb] bg-white px-4 py-3 text-sm text-[#1f2d27] placeholder-[#adb5ab] outline-none focus:border-[#174f35] focus:ring-2 focus:ring-[#174f35]/10`
+
   return (
-    <div className="p-8">
+    <div className="px-5 py-8 sm:px-8">
       <div className="max-w-3xl mx-auto">
-        <div className="flex items-center gap-2 text-sm text-slate-500 mb-6">
-          <Link href="/dashboard" className="hover:text-slate-300">Kasalarım</Link>
-          <span>/</span>
-          <Link href={`/dashboard/vault/${id}`} className="hover:text-slate-300">{vault.display_name}</Link>
-          <span>/</span>
-          <span className="text-slate-300">Gizli Kasa</span>
+        <div className="flex items-center gap-2 text-sm mb-6">
+          <Link href="/dashboard" className="text-[#788177] hover:text-[#174f35] transition-colors">Anı Alanım</Link>
+          <span className="text-[#c8bfb0]">/</span>
+          <Link href={`/dashboard/vault/${id}`} className="text-[#788177] hover:text-[#174f35] transition-colors">{vault.display_name}</Link>
+          <span className="text-[#c8bfb0]">/</span>
+          <span className="font-semibold text-[#22362e]">Özel İçerikler</span>
         </div>
 
         {isLocked && (
-          <div className="mb-5 bg-amber-900/20 border border-amber-500/30 text-amber-400 text-sm rounded-xl px-4 py-3">
-            ⏳ Ödeme doğrulandıktan sonra gizli kasaya içerik ekleyebilirsiniz.
+          <div className="mb-5 rounded-2xl border border-[#dfbd72]/50 bg-[#fff7e6] px-5 py-4 text-sm text-[#725212]">
+            Ödeme doğrulandıktan sonra özel içerik ekleyebilirsiniz.
           </div>
         )}
 
-        <div className="mb-6">
-          <div className="flex items-center gap-3 mb-2">
-            <span className="text-2xl">🔐</span>
-            <h1 className="text-2xl font-bold text-slate-100">Gizli Kasa</h1>
-          </div>
-          <div className="glass border border-slate-700/50 rounded-xl px-4 py-3">
-            <p className="text-sm text-slate-400 leading-6">
-              Bu bölümdeki içerikler <strong className="text-slate-200">sadece varisleriniz</strong> tarafından görülebilir.
+        <div className="mb-7">
+          <h1 className="font-serif text-3xl text-[#1f2d27] mb-3">Özel İçerikler</h1>
+          <div className="rounded-2xl border border-[#e5dccb] bg-white px-5 py-4">
+            <p className="text-sm text-[#4a5e55] leading-6">
+              Bu bölümdeki içerikler <span className="font-semibold text-[#1f2d27]">sadece yetkili kişiler</span> tarafından görülebilir.
               Vasiyet, özel mesajlar, belgeler ve hatıralar buraya eklenebilir. Herkese açık anma sayfasında görünmez.
             </p>
           </div>
         </div>
 
         {!isLocked && (
-          <div className="glass border border-amber-500/15 bg-amber-500/5 rounded-2xl p-5 mb-6">
-            <h2 className="text-sm font-semibold text-amber-400 mb-4">Gizli İçerik Ekle</h2>
+          <div className="rounded-3xl border border-[#dfbd72]/40 bg-[#fffdf8] p-6 shadow-[0_16px_50px_rgba(64,48,24,0.06)] mb-7">
+            <div className="flex items-center gap-2 mb-4">
+              <span className="text-lg">🔐</span>
+              <h2 className="text-sm font-semibold text-[#1f2d27]">Özel İçerik Ekle</h2>
+            </div>
             <form action={addAction} className="space-y-3">
               <input type="hidden" name="is_secret" value="true" />
-              <input type="text" name="title" placeholder="Başlık (örn: Vasiyetim, Oğluma Mesaj...)"
-                className="w-full bg-slate-800 border border-slate-700 text-slate-100 placeholder-slate-500 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-amber-500" />
-              <textarea name="content" required rows={5}
-                placeholder="Bu içerik sadece varisleriniz tarafından görülebilir. Vasiyet, özel mesajlar, sevdiklerinize bıraktığınız notlar..."
-                className="w-full bg-slate-800 border border-slate-700 text-slate-100 placeholder-slate-500 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-amber-500 resize-none" />
-              <div className="flex items-center gap-3">
-                <input type="date" name="memory_date"
-                  className="bg-slate-800 border border-slate-700 text-slate-100 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-amber-500" />
-                <button type="submit"
-                  className="bg-amber-600 hover:bg-amber-500 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-colors">
-                  Gizli Kasaya Ekle
+              <input
+                type="text"
+                name="title"
+                placeholder="Başlık (örn: Vasiyetim, Oğluma Mesaj...)"
+                className={inputCls}
+              />
+              <textarea
+                name="content"
+                required
+                rows={5}
+                placeholder="Bu içerik sadece yetkili kişileriniz tarafından görülebilir. Vasiyet, özel mesajlar, sevdiklerinize bıraktığınız notlar..."
+                className={inputCls + ' resize-none'}
+              />
+              <div className="flex items-center gap-3 flex-wrap">
+                <input
+                  type="date"
+                  name="memory_date"
+                  required
+                  className="rounded-xl border border-[#e5dccb] bg-white px-4 py-3 text-sm text-[#1f2d27] outline-none focus:border-[#174f35] focus:ring-2 focus:ring-[#174f35]/10"
+                />
+                <button
+                  type="submit"
+                  className="rounded-xl bg-[#174f35] px-6 py-3 text-sm font-semibold text-white shadow-[0_14px_35px_rgba(23,79,53,0.18)] hover:bg-[#123f2b] transition-colors"
+                >
+                  Özel İçerik Ekle
                 </button>
               </div>
             </form>
@@ -89,35 +104,42 @@ export default async function GizliKasaPage({ params }: Props) {
         )}
 
         <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wide">Gizli Notlar & Vasiyetler</h2>
-            <span className="text-xs text-slate-600">{secrets?.length ?? 0} öğe</span>
+          <div className="flex items-center justify-between mb-1">
+            <h2 className="text-xs font-semibold text-[#788177] uppercase tracking-wide">Gizli Notlar & Vasiyetler</h2>
+            <span className="text-xs text-[#adb5ab]">{secrets?.length ?? 0} öğe</span>
           </div>
 
           {!secrets?.length ? (
-            <div className="glass border border-dashed border-slate-700 rounded-2xl p-10 text-center">
-              <div className="text-4xl mb-2">🔒</div>
-              <p className="text-slate-500 text-sm">Henüz gizli içerik eklenmemiş</p>
-              <p className="text-slate-700 text-xs mt-1">Varislerinize bırakmak istediğiniz özel mesajlar burada saklanır</p>
+            <div className="rounded-3xl border border-dashed border-[#e5dccb] bg-[#fffdf8] p-12 text-center">
+              <div className="text-4xl mb-3">🔒</div>
+              <p className="text-[#788177] text-sm">Henüz özel içerik eklenmemiş</p>
+              <p className="text-xs text-[#adb5ab] mt-1">Yetkili kişilerinize bırakmak istediğiniz özel mesajlar burada saklanır</p>
             </div>
           ) : secrets.map((s) => {
             const del = deleteMemoryAction.bind(null, s.id, id)
             return (
-              <div key={s.id} className="glass border border-amber-500/15 bg-amber-500/5 rounded-2xl p-5 group">
+              <div key={s.id} className="rounded-2xl border border-[#dfbd72]/30 bg-[#fffdf8] p-5 group hover:border-[#dfbd72]/60 transition-colors">
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex-1">
-                    <div className="flex items-center gap-2 mb-1">
-                      <span className="text-xs bg-amber-500/20 text-amber-400 px-2 py-0.5 rounded-full">🔐 Gizli</span>
-                      {s.title && <h3 className="font-semibold text-slate-200 text-sm">{s.title}</h3>}
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-xs bg-[#fff7e6] text-[#725212] border border-[#dfbd72]/40 px-2 py-0.5 rounded-full font-medium">🔐 Gizli</span>
+                      {s.title && <h3 className="font-semibold text-[#1f2d27] text-sm">{s.title}</h3>}
                     </div>
-                    <p className="text-slate-300 text-sm leading-7 whitespace-pre-wrap">{s.content}</p>
+                    <p className="text-[#4a5e55] text-sm leading-7 whitespace-pre-wrap">{s.content}</p>
                     {s.memory_date && (
-                      <p className="text-xs text-slate-600 mt-2">{new Date(s.memory_date).toLocaleDateString('tr-TR', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                      <p className="text-xs text-[#adb5ab] mt-2">
+                        {new Date(s.memory_date).toLocaleDateString('tr-TR', { year: 'numeric', month: 'long', day: 'numeric' })}
+                      </p>
                     )}
                   </div>
                   {!isLocked && (
                     <form action={del}>
-                      <button type="submit" className="text-slate-700 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100 text-xs">Sil</button>
+                      <button
+                        type="submit"
+                        className="text-[#e5dccb] hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100 text-xs font-medium"
+                      >
+                        Sil
+                      </button>
                     </form>
                   )}
                 </div>
@@ -127,13 +149,13 @@ export default async function GizliKasaPage({ params }: Props) {
         </div>
 
         {(secretMedia?.length ?? 0) > 0 && (
-          <div className="mt-6">
-            <h2 className="text-sm font-semibold text-slate-400 uppercase tracking-wide mb-3">Gizli Medya</h2>
+          <div className="mt-7">
+            <h2 className="text-xs font-semibold text-[#788177] uppercase tracking-wide mb-3">Gizli Medya</h2>
             <div className="space-y-2">
               {secretMedia?.map((m) => (
-                <div key={m.id} className="glass border border-slate-700 rounded-xl px-4 py-3 flex items-center gap-3">
+                <div key={m.id} className="rounded-2xl border border-[#e5dccb] bg-white px-4 py-3 flex items-center gap-3">
                   <span className="text-lg">{m.media_type === 'image' ? '🖼️' : m.media_type === 'video' ? '🎬' : '📄'}</span>
-                  <span className="text-sm text-slate-300">{m.original_filename ?? 'Dosya'}</span>
+                  <span className="text-sm text-[#1f2d27] font-medium">{m.original_filename ?? 'Dosya'}</span>
                 </div>
               ))}
             </div>

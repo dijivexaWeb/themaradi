@@ -41,8 +41,8 @@ export default async function RealMemorialPage({ vault }: Props) {
     { data: memories },
     { data: familyMembers },
   ] = await Promise.all([
-    supabase.from('media').select('*').eq('vault_id', id).eq('media_type', 'image').eq('is_public', true).order('sort_order').limit(24),
-    supabase.from('media').select('*').eq('vault_id', id).eq('media_type', 'video').eq('is_public', true).limit(6),
+    supabase.from('media').select('*').eq('vault_id', id).eq('media_type', 'image').eq('is_public', true).order('taken_at', { ascending: false }).limit(24),
+    supabase.from('media').select('*').eq('vault_id', id).eq('media_type', 'video').eq('is_public', true).order('taken_at', { ascending: false }).limit(6),
     supabase.from('vault_memories').select('*').eq('vault_id', id).eq('is_secret', false).order('memory_date', { ascending: false }),
     supabase.from('vault_family_members').select('*').eq('vault_id', id).order('sort_order'),
   ])
@@ -218,6 +218,14 @@ export default async function RealMemorialPage({ vault }: Props) {
                     {v.original_filename && (
                       <p className="text-xs text-[#cfc3ad] px-4 py-2">{v.original_filename}</p>
                     )}
+                    {v.taken_at && (
+                      <p className="text-[11px] text-[#c7a76f]/70 px-4 pb-1">
+                        {new Date(v.taken_at).toLocaleString('tr-TR', { dateStyle: 'medium', timeStyle: 'short' })}
+                      </p>
+                    )}
+                    {v.caption && (
+                      <p className="text-xs text-[#8f826d] px-4 pb-3 leading-5">{v.caption}</p>
+                    )}
                   </div>
                 )
               })}
@@ -231,15 +239,27 @@ export default async function RealMemorialPage({ vault }: Props) {
             <p className="text-[#c7a76f] text-xs uppercase tracking-[0.2em] mb-5">
               Fotoğraf Arşivi ({photos.length})
             </p>
-            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
               {photos.map((p) => (
-                <div key={p.id} className="aspect-square rounded-xl overflow-hidden relative bg-[#0d1f1a] group">
-                  <Image
-                    src={p.thumb_url ?? p.original_url}
-                    alt={p.original_filename ?? ''}
-                    fill className="object-cover group-hover:scale-105 transition-transform duration-300"
-                    unoptimized
-                  />
+                <div key={p.id} className="rounded-xl overflow-hidden bg-[#0d1f1a] border border-[#c7a76f]/10 group">
+                  <div className="aspect-square relative">
+                    <Image
+                      src={p.thumb_url ?? p.original_url}
+                      alt={p.original_filename ?? ''}
+                      fill className="object-cover group-hover:scale-105 transition-transform duration-300"
+                      unoptimized
+                    />
+                  </div>
+                  <div className="p-3">
+                    {p.taken_at && (
+                      <p className="text-[11px] text-[#c7a76f]/70 mb-1">
+                        {new Date(p.taken_at).toLocaleString('tr-TR', { dateStyle: 'medium', timeStyle: 'short' })}
+                      </p>
+                    )}
+                    {p.caption && (
+                      <p className="text-xs text-[#cfc3ad] leading-5 line-clamp-3">{p.caption}</p>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>

@@ -1,13 +1,7 @@
 import { fetchPricingConfig } from '@/lib/pricing'
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/server'
-import { redirect } from 'next/navigation'
 
 export default async function SatinAlPage() {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
-
   const pricing = await fetchPricingConfig()
   const memorialPrice = pricing.campaignActive && pricing.campaignMemorial ? pricing.campaignMemorial : pricing.memorialPrice
   const vaultSetup = pricing.campaignActive && pricing.campaignVaultSetup ? pricing.campaignVaultSetup : pricing.vaultSetup
@@ -76,7 +70,7 @@ export default async function SatinAlPage() {
             </Link>
           </div>
 
-          {/* Yaşam Kasası */}
+          {/* Yaşam Anısı */}
           <div className="border border-emerald-500/30 bg-slate-900 rounded-2xl p-7 flex flex-col relative overflow-hidden">
             <div className="absolute top-4 right-4 bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 text-[10px] font-bold px-2 py-1 rounded-full uppercase tracking-wider">
               Önerilen
@@ -87,7 +81,7 @@ export default async function SatinAlPage() {
                 <span className="text-xl">🔐</span>
               </div>
               <div>
-                <h2 className="font-bold text-lg text-white">Yaşam Kasası</h2>
+                <h2 className="font-bold text-lg text-white">Yaşam Anısı</h2>
                 <p className="text-xs text-slate-500">Kendiniz için, hayattayken</p>
               </div>
             </div>
@@ -113,7 +107,7 @@ export default async function SatinAlPage() {
             <ul className="space-y-2.5 text-sm text-slate-300 flex-1 mb-7">
               {[
                 'Anma Profili\'nin tüm özellikleri',
-                'Gizli kasa (sadece varisler görür)',
+                'Özel içerikler (sadece yetkili kişiler görür)',
                 'Vasiyet, belgeler, video mesajlar',
                 'Varis yönetimi (e-posta davet)',
                 'Ölüm sonrası otomatik yayın seçeneği',
@@ -129,7 +123,7 @@ export default async function SatinAlPage() {
 
             <Link href="/satin-al/kasa"
               className="w-full text-center bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-3 rounded-xl transition-colors text-sm">
-              Yaşam Kasası Satın Al
+              Yaşam Anısı Satın Al
             </Link>
           </div>
         </div>

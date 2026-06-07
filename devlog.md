@@ -5,6 +5,107 @@
 
 ---
 
+## 2026-06-07 — Oturum 19: Anılar — Medya Ekleme + Zorunlu Tarih
+
+### Yapılanlar
+- `vault_memories` tablosuna `media_url` (text) ve `media_type` (text, 'image'|'video') kolonları eklendi (migration)
+- `memories.ts` action güncellendi: tarih zorunlu (`!memoryDate → return`), dosya upload (vault-media bucket, `memories/{vaultId}/{userId}/...`) + URL desteği
+- `anilar/page.tsx` yeniden yazıldı: tarih zorunlu `required`, medya bölümü (dosya yükle + URL + tür seçimi), kartlarda fotoğraf/video embed gösterimi
+- `gizli-kasa/page.tsx` tarih alanına `required` eklendi
+
+### Nerede Kaldık
+Anılar sayfası artık fotoğraf/video destekli. Medya dosyaları `vault-media` bucket'ına `memories/` prefix ile yükleniyor.
+
+### Sıradaki Adım
+1. Sayfa test et — özellikle dosya upload ve video embed
+2. `payments` RLS hatası düzeltmesi
+3. Login "Kaydınız yoksa" → `/satin-al` yönlendirmesi
+
+---
+
+## 2026-06-07 — Oturum 18: Tüm Alt Sayfalar Yeniden Tasarlandı
+
+### Yapılanlar
+- `biography/page.tsx` — warm cream/olive tasarımıyla yeniden yazıldı (client component, auto-save korundu)
+- `profil/page.tsx` — yeni tasarım, dosya upload + URL seçeneği, `saveVaultProfileAction` bağlı
+- `fotolar/page.tsx` — yeni tasarım, `addPhotoAction` ile hem dosya hem URL desteği, `encType="multipart/form-data"` eklendi
+- `anilar/page.tsx` — yeni tasarım, tüm logic korundu
+- `aile/page.tsx` — yeni tasarım, aile üyeleri listesi ve form güncellendi
+- `videolar/page.tsx` — yeni tasarım, YouTube/Vimeo embed + dosya upload
+- `belgeler/page.tsx` — yeni tasarım, inline action `id` string üzerinden çalışıyor
+- `heirs/page.tsx` — yeni tasarım ("Yetkili Kişiler" başlığı)
+- `gizli-kasa/page.tsx` — yeni tasarım, özel içerikler ve gizli medya listesi
+
+### Proje Durumu
+- [x] Auth sistemi
+- [x] Dashboard ana sayfası (warm cream tasarım)
+- [x] Layout sidebar (warm cream)
+- [x] Tüm alt sayfalar (biography, profil, fotolar, anilar, aile, videolar, belgeler, heirs, gizli-kasa, settings) — TAMAMLANDI
+- [x] Storage bucket (vault-media)
+- [ ] payments RLS hatası
+- [ ] Login sayfası "Kaydınız yoksa" → /satin-al yönlendirmesi
+
+### Kritik Kararlar / Notlar
+- Tüm sayfalarda ortak tasarım tokenleri: `bg-[#fbf8f0]`, kart `bg-[#fffdf8]`, yeşil `#174f35`, altın `#dfbd72`, kenarlık `#e5dccb`
+- Input stili: `rounded-xl border border-[#e5dccb] bg-white focus:border-[#174f35]`
+- Breadcrumb: `text-[#788177]` link, `font-semibold text-[#22362e]` aktif
+- Kilitli uyarı: `bg-[#fff7e6] border-[#dfbd72]/50 text-[#725212]`
+- File upload formlarında `encType="multipart/form-data"` zorunlu
+- `media.ts` action dosyası zaten hem URL hem dosya destekliyor (`vault-media` bucket)
+
+### Nerede Kaldık
+Tüm 9 alt sayfa (biography, profil, fotolar, anilar, aile, videolar, belgeler, heirs, gizli-kasa) ve settings sayfası warm cream/olive/altın tasarımına taşındı. Önizleme (onizleme) sayfası kasıtlı olarak koyu yeşil önizleme tasarımında bırakıldı.
+
+### Sıradaki Adım
+1. Sayfaları test et — özellikle dosya upload (profil + fotolar + videolar)
+2. `payments` tablosu RLS hatasını düzelt (kayıt yaptırma akışı kırık)
+3. Login sayfasında "Kaydınız yoksa" linkini `/satin-al` satın alma sayfasına yönlendir
+4. `onizleme` sayfasını isteğe göre gözden geçir (şu an koyu yeşil, kasıtlı)
+
+---
+
+## 2026-06-07 — Oturum 17: Hata Teşhisi + Storage Bucket + Kullanıcı Geri Bildirimleri
+
+### Yapılanlar
+- `/dashboard/vault/[id]/profil` — 404 hatası teşhis edildi; inline `'use server'` fonksiyonların modül seviyesine taşınması gerektiği tespit edildi
+- Supabase API/Postgres logları incelendi: `invalid input syntax for type uuid: ""` ve `payments` RLS hatası görüldü
+- Supabase Storage `media` bucket oluşturuldu (10MB limit, jpeg/png/webp/gif, public read, authenticated upload)
+- Claude Code auto-update sorunu kullanıcıya açıklandı (VS Code açıkken güncelleme çalışmıyor)
+- Kullanıcı geri bildirimleri alındı ve sıradaki oturum için yapılacaklar netleşti
+
+### Proje Durumu
+- [x] Auth sistemi (Supabase SSR)
+- [x] Admin paneli (bank settings, gateway settings, verifications, exemptions)
+- [x] Satın alma akışı (havale + pending_verification)
+- [x] Vault CRUD + tüm içerik sayfaları
+- [x] RLS sonsuz döngü düzeltmesi (SECURITY DEFINER fonksiyonlar)
+- [x] createServiceClient düzeltmesi (cookie'siz pure service role)
+- [x] Supabase Storage media bucket
+- [ ] Profil sayfası inline action → modül action'a taşınacak (404 fix)
+- [ ] Gerçek dosya yükleme (şu an URL tabanlı, bucket hazır)
+- [ ] "Kasalarım"/"Kasa" → daha duygusal isim (kullanıcı talebi)
+- [ ] Tasarım revizyonu — daha premium, duygusal görünüm (kullanıcı talebi)
+- [ ] Login sayfası "Kaydınız yoksa" linki → satın alma sayfasına yönlendir
+
+### Kritik Kararlar / Notlar
+- Kullanıcı "birden fazla kasa olmaz" dedi — konsept "Kasa" yerine daha duygusal bir isim istiyor
+- Kullanıcı foto yüklemenin URL yerine gerçek dosya yükleme olmasını istiyor + otomatik sıkıştırma
+- Sistem şu an çalışıyor; tasarım ve isim revizyonu sonraki oturumun önceliği
+- `payments` tablosunda RLS hatası var — satın alma akışında payment kaydı oluşturulurken sorun çıkabilir
+
+### Nerede Kaldık
+Teşhis oturumu. Kod değişikliği minimal (sadece storage bucket SQL). Kullanıcı sistemi çalışır buldu. Sıradaki oturumda somut kod değişiklikleri yapılacak.
+
+### Sıradaki Adım
+1. `profil/page.tsx` inline server action → `src/lib/actions/profile.ts` modülüne taşı (404 fix)
+2. `fotolar/page.tsx` — gerçek dosya yükleme (Canvas sıkıştırma + Supabase Storage)
+3. "Kasalarım" / "Kasa" terminolojisini daha duygusal bir isimle değiştir (tüm sayfalarda)
+4. Dashboard ve vault sayfaları tasarım revizyonu — premium anma platformu görünümü
+5. Login sayfası "Kaydınız yoksa" → `/satin-al` yönlendirmesi
+6. `payments` tablosu RLS politikası düzelt
+
+---
+
 ## 2026-06-07 — Oturum 16: Tam İçerik Sistemi — Ödeme, Kasa, Anma Sayfası
 
 ### Yapılanlar

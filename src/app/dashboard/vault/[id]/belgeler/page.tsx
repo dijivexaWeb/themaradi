@@ -6,11 +6,11 @@ import { revalidatePath } from 'next/cache'
 interface Props { params: Promise<{ id: string }> }
 
 const statusLabels: Record<string, { label: string; color: string }> = {
-  pending: { label: 'İnceleniyor', color: 'bg-amber-100 text-amber-700' },
-  under_review: { label: 'Değerlendirmede', color: 'bg-blue-100 text-blue-700' },
-  approved: { label: 'Onaylandı', color: 'bg-emerald-100 text-emerald-700' },
-  rejected: { label: 'Reddedildi', color: 'bg-red-100 text-red-700' },
-  contested: { label: 'İtiraz Var', color: 'bg-orange-100 text-orange-700' },
+  pending: { label: 'İnceleniyor', color: 'bg-[#fff7e6] text-[#725212] border-[#dfbd72]/50' },
+  under_review: { label: 'Değerlendirmede', color: 'bg-blue-50 text-blue-700 border-blue-200' },
+  approved: { label: 'Onaylandı', color: 'bg-[#f0fdf4] text-[#174f35] border-[#174f35]/20' },
+  rejected: { label: 'Reddedildi', color: 'bg-red-50 text-red-700 border-red-200' },
+  contested: { label: 'İtiraz Var', color: 'bg-orange-50 text-orange-700 border-orange-200' },
 }
 
 export default async function BelgelerPage({ params }: Props) {
@@ -28,7 +28,6 @@ export default async function BelgelerPage({ params }: Props) {
     .eq('vault_id', id)
     .order('created_at', { ascending: false })
 
-  const isLocked = vault.status === 'pending_verification'
   const hasPendingOrApproved = claims?.some(c => ['pending', 'under_review', 'approved'].includes(c.status))
 
   async function submitDocuments(formData: FormData) {
@@ -61,44 +60,44 @@ export default async function BelgelerPage({ params }: Props) {
     revalidatePath(`/dashboard/vault/${id}`)
   }
 
-  const fieldCls = `w-full bg-slate-800 border border-slate-700 text-slate-100 placeholder-slate-500 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-amber-500`
+  const inputCls = `w-full rounded-xl border border-[#e5dccb] bg-white px-4 py-3 text-sm text-[#1f2d27] placeholder-[#adb5ab] outline-none focus:border-[#174f35] focus:ring-2 focus:ring-[#174f35]/10`
+  const labelCls = `mb-1.5 block text-xs font-semibold text-[#4a5e55]`
 
   return (
-    <div className="p-8">
+    <div className="px-5 py-8 sm:px-8">
       <div className="max-w-2xl mx-auto">
-        <div className="flex items-center gap-2 text-sm text-slate-500 mb-6">
-          <Link href="/dashboard" className="hover:text-slate-300">Kasalarım</Link>
-          <span>/</span>
-          <Link href={`/dashboard/vault/${id}`} className="hover:text-slate-300">{vault.display_name}</Link>
-          <span>/</span>
-          <span className="text-slate-300">Belgeler</span>
+        <div className="flex items-center gap-2 text-sm mb-6">
+          <Link href="/dashboard" className="text-[#788177] hover:text-[#174f35] transition-colors">Anı Alanım</Link>
+          <span className="text-[#c8bfb0]">/</span>
+          <Link href={`/dashboard/vault/${id}`} className="text-[#788177] hover:text-[#174f35] transition-colors">{vault.display_name}</Link>
+          <span className="text-[#c8bfb0]">/</span>
+          <span className="font-semibold text-[#22362e]">Belgeler</span>
         </div>
 
-        <h1 className="text-2xl font-bold text-slate-100 mb-2">Belge Doğrulama</h1>
-        <p className="text-slate-500 text-sm mb-6">
+        <h1 className="font-serif text-3xl text-[#1f2d27] mb-2">Belge Doğrulama</h1>
+        <p className="text-sm text-[#788177] mb-7 leading-6">
           Anma profilinin aktive edilmesi için ölüm belgesi ve kimlik belgesi yüklemeniz gerekmektedir.
           Belgeler ekibimiz tarafından incelenerek onaylanır.
         </p>
 
-        {/* Existing claims */}
         {claims && claims.length > 0 && (
           <div className="space-y-3 mb-6">
             {claims.map((claim) => {
-              const s = statusLabels[claim.status] ?? { label: claim.status, color: 'bg-slate-100 text-slate-600' }
+              const s = statusLabels[claim.status] ?? { label: claim.status, color: 'bg-[#f5efdf] text-[#788177] border-[#e5dccb]' }
               return (
-                <div key={claim.id} className="glass border border-slate-800/60 rounded-xl p-4">
+                <div key={claim.id} className="rounded-2xl border border-[#e5dccb] bg-white p-4">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="font-medium text-slate-200 text-sm">Belge Başvurusu</span>
-                    <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${s.color}`}>{s.label}</span>
+                    <span className="font-semibold text-[#1f2d27] text-sm">Belge Başvurusu</span>
+                    <span className={`text-xs px-2.5 py-0.5 rounded-full font-medium border ${s.color}`}>{s.label}</span>
                   </div>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-[#788177]">
                     Gönderildi: {new Date(claim.created_at).toLocaleDateString('tr-TR')}
                   </p>
                   {claim.rejection_reason && (
-                    <p className="text-xs text-red-400 mt-1">Red gerekçesi: {claim.rejection_reason}</p>
+                    <p className="text-xs text-red-500 mt-1">Red gerekçesi: {claim.rejection_reason}</p>
                   )}
                   {claim.verification_notes && (
-                    <p className="text-xs text-slate-400 mt-1 italic">{claim.verification_notes}</p>
+                    <p className="text-xs text-[#4a5e55] mt-1 italic">{claim.verification_notes}</p>
                   )}
                 </div>
               )
@@ -107,17 +106,19 @@ export default async function BelgelerPage({ params }: Props) {
         )}
 
         {!hasPendingOrApproved && (
-          <div className="glass border border-slate-800/60 rounded-2xl p-5">
-            <h2 className="text-sm font-semibold text-slate-300 mb-1">Belge Yükle</h2>
-            <p className="text-xs text-slate-500 mb-4">
-              Şu an için belgeleri URL olarak girin (Google Drive, Dropbox vb. paylaşım linki).
-              Dosya yükleme özelliği yakında gelecek.
+          <div className="rounded-3xl border border-[#e5dccb] bg-[#fffdf8] p-6 shadow-[0_16px_50px_rgba(64,48,24,0.06)]">
+            <h2 className="text-sm font-semibold text-[#1f2d27] mb-1">Belge Yükle</h2>
+            <p className="text-xs text-[#788177] mb-5">
+              Belgeleri URL olarak girin (Google Drive, Dropbox vb. paylaşım linki).
             </p>
 
             <form action={submitDocuments} className="space-y-4">
               <div>
-                <label className="block text-xs text-slate-400 mb-1.5">Belge Türü</label>
-                <select name="document_type" className={`bg-slate-800 border border-slate-700 text-slate-100 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-amber-500 w-full`}>
+                <label className={labelCls}>Belge Türü</label>
+                <select
+                  name="document_type"
+                  className="w-full rounded-xl border border-[#e5dccb] bg-white px-4 py-3 text-sm text-[#1f2d27] outline-none focus:border-[#174f35] focus:ring-2 focus:ring-[#174f35]/10"
+                >
                   <option value="death_certificate">Ölüm Belgesi</option>
                   <option value="official_record">Resmi Kayıt</option>
                   <option value="other">Diğer</option>
@@ -125,34 +126,33 @@ export default async function BelgelerPage({ params }: Props) {
               </div>
 
               <div>
-                <label className="block text-xs text-slate-400 mb-1.5">
-                  Ölüm Belgesi URL <span className="text-amber-400">*</span>
+                <label className={labelCls}>
+                  Ölüm Belgesi URL <span className="text-[#dfbd72]">*</span>
                 </label>
-                <input type="url" name="document_url" required placeholder="https://drive.google.com/..."
-                  className={fieldCls} />
-                <p className="text-xs text-slate-600 mt-1">Ölüm cüzdanı veya resmi ölüm belgesi</p>
+                <input type="url" name="document_url" required placeholder="https://drive.google.com/..." className={inputCls} />
+                <p className="mt-1 text-xs text-[#adb5ab]">Ölüm cüzdanı veya resmi ölüm belgesi</p>
               </div>
 
               <div>
-                <label className="block text-xs text-slate-400 mb-1.5">Başvuran Kimlik URL</label>
-                <input type="url" name="requester_id_url" placeholder="https://... (TC Kimlik veya pasaport)"
-                  className={fieldCls} />
+                <label className={labelCls}>Başvuran Kimlik URL</label>
+                <input type="url" name="requester_id_url" placeholder="https://... (TC Kimlik veya pasaport)" className={inputCls} />
               </div>
 
               <div>
-                <label className="block text-xs text-slate-400 mb-1.5">Vefat Eden Kimlik URL</label>
-                <input type="url" name="deceased_id_url" placeholder="https://... (vefat eden kişinin kimliği)"
-                  className={fieldCls} />
+                <label className={labelCls}>Vefat Eden Kimlik URL</label>
+                <input type="url" name="deceased_id_url" placeholder="https://... (vefat eden kişinin kimliği)" className={inputCls} />
               </div>
 
-              <div className="bg-amber-900/20 border border-amber-500/20 rounded-xl p-3">
-                <p className="text-xs text-amber-400">
-                  ⚠️ Belgeler gizli tutulur ve yalnızca ekibimiz tarafından incelenir. Sahte belge yüklemek hesabın kalıcı olarak askıya alınmasına neden olur.
+              <div className="rounded-2xl border border-[#dfbd72]/50 bg-[#fff7e6] px-4 py-3">
+                <p className="text-xs text-[#725212] leading-5">
+                  Belgeler gizli tutulur ve yalnızca ekibimiz tarafından incelenir. Sahte belge yüklemek hesabın kalıcı olarak askıya alınmasına neden olur.
                 </p>
               </div>
 
-              <button type="submit"
-                className="w-full bg-amber-500 hover:bg-amber-400 text-white font-semibold py-3 rounded-xl transition-colors text-sm">
+              <button
+                type="submit"
+                className="w-full rounded-xl bg-[#174f35] py-3.5 text-sm font-semibold text-white shadow-[0_14px_35px_rgba(23,79,53,0.18)] hover:bg-[#123f2b] transition-colors"
+              >
                 Belgeleri Gönder
               </button>
             </form>
@@ -160,10 +160,10 @@ export default async function BelgelerPage({ params }: Props) {
         )}
 
         {hasPendingOrApproved && (
-          <div className="glass border border-emerald-500/20 rounded-2xl p-5 text-center">
-            <div className="text-3xl mb-2">📋</div>
-            <p className="text-slate-300 font-medium text-sm">Belgeleriniz alındı</p>
-            <p className="text-slate-500 text-xs mt-1">Ekibimiz belgelerinizi inceliyor. En kısa sürede geri dönüş yapacağız.</p>
+          <div className="rounded-3xl border border-[#e5dccb] bg-[#fffdf8] p-8 text-center shadow-[0_16px_50px_rgba(64,48,24,0.06)]">
+            <div className="text-3xl mb-3">📋</div>
+            <p className="font-semibold text-[#1f2d27] text-sm">Belgeleriniz alındı</p>
+            <p className="text-[#788177] text-xs mt-1.5">Ekibimiz belgelerinizi inceliyor. En kısa sürede geri dönüş yapacağız.</p>
           </div>
         )}
       </div>

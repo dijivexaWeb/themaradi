@@ -24,7 +24,7 @@ export default async function MediaPage({ params }: Props) {
     <div className="p-8">
       <div className="max-w-5xl mx-auto">
         <div className="flex items-center gap-2 text-sm text-slate-500 mb-6">
-          <Link href="/dashboard" className="hover:text-slate-300">Kasalar</Link>
+          <Link href="/dashboard" className="hover:text-slate-300">Anı Alanım</Link>
           <span>/</span>
           <Link href={`/dashboard/vault/${id}`} className="hover:text-slate-300">{vault.display_name}</Link>
           <span>/</span>

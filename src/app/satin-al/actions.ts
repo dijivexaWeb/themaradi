@@ -1,6 +1,6 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { fetchPricingConfig } from '@/lib/pricing'
 
@@ -16,11 +16,58 @@ function slugify(text: string): string {
     .substring(0, 50)
 }
 
+async function getOrCreatePurchaseUser(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  formData: FormData,
+  senderName: string,
+  senderEmail: string
+) {
+  const { data: { user: currentUser } } = await supabase.auth.getUser()
+  if (currentUser) return { user: currentUser }
+
+  const password = (formData.get('password') as string)?.trim()
+  const passwordConfirm = (formData.get('password_confirm') as string)?.trim()
+
+  if (!password || password.length < 6) {
+    return { error: 'Şifre en az 6 karakter olmalıdır' }
+  }
+
+  if (password !== passwordConfirm) {
+    return { error: 'Şifreler eşleşmiyor' }
+  }
+
+  const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+    email: senderEmail,
+    password,
+    options: {
+      data: { full_name: senderName },
+      emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3010'}/auth/callback`,
+    },
+  })
+
+  if (!signUpError && signUpData.user) {
+    if (!signUpData.session) {
+      return {
+        error: 'Hesap oluşturuldu ama oturum açılamadı. Supabase Auth ayarlarından e-posta onayını kapatın veya giriş ekranından şifreyle giriş yapın.',
+      }
+    }
+    return { user: signUpData.user }
+  }
+
+  const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
+    email: senderEmail,
+    password,
+  })
+
+  if (signInError || !signInData.user) {
+    return { error: signUpError?.message ?? signInError?.message ?? 'Hesap oluşturulamadı' }
+  }
+
+  return { user: signInData.user }
+}
+
 export async function purchaseMemorialAction(_prev: unknown, formData: FormData) {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
-
   const displayName = (formData.get('display_name') as string)?.trim()
   const senderName = (formData.get('sender_name') as string)?.trim()
   const senderEmail = (formData.get('sender_email') as string)?.trim().toLowerCase()
@@ -28,6 +75,10 @@ export async function purchaseMemorialAction(_prev: unknown, formData: FormData)
   if (!displayName) return { error: 'Anma profili sahibinin adı zorunludur' }
   if (!senderName) return { error: 'Ad Soyad zorunludur' }
   if (!senderEmail || !senderEmail.includes('@')) return { error: 'Geçerli bir e-posta girin' }
+
+  const authResult = await getOrCreatePurchaseUser(supabase, formData, senderName, senderEmail)
+  if ('error' in authResult) return { error: authResult.error }
+  const user = authResult.user
 
   const pricing = await fetchPricingConfig()
   const amount = pricing.campaignActive && pricing.campaignMemorial
@@ -51,7 +102,8 @@ export async function purchaseMemorialAction(_prev: unknown, formData: FormData)
   const dueDate = new Date()
   dueDate.setDate(dueDate.getDate() + 3)
 
-  await supabase.from('payments').insert({
+  const service = await createServiceClient()
+  const { error: paymentErr } = await service.from('payments').insert({
     vault_id: vault.id,
     user_id: user.id,
     amount,
@@ -62,22 +114,24 @@ export async function purchaseMemorialAction(_prev: unknown, formData: FormData)
     due_date: dueDate.toISOString().split('T')[0],
     notes: `Gönderen: ${senderName} <${senderEmail}>`,
   })
+  if (paymentErr) return { error: 'Ödeme kaydı oluşturulamadı: ' + paymentErr.message }
 
   redirect(`/dashboard/vault/${vault.id}?purchased=1`)
 }
 
 export async function purchaseVaultAction(_prev: unknown, formData: FormData) {
   const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
-
   const displayName = (formData.get('display_name') as string)?.trim()
   const senderName = (formData.get('sender_name') as string)?.trim()
   const senderEmail = (formData.get('sender_email') as string)?.trim().toLowerCase()
 
-  if (!displayName) return { error: 'Kasa adı zorunludur' }
+  if (!displayName) return { error: 'Anı alanı adı zorunludur' }
   if (!senderName) return { error: 'Ad Soyad zorunludur' }
   if (!senderEmail || !senderEmail.includes('@')) return { error: 'Geçerli bir e-posta girin' }
+
+  const authResult = await getOrCreatePurchaseUser(supabase, formData, senderName, senderEmail)
+  if ('error' in authResult) return { error: authResult.error }
+  const user = authResult.user
 
   const pricing = await fetchPricingConfig()
   const setupAmount = pricing.campaignActive && pricing.campaignVaultSetup
@@ -101,7 +155,8 @@ export async function purchaseVaultAction(_prev: unknown, formData: FormData) {
   const dueDate = new Date()
   dueDate.setDate(dueDate.getDate() + 3)
 
-  await supabase.from('payments').insert({
+  const service = await createServiceClient()
+  const { error: paymentErr } = await service.from('payments').insert({
     vault_id: vault.id,
     user_id: user.id,
     amount: setupAmount,
@@ -112,6 +167,7 @@ export async function purchaseVaultAction(_prev: unknown, formData: FormData) {
     due_date: dueDate.toISOString().split('T')[0],
     notes: `Gönderen: ${senderName} <${senderEmail}>`,
   })
+  if (paymentErr) return { error: 'Ödeme kaydı oluşturulamadı: ' + paymentErr.message }
 
   redirect(`/dashboard/vault/${vault.id}?purchased=1`)
 }

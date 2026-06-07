@@ -1,8 +1,11 @@
 ﻿'use server'
 
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
+
+const MEDIA_BUCKET = 'vault-media'
+const MAX_PROFILE_PHOTO_BYTES = 15 * 1024 * 1024
 
 function slugify(text: string): string {
   return text
@@ -13,32 +16,50 @@ function slugify(text: string): string {
     .trim()
 }
 
-export async function createVaultAction(formData: FormData): Promise<void> {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
+function cleanFilename(name: string) {
+  const cleaned = name
+    .toLowerCase()
+    .replace(/ş/g, 's').replace(/ğ/g, 'g').replace(/ü/g, 'u')
+    .replace(/ö/g, 'o').replace(/ı/g, 'i').replace(/ç/g, 'c')
+    .replace(/[^a-z0-9._-]/g, '-')
+    .replace(/-+/g, '-')
+    .replace(/^-|-$/g, '')
 
-  const displayName = formData.get('display_name') as string
-  if (!displayName?.trim()) return
+  return cleaned || 'profil-fotografi'
+}
 
-  const baseSlug = slugify(displayName)
-  const slug = `${baseSlug}-${Date.now().toString(36)}`
+async function uploadProfilePhoto(vaultId: string, userId: string, formData: FormData) {
+  const file = formData.get('cover_photo_file')
+  if (!(file instanceof File) || file.size === 0) return null
+  if (!file.type.startsWith('image/') || file.size > MAX_PROFILE_PHOTO_BYTES) return null
 
-  const { data, error } = await supabase
-    .from('vaults')
-    .insert({
-      owner_id: user.id,
-      display_name: displayName.trim(),
-      slug,
-      status: 'hidden_vault',
+  const service = await createServiceClient()
+  const path = `${vaultId}/${userId}/profile-${Date.now()}-${cleanFilename(file.name)}`
+  let { error } = await service.storage.from(MEDIA_BUCKET).upload(path, file, {
+    contentType: file.type,
+    upsert: false,
+  })
+  if (error && error.message.toLowerCase().includes('bucket')) {
+    await service.storage.createBucket(MEDIA_BUCKET, {
+      public: true,
+      fileSizeLimit: MAX_PROFILE_PHOTO_BYTES,
+      allowedMimeTypes: ['image/jpeg', 'image/png', 'image/webp', 'image/gif'],
     })
-    .select('id')
-    .single()
+    const retry = await service.storage.from(MEDIA_BUCKET).upload(path, file, {
+      contentType: file.type,
+      upsert: false,
+    })
+    error = retry.error
+  }
+  if (error) return null
 
-  if (error || !data) return
+  const { data } = service.storage.from(MEDIA_BUCKET).getPublicUrl(path)
+  return data.publicUrl
+}
 
-  revalidatePath('/dashboard')
-  redirect(`/dashboard/vault/${data.id}`)
+export async function createVaultAction(formData: FormData): Promise<void> {
+  void formData
+  redirect('/satin-al')
 }
 
 export async function updateVaultAction(vaultId: string, formData: FormData) {
@@ -117,7 +138,7 @@ export async function linkQRToVaultAction(vaultId: string, qrHash: string) {
     .eq('owner_id', user.id)
     .single()
 
-  if (!vault) return { error: 'Kasa bulunamadı' }
+  if (!vault) return { error: 'Anı alanı bulunamadı' }
 
   const { error } = await supabase
     .from('dynamic_qr')
@@ -132,4 +153,49 @@ export async function linkQRToVaultAction(vaultId: string, qrHash: string) {
 
   revalidatePath(`/dashboard/vault/${vaultId}/settings`)
   return { success: true }
+}
+
+export async function saveVaultProfileAction(vaultId: string, formData: FormData): Promise<void> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) redirect('/login')
+
+  const { data: vault } = await supabase
+    .from('vaults')
+    .select('id, display_name, status, cover_photo_url')
+    .eq('id', vaultId)
+    .eq('owner_id', user.id)
+    .single()
+
+  if (!vault || vault.status === 'pending_verification') return
+
+  const uploadedCoverUrl = await uploadProfilePhoto(vaultId, user.id, formData)
+  const coverPhotoUrl = uploadedCoverUrl
+    ?? (formData.get('cover_photo_url') as string)?.trim()
+    ?? vault.cover_photo_url
+    ?? null
+
+  const { error } = await supabase
+    .from('vaults')
+    .update({
+      display_name: (formData.get('display_name') as string)?.trim() || vault.display_name,
+      tagline: (formData.get('tagline') as string)?.trim() || null,
+      birth_date: (formData.get('birth_date') as string) || null,
+      death_date: (formData.get('death_date') as string) || null,
+      birth_place: (formData.get('birth_place') as string)?.trim() || null,
+      death_place: (formData.get('death_place') as string)?.trim() || null,
+      cover_photo_url: coverPhotoUrl || null,
+      last_message: (formData.get('last_message') as string)?.trim() || null,
+      cemetery_name: (formData.get('cemetery_name') as string)?.trim() || null,
+      cemetery_address: (formData.get('cemetery_address') as string)?.trim() || null,
+      updated_at: new Date().toISOString(),
+    })
+    .eq('id', vaultId)
+    .eq('owner_id', user.id)
+
+  if (error) return
+
+  revalidatePath(`/dashboard/vault/${vaultId}`)
+  revalidatePath(`/dashboard/vault/${vaultId}/profil`)
+  revalidatePath(`/dashboard/vault/${vaultId}/onizleme`)
 }

@@ -1,103 +1,115 @@
 import { createClient } from '@/lib/supabase/server'
+import BrandLogo from '@/components/BrandLogo'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
+import {
+  CreditCard,
+  Eye,
+  Headphones,
+  Home,
+  LogOut,
+  QrCode,
+  ShieldCheck,
+} from 'lucide-react'
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('full_name, avatar_url, role')
-    .eq('id', user.id)
-    .single()
+  const [{ data: profile }, { data: firstArea }] = await Promise.all([
+    supabase
+      .from('profiles')
+      .select('full_name, avatar_url, role')
+      .eq('id', user.id)
+      .single(),
+    supabase
+      .from('vaults')
+      .select('id')
+      .eq('owner_id', user.id)
+      .order('created_at', { ascending: true })
+      .limit(1)
+      .maybeSingle(),
+  ])
 
   const initial = (profile?.full_name?.[0] ?? user.email?.[0] ?? '?').toUpperCase()
+  const areaHref = firstArea ? `/dashboard/vault/${firstArea.id}` : '/dashboard'
 
   const navItems = [
-    {
-      href: '/dashboard',
-      label: 'Kasalarim',
-      icon: (
-        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-        </svg>
-      ),
-    },
-    {
-      href: '/dashboard/billing',
-      label: 'Abonelik',
-      icon: (
-        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-        </svg>
-      ),
-    },
+    { href: areaHref, label: 'Anı Alanım', icon: Home },
+    { href: '/dashboard/billing', label: 'Abonelik', icon: CreditCard },
+    { href: firstArea ? `/dashboard/vault/${firstArea.id}/onizleme` : '/dashboard', label: 'Profil Önizleme', icon: Eye },
+    { href: firstArea ? `/dashboard/vault/${firstArea.id}/settings` : '/dashboard', label: 'Yayın ve QR Ayarları', icon: QrCode },
   ]
 
   return (
-    <div className="theme-admin min-h-screen bg-[#f5f7fb]">
-      <aside className="fixed left-0 top-0 h-full w-60 border-r border-white/[0.06] flex flex-col z-40" style={{ background: 'rgba(8, 16, 36, 0.95)' }}>
-        {/* Logo */}
-        <div className="px-5 h-14 flex items-center border-b border-white/[0.06]">
-          <Link href="/" className="font-bold text-lg tracking-tight gradient-text">
-            themaradi
-          </Link>
+    <div className="theme-memorial min-h-screen bg-[#fbf8f0] text-[#173d31]">
+      <aside className="fixed left-0 top-0 z-40 hidden h-full w-72 flex-col border-r border-[#e5dccb] bg-[#fffdf7]/95 px-4 py-7 shadow-[18px_0_55px_rgba(64,48,24,0.06)] lg:flex">
+        <div className="px-4">
+          <BrandLogo href="/" className="text-[#173d31]" />
         </div>
 
-        {/* Nav */}
-        <nav className="flex-1 px-3 py-4 space-y-0.5">
-          {navItems.map(({ href, label, icon }) => (
+        <nav className="mt-9 flex-1 space-y-2">
+          {navItems.map(({ href, label, icon: Icon }, index) => (
             <Link
-              key={href}
+              key={label}
               href={href}
-              className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-slate-400 hover:text-slate-100 hover:bg-white/[0.05] transition-all group"
+              className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium transition-all ${
+                index === 0
+                  ? 'bg-[#174f35] text-white shadow-[0_14px_35px_rgba(23,79,53,0.22)]'
+                  : 'text-[#23382f] hover:bg-[#f5efdf]'
+              }`}
             >
-              <span className="text-slate-500 group-hover:text-amber-400 transition-colors">{icon}</span>
+              <Icon className={`h-4 w-4 ${index === 0 ? 'text-[#dfbd72]' : 'text-[#7b837d]'}`} />
               {label}
             </Link>
           ))}
         </nav>
 
-        {/* Admin shortcut */}
         {profile?.role === 'admin' && (
-          <div className="px-3 pb-2">
-            <Link
-              href="/admin"
-              className="flex items-center gap-2 px-3 py-2 rounded-xl text-xs font-semibold text-emerald-400 border border-emerald-500/20 bg-emerald-500/5 hover:bg-emerald-500/10 transition-all"
-            >
-              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-              </svg>
-              Admin Paneli
-            </Link>
-          </div>
+          <Link
+            href="/admin"
+            className="mb-4 flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-xs font-semibold text-emerald-800"
+          >
+            <ShieldCheck className="h-4 w-4" />
+            Admin Paneli
+          </Link>
         )}
 
-        {/* User */}
-        <div className="px-3 pb-4 border-t border-white/[0.06] pt-3">
-          <div className="flex items-center gap-3 px-3 py-2 rounded-xl mb-1">
-            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-amber-400/30 to-amber-600/20 border border-amber-500/20 flex items-center justify-center text-amber-300 text-xs font-bold shrink-0">
+        <div className="rounded-2xl border border-[#e5dccb] bg-white/70 p-3">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#174f35] text-sm font-bold text-[#f7df9d]">
               {initial}
             </div>
-            <div className="flex-1 min-w-0">
-              <div className="text-xs font-medium text-slate-200 truncate">{profile?.full_name ?? 'Kullanici'}</div>
-              <div className="text-[11px] text-slate-600 truncate">{user.email}</div>
+            <div className="min-w-0 flex-1">
+              <div className="truncate text-sm font-semibold text-[#21372e]">{profile?.full_name ?? 'The Maradi Üyesi'}</div>
+              <div className="truncate text-xs text-[#7b837d]">{user.email}</div>
             </div>
           </div>
+        </div>
+
+        <div className="mt-5 space-y-2">
+          <Link href="/contact" className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm text-[#69766f] hover:bg-[#f5efdf]">
+            <Headphones className="h-4 w-4" />
+            Yardım & Destek
+          </Link>
           <form action="/auth/signout" method="post">
-            <button type="submit" className="w-full flex items-center gap-2 px-3 py-2 text-xs text-slate-600 hover:text-slate-300 hover:bg-white/[0.04] rounded-xl transition-all">
-              <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-              </svg>
-              Cikis Yap
+            <button type="submit" className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm text-[#69766f] hover:bg-[#f5efdf]">
+              <LogOut className="h-4 w-4" />
+              Çıkış Yap
             </button>
           </form>
         </div>
       </aside>
 
-      <main className="pl-60 min-h-screen">
+      <header className="sticky top-0 z-30 flex items-center justify-between border-b border-[#e5dccb] bg-[#fffdf7]/95 px-4 py-3 backdrop-blur lg:hidden">
+        <BrandLogo href={areaHref} className="text-[#173d31]" />
+        <Link href="/dashboard/billing" className="rounded-full border border-[#e5dccb] px-3 py-1.5 text-xs font-semibold text-[#174f35]">
+          Abonelik
+        </Link>
+      </header>
+
+      <main className="min-h-screen lg:pl-72">
         {children}
       </main>
     </div>

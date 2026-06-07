@@ -26,7 +26,6 @@ export default async function HeirsPage({ params }: Props) {
   const { data: vault } = await supabase.from('vaults').select('id, display_name, status, product_type').eq('id', id).eq('owner_id', user.id).single()
   if (!vault) notFound()
 
-  // Sadece life_vault'ta varis yönetimi var
   if (vault.product_type === 'memorial_profile') {
     redirect(`/dashboard/vault/${id}`)
   }
@@ -40,54 +39,55 @@ export default async function HeirsPage({ params }: Props) {
   const isLocked = vault.status === 'pending_verification'
   const inviteWithVault = inviteHeirAction.bind(null, id)
 
-  const fieldCls = `w-full bg-slate-800 border border-slate-700 text-slate-100 placeholder-slate-500 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-amber-500`
-  const selectCls = `bg-slate-800 border border-slate-700 text-slate-100 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-amber-500 w-full`
+  const inputCls = `w-full rounded-xl border border-[#e5dccb] bg-white px-4 py-3 text-sm text-[#1f2d27] placeholder-[#adb5ab] outline-none focus:border-[#174f35] focus:ring-2 focus:ring-[#174f35]/10`
+  const selectCls = `w-full rounded-xl border border-[#e5dccb] bg-white px-4 py-3 text-sm text-[#1f2d27] outline-none focus:border-[#174f35] focus:ring-2 focus:ring-[#174f35]/10`
+  const labelCls = `mb-1.5 block text-xs font-semibold text-[#4a5e55]`
 
   return (
-    <div className="p-8">
+    <div className="px-5 py-8 sm:px-8">
       <div className="max-w-3xl mx-auto">
-        <div className="flex items-center gap-2 text-sm text-slate-500 mb-6">
-          <Link href="/dashboard" className="hover:text-slate-300">Kasalarım</Link>
-          <span>/</span>
-          <Link href={`/dashboard/vault/${id}`} className="hover:text-slate-300">{vault.display_name}</Link>
-          <span>/</span>
-          <span className="text-slate-300">Varisler</span>
+        <div className="flex items-center gap-2 text-sm mb-6">
+          <Link href="/dashboard" className="text-[#788177] hover:text-[#174f35] transition-colors">Anı Alanım</Link>
+          <span className="text-[#c8bfb0]">/</span>
+          <Link href={`/dashboard/vault/${id}`} className="text-[#788177] hover:text-[#174f35] transition-colors">{vault.display_name}</Link>
+          <span className="text-[#c8bfb0]">/</span>
+          <span className="font-semibold text-[#22362e]">Yetkili Kişiler</span>
         </div>
 
         {isLocked && (
-          <div className="mb-5 bg-amber-900/20 border border-amber-500/30 text-amber-400 text-sm rounded-xl px-4 py-3">
-            ⏳ Ödeme doğrulandıktan sonra varis ekleyebilirsiniz.
+          <div className="mb-5 rounded-2xl border border-[#dfbd72]/50 bg-[#fff7e6] px-5 py-4 text-sm text-[#725212]">
+            Ödeme doğrulandıktan sonra yetkili kişi ekleyebilirsiniz.
           </div>
         )}
 
-        <div className="mb-6">
-          <h1 className="text-2xl font-bold text-slate-100 mb-2">Varisler ve Yetkililer</h1>
-          <div className="glass border border-slate-700/50 rounded-xl px-4 py-3">
-            <p className="text-sm text-slate-400 leading-6">
-              Varisler ölümünüzden sonra gizli kasanıza erişebilir ve içerikleri görüntüleyebilir.
-              <strong className="text-slate-200"> Vasiy</strong> olarak atanan kişi kasayı devralabilir.
+        <div className="mb-7">
+          <h1 className="font-serif text-3xl text-[#1f2d27] mb-3">Yetkili Kişiler</h1>
+          <div className="rounded-2xl border border-[#e5dccb] bg-white px-5 py-4">
+            <p className="text-sm text-[#4a5e55] leading-6">
+              Yetkili kişiler özel içeriklerinize erişebilir ve içerikleri görüntüleyebilir.
+              <span className="font-semibold text-[#1f2d27]"> Vasiy</span> olarak atanan kişi anı alanını devralabilir.
               Davet e-posta ile gönderilir ve onay gerektirir.
             </p>
           </div>
         </div>
 
         {!isLocked && (
-          <div className="glass border border-slate-800/60 rounded-2xl p-5 mb-6">
-            <h2 className="text-sm font-semibold text-slate-300 mb-4">Yeni Varis Davet Et</h2>
+          <div className="rounded-3xl border border-[#e5dccb] bg-[#fffdf8] p-6 shadow-[0_16px_50px_rgba(64,48,24,0.06)] mb-7">
+            <h2 className="text-sm font-semibold text-[#1f2d27] mb-4">Yeni Yetkili Davet Et</h2>
             <form action={inviteWithVault} className="space-y-3">
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs text-slate-400 mb-1.5">Ad Soyad <span className="text-amber-400">*</span></label>
-                  <input type="text" name="full_name" required placeholder="Ali Yılmaz" className={fieldCls} />
+                  <label className={labelCls}>Ad Soyad <span className="text-[#dfbd72]">*</span></label>
+                  <input type="text" name="full_name" required placeholder="Ali Yılmaz" className={inputCls} />
                 </div>
                 <div>
-                  <label className="block text-xs text-slate-400 mb-1.5">E-posta <span className="text-amber-400">*</span></label>
-                  <input type="email" name="email" required placeholder="varis@email.com" className={fieldCls} />
+                  <label className={labelCls}>E-posta <span className="text-[#dfbd72]">*</span></label>
+                  <input type="email" name="email" required placeholder="varis@email.com" className={inputCls} />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs text-slate-400 mb-1.5">Yakınlık</label>
+                  <label className={labelCls}>Yakınlık</label>
                   <select name="relationship" className={selectCls}>
                     <option value="">Seç...</option>
                     {Object.entries(relationshipLabels).map(([v, l]) => (
@@ -96,7 +96,7 @@ export default async function HeirsPage({ params }: Props) {
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs text-slate-400 mb-1.5">Yetki Seviyesi</label>
+                  <label className={labelCls}>Yetki Seviyesi <span className="text-[#dfbd72]">*</span></label>
                   <select name="access_level" required className={selectCls}>
                     <option value="executor">Vasiy — Devralır</option>
                     <option value="contributor">Katkı Sağlayan</option>
@@ -105,11 +105,13 @@ export default async function HeirsPage({ params }: Props) {
                 </div>
               </div>
               <div>
-                <label className="block text-xs text-slate-400 mb-1.5">Telefon (opsiyonel)</label>
-                <input type="tel" name="phone" placeholder="+90 555 555 55 55" className={fieldCls} />
+                <label className={labelCls}>Telefon (opsiyonel)</label>
+                <input type="tel" name="phone" placeholder="+90 555 555 55 55" className={inputCls} />
               </div>
-              <button type="submit"
-                className="bg-amber-500 hover:bg-amber-400 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-colors">
+              <button
+                type="submit"
+                className="rounded-xl bg-[#174f35] px-6 py-3 text-sm font-semibold text-white shadow-[0_14px_35px_rgba(23,79,53,0.18)] hover:bg-[#123f2b] transition-colors"
+              >
                 Davet Gönder
               </button>
             </form>
@@ -117,9 +119,10 @@ export default async function HeirsPage({ params }: Props) {
         )}
 
         {!heirs?.length ? (
-          <div className="text-center py-12 text-slate-600">
+          <div className="rounded-3xl border border-dashed border-[#e5dccb] bg-[#fffdf8] p-14 text-center">
             <div className="text-4xl mb-3">👥</div>
-            <p className="text-sm">Henüz varis eklenmemiş</p>
+            <p className="text-[#788177] text-sm">Henüz yetkili kişi eklenmemiş</p>
+            <p className="text-xs text-[#adb5ab] mt-1">Güvendiğiniz kişileri davet ederek içeriklerinize erişim verin</p>
           </div>
         ) : (
           <div className="space-y-3">
@@ -127,34 +130,39 @@ export default async function HeirsPage({ params }: Props) {
               const isExpired = heir.invitation_expires_at ? new Date(heir.invitation_expires_at) < new Date() : false
               const statusLabel = heir.accepted_at ? 'Kabul Etti' : isExpired ? 'Süresi Doldu' : 'Davet Gönderildi'
               const statusColor = heir.accepted_at
-                ? 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20'
+                ? 'text-[#174f35] bg-[#f0fdf4] border-[#174f35]/20'
                 : isExpired
-                  ? 'text-red-400 bg-red-500/10 border-red-500/20'
-                  : 'text-amber-400 bg-amber-500/10 border-amber-500/20'
+                  ? 'text-red-600 bg-red-50 border-red-200'
+                  : 'text-[#725212] bg-[#fff7e6] border-[#dfbd72]/50'
               const revoke = revokeHeirAccessAction.bind(null, heir.id, id)
 
               return (
-                <div key={heir.id} className="glass border border-slate-800/60 rounded-xl px-5 py-4 flex items-center gap-4 group">
-                  <div className="w-9 h-9 rounded-full bg-gradient-to-br from-amber-500/30 to-amber-400/20 flex items-center justify-center text-sm font-bold text-amber-400 shrink-0">
+                <div key={heir.id} className="rounded-2xl border border-[#e5dccb] bg-white px-5 py-4 flex items-center gap-4 group hover:border-[#174f35]/20 transition-colors">
+                  <div className="w-9 h-9 rounded-full bg-[#174f35]/10 flex items-center justify-center text-sm font-bold text-[#174f35] shrink-0">
                     {(heir.full_name ?? heir.heir_email)[0]?.toUpperCase()}
                   </div>
                   <div className="flex-1 min-w-0">
-                    {heir.full_name && <div className="text-sm font-medium text-slate-100">{heir.full_name}</div>}
-                    <div className="text-xs text-slate-500 truncate">{heir.heir_email}</div>
+                    {heir.full_name && <div className="text-sm font-semibold text-[#1f2d27]">{heir.full_name}</div>}
+                    <div className="text-xs text-[#788177] truncate">{heir.heir_email}</div>
                     <div className="flex items-center gap-2 mt-0.5">
-                      <span className="text-[11px] text-slate-600">{accessLabels[heir.access_level ?? ''] ?? heir.access_level}</span>
+                      <span className="text-[11px] text-[#adb5ab]">{accessLabels[heir.access_level ?? ''] ?? heir.access_level}</span>
                       {heir.relationship && (
                         <>
-                          <span className="text-slate-700">·</span>
-                          <span className="text-[11px] text-slate-600">{relationshipLabels[heir.relationship] ?? heir.relationship}</span>
+                          <span className="text-[#e5dccb]">·</span>
+                          <span className="text-[11px] text-[#adb5ab]">{relationshipLabels[heir.relationship] ?? heir.relationship}</span>
                         </>
                       )}
                     </div>
                   </div>
-                  <div className={`text-xs px-2.5 py-1 rounded-full border shrink-0 ${statusColor}`}>{statusLabel}</div>
+                  <div className={`text-xs px-2.5 py-1 rounded-full border shrink-0 font-medium ${statusColor}`}>{statusLabel}</div>
                   {!isLocked && (
                     <form action={revoke}>
-                      <button type="submit" className="text-slate-700 hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100 text-xs">Kaldır</button>
+                      <button
+                        type="submit"
+                        className="text-[#e5dccb] hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100 text-xs font-medium"
+                      >
+                        Kaldır
+                      </button>
                     </form>
                   )}
                 </div>

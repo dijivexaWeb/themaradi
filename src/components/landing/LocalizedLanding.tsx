@@ -68,7 +68,7 @@ export default function LocalizedLanding({ pricing }: { pricing: PricingConfig }
               {s.hero.p}
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <Link href="#nasil-calisir" className="inline-flex items-center justify-center gap-2 rounded-md bg-[#103b2c] px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-[#103b2c]/20 transition hover:bg-[#0b2b20]">
+              <Link href="/satin-al" className="inline-flex items-center justify-center gap-2 rounded-md bg-[#103b2c] px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-[#103b2c]/20 transition hover:bg-[#0b2b20]">
                 {s.hero.ctaPrimary}
                 <ArrowRight className="h-4 w-4" />
               </Link>
@@ -272,7 +272,7 @@ export default function LocalizedLanding({ pricing }: { pricing: PricingConfig }
                 <p className="text-xs text-[#8a7a64]">{h.scenarioA.priceLabel}</p>
                 <p className="font-serif text-2xl text-[#173d31]">{h.scenarioA.price} <span className="text-base text-[#b08340]">{h.scenarioA.currency}</span></p>
               </div>
-              <Link href="/pricing" className="inline-flex items-center gap-2 rounded-xl border border-[#c7a76f] px-5 py-2.5 text-sm font-semibold text-[#173d31] transition hover:bg-[#f4eee3]">
+              <Link href="/satin-al" className="inline-flex items-center gap-2 rounded-xl border border-[#c7a76f] px-5 py-2.5 text-sm font-semibold text-[#173d31] transition hover:bg-[#f4eee3]">
                 {h.scenarioA.detailsBtn} <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
@@ -303,7 +303,7 @@ export default function LocalizedLanding({ pricing }: { pricing: PricingConfig }
                 <p className="font-serif text-2xl text-[#173d31]">{h.scenarioB.price} <span className="text-base text-[#b08340]">{h.scenarioB.currency}</span></p>
                 <p className="text-xs text-[#8a7a64]">{h.scenarioB.priceAlt}</p>
               </div>
-              <Link href="/pricing" className="inline-flex items-center gap-2 rounded-xl bg-[#103b2c] px-5 py-2.5 text-sm font-semibold text-white shadow transition hover:bg-[#0b2b20]">
+              <Link href="/satin-al" className="inline-flex items-center gap-2 rounded-xl bg-[#103b2c] px-5 py-2.5 text-sm font-semibold text-white shadow transition hover:bg-[#0b2b20]">
                 {h.scenarioB.startBtn} <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
@@ -422,7 +422,7 @@ export default function LocalizedLanding({ pricing }: { pricing: PricingConfig }
         </div>
         <p className="mt-6 text-center text-sm text-[#8a7a64]">
           {p.viewAll}{' '}
-          <Link href="/pricing" className="font-semibold text-[#9a7132] underline-offset-2 hover:underline">{p.viewAllLink}</Link>{' '}
+          <Link href="/satin-al" className="font-semibold text-[#9a7132] underline-offset-2 hover:underline">{p.viewAllLink}</Link>{' '}
           {p.viewAllSuffix}
         </p>
       </section>
