@@ -1,11 +1,955 @@
 const en = {
   nav: {
+    home: 'Home',
     howItWorks: 'How it works',
-    features: 'Features',
+    features: 'Memorials',
+    demoProfile: 'Demo profile',
     pricing: 'Pricing',
     faq: 'FAQ',
     login: 'Sign in',
     cta: 'Start',
+    openMenu: 'Open menu',
+  },
+
+  landing: {
+    hero: {
+      eyebrow: '',
+      h1a: 'Memories Don\'t Live',
+      h1b: 'in Stone — They Live in Time.',
+      p: 'QR codes placed on gravestones open digital memorial pages that hold the stories, photos, and meaning of your loved ones.',
+      ctaPrimary: 'How it works?',
+      ctaSecondary: 'See demo profile',
+    },
+
+    profilePreview: {
+      heading: 'Digital Memorial Profile',
+      body: 'Beautifully presented digital memorial pages that capture every detail of your loved one\'s life.',
+      cta: 'See Demo Profile',
+      profileName: 'Ahmet Yılmaz',
+      profileYears: '1940 – 2020',
+      profileBio: 'Life story, family memories, and beautiful moments are preserved in this elegant digital profile.',
+      readStory: 'Read Life Story',
+      viewAll: 'View All Content',
+      statLifeStory: 'Life Story',
+      statPhotos: 'Photos',
+      statVideos: 'Videos',
+      statMemories: '66 Memories',
+    },
+
+    quickSteps: [
+      {
+        title: 'QR plate is placed',
+        text: 'A personalized, durable QR plate is produced and added to the gravestone or memorial space. The plate is valid for life — the redirect works even if the URL changes.',
+      },
+      {
+        title: 'Digital memorial profile opens',
+        text: 'Life story, photos, videos, audio recordings and cemetery location are gathered on a single page. Family members can update content over time.',
+      },
+      {
+        title: 'Memories are passed to generations',
+        text: 'When visitors scan the QR code, the page opens; they light a candle, leave flowers, send condolence messages. Notifications are sent to the heirs.',
+      },
+    ],
+
+    values: [
+      { title: 'Memories are Safe', text: 'Your memories are protected in the digital realm, they don\'t fade with time.' },
+      { title: 'Meaningful Visits', text: 'Each visit allows you to form a deeper connection with your loved ones.' },
+      { title: 'Easy Access', text: 'A QR code opens a rich digital memorial page in seconds.' },
+      { title: 'Legacy for New Generations', text: 'Your stories and values inspire future generations.' },
+    ],
+
+    ctaBanner: {
+      heading: 'Preserve not just a name, but a life.',
+      button: 'Contact Us',
+    },
+
+    whySection: {
+      heading: 'Why The Maradi?',
+      sub: 'Transforms more than a gravestone into a respectful, permanent digital memorial experience.',
+    },
+
+    whyItems: [
+      {
+        title: 'Makes memories permanent',
+        text: 'Photos, stories, audio and videos are stored in an organized digital memorial space. They don\'t fade over time — they remain accessible for generations.',
+      },
+      {
+        title: 'Bridges the physical and digital worlds',
+        text: 'The QR code on the gravestone is a direct gateway to the memorial page. Easy for visitors, meaningful for family.',
+      },
+      {
+        title: 'Easy management for family',
+        text: 'Authorized family members can update the profile over time. They can track condolence notifications and manage content.',
+      },
+      {
+        title: 'A human-touching experience',
+        text: 'Visitors encounter not just a name but a lived life. They light candles, leave flowers, pray — every interaction sends notifications to heirs.',
+      },
+      {
+        title: 'Verified, trustworthy profiles',
+        text: 'Every Memorial Profile is verified with ID and death certificate. With a 14-day objection window, the risk of fake profiles approaches zero.',
+      },
+      {
+        title: 'Lifetime uptime commitment',
+        text: 'The Maradi commits to permanent operation. Memorial Profiles remain accessible for life; no extra charges or renewals. QR plates are never invalidated.',
+      },
+    ],
+
+    howItWorksDetailed: {
+      heading: 'How does it work?',
+      sub: 'Two different scenarios — both lead to the same platform.',
+      scenarioA: {
+        badge: 'Scenario A — Your loved one has passed',
+        heading: 'Family creates it, goes live immediately',
+        steps: [
+          'The Memorial Profile form is filled, biography and photos are added.',
+          'ID and death certificate are uploaded; admin review within 24–48 hours.',
+          'The profile waits ready during the 14-day objection window.',
+          'If no objection, the profile goes live and the QR plate is produced and sent.',
+        ],
+        priceLabel: 'One-time',
+        price: '249',
+        currency: '₾',
+        detailsBtn: 'Details',
+      },
+      scenarioB: {
+        badge: 'Scenario B — Set it up yourself while alive',
+        heading: 'Life Vault — build your legacy',
+        steps: [
+          'Life Vault is opened; photos, videos, audio recordings and biography are added.',
+          '3 heirs are designated. Your vault remains private, only you manage it.',
+          'You accumulate memories for years. You can add special notes for your heirs in the final message section.',
+          'After passing, when at least 2 of the 3 heirs confirm, the vault automatically converts to a Memorial Profile.',
+        ],
+        priceLabel: '49 ₾ setup + QR plate',
+        price: '12.90',
+        currency: '₾/mo',
+        priceAlt: 'or 99 ₾/yr',
+        startBtn: 'Start',
+      },
+    },
+
+    security: {
+      heading: 'Security infrastructure',
+      body: 'Your loved ones\' memories are a trust to us. Your data is protected with industry-standard encryption, access isolation and permanent redirect infrastructure.',
+      commitment: 'Lifetime uptime commitment. Created Memorial Profiles are permanent; no extra charges or renewals. QR plates are never invalidated.',
+      readPrivacy: 'Read privacy policy',
+    },
+
+    securityItems: [
+      {
+        title: 'TLS 1.3 encrypted transmission',
+        text: 'All data traffic from browser to server is encrypted with the TLS 1.3 protocol. Full protection against man-in-the-middle attacks.',
+      },
+      {
+        title: 'Row-level data isolation',
+        text: 'With Supabase PostgreSQL Row Level Security (RLS), each user can only access their own data. Other profiles are completely inaccessible.',
+      },
+      {
+        title: 'AES-256 media encryption',
+        text: 'Photos, videos and audio recordings are stored encrypted with AES-256 on Cloudflare R2. Verification documents are permanently deleted within 30 days after approval.',
+      },
+      {
+        title: 'bcrypt password hashing',
+        text: 'Passwords are never stored as plain text; they are hashed with the bcrypt algorithm. Even in a security breach, your passwords cannot be read.',
+      },
+      {
+        title: 'Permanent QR redirect',
+        text: 'The URL on the QR plate works with an ID independent of slug or domain name. Even if the page address changes, plates remain valid forever.',
+      },
+      {
+        title: 'Document verification + objection window',
+        text: 'ID and death certificate are required for Memorial Profile applications. 24–48 hour admin review and a 14-day objection window minimizes the risk of fake profiles.',
+      },
+    ],
+
+    pricingSection: {
+      heading: 'Pricing',
+      sub: 'Two products, two needs. QR plate is included in both.',
+      memorialBadge: 'Your loved one has passed',
+      memorialTitle: 'Memorial Profile',
+      memorialPriceLabel: 'one-time',
+      memorialFeatures: [
+        'Full digital memorial profile',
+        'Photo & video gallery',
+        'Cemetery location & Map',
+        'Condolence / candle / flower feature',
+        'QR plate production and delivery',
+        'Identity verification + 14-day objection',
+        'Lifetime access',
+      ],
+      memorialCta: 'View Details',
+      vaultBadgeTop: 'Start while alive',
+      vaultBadge: 'Build your own legacy',
+      vaultTitle: 'Life Vault',
+      vaultPriceMonthly: '₾/mo',
+      vaultPriceAlt: 'or 99 ₾/yr',
+      vaultSetup: '+ 49 ₾ setup fee (QR plate included)',
+      vaultFeatures: [
+        'Private memory vault (while alive)',
+        'Photo, video, audio recording',
+        'Final message & personal biography',
+        '3 heir designation',
+        '2/3 approval → automatic memorial profile',
+        'Family notification system',
+        'QR plate included at setup',
+      ],
+      vaultCta: 'Open Life Vault',
+      viewAll: 'See the',
+      viewAllLink: 'pricing page',
+      viewAllSuffix: 'for all details.',
+    },
+
+    faqSection: {
+      heading: 'Frequently asked questions',
+      moreQuestions: 'Have more questions?',
+      moreQuestionsBody: 'We respond within 7 days — usually much faster.',
+      contactLink: 'Contact us',
+    },
+
+    faqs: [
+      {
+        q: 'What is the difference between Memorial Profile and Life Vault?',
+        a: 'Memorial Profile is a one-time (249 ₾) service created by the family for a deceased loved one. Life Vault is a subscription service (49 ₾ setup + 12.90 ₾/mo) where you build your own digital legacy while alive, and heirs publish it after passing.',
+      },
+      {
+        q: 'How long does the QR plate last?',
+        a: 'The Maradi QR code is tied to a unique ID in the database, not a slug or domain name. Even if the domain changes, the plate works. The Maradi is under a lifetime uptime commitment; QR plates are never invalidated.',
+      },
+      {
+        q: 'Why do you require an ID document?',
+        a: 'To prevent the creation of fake death profiles for living people. This rule is applied equally to all applications. Documents are permanently deleted within 30 days after verification; they are never used for any other purpose.',
+      },
+      {
+        q: 'What happens if the platform shuts down?',
+        a: 'The Maradi makes a lifetime uptime commitment. Created Memorial Profiles are permanent; no extra charges, subscriptions or renewals required. QR plates are never invalidated — the redirect works even if the domain or URL changes.',
+      },
+      {
+        q: 'Can family members add content?',
+        a: 'Yes. Authorized family members can be added as profile managers. They can update photos, videos and biography. They can view and manage condolence messages.',
+      },
+      {
+        q: 'What happens if I cancel my Life Vault subscription?',
+        a: 'All features remain active until the cancellation date. Afterwards the vault is frozen — content is not deleted. Heirs can reactivate the subscription after passing to publish the vault.',
+      },
+      {
+        q: 'When does the QR plate physically arrive?',
+        a: 'Plate production starts after the profile is approved. Deliveries within Georgia and Turkey take 5–10 business days, other countries 10–20 business days.',
+      },
+      {
+        q: 'What currency is payment made in?',
+        a: 'In Georgian Lari (₾/GEL). TBC Pay, BOG Pay, Visa/Mastercard and bank transfer are accepted. For payments from outside Georgia, the currency equivalent is automatically calculated.',
+      },
+    ],
+
+    finalCta: {
+      heading: 'Preserve the memory of your loved ones.',
+      sub: 'Start today with a digital memorial experience that carries memories to the future.',
+      primaryBtn: 'Start Now',
+      secondaryBtn: 'Contact us',
+    },
+
+    footer: {
+      tagline: 'Memories are not entrusted to stone, but to love.',
+      commitment: 'Lifetime uptime commitment.',
+      colPlatform: 'Platform',
+      colCorporate: 'Corporate',
+      colDocs: 'Documents',
+      colContact: 'Contact',
+      platformLinks: [
+        { label: 'Home', href: '/' },
+        { label: 'How it works', href: '#nasil-calisir' },
+        { label: 'Why The Maradi?', href: '#ozellikler' },
+        { label: 'Demo Profile', href: '/memorial/demo' },
+        { label: 'Pricing', href: '/pricing' },
+        { label: 'FAQ', href: '#sss' },
+      ],
+      corporateLinks: [
+        { label: 'About Us', href: '/contact' },
+        { label: 'Contact', href: '/contact' },
+      ],
+      docLinks: [
+        { label: 'Privacy Policy', href: '/privacy' },
+        { label: 'Terms of Service', href: '/terms' },
+        { label: 'Verification Policy', href: '/legal/verification-policy' },
+      ],
+      copyright: '© 2026 The Maradi. All rights reserved.',
+    },
+  },
+
+  pricing: {
+    pageTitle: 'Pricing — The Maradi',
+    nav: {
+      home: 'Home',
+      demoProfile: 'Demo Profile',
+      contact: 'Contact',
+      askQuestion: 'Ask a question',
+    },
+    hero: {
+      eyebrow: 'Pricing',
+      h1a: 'Two products,',
+      h1b: 'two different needs.',
+      p: 'For a deceased loved one <strong>Memorial Profile</strong> or build your own legacy while alive — <strong>Life Vault</strong>. QR grave plate is included in both.',
+    },
+    memorial: {
+      badge: 'Your loved one has passed',
+      title: 'Memorial Profile',
+      price: '249',
+      currency: '₾',
+      priceLabel: 'one-time',
+      priceNote: 'QR plate production and delivery included. No other payments.',
+      verificationNote: 'Identity verification required. Documents are uploaded after payment, profile goes live after admin approval.',
+      cta: 'Create Memorial Profile',
+      features: [
+        'Full digital memorial profile',
+        'Photo & video gallery',
+        'Life story and chronology',
+        'Condolence / candle / flower feature',
+        'QR plate production and delivery',
+        'Google Maps cemetery integration',
+        'Identity verification process',
+        '14-day objection window',
+        'Lifetime access',
+      ],
+    },
+    vault: {
+      badge: 'For yourself — start while alive',
+      badgeLabel: 'Build your own legacy',
+      title: 'Life Vault',
+      setupLabel: 'Setup fee',
+      setup: '49',
+      setupCurrency: '₾',
+      setupNote: 'QR plate included',
+      monthlyLabel: 'Then',
+      monthly: '12.90',
+      monthlyCurrency: '₾',
+      monthlyPeriod: '/ mo',
+      annualNote: 'Or save 36% with <strong>99 ₾/yr</strong>.',
+      cta: 'Open Life Vault',
+      features: [
+        'Private memory vault (while alive)',
+        'Photo, video, audio recording',
+        'Personal biography and chronology',
+        'Final message section',
+        '3 heir designation',
+        '2/3 approval for automatic publishing',
+        'Family notification system',
+        'QR plate (included in setup fee)',
+        'Full memorial profile after passing',
+      ],
+    },
+    comparison: {
+      heading: 'Which one suits you?',
+      sub: 'Different needs, different products.',
+      colStatus: 'Situation',
+      colMemorial: 'Memorial Profile',
+      colVault: 'Life Vault',
+      rows: [
+        'Your loved one has recently passed',
+        'You want to prepare a legacy while alive',
+        'Quick profile, single payment',
+        'You want to accumulate content for years',
+        'Heirs confirm after death',
+        'Document verification required',
+        'QR plate included',
+        'Lifetime access',
+      ],
+      rowMemorial: [true, false, true, false, false, true, true, true],
+      rowVault: [false, true, false, true, true, false, true, true],
+    },
+    verification: {
+      eyebrow: 'Security & Verification',
+      heading: 'How is a Memorial Profile verified?',
+      sub: 'We apply document verification and an objection window to prevent fake profile creation.',
+      safetyNote: 'Your documents are safe. Uploaded ID and death certificates are used only for verification purposes and are permanently deleted from the system after approval. Compliant with GDPR and Georgian Personal Data Law.',
+      steps: [
+        {
+          num: '01',
+          title: 'Profile application',
+          desc: 'The deceased person\'s information is entered. The profile is put in pending_verification status and does not go live immediately.',
+        },
+        {
+          num: '02',
+          title: 'Document upload',
+          desc: 'The applicant\'s ID document and death certificate (national ID or official death certificate) are uploaded.',
+        },
+        {
+          num: '03',
+          title: 'Admin review',
+          desc: 'Documents are reviewed by the team within 24–48 hours. Suspicious cases request additional verification.',
+        },
+        {
+          num: '04',
+          title: '14-day objection window',
+          desc: 'The approved profile can receive an "objection" for 14 days. If the person is still alive or the information is wrong, it can be reported.',
+        },
+        {
+          num: '05',
+          title: 'Going live',
+          desc: 'If there is no objection, the profile goes fully live. QR plate production begins and is sent to your address.',
+        },
+      ],
+    },
+    payment: {
+      heading: 'Payment methods',
+      sub: 'All common methods from Georgia and Turkey are supported.',
+      securityNote: 'All payments are processed through SSL-encrypted and secure infrastructure. Card details are not stored in our system.',
+      methods: [
+        { name: 'Visa / Mastercard', desc: 'All credit and debit cards' },
+        { name: 'TBC Pay', desc: 'TBC Bank online payment' },
+        { name: 'BOG Pay', desc: 'Bank of Georgia payment' },
+        { name: 'Bank Transfer', desc: 'TBC, BOG, Liberty Bank' },
+      ],
+    },
+    faqSection: {
+      heading: 'Frequently asked questions',
+    },
+    faqs: [
+      {
+        q: 'What is the difference between Memorial Profile and Life Vault?',
+        a: 'Memorial Profile is a one-time profile created by family for a deceased person. Life Vault is a long-term vault where a living person records their own life and transfers it to heirs.',
+      },
+      {
+        q: 'Why do you require an ID document?',
+        a: 'To prevent the creation of fake death profiles for living people. This rule applies to everyone; documents are kept securely and deleted from the system after verification.',
+      },
+      {
+        q: 'How and when does the QR plate arrive?',
+        a: 'Production starts after the profile is approved. For addresses within Georgia, 5–10 business days, abroad 10–20 business days should be allowed.',
+      },
+      {
+        q: 'What happens if I cancel my Life Vault subscription?',
+        a: 'The vault remains active until the cancellation date. Afterwards the vault is frozen; heirs can pay the annual fee to publish the vault whenever they want after passing.',
+      },
+      {
+        q: 'What currency is payment made in?',
+        a: 'In Georgian Lari (₾/GEL). TBC Pay, BOG Pay, Visa/Mastercard and bank transfer are accepted.',
+      },
+      {
+        q: 'Someone creates a profile for a person who is still alive?',
+        a: 'The relevant person can report "I am alive" during the 14-day objection window. The profile is immediately suspended and legal proceedings are initiated against the applicant.',
+      },
+    ],
+    cta: {
+      heading: 'Preserve the memory',
+      headingAccent: 'of your loved ones.',
+      sub: 'First see the demo profile, then make your decision.',
+      demoBtn: 'See Demo Profile',
+      contactBtn: 'Ask a question',
+    },
+    footer: {
+      privacy: 'Privacy',
+      terms: 'Terms',
+      contact: 'Contact',
+      copyright: '© 2026 The Maradi',
+    },
+    bulkContact: 'For corporate or bulk orders,',
+    bulkContactLink: 'contact us',
+  },
+
+  contact: {
+    pageTitle: 'Contact — The Maradi',
+    nav: {
+      home: 'Home',
+      pricing: 'Pricing',
+      demoProfile: 'Demo Profile',
+      start: 'Start',
+    },
+    hero: {
+      eyebrow: 'Contact',
+      h1a: 'How can we',
+      h1b: 'help you?',
+      p: 'We are here to answer every question you have about Memorial Profile, Life Vault or QR plate. We usually respond within 24 hours.',
+    },
+    info: {
+      phone: 'Phone',
+      email: 'Email',
+      address: 'Address',
+      hours: 'Working hours',
+      phoneTag: 'Georgia',
+      emailTagGeneral: 'General',
+      emailTagSupport: 'Support',
+      hoursWeekday: 'Mon–Fri  09:00 – 18:00',
+      hoursWeekdayTag: 'GE time',
+      hoursSaturday: 'Sat  10:00 – 14:00',
+      addressLine1: 'Petre Bagrationi Str. 220',
+      addressLine2: 'Batumi / Georgia',
+    },
+    form: {
+      heading: 'Send a message',
+      subheading: 'All fields are required.',
+      nameLabel: 'Full Name',
+      namePlaceholder: 'Your name',
+      emailLabel: 'Email',
+      emailPlaceholder: 'example@email.com',
+      subjectLabel: 'Subject',
+      subjectPlaceholder: 'Select',
+      subjectOptions: [
+        'About Memorial Profile',
+        'About Life Vault',
+        'QR plate order',
+        'Technical support',
+        'Partnership / B2B',
+        'Other',
+      ],
+      messageLabel: 'Your message',
+      messagePlaceholder: 'How can we help?',
+      sendBtn: 'Send Message',
+      sendingBtn: 'Sending…',
+      successTitle: 'Your message has been delivered',
+      successBody: 'We will get back to you as soon as possible — usually within 24 hours.',
+    },
+    departments: {
+      heading: 'Write directly to our departments',
+      support: { title: 'Support', desc: 'Account, profile and technical questions.' },
+      partnership: { title: 'Partnership', desc: 'Gravestone workshops, funeral services and B2B.' },
+      privacy: { title: 'Privacy', desc: 'GDPR and personal data requests.' },
+    },
+    footer: {
+      privacy: 'Privacy',
+      terms: 'Terms',
+      pricing: 'Pricing',
+      copyright: '© 2026 The Maradi',
+    },
+  },
+
+  qPages: {
+    pending: {
+      title: 'Profile is being prepared',
+      body: 'The memorial profile linked to this QR code has not yet gone live. It will be automatically accessible once the verification process is complete.',
+      problem: 'Is there a problem?',
+      contactLink: 'Contact us',
+    },
+    notFound: {
+      title: 'QR code not recognized',
+      body: 'No profile was found for this QR code. Make sure you scanned the plate correctly or contact us.',
+      contactBtn: 'Contact Us',
+      homeBtn: 'Home Page',
+    },
+  },
+
+  cookieBanner: {
+    text: 'We use essential cookies for session management. Optional cookies for QR scan analytics are also available.',
+    policyLink: 'Cookie Policy',
+    essentialOnly: 'Essential only',
+    acceptAll: 'Accept all',
+  },
+
+  legal: {
+    shell: {
+      toc: 'Contents',
+      lastUpdated: 'Last updated:',
+      privacyLink: 'Privacy',
+      termsLink: 'Terms',
+      verificationLink: 'Verification',
+      footerPrivacy: 'Privacy',
+      footerTerms: 'Terms',
+      footerContact: 'Contact',
+      copyright: '© 2026 The Maradi',
+    },
+
+    privacy: {
+      eyebrow: 'Legal Document',
+      title: 'Privacy Policy',
+      date: '7 June 2026 · GDPR · Georgian PDL · KVKK compliant',
+      toc: [
+        { id: 'taraflar', label: '1. Data Controller' },
+        { id: 'toplanan', label: '2. Data Collected' },
+        { id: 'amaclar', label: '3. Processing Purposes' },
+        { id: 'ozel', label: '4. Special Category Data' },
+        { id: 'saklama', label: '5. Retention Periods' },
+        { id: 'guvenlik', label: '6. Security' },
+        { id: 'ucuncu', label: '7. Third Parties' },
+        { id: 'transfer', label: '8. International Transfer' },
+        { id: 'haklar', label: '9. User Rights' },
+        { id: 'cerezler', label: '10. Cookies' },
+        { id: 'cocuklar', label: '11. Children\'s Privacy' },
+        { id: 'degisiklik', label: '12. Changes' },
+        { id: 'iletisim', label: '13. Contact' },
+      ],
+      sections: {
+        controller: {
+          h: '1. Data Controller',
+          p1: 'This policy belongs to the data controller operating under the trade name The Maradi and registered at the address below:',
+          address: 'Petre Bagrationi Str. 220, Batumi, Georgia',
+          email: 'privacy@themaradi.com',
+          tel: '+995 555 511 884',
+          p2: 'The Maradi processes your personal data under the Georgian Personal Data Protection Law (2012, rev. 2024), the EU General Data Protection Regulation (GDPR — 2016/679) and for users residing in Turkey, under the KVKK Law No. 6698.',
+        },
+        collected: {
+          h: '2. Data Collected',
+          h2a: '2.1 Account and Identity Data',
+          items2a: ['Name, surname, email address, phone number', 'Password (bcrypt hash — plain text is never stored)', 'Profile photo (optional)'],
+          h2b: '2.2 Memorial Profile / Vault Content',
+          items2b: ['Deceased person\'s name, birth/death date, biographical information', 'Photos, videos, audio recordings (uploaded by user)', 'Cemetery address and GPS coordinates'],
+          h2c: '2.3 Verification Documents',
+          items2c: ['Applicant\'s national ID card or passport (front side only)', 'Official death certificate'],
+          noteVerification: 'Verification documents are permanently deleted from the system within 30 days after the review is completed, regardless of the outcome.',
+          h2d: '2.4 Technical Data',
+          items2d: ['IP address, browser type, operating system', 'QR scan timestamp and approximate geographic region', 'Session and authentication cookies'],
+        },
+        purposes: {
+          h: '3. Processing Purposes',
+          items: [
+            'Account creation, authentication and digital vault management',
+            'QR redirect, memorial profile publishing and family notification system',
+            'Verification of identity and death documents (Memorial Profile applications)',
+            'Security, abuse prevention and fulfillment of legal obligations',
+            'QR scan analytics (anonymized)',
+            'Technical support and error analysis',
+          ],
+        },
+        special: {
+          h: '4. Special Category Data',
+          p: 'Death certificates and biometric images that may be included in them fall under the category of special category personal data. The Maradi processes these documents solely for identity verification of Memorial Profile applications and permanently deletes them within 30 days.',
+        },
+        retention: {
+          h: '5. Retention Periods',
+          rows: [
+            ['Account data', 'Until account closure + 2 years (legal obligation)'],
+            ['Verification documents', '30 days from review completion → permanent deletion'],
+            ['Memorial Profile content', 'Lifetime (as long as the platform operates)'],
+            ['Log records', '90 days'],
+            ['QR scan analytics', '12 months (anonymized)'],
+          ],
+        },
+        security: {
+          h: '6. Security',
+          items: [
+            'TLS 1.3 encrypted data transmission',
+            'AES-256 media file encryption (Cloudflare R2)',
+            'Row Level Security (RLS) — each user accesses only their own data',
+            'bcrypt password hashing',
+            'Regular security audits and penetration testing',
+          ],
+        },
+        thirdParties: {
+          h: '7. Third Parties',
+          rows: [
+            ['Supabase', 'Database and authentication infrastructure', 'EU (Frankfurt)'],
+            ['Cloudflare R2', 'Media file storage', 'EU/US'],
+            ['Vercel', 'Web hosting and CDN', 'EU/US'],
+            ['Google Maps', 'Cemetery location display', 'Google Privacy Policy'],
+          ],
+          note: 'No third party is granted access to your personal data for advertising, analytics or profiling purposes.',
+        },
+        transfer: {
+          h: '8. International Transfer',
+          p: 'Some service providers may store data in the United States. Transfer safeguards are based on EU Standard Contractual Clauses (SCC). Georgian PDL requirements for cross-border transfer are fully complied with.',
+        },
+        rights: {
+          h: '9. User Rights',
+          items: [
+            'Access: learn what data we hold about you',
+            'Correction: request correction of incorrect data',
+            'Deletion: request deletion of your data (right to erasure)',
+            'Restriction: request restriction of processing',
+            'Portability: receive your data in machine-readable format',
+            'Objection: object to processing based on legitimate interest',
+            'Complaint: you may file a complaint with the Georgian Personal Data Protection Service',
+          ],
+          contact: 'To exercise your rights:',
+          email: 'privacy@themaradi.com',
+          note: 'We respond within 30 days.',
+        },
+        cookies: {
+          h: '10. Cookies',
+          p: 'See our Cookie Policy for detailed information.',
+        },
+        children: {
+          h: '11. Children\'s Privacy',
+          p: 'The Maradi does not knowingly collect personal data from individuals under 16. If you believe a child has provided personal data, please contact us at privacy@themaradi.com.',
+        },
+        changes: {
+          h: '12. Changes',
+          p: 'Material changes will be announced on the platform with at least 14 days notice. Continued use after the notification constitutes acceptance of the new policy.',
+        },
+        contactSection: {
+          h: '13. Contact',
+          email: 'privacy@themaradi.com',
+          tel: '+995 555 511 884',
+          address: 'Petre Bagrationi Str. 220, Batumi, Georgia',
+        },
+      },
+    },
+
+    terms: {
+      eyebrow: 'Legal Document',
+      title: 'Terms of Service',
+      date: '7 June 2026',
+      toc: [
+        { id: 'taraflar', label: '1. Parties and Scope' },
+        { id: 'hizmetler', label: '2. Services' },
+        { id: 'hesap', label: '3. Account Creation' },
+        { id: 'yasak', label: '4. Prohibited Uses' },
+        { id: 'dogrulama', label: '5. Verification Process' },
+        { id: 'odeme', label: '6. Payment and Refund' },
+        { id: 'icerik', label: '7. Content Rights' },
+        { id: 'sorumluluk', label: '8. Liability Limitation' },
+        { id: 'askiya', label: '9. Account Suspension' },
+        { id: 'abonelik', label: '10. Subscription Cancellation' },
+        { id: 'sureklilk', label: '11. Service Continuity Commitment' },
+        { id: 'hukuk', label: '12. Applicable Law' },
+        { id: 'degisiklik', label: '13. Changes' },
+      ],
+      content: {
+        parties: {
+          h: '1. Parties and Scope',
+          p1: 'These Terms of Service constitute the agreement between The Maradi (Petre Bagrationi Str. 220, Batumi, Georgia — hereinafter "The Maradi", "we", "our") and the natural or legal person ("User", "you") using the platform. By starting to use the platform, you are deemed to have accepted these terms.',
+          p2: 'If you are under 18, you cannot use the platform. If you are applying on behalf of a third person, you declare that you are authorized on behalf of that person.',
+        },
+        services: {
+          h: '2. Services',
+          p: 'The Maradi offers two main products:',
+          memorialH: '2.1 Memorial Profile',
+          memorialP: 'A digital memorial profile created by family or authorized relatives for a deceased person, subject to a one-time fee. The profile covers biography, photos, videos, cemetery information and QR plate service. Identity verification and 14-day objection process are applied before going live.',
+          vaultH: '2.2 Life Vault',
+          vaultP: 'A subscription-based service where the user creates their own digital legacy while alive. The user can add photos, videos, audio recordings, biography and final message; designate 3 heirs. After passing, when at least 2 of the 3 heirs give approval, the vault automatically converts to a publicly accessible Memorial Profile. Subscription is offered with setup fee + monthly/annual fee.',
+        },
+        account: {
+          h: '3. Account Creation',
+          items: ['Valid email address and secure password required.', 'You are responsible for the security of your account.', 'The information you provide must be accurate and complete.', 'You may only create one account. Duplicate accounts are deleted.'],
+        },
+        prohibited: {
+          h: '4. Prohibited Uses',
+          items: ['Creating a false Memorial Profile for a living person', 'Uploading content that violates intellectual property rights', 'Harassing, threatening or engaging in hate speech', 'Accessing other users\' data or attempting to infiltrate the system', 'Using the platform for advertising, spam or commercial scraping purposes'],
+        },
+        verificationTerms: {
+          h: '5. Verification Process',
+          p: 'To prevent fake profiles for living people, document verification is required for every Memorial Profile application. Documents are used only for verification and are permanently deleted within 30 days. The 14-day objection window is mandatory and cannot be waived.',
+        },
+        payment: {
+          h: '6. Payment and Refund',
+          items: [
+            'Memorial Profile fee (249 ₾) is non-refundable after the profile goes live.',
+            'If profile is rejected or canceled before going live, the full amount is refunded.',
+            'Life Vault setup fee (49 ₾) is non-refundable.',
+            'Monthly/annual subscription can be canceled before the next billing cycle. Amount paid for the current period is not refunded.',
+            'All amounts are in Georgian Lari (₾/GEL).',
+          ],
+        },
+        content: {
+          h: '7. Content Rights',
+          p1: 'You retain all copyright of content you upload. You grant The Maradi a non-exclusive license to store, display and back up your content for the purpose of providing the service.',
+          p2: 'The Maradi may remove content that violates the law or these terms without notice.',
+        },
+        liability: {
+          h: '8. Liability Limitation',
+          p: 'The Maradi\'s total liability for direct damages is limited to the total fees paid by the user in the last 12 months. No responsibility is accepted for indirect, incidental or consequential damages.',
+        },
+        suspension: {
+          h: '9. Account Suspension',
+          items: [
+            'Fraudulent or false profile creation',
+            'Uploading illegal or harmful content',
+            'System abuse or attempting to harm the platform',
+          ],
+          p: 'In these cases the account may be suspended or permanently closed without prior notice.',
+        },
+        cancellation: {
+          h: '10. Subscription Cancellation',
+          p: 'You can cancel your Life Vault subscription at any time. After cancellation, the vault remains in frozen status; heirs can reactivate it after passing.',
+        },
+        continuity: {
+          h: '11. Service Continuity Commitment',
+          p: 'The Maradi undertakes to keep Memorial Profiles permanently accessible. In the event of service closure, users will be notified at least 6 months in advance and provided with data export opportunity.',
+        },
+        law: {
+          h: '12. Applicable Law',
+          p: 'These terms are governed by the laws of Georgia. Any dispute will be resolved in the courts of Batumi, Georgia.',
+        },
+        changes: {
+          h: '13. Changes',
+          p: 'Material changes will be communicated at least 14 days before they take effect. Continued use constitutes acceptance.',
+        },
+      },
+    },
+
+    kvkk: {
+      eyebrow: 'KVKK',
+      title: 'KVKK Disclosure Text',
+      date: '7 June 2026',
+      toc: [
+        { id: 'sorumluluk', label: '1. Data Controller' },
+        { id: 'kategoriler', label: '2. Data Categories Processed' },
+        { id: 'amaclar', label: '3. Processing Purposes' },
+        { id: 'haklar', label: '4. Your Rights' },
+      ],
+      sections: {
+        controller: {
+          h: '1. Data Controller',
+          p: 'The Maradi processes user data within the scope of digital memorial profile and life vault services in accordance with the Personal Data Protection Law (KVKK) No. 6698. Data controller: The Maradi — Petre Bagrationi Str. 220, Batumi, Georgia. Contact: privacy@themaradi.com',
+        },
+        categories: {
+          h: '2. Data Categories Processed',
+          items: [
+            'Identity and contact data: email, name surname, phone, profile information and session records.',
+            'User content: biography, photos, videos, audio recordings, documents, heir information and visitor messages.',
+            'Verification documents: ID document and death certificate (deleted within 30 days after verification).',
+          ],
+        },
+        purposes: {
+          h: '3. Processing Purposes',
+          items: [
+            'Account creation, identity verification and digital vault management',
+            'QR redirect, memorial profile publishing and family notification system',
+            'Security, abuse prevention and fulfillment of legal obligations',
+            'Technical support and error analysis',
+          ],
+        },
+        rights: {
+          h: '4. Your Rights under KVKK',
+          p1: 'Under KVKK Article 11; you have the rights to learn whether your personal data is being processed, to request information if it has been processed, to learn whether it is being used in accordance with its purpose, to know the third parties to whom it has been transferred domestically or abroad, to request correction of incomplete or incorrectly processed data, to request deletion or destruction, to request notification to the persons to whom these operations have been transferred, to object to a result that is against you through automated systems, and to request compensation for damages if you suffer.',
+          p2: 'For applications:',
+          email: 'privacy@themaradi.com',
+          note: '— We respond within 30 days.',
+        },
+      },
+    },
+
+    cookies: {
+      eyebrow: 'Legal Document',
+      title: 'Cookie Policy',
+      date: '7 June 2026',
+      toc: [
+        { id: 'zorunlu', label: '1. Essential Cookies' },
+        { id: 'tercihler', label: '2. Local Preferences' },
+        { id: 'analitik', label: '3. Analytics' },
+        { id: 'kontrol', label: '4. Control' },
+      ],
+      sections: {
+        essential: {
+          h: '1. Essential Cookies',
+          p: 'Authentication and session cookies are required for login, dashboard access and account security. These cookies cannot be disabled.',
+        },
+        preferences: {
+          h: '2. Local Preferences',
+          p: 'Language preference can be stored in the browser\'s local storage to preserve the selected language between visits.',
+        },
+        analytics: {
+          h: '3. Analytics',
+          p: 'QR scans may store limited technical analytics data such as timestamp, device type and approximate location header. This data is processed anonymously.',
+        },
+        control: {
+          h: '4. Control',
+          p: 'You can manage cookies from your browser settings. Blocking essential cookies may prevent you from logging in or accessing the dashboard.',
+        },
+      },
+    },
+
+    verification: {
+      eyebrow: 'Legal Document',
+      title: 'Verification and Objection Policy',
+      date: '7 June 2026',
+      toc: [
+        { id: 'amac', label: '1. Purpose and Scope' },
+        { id: 'neden', label: '2. Why is Verification Required?' },
+        { id: 'belgeler', label: '3. Required Documents' },
+        { id: 'surec', label: '4. Verification Process' },
+        { id: 'itiraz', label: '5. 14-Day Objection Window' },
+        { id: 'nasil', label: '6. How to Object?' },
+        { id: 'degerlendirme', label: '7. Objection Evaluation' },
+        { id: 'yasayan', label: '8. "This Person is Still Alive" Report' },
+        { id: 'sahte', label: '9. Consequences of Fake Application' },
+        { id: 'gizlilik', label: '10. Document Confidentiality' },
+        { id: 'itiraz_red', label: '11. Objection Rejection and Appeal' },
+        { id: 'iletisim', label: '12. Contact' },
+      ],
+      sections: {
+        purpose: {
+          h: '1. Purpose and Scope',
+          p: 'This policy explains the identity verification process, required documents, review steps and 14-day objection window applied when creating a Memorial Profile on The Maradi platform. All Memorial Profile applications are subject to this policy.',
+        },
+        why: {
+          h: '2. Why is Verification Required?',
+          p: 'The most serious risk in digital memorial profiles is the creation of a fake death profile for a living person. This situation:',
+          items: [
+            'Can damage the honor and privacy of the relevant person,',
+            'Can cause deep psychological trauma to family members,',
+            'Can become a tool for crimes such as fraud, inheritance irregularity or defamation.',
+          ],
+          p2: 'For this reason, The Maradi requires document verification and objection window for every Memorial Profile application. This process is not one-sided suspicion; it is a standard procedure applied equally to all applications.',
+        },
+        documents: {
+          h: '3. Required Documents',
+          h2a: '3.1 Applicant\'s Identity',
+          items2a: ['National ID card or passport (front side)'],
+          h2b: '3.2 Death Proof',
+          items2b: ['Official death certificate', 'Or a document of equivalent official status'],
+          note: 'Documents are reviewed only by authorized The Maradi employees. They are stored encrypted and permanently deleted from the system within 30 days after review.',
+        },
+        process: {
+          h: '4. Verification Process',
+          steps: [
+            { num: '01', title: 'Application', text: 'Profile form is filled with deceased person\'s information. Payment is completed. Profile is put in pending_verification status.' },
+            { num: '02', title: 'Document Upload', text: 'Required documents are uploaded securely.' },
+            { num: '03', title: 'Admin Review', text: 'Documents are reviewed within 24–48 hours. Suspicious cases request additional verification.' },
+            { num: '04', title: '14-Day Waiting Period', text: 'The approved profile is made publicly accessible but remains in "objection period" for 14 days.' },
+            { num: '05', title: 'Going Live', text: 'If there is no objection at the end of 14 days, the profile becomes fully published and the QR plate production order is created.' },
+          ],
+        },
+        objectionWindow: {
+          h: '5. 14-Day Objection Window',
+          p: 'During the 14-day period, anyone can submit an objection through the "Report This Profile" button visible on the profile. Objection reasons:',
+          items: [
+            'The person is still alive',
+            'Incorrect or misleading information',
+            'The requester is not authorized',
+            'Violation of privacy',
+          ],
+        },
+        howToObject: {
+          h: '6. How to Object?',
+          methods: [
+            'Click the "Report This Profile" button on the profile page',
+            'Send an email to: privacy@themaradi.com',
+            'By phone: +995 555 511 884',
+          ],
+          p: 'The objection must contain: your name, your relationship to the profile, your contact information, and supporting document if possible.',
+        },
+        evaluation: {
+          h: '7. Objection Evaluation',
+          items: [
+            'The profile is immediately suspended when the objection is received.',
+            'The objection is reviewed within 48 hours.',
+            'If valid: the profile is deleted, applicant is notified.',
+            'If unfounded: the profile goes live, objecting party is notified.',
+          ],
+        },
+        stillAlive: {
+          h: '8. "This Person is Still Alive" Report',
+          p: 'If the person can prove they are alive (video call, ID document, in-person verification):',
+          items: [
+            'The profile is immediately and permanently deleted.',
+            'The fee paid by the applicant is not refunded.',
+            'A legal process is initiated against the applicant.',
+          ],
+        },
+        fakeApplication: {
+          h: '9. Consequences of Fake Application',
+          items: [
+            'Immediate and permanent account closure',
+            'Blacklisting of all payment methods used',
+            'Notification to relevant authorities',
+            'Legal proceedings under Georgian, EU and Turkish law',
+          ],
+        },
+        confidentiality: {
+          h: '10. Document Confidentiality',
+          p: 'All uploaded documents are stored with AES-256 encryption. They are accessible only by authorized personnel. They are permanently deleted from the system within 30 days after review. They will never be shared with third parties.',
+        },
+        appeal: {
+          h: '11. Objection Rejection and Appeal',
+          p: 'If your objection is rejected, you can re-apply with additional evidence by contacting privacy@themaradi.com. If you believe the decision is incorrect, you can appeal to the Georgian Personal Data Protection Service.',
+        },
+        contactSection: {
+          h: '12. Contact',
+          email: 'privacy@themaradi.com',
+          tel: '+995 555 511 884',
+          address: 'Petre Bagrationi Str. 220, Batumi, Georgia',
+        },
+      },
+    },
   },
 }
 
