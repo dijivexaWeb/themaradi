@@ -2,10 +2,13 @@ import { createClient } from '@/lib/supabase/server'
 import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
-import { addMemoryAction, deleteMemoryAction } from '@/lib/actions/memories'
+import { addMemoryAction, updateMemoryAction, deleteMemoryAction } from '@/lib/actions/memories'
 import PersonHeader from '../_PersonHeader'
 
-interface Props { params: Promise<{ id: string }> }
+interface Props {
+  params: Promise<{ id: string }>
+  searchParams: Promise<{ edit?: string }>
+}
 
 function getVideoEmbed(url: string): string | null {
   const yt = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/)
@@ -15,8 +18,9 @@ function getVideoEmbed(url: string): string | null {
   return null
 }
 
-export default async function AnilarPage({ params }: Props) {
+export default async function AnilarPage({ params, searchParams }: Props) {
   const { id } = await params
+  const { edit: editId } = await searchParams
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
@@ -33,6 +37,7 @@ export default async function AnilarPage({ params }: Props) {
 
   const isLocked = vault.status === 'pending_verification'
   const addAction = addMemoryAction.bind(null, id)
+  const pageUrl = `/dashboard/vault/${id}/anilar`
 
   const inputCls = `w-full rounded-xl border border-[#e5dccb] bg-white px-4 py-3 text-sm text-[#1f2d27] placeholder-[#adb5ab] outline-none focus:border-[#174f35] focus:ring-2 focus:ring-[#174f35]/10`
   const labelCls = `mb-1.5 block text-xs font-semibold text-[#4a5e55]`
@@ -92,7 +97,6 @@ export default async function AnilarPage({ params }: Props) {
                   className={inputCls + ' resize-none'} />
               </div>
 
-              {/* Medya */}
               <div className="rounded-2xl border border-[#e5dccb] bg-white p-4 space-y-3">
                 <p className="text-xs font-semibold text-[#4a5e55] flex items-center gap-1.5">
                   <span>🖼️</span> Fotoğraf veya Video <span className="font-normal text-[#adb5ab]">(opsiyonel)</span>
@@ -135,74 +139,116 @@ export default async function AnilarPage({ params }: Props) {
           </div>
         ) : (
           <div className="relative">
-            {/* Vertical timeline line */}
             <div className="absolute left-[7px] top-3 bottom-3 w-0.5 rounded-full bg-[#e5dccb]" />
 
             <div className="space-y-0">
               {memories.map((m) => {
                 const del = deleteMemoryAction.bind(null, m.id, id)
+                const update = updateMemoryAction.bind(null, m.id, id, pageUrl)
                 const embedUrl = m.media_type === 'video' && m.media_url ? getVideoEmbed(m.media_url) : null
+                const isEditing = editId === m.id
 
                 return (
                   <div key={m.id} className="relative pl-10 pb-8 last:pb-0 group">
-                    {/* Timeline dot */}
                     <div className="absolute left-0 top-2 h-4 w-4 rounded-full border-2 border-[#174f35] bg-white shadow-sm" />
 
-                    <div className="rounded-2xl border border-[#e5dccb] bg-white overflow-hidden hover:border-[#174f35]/20 transition-colors">
-                      {/* Fotoğraf */}
-                      {m.media_type === 'image' && m.media_url && (
-                        <div className="relative w-full">
-                          <Image
-                            src={m.media_url}
-                            alt={m.title ?? 'Anı fotoğrafı'}
-                            width={0}
-                            height={0}
-                            sizes="(max-width: 768px) 100vw, 672px"
-                            style={{ width: '100%', height: 'auto' }}
-                            className="rounded-t-2xl"
-                            unoptimized
-                          />
-                        </div>
-                      )}
-
-                      {/* Video embed */}
-                      {m.media_type === 'video' && embedUrl && (
-                        <div className="aspect-video">
-                          <iframe src={embedUrl} className="w-full h-full" allowFullScreen title={m.title ?? 'Video'} />
-                        </div>
-                      )}
-
-                      {/* Video link */}
-                      {m.media_type === 'video' && m.media_url && !embedUrl && (
-                        <div className="bg-[#f5efdf] px-5 py-3 flex items-center gap-2">
-                          <span>🎬</span>
-                          <a href={m.media_url} target="_blank" rel="noopener noreferrer"
-                            className="text-sm text-[#174f35] hover:underline font-medium">Videoyu Aç →</a>
-                        </div>
-                      )}
-
-                      <div className="p-5">
-                        <div className="flex items-start justify-between gap-3">
-                          <div className="flex-1">
-                            {m.memory_date && (
-                              <p className="text-xs font-semibold text-[#dfbd72] tracking-wide mb-1.5">
-                                {new Date(m.memory_date).toLocaleDateString('tr-TR', { year: 'numeric', month: 'long', day: 'numeric' })}
-                              </p>
-                            )}
-                            {m.title && <h3 className="font-semibold text-[#1f2d27] mb-1.5 font-serif text-lg">{m.title}</h3>}
-                            <p className="text-[#4a5e55] text-sm leading-7 whitespace-pre-wrap">{m.content}</p>
+                    {isEditing ? (
+                      /* ── Inline edit form ── */
+                      <div className="rounded-2xl border-2 border-[#174f35]/30 bg-[#fffdf8] p-5 shadow-sm">
+                        <p className="text-xs font-semibold text-[#174f35] mb-4 flex items-center gap-1.5">
+                          <span>✏️</span> Anıyı Düzenle
+                        </p>
+                        <form action={update} className="space-y-3">
+                          <div className="grid sm:grid-cols-2 gap-3">
+                            <div>
+                              <label className={labelCls}>Tarih <span className="text-[#dfbd72]">*</span></label>
+                              <input type="date" name="memory_date" required
+                                defaultValue={m.memory_date ?? ''}
+                                className={inputCls} />
+                            </div>
+                            <div>
+                              <label className={labelCls}>Başlık</label>
+                              <input type="text" name="title"
+                                defaultValue={m.title ?? ''}
+                                placeholder="Başlık..." className={inputCls} />
+                            </div>
                           </div>
-                          {!isLocked && (
-                            <form action={del}>
-                              <button type="submit"
-                                className="shrink-0 text-[#e5dccb] hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100 text-xs font-medium">
-                                Sil
-                              </button>
-                            </form>
-                          )}
+                          <div>
+                            <label className={labelCls}>Anı <span className="text-[#dfbd72]">*</span></label>
+                            <textarea name="content" required rows={4}
+                              defaultValue={m.content ?? ''}
+                              className={inputCls + ' resize-none'} />
+                          </div>
+                          <div className="flex items-center gap-3 pt-1">
+                            <button type="submit"
+                              className="rounded-xl bg-[#174f35] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#123f2b] transition-colors">
+                              Kaydet
+                            </button>
+                            <Link href={pageUrl}
+                              className="rounded-xl border border-[#e5dccb] px-5 py-2.5 text-sm font-medium text-[#788177] hover:bg-[#f5efdf] transition-colors">
+                              İptal
+                            </Link>
+                          </div>
+                        </form>
+                      </div>
+                    ) : (
+                      /* ── Read view ── */
+                      <div className="rounded-2xl border border-[#e5dccb] bg-white overflow-hidden hover:border-[#174f35]/20 transition-colors">
+                        {m.media_type === 'image' && m.media_url && (
+                          <div className="relative w-full">
+                            <Image
+                              src={m.media_url}
+                              alt={m.title ?? 'Anı fotoğrafı'}
+                              width={0} height={0}
+                              sizes="(max-width: 768px) 100vw, 672px"
+                              style={{ width: '100%', height: 'auto' }}
+                              className="rounded-t-2xl"
+                              unoptimized
+                            />
+                          </div>
+                        )}
+                        {m.media_type === 'video' && embedUrl && (
+                          <div className="aspect-video">
+                            <iframe src={embedUrl} className="w-full h-full" allowFullScreen title={m.title ?? 'Video'} />
+                          </div>
+                        )}
+                        {m.media_type === 'video' && m.media_url && !embedUrl && (
+                          <div className="bg-[#f5efdf] px-5 py-3 flex items-center gap-2">
+                            <span>🎬</span>
+                            <a href={m.media_url} target="_blank" rel="noopener noreferrer"
+                              className="text-sm text-[#174f35] hover:underline font-medium">Videoyu Aç →</a>
+                          </div>
+                        )}
+
+                        <div className="p-5">
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="flex-1">
+                              {m.memory_date && (
+                                <p className="text-xs font-semibold text-[#dfbd72] tracking-wide mb-1.5">
+                                  {new Date(m.memory_date).toLocaleDateString('tr-TR', { year: 'numeric', month: 'long', day: 'numeric' })}
+                                </p>
+                              )}
+                              {m.title && <h3 className="font-semibold text-[#1f2d27] mb-1.5 font-serif text-lg">{m.title}</h3>}
+                              <p className="text-[#4a5e55] text-sm leading-7 whitespace-pre-wrap">{m.content}</p>
+                            </div>
+                            {!isLocked && (
+                              <div className="flex items-center gap-2 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <Link href={`?edit=${m.id}`}
+                                  className="text-xs font-medium text-[#174f35] hover:underline">
+                                  Düzenle
+                                </Link>
+                                <span className="text-[#e5dccb]">·</span>
+                                <form action={del}>
+                                  <button type="submit" className="text-xs font-medium text-[#e5dccb] hover:text-red-400 transition-colors">
+                                    Sil
+                                  </button>
+                                </form>
+                              </div>
+                            )}
+                          </div>
                         </div>
                       </div>
-                    </div>
+                    )}
                   </div>
                 )
               })}

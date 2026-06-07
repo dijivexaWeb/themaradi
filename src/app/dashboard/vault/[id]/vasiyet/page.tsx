@@ -1,14 +1,18 @@
 import { createClient } from '@/lib/supabase/server'
 import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
-import { addMemoryAction, deleteMemoryAction } from '@/lib/actions/memories'
+import { addMemoryAction, updateMemoryAction, deleteMemoryAction } from '@/lib/actions/memories'
 import { uploadDocumentsAction, deleteDocumentAction } from '@/lib/actions/documents'
 import PersonHeader from '../_PersonHeader'
 
-interface Props { params: Promise<{ id: string }> }
+interface Props {
+  params: Promise<{ id: string }>
+  searchParams: Promise<{ edit?: string }>
+}
 
-export default async function VasiyetPage({ params }: Props) {
+export default async function VasiyetPage({ params, searchParams }: Props) {
   const { id } = await params
+  const { edit: editId } = await searchParams
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
@@ -32,6 +36,7 @@ export default async function VasiyetPage({ params }: Props) {
   const isLocked = vault.status === 'pending_verification'
   const addNote = addMemoryAction.bind(null, id)
   const uploadDocs = uploadDocumentsAction.bind(null, id)
+  const pageUrl = `/dashboard/vault/${id}/vasiyet`
 
   const today = new Date().toISOString().split('T')[0]
 
@@ -107,29 +112,72 @@ export default async function VasiyetPage({ params }: Props) {
             <div className="space-y-4">
               {notes.map((n) => {
                 const del = deleteMemoryAction.bind(null, n.id, id)
+                const update = updateMemoryAction.bind(null, n.id, id, pageUrl)
+                const isEditing = editId === n.id
+
                 return (
-                  <div key={n.id}
-                    className="group rounded-2xl border border-[#dfbd72]/30 bg-[#fffdf8] p-5 hover:border-[#dfbd72]/60 transition-colors">
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-2">
-                          <span className="text-xs bg-[#fff7e6] text-[#725212] border border-[#dfbd72]/40 px-2 py-0.5 rounded-full font-medium">📜 Vasiyet</span>
-                          {n.title && <h3 className="font-semibold text-[#1f2d27] text-sm">{n.title}</h3>}
-                        </div>
-                        <p className="text-xs text-[#dfbd72] font-semibold mb-2">
-                          {new Date(n.created_at).toLocaleDateString('tr-TR', { year: 'numeric', month: 'long', day: 'numeric' })}
+                  <div key={n.id}>
+                    {isEditing ? (
+                      /* ── Inline edit form ── */
+                      <div className="rounded-2xl border-2 border-[#174f35]/30 bg-[#fffdf8] p-5 shadow-sm">
+                        <p className="text-xs font-semibold text-[#174f35] mb-4 flex items-center gap-1.5">
+                          <span>✏️</span> Vasiyeti Düzenle
                         </p>
-                        <p className="text-[#4a5e55] text-sm leading-7 whitespace-pre-wrap">{n.content}</p>
-                      </div>
-                      {!isLocked && (
-                        <form action={del}>
-                          <button type="submit"
-                            className="text-[#e5dccb] hover:text-red-400 transition-colors opacity-0 group-hover:opacity-100 text-xs font-medium shrink-0">
-                            Sil
-                          </button>
+                        <form action={update} className="space-y-3">
+                          <div>
+                            <label className={labelCls}>Başlık</label>
+                            <input type="text" name="title" defaultValue={n.title ?? ''} className={inputCls} />
+                          </div>
+                          <div>
+                            <label className={labelCls}>Vasiyetname Metni <span className="text-[#dfbd72]">*</span></label>
+                            <textarea name="content" required rows={6}
+                              defaultValue={n.content ?? ''}
+                              className={inputCls + ' resize-none'} />
+                          </div>
+                          <input type="hidden" name="memory_date" value={n.memory_date ?? today} />
+                          <div className="flex items-center gap-3 pt-1">
+                            <button type="submit"
+                              className="rounded-xl bg-[#174f35] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#123f2b] transition-colors">
+                              Kaydet
+                            </button>
+                            <Link href={pageUrl}
+                              className="rounded-xl border border-[#e5dccb] px-5 py-2.5 text-sm font-medium text-[#788177] hover:bg-[#f5efdf] transition-colors">
+                              İptal
+                            </Link>
+                          </div>
                         </form>
-                      )}
-                    </div>
+                      </div>
+                    ) : (
+                      /* ── Read view ── */
+                      <div className="group rounded-2xl border border-[#dfbd72]/30 bg-[#fffdf8] p-5 hover:border-[#dfbd72]/60 transition-colors">
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="flex-1">
+                            <div className="flex items-center gap-2 mb-2">
+                              <span className="text-xs bg-[#fff7e6] text-[#725212] border border-[#dfbd72]/40 px-2 py-0.5 rounded-full font-medium">📜 Vasiyet</span>
+                              {n.title && <h3 className="font-semibold text-[#1f2d27] text-sm">{n.title}</h3>}
+                            </div>
+                            <p className="text-xs text-[#dfbd72] font-semibold mb-2">
+                              {new Date(n.created_at).toLocaleDateString('tr-TR', { year: 'numeric', month: 'long', day: 'numeric' })}
+                            </p>
+                            <p className="text-[#4a5e55] text-sm leading-7 whitespace-pre-wrap">{n.content}</p>
+                          </div>
+                          {!isLocked && (
+                            <div className="flex items-center gap-2 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <Link href={`?edit=${n.id}`}
+                                className="text-xs font-medium text-[#174f35] hover:underline">
+                                Düzenle
+                              </Link>
+                              <span className="text-[#e5dccb]">·</span>
+                              <form action={del}>
+                                <button type="submit" className="text-xs font-medium text-[#e5dccb] hover:text-red-400 transition-colors">
+                                  Sil
+                                </button>
+                              </form>
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )
               })}

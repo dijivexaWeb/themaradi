@@ -91,7 +91,7 @@ export async function addMemoryAction(vaultId: string, formData: FormData): Prom
   revalidatePath(`/dashboard/vault/${vaultId}`)
 }
 
-export async function updateMemoryAction(memoryId: string, vaultId: string, formData: FormData): Promise<void> {
+export async function updateMemoryAction(memoryId: string, vaultId: string, redirectTo: string, formData: FormData): Promise<void> {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
@@ -112,6 +112,9 @@ export async function updateMemoryAction(memoryId: string, vaultId: string, form
 
   revalidatePath(`/dashboard/vault/${vaultId}/anilar`)
   revalidatePath(`/dashboard/vault/${vaultId}/gizli-kasa`)
+  revalidatePath(`/dashboard/vault/${vaultId}/vasiyet`)
+  revalidatePath(`/dashboard/vault/${vaultId}`)
+  redirect(redirectTo)
 }
 
 export async function deleteMemoryAction(memoryId: string, vaultId: string): Promise<void> {
