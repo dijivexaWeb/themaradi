@@ -28,6 +28,10 @@ export async function inviteHeirAction(vaultId: string, formData: FormData): Pro
   const token = nanoid(32)
   const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString()
 
+  const fullName = (formData.get('full_name') as string)?.trim() || null
+  const relationship = (formData.get('relationship') as string)?.trim() || null
+  const phone = (formData.get('phone') as string)?.trim() || null
+
   await supabase.from('heirs').insert({
     vault_id: vaultId,
     heir_email: email.toLowerCase().trim(),
@@ -35,12 +39,15 @@ export async function inviteHeirAction(vaultId: string, formData: FormData): Pro
     status: 'pending',
     invitation_token: token,
     invitation_expires_at: expiresAt,
+    full_name: fullName,
+    relationship: relationship,
+    phone: phone,
   })
 
   revalidatePath(`/dashboard/vault/${vaultId}/heirs`)
 }
 
-export async function revokeHeirAccessAction(heirId: string, vaultId: string) {
+export async function revokeHeirAccessAction(heirId: string, vaultId: string): Promise<void> {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
@@ -52,16 +59,13 @@ export async function revokeHeirAccessAction(heirId: string, vaultId: string) {
     .eq('owner_id', user.id)
     .single()
 
-  if (!vault) return { error: 'Yetkisiz erişim' }
+  if (!vault) return
 
-  const { error } = await supabase
+  await supabase
     .from('heirs')
     .delete()
     .eq('id', heirId)
     .eq('vault_id', vaultId)
 
-  if (error) return { error: error.message }
-
   revalidatePath(`/dashboard/vault/${vaultId}/heirs`)
-  return { success: true }
 }

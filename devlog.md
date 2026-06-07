@@ -5,6 +5,107 @@
 
 ---
 
+## 2026-06-07 — Oturum 16: Tam İçerik Sistemi — Ödeme, Kasa, Anma Sayfası
+
+### Yapılanlar
+- `src/lib/actions/memories.ts` — addMemoryAction, updateMemoryAction, deleteMemoryAction (void dönüş tipi, lock kontrolü)
+- `src/lib/actions/family.ts` — addFamilyMemberAction, updateFamilyMemberAction, deleteFamilyMemberAction (void)
+- `src/lib/actions/heirs.ts` — full_name + relationship + phone alanları eklendi, revokeHeirAccessAction void yapıldı
+- `src/app/satin-al/page.tsx` — ürün seçim sayfası (Anma 249₾ / Kasa 49₾+12.90₾)
+- `src/app/satin-al/actions.ts` — purchaseMemorialAction + purchaseVaultAction (pending_verification status ile vault oluşturur)
+- `src/app/satin-al/anma/page.tsx` — anma satın alma formu (IBAN, havale)
+- `src/app/satin-al/kasa/page.tsx` — kasa satın alma formu
+- `src/app/admin/verifications/actions.ts` — approvePaymentAction + rejectPaymentAction
+- `src/app/admin/verifications/page.tsx` — ödeme bilgisi join eklendi
+- `src/app/admin/verifications/_ApproveButton.tsx` — paymentId prop eklendi
+- `src/app/admin/_components/StatusBadge.tsx` — Türkçe etiketler
+- `src/app/dashboard/vault/[id]/page.tsx` — tamamlanma yüzdesi, kilit banner, 10-kart grid
+- `src/app/dashboard/vault/[id]/profil/page.tsx` — kişisel bilgiler (ad, tarihler, fotoğraf, mezar vb.)
+- `src/app/dashboard/vault/[id]/biography/page.tsx` — lock kontrolü eklendi
+- `src/app/dashboard/vault/[id]/anilar/page.tsx` — anı ekleme/silme
+- `src/app/dashboard/vault/[id]/aile/page.tsx` — aile ağacı builder
+- `src/app/dashboard/vault/[id]/fotolar/page.tsx` — 50 foto limiti, URL tabanlı
+- `src/app/dashboard/vault/[id]/videolar/page.tsx` — 10 video limiti, YouTube/Vimeo embed
+- `src/app/dashboard/vault/[id]/belgeler/page.tsx` — ölüm belgesi URL yükleme
+- `src/app/dashboard/vault/[id]/gizli-kasa/page.tsx` — is_secret memories (life_vault only)
+- `src/app/dashboard/vault/[id]/heirs/page.tsx` — full_name/relationship/phone ile davet formu (life_vault only)
+- `src/app/dashboard/vault/[id]/onizleme/page.tsx` — ölüm sonrası sayfa önizleme (amber banner)
+- `src/app/dashboard/vault/[id]/settings/page.tsx` — pub_settings bölümü eklendi (6 toggle)
+- `src/app/memorial/[slug]/page.tsx` — slug='demo' → demo, diğer → gerçek veri
+- `src/app/memorial/[slug]/RealMemorialPage.tsx` — gerçek vault datası ile anma sayfası
+
+### Proje Durumu
+- [x] Supabase schema (migration 013: vault_family_members, vault_memories, heirs güncelleme, pub_settings, payment_verified_at)
+- [x] Satın alma akışı (havale + pending_verification)
+- [x] Admin ödeme onaylama/reddetme
+- [x] Vault lock mekanizması (pending_verification → her yerde disabled)
+- [x] Tamamlanma yüzdesi hesaplama
+- [x] Profil bilgileri sayfası
+- [x] Biyografi (lock kontrolü eklendi)
+- [x] Fotoğraf galerisi (URL, 50 limit)
+- [x] Video galerisi (YouTube/Vimeo, 10 limit)
+- [x] Anılar sayfası
+- [x] Aile ağacı
+- [x] Belgeler / ölüm belgesi
+- [x] Gizli kasa (life_vault only)
+- [x] Varisler (life_vault only, full_name/relationship/phone)
+- [x] Önizleme sayfası (ölüm sonrası sayfa nasıl görünür)
+- [x] Settings pub_settings toggleları
+- [x] memorial/[slug] gerçek veri bağlantısı
+- [ ] R2 dosya yükleme (URL tabanlı çalışıyor şimdilik)
+- [ ] Varis davet e-postası gönderimi
+- [ ] Ödeme bildirim e-postası
+
+### Kritik Kararlar / Notlar
+- Server actions artık `Promise<void>` döndürüyor; form `action=` prop tipi uyumsuzluğunu çözdü
+- memorial_profile → gizli-kasa ve heirs sayfalarına giremez (redirect ile)
+- RealMemorialPage VaultRow interface ile tip güvenliği sağlandı
+- Tüm TypeScript hataları giderildi (npx tsc --noEmit temiz çıktı)
+
+### Nerede Kaldık
+Tüm planlanan özellikler tamamlandı. Son commit atıldı. Sistem çalışır durumda: satın alma → admin onay → içerik doldurma → önizleme → yayın. R2 entegrasyonu ve e-posta bildirimleri sıradaki büyük adım.
+
+### Sıradaki Adım
+1. R2 / Cloudflare entegrasyonu ile gerçek dosya yükleme (fotolar + belgeler)
+2. Supabase Edge Function veya Resend ile varis davet e-postası
+3. Admin panel ödeme onay e-postası bildirimi
+4. memorial/[slug] public sayfasına ziyaretçi guestbook / yorum bölümü
+5. QR kod üretimi ve PDF indirme özelliği
+
+---
+
+## 2026-06-07 — Oturum 15: Admin Durum Etiketleri Türkçeleştirildi
+
+### Yapılanlar
+- `src/app/admin/_components/StatusBadge.tsx` — renk-only map'ten `{ label, cls }` config map'e dönüştürüldü; tüm vault, ödeme, iletişim, rol durumları artık Türkçe görünüyor
+- `src/app/admin/page.tsx` — vault özet kartlarındaki İngilizce kod etiketleri Türkçeye çevrildi
+
+### Proje Durumu
+- [x] Admin login ayrı URL (`/admin/login`)
+- [x] Admin panel DB bağlantılı sayfalar
+- [x] Kasa (ödeme yönetimi) sayfası
+- [x] DB'den fiyat yönetimi + kampanya sistemi
+- [x] Admin durum etiketleri Türkçe
+- [ ] Resend e-posta entegrasyonu
+- [ ] TBC Pay / BOG Pay ödeme entegrasyonu
+- [ ] R2 medya yükleme
+- [ ] Supabase bölge migrasyonu (Tokyo → Frankfurt)
+
+### Kritik Kararlar / Notlar
+- `StatusBadge` artık ham DB değeri yerine Türkçe etiket gösteriyor; bilinmeyen status string'leri olduğu gibi fallback olarak görünüyor
+- Supabase bölgesi hâlâ `ap-northeast-1` (Tokyo) — Gürcistan/Türkiye pazarı için Frankfurt (`eu-central-1`) öneriliyor
+
+### Nerede Kaldık
+`StatusBadge.tsx` ve `admin/page.tsx` Türkçe etiket düzenlemesi tamamlandı ve commit'lendi (f0fd4ca). Supabase bölge migrasyonu henüz yapılmadı.
+
+### Sıradaki Adım
+1. Supabase bölge migrasyonu: Tokyo → Frankfurt (Ayarlar → Genel → Bölge değiştir)
+2. Resend ile iletişim formu e-posta entegrasyonu
+3. R2 medya yükleme altyapısı
+4. TBC Pay / BOG Pay ödeme entegrasyonu başlangıcı
+
+---
+
 ## 2026-06-07 — Oturum 14: Admin Login, Kasa Geliştirme, DB Fiyat Yönetimi
 
 ### Yapılanlar

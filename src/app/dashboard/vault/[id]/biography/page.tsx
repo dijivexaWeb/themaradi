@@ -11,23 +11,26 @@ export default function BiographyPage() {
   const [initial, setInitial] = useState('')
   const [content, setContent] = useState('')
   const [vaultName, setVaultName] = useState('')
+  const [isLocked, setIsLocked] = useState(false)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const dirty = content !== initial
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   useEffect(() => {
-    supabase.from('vaults').select('display_name, biography').eq('id', id).single()
+    supabase.from('vaults').select('display_name, biography, status').eq('id', id).single()
       .then(({ data }) => {
         if (data) {
           setVaultName(data.display_name)
           setInitial(data.biography ?? '')
           setContent(data.biography ?? '')
+          setIsLocked(data.status === 'pending_verification')
         }
       })
   }, [id, supabase])
 
   const save = async (text: string) => {
+    if (isLocked) return
     setSaving(true)
     await supabase.from('vaults').update({ biography: text }).eq('id', id)
     setInitial(text)
@@ -37,6 +40,7 @@ export default function BiographyPage() {
   }
 
   const handleChange = (text: string) => {
+    if (isLocked) return
     setContent(text)
     if (timeoutRef.current) clearTimeout(timeoutRef.current)
     timeoutRef.current = setTimeout(() => save(text), 2000)
@@ -53,12 +57,18 @@ export default function BiographyPage() {
           <span className="text-slate-300">Biyografi</span>
         </div>
 
+        {isLocked && (
+          <div className="mb-5 bg-amber-900/20 border border-amber-500/30 text-amber-400 text-sm rounded-xl px-4 py-3">
+            ⏳ Ödeme doğrulandıktan sonra biyografi yazabilirsiniz.
+          </div>
+        )}
+
         <div className="flex items-center justify-between mb-4">
           <h1 className="text-2xl font-bold text-slate-100">Biyografi</h1>
           <div className="flex items-center gap-3">
             {saving && <span className="text-xs text-slate-500">Kaydediliyor...</span>}
             {saved && <span className="text-xs text-emerald-400">Kaydedildi</span>}
-            {dirty && !saving && (
+            {dirty && !saving && !isLocked && (
               <button onClick={() => save(content)}
                 className="text-xs bg-amber-500 hover:bg-amber-400 text-white px-4 py-1.5 rounded-lg transition-colors">
                 Kaydet
@@ -70,9 +80,10 @@ export default function BiographyPage() {
         <textarea
           value={content}
           onChange={(e) => handleChange(e.target.value)}
+          disabled={isLocked}
           placeholder="Hayat hikayeleri, anlar, hatiralar... Bu kisiye dair bilmek istediklerinizi buraya yazin."
           rows={20}
-          className="w-full bg-slate-800/60 border border-slate-700 text-slate-100 placeholder-slate-600 rounded-2xl px-5 py-4 text-sm focus:outline-none focus:border-amber-500 resize-none leading-relaxed"
+          className="w-full bg-slate-800/60 border border-slate-700 text-slate-100 placeholder-slate-600 rounded-2xl px-5 py-4 text-sm focus:outline-none focus:border-amber-500 resize-none leading-relaxed disabled:opacity-50 disabled:cursor-not-allowed"
         />
 
         <p className="text-xs text-slate-600 mt-3">

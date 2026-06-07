@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
+import { revalidatePath } from 'next/cache'
 import { updateVaultAction, deleteVaultAction, linkQRToVaultAction } from '@/lib/actions/vault'
 
 interface Props { params: Promise<{ id: string }> }
@@ -16,9 +17,30 @@ export default async function SettingsPage({ params }: Props) {
 
   const { data: linkedQRs } = await supabase.from('dynamic_qr').select('qr_hash, activated_at, redirect_count').eq('target_vault_id', id)
 
+  const pub = (vault.pub_settings ?? {}) as Record<string, boolean>
+
   async function update(formData: FormData) { 'use server'; await updateVaultAction(id, formData) }
   async function del() { 'use server'; await deleteVaultAction(id) }
   async function linkQR(formData: FormData) { 'use server'; await linkQRToVaultAction(id, formData.get('qr_hash') as string) }
+
+  async function savePubSettings(formData: FormData) {
+    'use server'
+    const sup = await createClient()
+    const { data: { user: u } } = await sup.auth.getUser()
+    if (!u) return
+    const { data: v } = await sup.from('vaults').select('id').eq('id', id).eq('owner_id', u.id).single()
+    if (!v) return
+    const settings = {
+      auto_publish_on_death: formData.get('auto_publish_on_death') === 'on',
+      require_heir_approval: formData.get('require_heir_approval') === 'on',
+      show_family_tree: formData.get('show_family_tree') === 'on',
+      show_memories: formData.get('show_memories') === 'on',
+      show_media: formData.get('show_media') === 'on',
+      show_biography: formData.get('show_biography') === 'on',
+    }
+    await sup.from('vaults').update({ pub_settings: settings }).eq('id', id)
+    revalidatePath(`/dashboard/vault/${id}/settings`)
+  }
 
   return (
     <div className="p-8">
@@ -81,6 +103,39 @@ export default async function SettingsPage({ params }: Props) {
             <button type="submit" className="bg-slate-700 hover:bg-slate-600 text-slate-100 text-sm font-medium px-4 py-2.5 rounded-xl transition-colors">
               Eşleştir
             </button>
+          </form>
+        </div>
+
+        {/* pub_settings — post-death publication preferences */}
+        <div className="glass border border-slate-800/60 rounded-2xl p-6 mb-5">
+          <h2 className="text-sm font-semibold text-slate-200 mb-1">Ölüm Sonrası Yayın Ayarları</h2>
+          <p className="text-xs text-slate-500 mb-4">
+            Vefatınızdan sonra anma sayfanızın nasıl yayınlanacağını önceden belirleyin.
+          </p>
+          <form action={savePubSettings} className="space-y-3">
+            {([
+              ['auto_publish_on_death', 'Ölümümden sonra otomatik olarak yayınla', pub.auto_publish_on_death],
+              ['require_heir_approval', 'Yayınlamadan önce varis onayı iste', pub.require_heir_approval !== false],
+              ['show_biography', 'Hayat hikayemi göster', pub.show_biography !== false],
+              ['show_family_tree', 'Aile ağacımı göster', pub.show_family_tree !== false],
+              ['show_memories', 'Anılarımı göster', pub.show_memories !== false],
+              ['show_media', 'Fotoğraf ve videolarımı göster', pub.show_media !== false],
+            ] as [string, string, boolean][]).map(([name, label, defaultVal]) => (
+              <label key={name} className="flex items-center gap-3 cursor-pointer group">
+                <div className="relative">
+                  <input type="checkbox" name={name} defaultChecked={defaultVal}
+                    className="sr-only peer" />
+                  <div className="w-9 h-5 bg-slate-700 peer-checked:bg-amber-500 rounded-full transition-colors" />
+                  <div className="absolute left-0.5 top-0.5 w-4 h-4 bg-white rounded-full transition-all peer-checked:translate-x-4" />
+                </div>
+                <span className="text-sm text-slate-300 group-hover:text-slate-100 transition-colors">{label}</span>
+              </label>
+            ))}
+            <div className="pt-2">
+              <button type="submit" className="bg-amber-500 hover:bg-amber-400 text-white text-sm font-semibold px-5 py-2.5 rounded-xl transition-colors">
+                Yayın Ayarlarını Kaydet
+              </button>
+            </div>
           </form>
         </div>
 

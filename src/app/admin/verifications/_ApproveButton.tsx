@@ -1,22 +1,22 @@
 'use client'
 
-import { approveVault } from '../actions'
+import { approvePaymentAction } from './actions'
 import { useState } from 'react'
 
-export default function ApproveButton({ vaultId }: { vaultId: string }) {
+export default function ApproveButton({ vaultId, paymentId }: { vaultId: string; paymentId?: string }) {
   const [loading, setLoading] = useState(false)
   const [done, setDone] = useState(false)
 
   async function handle() {
-    if (!window.confirm('Bu vault\'u onaylamak istiyor musunuz? Durum public_memorial olarak değişecek.')) return
+    if (!window.confirm('Ödemeyi onaylamak istiyor musunuz? Vault aktive edilecek.')) return
     setLoading(true)
-    const result = await approveVault(vaultId)
+    const result = await approvePaymentAction(vaultId, paymentId ?? '')
     setLoading(false)
-    if (!result.success) { alert(result.error); return }
+    if (!result.success) { alert('Hata oluştu'); return }
     setDone(true)
   }
 
-  if (done) return <span className="text-xs text-emerald-600 font-medium">Onaylandı</span>
+  if (done) return <span className="text-xs text-emerald-600 font-semibold">✓ Onaylandı</span>
 
   return (
     <button

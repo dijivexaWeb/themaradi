@@ -1,6 +1,5 @@
 import { requireAdmin } from '@/lib/admin/auth'
 import { createServiceClient } from '@/lib/supabase/server'
-import StatusBadge from '../_components/StatusBadge'
 import RejectModal from '../_components/RejectModal'
 import ApproveButton from './_ApproveButton'
 
@@ -11,8 +10,9 @@ export default async function VerificationsPage() {
   const { data: vaults } = await supabase
     .from('vaults')
     .select(`
-      id, display_name, slug, created_at, owner_id, qr_code,
-      profiles!vaults_owner_id_fkey (full_name, email)
+      id, display_name, slug, created_at, product_type,
+      profiles!vaults_owner_id_fkey (full_name, email),
+      payments (id, amount, currency, product_type, payment_method, notes, status)
     `)
     .eq('status', 'pending_verification')
     .order('created_at', { ascending: true })
@@ -70,9 +70,17 @@ export default async function VerificationsPage() {
                         {daysLeft} gün kaldı
                       </span>
                     </td>
-                    <td className="px-4 py-3 flex gap-2 items-center">
-                      <ApproveButton vaultId={v.id} />
-                      <RejectModal vaultId={v.id} vaultName={v.display_name} />
+                    <td className="px-4 py-3">
+                      {(() => {
+                        const payment = Array.isArray(v.payments) ? v.payments[0] : (v as unknown as { payments?: { id: string; amount: number; currency: string } }).payments
+                        return (
+                          <div className="flex items-center gap-2">
+                            {payment && <span className="text-sm font-bold text-slate-800">{payment.amount} {payment.currency}</span>}
+                            <ApproveButton vaultId={v.id} paymentId={(payment as { id: string } | undefined)?.id} />
+                            <RejectModal vaultId={v.id} vaultName={v.display_name} />
+                          </div>
+                        )
+                      })()}
                     </td>
                   </tr>
                 )
