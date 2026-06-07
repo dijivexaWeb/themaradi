@@ -19,15 +19,13 @@ export async function GET(
 
   // Taramayı logla (fire-and-forget, hata yönlendirmeyi engellemesin)
   if (vault) {
-    supabase
-      .from('qr_scan_logs')
-      .insert({
+    void Promise.resolve(
+      supabase.from('qr_scan_logs').insert({
         qr_code: upperCode,
         vault_id: vault.id,
         user_agent: request.headers.get('user-agent') ?? undefined,
       })
-      .then(() => {})
-      .catch(() => {})
+    ).catch(() => {})
   }
 
   // QR kodu hiç tanınmıyorsa
