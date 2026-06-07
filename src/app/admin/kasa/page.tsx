@@ -103,6 +103,9 @@ export default async function KasaPage() {
   )
 }
 
+type OwnerProfile = { full_name: string | null; email: string | null }
+type VaultInfo = { id: string; display_name: string; status: string; profiles: OwnerProfile | OwnerProfile[] } | null
+// Supabase may return FK joins as array or object — accept both
 type PaymentRow = {
   id: string
   amount: number
@@ -112,12 +115,7 @@ type PaymentRow = {
   due_date: string | null
   paid_at: string | null
   notes: string | null
-  vaults: {
-    id: string
-    display_name: string
-    status: string
-    profiles: { full_name: string | null; email: string | null } | { full_name: string | null; email: string | null }[]
-  } | null
+  vaults: VaultInfo | VaultInfo[]
 }
 
 function PaymentFullTable({
@@ -147,7 +145,7 @@ function PaymentFullTable({
         </thead>
         <tbody className="divide-y divide-slate-100">
           {payments.map((p) => {
-            const vault = p.vaults
+            const vault = Array.isArray(p.vaults) ? p.vaults[0] : p.vaults
             const ownerRaw = vault?.profiles
             const owner = Array.isArray(ownerRaw) ? ownerRaw[0] : ownerRaw
 

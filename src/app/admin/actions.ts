@@ -498,3 +498,98 @@ export async function addManualPayment(formData: FormData): Promise<ActionResult
   revalidatePath('/admin/kasa')
   return { success: true }
 }
+
+// ─── Pricing Settings ───────────────────────────────────────────────────────
+
+export async function updatePricingSettings(formData: FormData): Promise<ActionResult> {
+  const { user, profile } = await requireAdmin()
+
+  const keys = [
+    'price_memorial_one_time', 'price_vault_setup', 'price_vault_monthly',
+    'campaign_active', 'campaign_label',
+    'campaign_price_memorial', 'campaign_price_vault_setup', 'campaign_price_vault_monthly',
+    'campaign_ends_at',
+  ]
+
+  const supabase = await createServiceClient()
+  const updates = keys.map((key) => ({
+    key,
+    value: (formData.get(key) ?? '').toString(),
+    updated_at: new Date().toISOString(),
+  }))
+
+  const { error } = await supabase
+    .from('platform_settings')
+    .upsert(updates, { onConflict: 'key' })
+
+  if (error) return { success: false, error: error.message }
+
+  await logAdminAction({
+    adminId: user.id,
+    adminEmail: user.email ?? profile.email ?? '',
+    action: 'pricing_settings_updated',
+    entityType: 'platform_settings',
+    newValue: Object.fromEntries(updates.map((u) => [u.key, u.value])),
+  })
+
+  revalidatePath('/admin/settings')
+  revalidatePath('/')
+  revalidatePath('/pricing')
+  return { success: true }
+}
+
+// ─── Pricing Exemptions ─────────────────────────────────────────────────────
+
+const exemptionSchema = z.object({
+  vault_id: z.string().uuid(),
+  exemption_type: z.enum(['free', 'discounted']),
+  discount_percent: z.coerce.number().min(1).max(99).optional(),
+  reason: z.string().min(3).max(255),
+  expires_at: z.string().optional(),
+  notes: z.string().max(500).optional(),
+})
+
+export async function addPricingExemption(formData: FormData): Promise<ActionResult> {
+  const { user, profile } = await requireAdmin()
+
+  const parsed = exemptionSchema.safeParse({
+    vault_id: formData.get('vault_id'),
+    exemption_type: formData.get('exemption_type'),
+    discount_percent: formData.get('discount_percent') || undefined,
+    reason: formData.get('reason'),
+    expires_at: formData.get('expires_at') || undefined,
+    notes: formData.get('notes') || undefined,
+  })
+
+  if (!parsed.success) return { success: false, error: parsed.error.issues[0]?.message ?? 'Geçersiz veri' }
+
+  const supabase = await createServiceClient()
+
+  const { data: vault } = await supabase.from('vaults').select('id, owner_id, display_name').eq('id', parsed.data.vault_id).single()
+  if (!vault) return { success: false, error: 'Vault bulunamadı' }
+
+  const { error } = await supabase.from('pricing_exemptions').insert({
+    vault_id: parsed.data.vault_id,
+    user_id: vault.owner_id,
+    exemption_type: parsed.data.exemption_type,
+    discount_percent: parsed.data.exemption_type === 'discounted' ? (parsed.data.discount_percent ?? null) : null,
+    reason: parsed.data.reason,
+    expires_at: parsed.data.expires_at ? new Date(parsed.data.expires_at).toISOString() : null,
+    notes: parsed.data.notes ?? null,
+    granted_by: user.id,
+  })
+
+  if (error) return { success: false, error: error.message }
+
+  await logAdminAction({
+    adminId: user.id,
+    adminEmail: user.email ?? profile.email ?? '',
+    action: 'pricing_exemption_granted',
+    entityType: 'pricing_exemptions',
+    entityId: parsed.data.vault_id,
+    newValue: { vault: vault.display_name, type: parsed.data.exemption_type, reason: parsed.data.reason },
+  })
+
+  revalidatePath('/admin/settings')
+  return { success: true }
+}
