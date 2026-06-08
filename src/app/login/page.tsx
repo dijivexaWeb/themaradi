@@ -16,6 +16,7 @@ const authCopy: Record<Lang, {
   resetNeedsEmail: string
   loading: string
   error: string
+  errorUnconfirmed: string
   terms: string
   privacy: string
   and: string
@@ -31,6 +32,7 @@ const authCopy: Record<Lang, {
     resetNeedsEmail: 'Önce e-posta adresinizi yazın.',
     loading: 'Yükleniyor...',
     error: 'E-posta veya şifre hatalı.',
+    errorUnconfirmed: 'E-postanızı henüz doğrulamadınız. Gelen kutunuzu ve spam klasörünü kontrol edin.',
     terms: 'Devam ederek',
     privacy: 'Gizlilik Politikası',
     and: 've',
@@ -46,6 +48,7 @@ const authCopy: Record<Lang, {
     resetNeedsEmail: 'ჯერ შეიყვანეთ ელფოსტა.',
     loading: 'იტვირთება...',
     error: 'ელფოსტა ან პაროლი არასწორია.',
+    errorUnconfirmed: 'ელფოსტა ჯერ არ გაქვთ დადასტურებული. შეამოწმეთ შემოსული ფოსტა და სპამი.',
     terms: 'გაგრძელებით ეთანხმებით',
     privacy: 'კონფიდენციალურობის პოლიტიკას',
     and: 'და',
@@ -61,6 +64,7 @@ const authCopy: Record<Lang, {
     resetNeedsEmail: 'Сначала введите e-mail.',
     loading: 'Загрузка...',
     error: 'Неверный e-mail или пароль.',
+    errorUnconfirmed: 'E-mail ещё не подтверждён. Проверьте входящие и папку «Спам».',
     terms: 'Продолжая, вы принимаете',
     privacy: 'Политику конфиденциальности',
     and: 'и',
@@ -76,6 +80,7 @@ const authCopy: Record<Lang, {
     resetNeedsEmail: 'Enter your email address first.',
     loading: 'Loading...',
     error: 'Email or password is incorrect.',
+    errorUnconfirmed: 'Your email has not been confirmed yet. Check your inbox and spam folder.',
     terms: 'By continuing, you accept the',
     privacy: 'Privacy Policy',
     and: 'and',
@@ -98,8 +103,12 @@ export default function LoginPage() {
     setMsg(null)
 
     const { error } = await supabase.auth.signInWithPassword({ email, password })
-    if (error) setMsg({ ok: false, text: c.error })
-    else window.location.href = '/dashboard'
+    if (error) {
+      const isUnconfirmed = error.message.toLowerCase().includes('not confirmed') || error.code === 'email_not_confirmed'
+      setMsg({ ok: false, text: isUnconfirmed ? c.errorUnconfirmed : c.error })
+    } else {
+      window.location.href = '/dashboard'
+    }
     setLoading(false)
   }
 
