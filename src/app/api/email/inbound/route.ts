@@ -59,6 +59,11 @@ export async function POST(req: NextRequest) {
   const { email: fromEmail, name: fromName } = parseFrom(fromRaw)
   const inbox = detectInbox(toArr)
 
+  // Kendi domain'imizden gelen mailler (outbound loop) — yoksay
+  if (fromEmail.toLowerCase().endsWith('@theeternalmemory.com')) {
+    return NextResponse.json({ ok: true, skipped: 'own_domain' })
+  }
+
   // Thread algılama: aynı from_email + benzer konu → aynı thread
   let threadId: string | null = null
   const cleanedSubject = stripRePrefix(subject)
