@@ -36,47 +36,32 @@ async function getOrCreatePurchaseUser(
   if (!password || password.length < 6) return { error: 'Şifre en az 6 karakter olmalıdır' }
   if (password !== passwordConfirm) return { error: 'Şifreler eşleşmiyor' }
 
-  // admin.createUser: Supabase otomatik email göndermez, biz göndereceğiz
-  const { data: createData, error: createError } = await service.auth.admin.createUser({
+  // generateLink: kullanıcıyı oluşturur + onay linki üretir, Supabase email göndermez
+  const { data: linkData, error: linkError } = await service.auth.admin.generateLink({
+    type: 'signup',
     email: senderEmail,
     password,
-    user_metadata: { full_name: senderName },
-    email_confirm: false,
+    options: {
+      data: { full_name: senderName },
+      redirectTo: `${SITE_URL}/auth/callback`,
+    },
   })
 
-  if (!createError && createData.user) {
-    return { user: createData.user, pendingEmailConfirmation: true as const }
+  if (!linkError && linkData?.user && linkData?.properties?.action_link) {
+    return {
+      user: linkData.user,
+      pendingEmailConfirmation: true as const,
+      confirmUrl: linkData.properties.action_link,
+    }
   }
 
-  // Kullanıcı zaten varsa giriş yapmayı dene
+  // generateLink başarısız — kullanıcı onaylı olarak zaten varsa giriş yap
   const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({ email: senderEmail, password })
   if (signInError || !signInData.user) {
-    const msg = createError?.message?.toLowerCase().includes('already')
-      ? 'Bu email adresi zaten kayıtlı. Şifrenizi kontrol edin veya giriş yapın.'
-      : (createError?.message ?? signInError?.message ?? 'Hesap oluşturulamadı')
-    return { error: msg }
+    return { error: 'Bu email kayıtlı. Şifrenizi kontrol edin veya giriş yapın.' }
   }
 
   return { user: signInData.user }
-}
-
-async function generateAndSendConfirmEmail(
-  service: Awaited<ReturnType<typeof createServiceClient>>,
-  senderEmail: string,
-  emailHtml: string,
-  emailSubject: string
-) {
-  const { data: linkData } = await service.auth.admin.generateLink({
-    type: 'signup',
-    email: senderEmail,
-    options: { redirectTo: `${SITE_URL}/auth/callback` },
-  })
-
-  const confirmUrl = linkData?.properties?.action_link
-  if (!confirmUrl) return
-
-  sendEmail({ to: senderEmail, subject: emailSubject, html: emailHtml.replace('__CONFIRM_URL__', confirmUrl) })
-    .catch(e => console.error('[generateAndSendConfirmEmail] error:', e))
 }
 
 export async function purchaseMemorialAction(_prev: unknown, formData: FormData) {
@@ -93,8 +78,10 @@ export async function purchaseMemorialAction(_prev: unknown, formData: FormData)
 
   const authResult = await getOrCreatePurchaseUser(supabase, service, formData, senderName, senderEmail)
   if ('error' in authResult) return { error: authResult.error }
+
   const user = authResult.user
-  const pendingEmailConfirmation = 'pendingEmailConfirmation' in authResult && authResult.pendingEmailConfirmation
+  const pendingEmailConfirmation = 'pendingEmailConfirmation' in authResult
+  const confirmUrl = 'confirmUrl' in authResult ? authResult.confirmUrl : undefined
 
   const pricing = await fetchPricingConfig()
   const amount = pricing.campaignActive && pricing.campaignMemorial
@@ -105,6 +92,7 @@ export async function purchaseMemorialAction(_prev: unknown, formData: FormData)
   const slug = `${baseSlug}-${Date.now().toString(36)}`
 
   if (pendingEmailConfirmation) {
+    // generateLink trigger'ı tetikliyor ama yedek olarak profiles upsert
     await service.from('profiles').upsert(
       { id: user.id, full_name: senderName, email: senderEmail },
       { onConflict: 'id', ignoreDuplicates: true }
@@ -140,21 +128,12 @@ export async function purchaseMemorialAction(_prev: unknown, formData: FormData)
   })
   if (paymentErr) return { error: 'Ödeme kaydı oluşturulamadı: ' + paymentErr.message }
 
-  if (pendingEmailConfirmation) {
-    // Taziye mesajlı onay emaili — link sonradan enjekte edilecek
-    const { data: linkData } = await service.auth.admin.generateLink({
-      type: 'signup',
-      email: senderEmail,
-      options: { redirectTo: `${SITE_URL}/auth/callback` },
-    })
-    const confirmUrl = linkData?.properties?.action_link ?? ''
-    if (confirmUrl) {
-      sendEmail({
-        to: senderEmail,
-        subject: `Anma sayfanızı oluşturun — The Eternal Memory`,
-        html: memorialSignupConfirmEmail({ authorName: senderName, vaultName: displayName, confirmUrl }),
-      }).catch(e => console.error('[purchaseMemorialAction] confirm email error:', e))
-    }
+  if (pendingEmailConfirmation && confirmUrl) {
+    sendEmail({
+      to: senderEmail,
+      subject: `Anma sayfanızı oluşturun — The Eternal Memory`,
+      html: memorialSignupConfirmEmail({ authorName: senderName, vaultName: displayName, confirmUrl }),
+    }).catch(e => console.error('[purchaseMemorialAction] confirm email error:', e))
     return { emailConfirmationSent: true as const, email: senderEmail }
   }
 
@@ -175,8 +154,10 @@ export async function purchaseVaultAction(_prev: unknown, formData: FormData) {
 
   const authResult = await getOrCreatePurchaseUser(supabase, service, formData, senderName, senderEmail)
   if ('error' in authResult) return { error: authResult.error }
+
   const user = authResult.user
-  const pendingEmailConfirmation = 'pendingEmailConfirmation' in authResult && authResult.pendingEmailConfirmation
+  const pendingEmailConfirmation = 'pendingEmailConfirmation' in authResult
+  const confirmUrl = 'confirmUrl' in authResult ? authResult.confirmUrl : undefined
 
   const pricing = await fetchPricingConfig()
   const setupAmount = pricing.campaignActive && pricing.campaignVaultSetup
@@ -222,20 +203,12 @@ export async function purchaseVaultAction(_prev: unknown, formData: FormData) {
   })
   if (paymentErr) return { error: 'Ödeme kaydı oluşturulamadı: ' + paymentErr.message }
 
-  if (pendingEmailConfirmation) {
-    const { data: linkData } = await service.auth.admin.generateLink({
-      type: 'signup',
-      email: senderEmail,
-      options: { redirectTo: `${SITE_URL}/auth/callback` },
-    })
-    const confirmUrl = linkData?.properties?.action_link ?? ''
-    if (confirmUrl) {
-      sendEmail({
-        to: senderEmail,
-        subject: `Hesabınızı doğrulayın — The Eternal Memory`,
-        html: vaultSignupConfirmEmail({ authorName: senderName, confirmUrl }),
-      }).catch(e => console.error('[purchaseVaultAction] confirm email error:', e))
-    }
+  if (pendingEmailConfirmation && confirmUrl) {
+    sendEmail({
+      to: senderEmail,
+      subject: `Hesabınızı doğrulayın — The Eternal Memory`,
+      html: vaultSignupConfirmEmail({ authorName: senderName, confirmUrl }),
+    }).catch(e => console.error('[purchaseVaultAction] confirm email error:', e))
     return { emailConfirmationSent: true as const, email: senderEmail }
   }
 
