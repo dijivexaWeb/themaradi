@@ -2,6 +2,7 @@
 
 import { useState, useTransition } from 'react'
 import { saveEmailSettingsAction, sendTestEmailAction, saveTurnstileSettingsAction } from './actions'
+import { regenerateWebhookSecretAction } from '../inbox/actions'
 
 const inputCls = 'w-full rounded-xl border border-[#e5dccb] bg-white px-4 py-3 text-sm text-[#1f2d27] outline-none focus:border-[#174f35] focus:ring-2 focus:ring-[#174f35]/10'
 const labelCls = 'mb-1.5 block text-xs font-semibold text-[#4a5e55]'
@@ -11,11 +12,13 @@ export default function EmailSettingsForm({ settings }: { settings: Record<strin
   const [isPending, startTransition] = useTransition()
   const [isTestPending, startTestTransition] = useTransition()
   const [isTurnstilePending, startTurnstileTransition] = useTransition()
+  const [isWebhookPending, startWebhookTransition] = useTransition()
   const [saved, setSaved] = useState(false)
   const [saveError, setSaveError] = useState('')
   const [turnstileSaved, setTurnstileSaved] = useState(false)
   const [turnstileError, setTurnstileError] = useState('')
   const [testResult, setTestResult] = useState<{ ok?: boolean; msg?: string } | null>(null)
+  const [webhookSecret, setWebhookSecret] = useState(settings.inbound_webhook_secret ?? '')
 
   function handleTurnstileSave(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -34,6 +37,13 @@ export default function EmailSettingsForm({ settings }: { settings: Record<strin
     startTransition(async () => {
       const result = await saveEmailSettingsAction(fd)
       if (!result.success) { setSaveError(result.error ?? 'Kaydedilemedi') } else { setSaved(true) }
+    })
+  }
+
+  function handleRegenerateWebhook() {
+    startWebhookTransition(async () => {
+      const r = await regenerateWebhookSecretAction()
+      if (r.secret) setWebhookSecret(r.secret)
     })
   }
 
@@ -188,6 +198,73 @@ export default function EmailSettingsForm({ settings }: { settings: Record<strin
           </div>
         </div>
       </form>
+
+      {/* Gelen Kutusu Webhook */}
+      <div className={sectionCls}>
+        <h2 className="font-semibold text-[#1f2d27] mb-1">Gelen Kutusu Webhook</h2>
+        <p className="text-xs text-[#788177] mb-5">
+          Bu URL'yi{' '}
+          <a href="https://resend.com/inbound-webhooks" target="_blank" rel="noopener noreferrer" className="underline text-[#174f35]">
+            Resend Inbound
+          </a>{' '}
+          bölümünde kaydedin. Artık support@, partner@, privacy@ adreslerine gelen mailler admin panelinde görünür.
+        </p>
+
+        <div className="mb-4">
+          <label className={labelCls}>Webhook URL</label>
+          <div className="flex gap-2">
+            <input
+              type="text"
+              readOnly
+              value={
+                webhookSecret
+                  ? `https://theeternalmemory.com/api/email/inbound?token=${webhookSecret}`
+                  : '— önce token oluşturun —'
+              }
+              className={`${inputCls} font-mono text-xs bg-slate-50 cursor-text select-all`}
+              onClick={(e) => (e.target as HTMLInputElement).select()}
+            />
+            <button
+              type="button"
+              onClick={() => {
+                const val = webhookSecret
+                  ? `https://theeternalmemory.com/api/email/inbound?token=${webhookSecret}`
+                  : ''
+                if (val) navigator.clipboard.writeText(val)
+              }}
+              className="shrink-0 rounded-xl border border-[#e5dccb] px-3 py-2 text-xs text-[#788177] hover:bg-slate-50 transition-colors"
+            >
+              Kopyala
+            </button>
+          </div>
+        </div>
+
+        <div className="flex items-center gap-4">
+          <button
+            type="button"
+            onClick={handleRegenerateWebhook}
+            disabled={isWebhookPending}
+            className="rounded-xl bg-[#174f35] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#123f2b] transition-colors disabled:opacity-60"
+          >
+            {isWebhookPending ? 'Oluşturuluyor...' : webhookSecret ? 'Yeni Token Oluştur' : 'Token Oluştur'}
+          </button>
+          {webhookSecret && (
+            <span className="text-xs text-[#788177]">
+              ⚠ Token değişirse Resend'de URL'yi güncellemeniz gerekir.
+            </span>
+          )}
+        </div>
+
+        <div className="mt-4 bg-[#fffdf8] border border-[#f0ebe0] rounded-xl p-4 text-xs text-[#788177] space-y-1.5">
+          <p className="font-semibold text-[#4a5e55]">Kurulum adımları:</p>
+          <ol className="list-decimal list-inside space-y-1">
+            <li>Yukarıdaki "Token Oluştur" butonuna tıklayın.</li>
+            <li>Resend panelini açın → Inbound → Add Webhook.</li>
+            <li>Webhook URL'yi yapıştırın, etki alanı olarak <code className="bg-[#f0ebe0] px-1 rounded">theeternalmemory.com</code> yazın.</li>
+            <li>Kaydedin. Artık gelen mailler admin panelinde "Gelen Kutusu"nda görünür.</li>
+          </ol>
+        </div>
+      </div>
 
       {/* Test email */}
       <form onSubmit={handleTest} className={sectionCls}>
