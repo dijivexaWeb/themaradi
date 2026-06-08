@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { saveEmailSettingsAction, sendTestEmailAction } from './actions'
+import { saveEmailSettingsAction, sendTestEmailAction, saveTurnstileSettingsAction } from './actions'
 
 const inputCls = 'w-full rounded-xl border border-[#e5dccb] bg-white px-4 py-3 text-sm text-[#1f2d27] outline-none focus:border-[#174f35] focus:ring-2 focus:ring-[#174f35]/10'
 const labelCls = 'mb-1.5 block text-xs font-semibold text-[#4a5e55]'
@@ -10,9 +10,22 @@ const sectionCls = 'rounded-2xl border border-[#e5dccb] bg-white p-6 shadow-sm'
 export default function EmailSettingsForm({ settings }: { settings: Record<string, string> }) {
   const [isPending, startTransition] = useTransition()
   const [isTestPending, startTestTransition] = useTransition()
+  const [isTurnstilePending, startTurnstileTransition] = useTransition()
   const [saved, setSaved] = useState(false)
   const [saveError, setSaveError] = useState('')
+  const [turnstileSaved, setTurnstileSaved] = useState(false)
+  const [turnstileError, setTurnstileError] = useState('')
   const [testResult, setTestResult] = useState<{ ok?: boolean; msg?: string } | null>(null)
+
+  function handleTurnstileSave(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault()
+    setTurnstileSaved(false); setTurnstileError('')
+    const fd = new FormData(e.currentTarget)
+    startTurnstileTransition(async () => {
+      const result = await saveTurnstileSettingsAction(fd)
+      if (!result.success) { setTurnstileError(result.error ?? 'Kaydedilemedi') } else { setTurnstileSaved(true) }
+    })
+  }
 
   function handleSave(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()
@@ -117,6 +130,63 @@ export default function EmailSettingsForm({ settings }: { settings: Record<strin
         >
           {isPending ? 'Kaydediliyor...' : 'Kaydet'}
         </button>
+      </form>
+
+      {/* Turnstile (CAPTCHA) */}
+      <form onSubmit={handleTurnstileSave} className={sectionCls}>
+        <h2 className="font-semibold text-[#1f2d27] mb-1">CAPTCHA Koruması (Cloudflare Turnstile)</h2>
+        <p className="text-xs text-[#788177] mb-5">
+          Giriş, iletişim ve taziye formlarını bot saldırılarına karşı korur.
+          Anahtarları <a href="https://dash.cloudflare.com/?to=/:account/turnstile" target="_blank" rel="noopener noreferrer" className="underline text-[#174f35]">Cloudflare Turnstile</a> panelinden alın.
+        </p>
+
+        <div className="space-y-4">
+          <div>
+            <label className={labelCls}>Site Anahtarı (public)</label>
+            <input
+              type="text"
+              name="turnstile_site_key"
+              defaultValue={settings.turnstile_site_key ?? ''}
+              placeholder="0x4AAAAAAA..."
+              className={inputCls}
+              autoComplete="off"
+            />
+            <p className="mt-1.5 text-xs text-[#adb5ab]">Tarayıcıya gönderilir — public, gizli değil.</p>
+          </div>
+          <div>
+            <label className={labelCls}>Gizli Anahtar (secret)</label>
+            <input
+              type="password"
+              name="turnstile_secret_key"
+              defaultValue={settings.turnstile_secret_key ?? ''}
+              placeholder="0x4AAAAAAA..."
+              className={inputCls}
+              autoComplete="off"
+            />
+            <p className="mt-1.5 text-xs text-[#adb5ab]">Sunucuda saklanır — asla paylaşmayın.</p>
+          </div>
+        </div>
+
+        {turnstileError && (
+          <p className="mt-3 rounded-lg bg-red-50 px-3 py-2 text-xs text-red-600">{turnstileError}</p>
+        )}
+        {turnstileSaved && (
+          <p className="mt-3 rounded-lg bg-green-50 px-3 py-2 text-xs text-green-700">Turnstile anahtarları kaydedildi.</p>
+        )}
+
+        <div className="mt-5 flex items-center gap-4">
+          <button
+            type="submit"
+            disabled={isTurnstilePending}
+            className="rounded-xl bg-[#174f35] px-6 py-3 text-sm font-semibold text-white hover:bg-[#123f2b] transition-colors disabled:opacity-60"
+          >
+            {isTurnstilePending ? 'Kaydediliyor...' : 'Kaydet'}
+          </button>
+          <div className="flex items-center gap-2 text-xs text-[#788177]">
+            <span className={`h-2 w-2 rounded-full ${settings.turnstile_site_key && settings.turnstile_secret_key ? 'bg-emerald-500' : 'bg-slate-300'}`} />
+            {settings.turnstile_site_key && settings.turnstile_secret_key ? 'Aktif' : 'Yapılandırılmadı'}
+          </div>
+        </div>
       </form>
 
       {/* Test email */}

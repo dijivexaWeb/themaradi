@@ -4,10 +4,11 @@ import { ArrowRight } from 'lucide-react'
 import { useState } from 'react'
 import { useLang } from '@/i18n/context'
 import { submitContactMessage } from './actions'
+import TurnstileWidget from '@/components/TurnstileWidget'
 
 type Status = 'idle' | 'sending' | 'sent' | 'error'
 
-export default function ContactForm() {
+export default function ContactForm({ siteKey }: { siteKey: string }) {
   const { t } = useLang()
   const f = t.contact.form
   const [status, setStatus] = useState<Status>('idle')
@@ -104,6 +105,8 @@ export default function ContactForm() {
           className="w-full resize-none rounded-xl border border-[#e1d5c3] bg-[#fbf8f1] px-4 py-3 text-sm text-[#173d31] placeholder-[#c0b49e] outline-none transition focus:border-[#b08340] focus:ring-2 focus:ring-[#b08340]/15"
         />
       </div>
+
+      <TurnstileWidget siteKey={siteKey} />
 
       <button
         type="submit"

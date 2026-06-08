@@ -2,8 +2,7 @@
 
 import { createServiceClient } from '@/lib/supabase/server'
 import { z } from 'zod'
-
-// TODO: rate limit this endpoint
+import { verifyTurnstile } from '@/lib/turnstile'
 
 const schema = z.object({
   name: z.string().min(2).max(255),
@@ -15,6 +14,9 @@ const schema = z.object({
 export async function submitContactMessage(
   formData: FormData
 ): Promise<{ success: boolean; error?: string }> {
+  const turnstileOk = await verifyTurnstile(formData.get('cf-turnstile-response') as string | null)
+  if (!turnstileOk) return { success: false, error: 'CAPTCHA doğrulaması başarısız. Tekrar deneyin.' }
+
   const parsed = schema.safeParse({
     name: formData.get('name'),
     email: formData.get('email'),

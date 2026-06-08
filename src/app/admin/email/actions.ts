@@ -29,6 +29,26 @@ export async function saveEmailSettingsAction(formData: FormData): Promise<{ err
   return { success: true }
 }
 
+export async function saveTurnstileSettingsAction(formData: FormData): Promise<{ error?: string; success?: boolean }> {
+  await requireAdmin()
+  const supabase = await createServiceClient()
+
+  const fields = [
+    { key: 'turnstile_site_key',   value: (formData.get('turnstile_site_key') as string)?.trim() ?? '' },
+    { key: 'turnstile_secret_key', value: (formData.get('turnstile_secret_key') as string)?.trim() ?? '' },
+  ]
+
+  for (const { key, value } of fields) {
+    const { error } = await supabase
+      .from('platform_settings')
+      .upsert({ key, value }, { onConflict: 'key' })
+    if (error) return { error: `${key} kaydedilemedi: ${error.message}` }
+  }
+
+  revalidatePath('/admin/email')
+  return { success: true }
+}
+
 export async function sendTestEmailAction(formData: FormData): Promise<{ error?: string; success?: boolean }> {
   await requireAdmin()
   const to = (formData.get('test_email') as string)?.trim()

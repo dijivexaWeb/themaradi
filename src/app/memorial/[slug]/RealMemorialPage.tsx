@@ -7,6 +7,7 @@ import FamilyTreeCanvas from '@/components/FamilyTreeCanvas'
 import AudioPlayerSection from './AudioPlayerSection'
 import RealMemorialInteractionsWrapper from './RealMemorialInteractionsWrapper'
 import TimelineSection from './TimelineSection'
+import { getTurnstileSiteKey } from '@/lib/turnstile'
 
 interface VaultRow {
   id: string
@@ -88,6 +89,8 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
     flower: reactionData.filter((r) => r.reaction_type === 'flower').length,
     prayer: reactionData.filter((r) => r.reaction_type === 'prayer').length,
   }
+
+  const turnstileSiteKey = await getTurnstileSiteKey()
 
   const timelineMemories = allMemories?.filter((m) => m.section === 'kronoloji') ?? []
   const featuredMemories = allMemories?.filter((m) => m.section === 'featured') ?? []
@@ -674,7 +677,7 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
 
       {/* ── TAZİYE DEFTERİ ── */}
       <div id="taziye">
-        <RealMemorialInteractionsWrapper entries={guestbookEntries} vaultId={id} initialCounts={initialCounts} />
+        <RealMemorialInteractionsWrapper entries={guestbookEntries} vaultId={id} initialCounts={initialCounts} siteKey={turnstileSiteKey} />
       </div>
 
       {/* ── AİLE BAĞLARI ── */}

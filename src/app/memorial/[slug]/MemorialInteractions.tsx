@@ -5,6 +5,7 @@ import { ArrowRight, Feather, Flame, Heart, X } from 'lucide-react'
 import { type Lang } from '@/i18n'
 import { useLang } from '@/i18n/context'
 import { submitCondolenceAction, addReactionAction } from '@/lib/actions/condolences'
+import TurnstileWidget from '@/components/TurnstileWidget'
 
 interface Condolence {
   name: string
@@ -36,7 +37,7 @@ const interactionCopy: Record<Lang, any> = {
 }
 interface InitialCounts { candle: number; flower: number; prayer: number }
 
-export default function MemorialInteractions({ condolences, vaultId, initialCounts }: { condolences: Condolence[]; vaultId?: string; initialCounts?: InitialCounts }) {
+export default function MemorialInteractions({ condolences, vaultId, initialCounts, siteKey = '' }: { condolences: Condolence[]; vaultId?: string; initialCounts?: InitialCounts; siteKey?: string }) {
   const { lang } = useLang()
   const copy = interactionCopy[lang]
   const [candlesLit, setCandlesLit] = useState(initialCounts?.candle ?? 0)
@@ -240,6 +241,8 @@ export default function MemorialInteractions({ condolences, vaultId, initialCoun
                   <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-[#8f9f96]">{copy.message}</label>
                   <textarea name="message" required rows={4} placeholder={copy.messagePlaceholder} className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-white outline-none placeholder:text-[#6b756f] focus:border-[#c7a76f] focus:ring-2 focus:ring-[#c7a76f]/10" />
                 </div>
+                <TurnstileWidget siteKey={siteKey} />
+
                 <div className="mt-5 flex gap-3">
                   <button type="submit" disabled={isPending} className="inline-flex items-center gap-2 rounded-xl bg-[#c7a76f] px-7 py-3 text-sm font-semibold text-[#091712] shadow-lg transition hover:bg-[#d4b87c] disabled:opacity-60">
                     {isPending ? '...' : copy.send} <ArrowRight className="h-4 w-4" />

@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import AdminLoginForm from './AdminLoginForm'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
+import { getTurnstileSiteKey } from '@/lib/turnstile'
 
 export const metadata: Metadata = {
   title: 'Admin Girişi — The Eternal Memory',
@@ -22,6 +23,8 @@ export default async function AdminLoginPage() {
     if (profile?.role === 'admin') redirect('/admin')
   }
 
+  const siteKey = await getTurnstileSiteKey()
+
   return (
     <div className="flex min-h-screen items-center justify-center bg-slate-950 px-4">
       <div className="w-full max-w-sm">
@@ -37,7 +40,7 @@ export default async function AdminLoginPage() {
           <h1 className="mb-6 text-center text-lg font-semibold text-white">
             Admin Girişi
           </h1>
-          <AdminLoginForm />
+          <AdminLoginForm siteKey={siteKey} />
         </div>
 
         <p className="mt-6 text-center text-xs text-slate-600">

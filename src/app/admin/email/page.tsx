@@ -15,6 +15,8 @@ export default async function EmailSettingsPage() {
       'email_from_name',
       'email_notify_new_guestbook',
       'email_notify_approved',
+      'turnstile_site_key',
+      'turnstile_secret_key',
     ])
 
   const settings = Object.fromEntries((data ?? []).map((r) => [r.key, r.value]))

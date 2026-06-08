@@ -6,7 +6,7 @@ import ContactForm from './ContactForm'
 import { useLang } from '@/i18n/context'
 import BrandLogo from '@/components/BrandLogo'
 
-export default function ContactPageClient() {
+export default function ContactPageClient({ siteKey }: { siteKey: string }) {
   const { t } = useLang()
   const c = t.contact
 
@@ -160,7 +160,7 @@ export default function ContactPageClient() {
             <div className="rounded-2xl border border-[#e1d5c3] bg-[#fffdf8] p-7 shadow-lg shadow-[#4d3d26]/6 sm:p-9">
               <h2 className="mb-1 font-serif text-2xl text-[#173d31]">{c.form.heading}</h2>
               <p className="mb-7 text-sm text-[#8a7a64]">{c.form.subheading}</p>
-              <ContactForm />
+              <ContactForm siteKey={siteKey} />
             </div>
           </div>
         </section>

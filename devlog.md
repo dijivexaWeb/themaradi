@@ -5,6 +5,56 @@
 
 ---
 
+## 2026-06-09 — Oturum 37: Cloudflare Turnstile CAPTCHA Entegrasyonu
+
+### Yapılanlar
+
+**Turnstile CAPTCHA — admin panelinden yönetilen, 4 forma eklendi:**
+- `platform_settings` tablosuna `turnstile_site_key` ve `turnstile_secret_key` eklendi (değerleri admin panelinden yönetilir, koda gömülmedi)
+- `src/lib/turnstile.ts` — `getTurnstileSiteKey()` ve `verifyTurnstile()` server yardımcıları
+- `src/components/TurnstileWidget.tsx` — `?render=explicit` ile explicit API, koşullu formları (taziye formu) destekler
+
+**Admin email sayfasına Turnstile bölümü eklendi:**
+- `src/app/admin/email/_EmailSettingsForm.tsx` — "CAPTCHA Koruması" bölümü + kaydetme formu
+- `src/app/admin/email/actions.ts` — `saveTurnstileSettingsAction` eklendi
+- `/admin/email` sayfasında site key + secret key girişi, aktif/kapalı durum göstergesi
+
+**Turnstile koruması eklenen formlar:**
+1. Admin giriş — `src/app/admin/login/page.tsx` + `AdminLoginForm.tsx` + `actions.ts`
+2. Kullanıcı girişi — `src/app/login/page.tsx` (server wrapper) + `_LoginPageClient.tsx` (client)
+3. İletişim formu — `src/app/contact/page.tsx` → `ContactPageClient.tsx` → `ContactForm.tsx` + `actions.ts`
+4. Taziye formu — `RealMemorialPage.tsx` → `RealMemorialInteractionsWrapper.tsx` → `MemorialInteractions.tsx` + `condolences.ts`
+
+**Mimari not:**
+- Site key DB'den okunur, server component'te prop olarak client'a geçer — koda gömülmez
+- Secret key sadece sunucuda `verifyTurnstile()` içinde kullanılır
+- Key yoksa (boş) → `verifyTurnstile()` `true` döner — graceful degradation
+
+### Proje Durumu
+- [x] Email onay akışı (oturum 36)
+- [x] Branded onay emaili şablonları
+- [x] Taziye gönderene teşekkür emaili
+- [x] Login "email doğrulanmadı" mesajı
+- [x] Cloudflare Turnstile CAPTCHA (4 form)
+- [x] Turnstile anahtarları admin panelinden yönetilir
+- [ ] Turnstile test: gerçek tarayıcıda widget göründüğünü doğrula
+
+### Kritik Kararlar / Notlar
+- Turnstile keyleri koda gömülmedi, `platform_settings` DB tablosunda (admin isteği)
+- Login sayfası server component'e dönüştürüldü: `page.tsx` (server) + `_LoginPageClient.tsx` (client)
+- `?render=explicit` API kullanıldı — koşullu render'lanan taziye formu için gerekli
+- Graceful degradation: Turnstile yapılandırılmamışsa formlar çalışmaya devam eder
+
+### Nerede Kaldık
+Cloudflare Turnstile admin email sayfasından yönetilir (`/admin/email`), 4 forma eklendi, build temiz. Anahtarlar DB'ye yüklendi. Sonraki adım gerçek tarayıcıda test.
+
+### Sıradaki Adım
+1. `/admin/email` sayfasından Turnstile bölümünü görüntüle, anahtarları kontrol et
+2. Kullanıcı login, admin login, iletişim ve taziye formlarını tarayıcıda test et
+3. İstersen yeni özellik: ödeme akışı sayfasına Turnstile eklenebilir
+
+---
+
 ## 2026-06-09 — Oturum 36: Email Doğrulama (Kayıt Onayı)
 
 ### Yapılanlar

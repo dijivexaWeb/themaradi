@@ -6,6 +6,7 @@ import { redirect } from 'next/navigation'
 import { headers } from 'next/headers'
 import { sendEmail, isNotificationEnabled } from '@/lib/email'
 import { newGuestbookEntryEmail, messageApprovedEmail, condolenceReceivedEmail } from '@/lib/email/templates'
+import { verifyTurnstile } from '@/lib/turnstile'
 
 export async function addReactionAction(vaultId: string, type: 'candle' | 'flower' | 'prayer'): Promise<void> {
   if (!['candle', 'flower', 'prayer'].includes(type)) return
@@ -83,6 +84,10 @@ export async function submitCondolenceAction(vaultId: string, formData: FormData
   // Katman 2 — Zaman kontrolü (< 3 saniye = bot)
   const ts = parseInt((formData.get('_t') as string | null) ?? '0', 10)
   if (!ts || Date.now() - ts < 3000) return {}  // çok hızlı — sessizce yoksay
+
+  // Katman 3 — Turnstile CAPTCHA
+  const turnstileOk = await verifyTurnstile(formData.get('cf-turnstile-response') as string | null)
+  if (!turnstileOk) return { error: 'CAPTCHA doğrulaması başarısız. Tekrar deneyin.' }
 
   const authorName = (formData.get('author_name') as string)?.trim()
   const relation = (formData.get('relation') as string)?.trim() || null

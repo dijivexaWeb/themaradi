@@ -3,6 +3,7 @@
 import { z } from 'zod'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
+import { verifyTurnstile } from '@/lib/turnstile'
 
 const schema = z.object({
   email: z.string().email(),
@@ -13,6 +14,10 @@ export async function adminLogin(
   _prev: { error: string } | null,
   formData: FormData,
 ): Promise<{ error: string }> {
+  const turnstileToken = formData.get('cf-turnstile-response') as string | null
+  const turnstileOk = await verifyTurnstile(turnstileToken)
+  if (!turnstileOk) return { error: 'CAPTCHA doğrulaması başarısız. Tekrar deneyin.' }
+
   // TODO: rate limit — max 5 attempts per IP per 15 min
   const parsed = schema.safeParse({
     email: formData.get('email'),

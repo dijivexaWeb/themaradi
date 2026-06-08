@@ -4,8 +4,9 @@ import { useActionState } from 'react'
 import { adminLogin } from './actions'
 import { Eye, EyeOff, Loader2, LogIn } from 'lucide-react'
 import { useState } from 'react'
+import TurnstileWidget from '@/components/TurnstileWidget'
 
-export default function AdminLoginForm() {
+export default function AdminLoginForm({ siteKey }: { siteKey: string }) {
   const [state, action, pending] = useActionState(adminLogin, null)
   const [showPw, setShowPw] = useState(false)
 
@@ -48,6 +49,8 @@ export default function AdminLoginForm() {
           </button>
         </div>
       </div>
+
+      <TurnstileWidget siteKey={siteKey} />
 
       {state?.error && (
         <div className="rounded-lg border border-red-900/50 bg-red-950/50 px-4 py-3 text-sm text-red-400">

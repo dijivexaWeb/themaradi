@@ -15,9 +15,10 @@ interface Props {
   entries: GuestbookEntry[]
   vaultId: string
   initialCounts: { candle: number; flower: number; prayer: number }
+  siteKey: string
 }
 
-export default function RealMemorialInteractionsWrapper({ entries, vaultId, initialCounts }: Props) {
+export default function RealMemorialInteractionsWrapper({ entries, vaultId, initialCounts, siteKey }: Props) {
   const condolences = entries.map((e) => ({
     name: e.author_name,
     date: new Date(e.created_at).toLocaleDateString('tr-TR', {
@@ -31,7 +32,7 @@ export default function RealMemorialInteractionsWrapper({ entries, vaultId, init
 
   return (
     <LangProvider>
-      <MemorialInteractions condolences={condolences} vaultId={vaultId} initialCounts={initialCounts} />
+      <MemorialInteractions condolences={condolences} vaultId={vaultId} initialCounts={initialCounts} siteKey={siteKey} />
     </LangProvider>
   )
 }

@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import ContactPageClient from './ContactPageClient'
+import { getTurnstileSiteKey } from '@/lib/turnstile'
 
 export const metadata: Metadata = {
   title: 'İletişim — The Eternal Memory',
@@ -7,6 +8,7 @@ export const metadata: Metadata = {
     'The Eternal Memory ile iletişime geçin. Batumi, Gürcistan ofisimiz — Anma Profili, Yaşam Kasası ve QR plaka soruları için.',
 }
 
-export default function ContactPage() {
-  return <ContactPageClient />
+export default async function ContactPage() {
+  const siteKey = await getTurnstileSiteKey()
+  return <ContactPageClient siteKey={siteKey} />
 }
