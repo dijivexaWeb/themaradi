@@ -5,28 +5,115 @@
 
 ---
 
-## 2026-06-08 — Oturum 35: Rebrand + Lotus Logo
+## 2026-06-09 — Oturum 36: Email Doğrulama (Kayıt Onayı)
 
 ### Yapılanlar
-- Tüm kaynak kodda "The Maradi" → "The Eternal Memory" rename yapıldı (i18n/tr, en, ka, ru + tüm component'lar)
-- `themaradi.com` → `theeternalmemory.com` domain değişikliği (email adresleri dahil)
-- `platform_settings.email_from_address` DB'de güncellendi
-- Resend domain doğrulaması: `theeternalmemory.com` DNS kayıtları (DKIM, SPF, DMARC) Vercel'e eklendi
-- `BrandLogo.tsx` yeni lotus çiçeği logosu: 5 taçyaprak + altın merkez şerit + su çizgisi
+
+**Kayıt akışı email onayı destekler hale getirildi:**
+- `src/app/satin-al/actions.ts` — `getOrCreatePurchaseUser` güncellendi:
+  - `signUpData.session` null ise (email onayı açık) artık hata değil `{ user, pendingEmailConfirmation: true }` döndürüyor
+  - Önceki hata mesajı: "Supabase Auth ayarlarından e-posta onayını kapatın" → kaldırıldı
+- `purchaseMemorialAction` + `purchaseVaultAction`:
+  - Email onayı bekleniyorken oturum yok → vault + payment oluşturmak için `createServiceClient()` (RLS bypass)
+  - Kayıt tamamlandıktan sonra `redirect()` yerine `{ emailConfirmationSent: true, email }` döndürüyor
+- `src/app/satin-al/anma/_AnmaFormClient.tsx` — email onayı ekranı eklendi (form yerine gösterilir)
+- `src/app/satin-al/kasa/_KasaFormClient.tsx` — aynı email onayı ekranı eklendi
+
+**Akış:**
+1. Kullanıcı formu doldurur → `signUp()` çağrılır
+2. Supabase email gönderir → session null → pendingEmailConfirmation: true
+3. Vault + payment service client ile kaydedilir
+4. Form: "E-postanızı doğrulayın" ekranı gösterilir
+5. Kullanıcı emaildeki linke tıklar → `/auth/callback?code=xxx` → oturum açılır → `/dashboard`
+
+**Supabase dashboard ayarları (KOD TARAFINDA HAZIR — kullanıcının yapması gerekenler):**
+- Authentication → Providers → Email → "Confirm email" toggle açılmalı
+- Authentication → SMTP → Custom SMTP açılmalı (smtp.resend.com, port 465, user: resend, pass: Resend API key)
 
 ### Proje Durumu
-- [x] Email altyapısı (Resend) çalışıyor
-- [x] Marka adı güncellendi
-- [x] Domain doğrulandı
-- [x] Lotus logo uygulandı
+- [x] Email altyapısı (Resend) + domain doğrulandı
+- [x] Onay emaili (approveGuestbookEntryAction → gönderici bildirildi)
+- [x] Rebrand tamamlandı (The Eternal Memory)
+- [x] Lotus logo + favicon uygulandı
+- [x] Kayıt email onayı — kod hazır, Supabase dashboard ayarları bekliyor
+
+### Kritik Kararlar
+- Email onayı beklenirken vault + payment service client ile oluşturulur (RLS bypass); kullanıcı email onaylayınca `/dashboard`'da vaultunu görür
+- `auth/callback/route.ts` zaten doğru çalışıyordu, değişiklik gerekmedi
 
 ### Nerede Kaldık
-`src/components/BrandLogo.tsx` güncellendi. Logo light/dark tema için hazır.
+Kod commit edildi. Supabase dashboard'da 2 ayar yapılması gerekiyor (Email confirmation + Custom SMTP).
 
 ### Sıradaki Adım
-1. favicon.ico / favicon.svg lotus sembolüyle güncellenmeli
-2. OG image (open graph) için logo güncellemesi
-3. Mesaj onaylandığında göndericiye email bildirimi testi
+1. Supabase dashboard → Auth → Email → "Confirm email" aç
+2. Supabase dashboard → Auth → SMTP → Resend ile custom SMTP kur
+3. `theeternalmemory.com` Vercel'de production domain olarak ayarlanmalı
+4. OG image oluşturulmalı
+
+---
+
+## 2026-06-08 — Oturum 35: Rebrand + Resend Domain + Lotus Logo + Favicon
+
+### Yapılanlar
+
+**Onay emaili tamamlandı:**
+- `approveGuestbookEntryAction` güncellendi: mesaj onaylandığında gönderici (author_email varsa) `messageApprovedEmail` şablonuyla bilgilendiriliyor
+- `src/lib/actions/condolences.ts` — import'a `messageApprovedEmail` eklendi
+
+**Rebrand — "The Eternal Memory":**
+- `find src | xargs sed` ile tüm `.ts/.tsx` dosyalarında `The Maradi` → `The Eternal Memory` toplu değişimi
+- `themaradi.com` → `theeternalmemory.com` toplu domain değişimi (privacy@, support@, info@, partner@ email adresleri dahil)
+- `platform_settings` DB'de `email_from_address` = `noreply@theeternalmemory.com` güncellendi (SQL ile)
+- `src/app/login/page.tsx` ve `src/app/auth/update-password/page.tsx` içinde hardcoded "themaradi" düzeltildi
+- `src/app/layout.tsx` — metadata title/OG `The Eternal Memory — Where memories never fade.` olarak güncellendi
+
+**Resend domain kurulumu:**
+- Domain: `theeternalmemory.com` (Vercel'den alındı)
+- Resend'de Ireland (eu-west-1) region seçildi
+- Vercel DNS'e 4 kayıt eklendi: DKIM (TXT), SPF MX, SPF TXT, DMARC (TXT)
+- Domain doğrulandı, test emaili başarıyla gitti
+
+**Slogan:**
+- "Where memories never fade." seçildi (5 alternatiften)
+
+**Logo yeniden tasarımı:**
+- İlk deneme: sonsuzluk (∞) + alev → küçük boyutlarda iki kiraz gibi göründü, reddedildi
+- İkinci deneme: yaprak/fener içinde alev → "amcık gibi" görüldü, reddedildi
+- Final: lotus çiçeği, 5 taçyaprak (SVG transform ile ±52° ve ±24° rotasyon), altın merkez şerit, altın su çizgisi
+- `src/components/BrandLogo.tsx` — `BrandMark` bileşeni lotus SVG ile yeniden yazıldı
+- Light (krem zemin) ve dark (koyu yeşil zemin) tema desteği
+
+**Favicon:**
+- `src/app/icon.svg` oluşturuldu — koyu yeşil daire zemin + altın lotus
+- Next.js App Router otomatik olarak `icon.svg` dosyasını favicon olarak kullanır
+- 16px / 32px / 64px boyutlarında test edildi
+
+**AI logo prompt:**
+- Midjourney/Ideogram için Türkçe → İngilizce prompt yazıldı (lotus mark + "The Eternal Memory" + slogan)
+
+**Git:**
+- Tüm değişiklikler commit edildi: `e718aa7`
+- `git push origin master` başarılı
+
+### Proje Durumu
+- [x] Email altyapısı (Resend) + domain doğrulandı
+- [x] Onay emaili (approveGuestbookEntryAction → gönderici bildirildi)
+- [x] Rebrand tamamlandı (The Eternal Memory)
+- [x] Lotus logo + favicon uygulandı
+- [x] Slogan: "Where memories never fade."
+
+### Kritik Kararlar
+- Resend region: Ireland (eu-west-1) — Kafkasya/Türkiye pazarına en yakın ve GDPR uyumlu
+- Logo konsepti: lotus (yeniden doğuş, sonsuzluk, saflık — tüm kültürlerde evrensel)
+- SVG transform yaklaşımı: rotate() ile 5 yaprak, hardcoded path yerine daha temiz
+
+### Nerede Kaldık
+Tüm değişiklikler push edildi. Vercel deploy başladı. `src/app/icon.svg` ve `BrandLogo.tsx` aktif.
+
+### Sıradaki Adım
+1. `theeternalmemory.com` Vercel'de production domain olarak ayarlanmalı (şu an `themaradi.vercel.app` + `theeternalmemory.com` var)
+2. OG image (open graph / Twitter card) için görsel oluşturulmalı
+3. AI ile üretilen logo gelince gerçek PNG/SVG dosyasıyla `icon.svg` ve `BrandLogo.tsx` güncellenecek
 
 ---
 

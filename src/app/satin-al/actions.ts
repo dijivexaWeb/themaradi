@@ -47,13 +47,13 @@ async function getOrCreatePurchaseUser(
 
   if (!signUpError && signUpData.user) {
     if (!signUpData.session) {
-      return {
-        error: 'Hesap oluşturuldu ama oturum açılamadı. Supabase Auth ayarlarından e-posta onayını kapatın veya giriş ekranından şifreyle giriş yapın.',
-      }
+      // Email confirmation is enabled — user must verify before logging in
+      return { user: signUpData.user, pendingEmailConfirmation: true as const }
     }
     return { user: signUpData.user }
   }
 
+  // Signup failed — user might already exist, try login
   const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
     email: senderEmail,
     password,
@@ -79,6 +79,7 @@ export async function purchaseMemorialAction(_prev: unknown, formData: FormData)
   const authResult = await getOrCreatePurchaseUser(supabase, formData, senderName, senderEmail)
   if ('error' in authResult) return { error: authResult.error }
   const user = authResult.user
+  const pendingEmailConfirmation = 'pendingEmailConfirmation' in authResult && authResult.pendingEmailConfirmation
 
   const pricing = await fetchPricingConfig()
   const amount = pricing.campaignActive && pricing.campaignMemorial
@@ -88,7 +89,11 @@ export async function purchaseMemorialAction(_prev: unknown, formData: FormData)
   const baseSlug = slugify(displayName)
   const slug = `${baseSlug}-${Date.now().toString(36)}`
 
-  const { data: vault, error: vaultErr } = await supabase.from('vaults').insert({
+  const service = await createServiceClient()
+  // When email confirmation is pending there's no session → use service client to bypass RLS
+  const dbClient = pendingEmailConfirmation ? service : supabase
+
+  const { data: vault, error: vaultErr } = await dbClient.from('vaults').insert({
     owner_id: user.id,
     display_name: displayName,
     slug,
@@ -102,7 +107,6 @@ export async function purchaseMemorialAction(_prev: unknown, formData: FormData)
   const dueDate = new Date()
   dueDate.setDate(dueDate.getDate() + 3)
 
-  const service = await createServiceClient()
   const { error: paymentErr } = await service.from('payments').insert({
     vault_id: vault.id,
     user_id: user.id,
@@ -115,6 +119,10 @@ export async function purchaseMemorialAction(_prev: unknown, formData: FormData)
     notes: `Gönderen: ${senderName} <${senderEmail}>`,
   })
   if (paymentErr) return { error: 'Ödeme kaydı oluşturulamadı: ' + paymentErr.message }
+
+  if (pendingEmailConfirmation) {
+    return { emailConfirmationSent: true as const, email: senderEmail }
+  }
 
   redirect(`/dashboard/vault/${vault.id}?purchased=1`)
 }
@@ -132,6 +140,7 @@ export async function purchaseVaultAction(_prev: unknown, formData: FormData) {
   const authResult = await getOrCreatePurchaseUser(supabase, formData, senderName, senderEmail)
   if ('error' in authResult) return { error: authResult.error }
   const user = authResult.user
+  const pendingEmailConfirmation = 'pendingEmailConfirmation' in authResult && authResult.pendingEmailConfirmation
 
   const pricing = await fetchPricingConfig()
   const setupAmount = pricing.campaignActive && pricing.campaignVaultSetup
@@ -141,7 +150,10 @@ export async function purchaseVaultAction(_prev: unknown, formData: FormData) {
   const baseSlug = slugify(displayName)
   const slug = `${baseSlug}-${Date.now().toString(36)}`
 
-  const { data: vault, error: vaultErr } = await supabase.from('vaults').insert({
+  const service = await createServiceClient()
+  const dbClient = pendingEmailConfirmation ? service : supabase
+
+  const { data: vault, error: vaultErr } = await dbClient.from('vaults').insert({
     owner_id: user.id,
     display_name: displayName,
     slug,
@@ -155,7 +167,6 @@ export async function purchaseVaultAction(_prev: unknown, formData: FormData) {
   const dueDate = new Date()
   dueDate.setDate(dueDate.getDate() + 3)
 
-  const service = await createServiceClient()
   const { error: paymentErr } = await service.from('payments').insert({
     vault_id: vault.id,
     user_id: user.id,
@@ -168,6 +179,10 @@ export async function purchaseVaultAction(_prev: unknown, formData: FormData) {
     notes: `Gönderen: ${senderName} <${senderEmail}>`,
   })
   if (paymentErr) return { error: 'Ödeme kaydı oluşturulamadı: ' + paymentErr.message }
+
+  if (pendingEmailConfirmation) {
+    return { emailConfirmationSent: true as const, email: senderEmail }
+  }
 
   redirect(`/dashboard/vault/${vault.id}?purchased=1`)
 }

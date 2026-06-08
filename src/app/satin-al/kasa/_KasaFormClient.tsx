@@ -12,6 +12,39 @@ export default function KasaFormClient({ bank, setupAmount, monthlyAmount }: { b
   const inp = 'w-full bg-slate-800 border border-slate-700 text-white placeholder-slate-500 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-emerald-500'
   const inpDisabled = 'w-full bg-slate-900 border border-slate-800 text-slate-600 placeholder-slate-700 rounded-xl px-4 py-2.5 text-sm cursor-not-allowed'
 
+  if (state && 'emailConfirmationSent' in state && state.emailConfirmationSent) {
+    return (
+      <div className="min-h-screen bg-slate-950 text-white flex flex-col items-center justify-center px-4">
+        <div className="max-w-md w-full text-center">
+          <div className="w-20 h-20 bg-emerald-500/15 rounded-full flex items-center justify-center mx-auto mb-6 text-4xl">📧</div>
+          <h1 className="text-2xl font-bold text-white mb-3">E-postanızı doğrulayın</h1>
+          <p className="text-slate-400 mb-2">
+            <span className="text-emerald-400 font-medium">{'email' in state ? state.email : ''}</span> adresine
+            bir doğrulama bağlantısı gönderdik.
+          </p>
+          <p className="text-slate-500 text-sm mb-8 leading-6">
+            Bağlantıya tıkladıktan sonra hesabınız aktif olacak ve panelinize giriş yapabileceksiniz.
+          </p>
+          <div className="bg-slate-800/60 border border-slate-700 rounded-xl p-5 text-left text-sm space-y-3 mb-6">
+            <div className="flex items-center gap-3 text-emerald-400">
+              <span>✓</span><span>Sipariş kaydedildi</span>
+            </div>
+            <div className="flex items-center gap-3 text-emerald-400">
+              <span>✓</span><span>Havale bilgileri ekibimize iletildi</span>
+            </div>
+            <div className="flex items-center gap-3 text-amber-400/70">
+              <span>⏳</span><span>E-posta doğrulama bekleniyor</span>
+            </div>
+            <div className="flex items-center gap-3 text-slate-500">
+              <span>⏳</span><span>Ödeme onayından sonra panel açılacak</span>
+            </div>
+          </div>
+          <p className="text-xs text-slate-600">E-posta gelmediyse spam klasörünü kontrol edin.</p>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <div className="min-h-screen bg-slate-950 text-white flex flex-col items-center justify-center px-4 py-16">
       <div className="max-w-lg w-full">
