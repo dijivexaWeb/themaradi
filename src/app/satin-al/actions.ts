@@ -129,11 +129,15 @@ export async function purchaseMemorialAction(_prev: unknown, formData: FormData)
   if (paymentErr) return { error: 'Ödeme kaydı oluşturulamadı: ' + paymentErr.message }
 
   if (pendingEmailConfirmation && confirmUrl) {
-    sendEmail({
-      to: senderEmail,
-      subject: `Anma sayfanızı oluşturun — The Eternal Memory`,
-      html: memorialSignupConfirmEmail({ authorName: senderName, vaultName: displayName, confirmUrl }),
-    }).catch(e => console.error('[purchaseMemorialAction] confirm email error:', e))
+    try {
+      await sendEmail({
+        to: senderEmail,
+        subject: `Anma sayfanızı oluşturun — The Eternal Memory`,
+        html: memorialSignupConfirmEmail({ authorName: senderName, vaultName: displayName, confirmUrl }),
+      })
+    } catch (e) {
+      console.error('[purchaseMemorialAction] confirm email error:', e)
+    }
     return { emailConfirmationSent: true as const, email: senderEmail }
   }
 
@@ -204,11 +208,15 @@ export async function purchaseVaultAction(_prev: unknown, formData: FormData) {
   if (paymentErr) return { error: 'Ödeme kaydı oluşturulamadı: ' + paymentErr.message }
 
   if (pendingEmailConfirmation && confirmUrl) {
-    sendEmail({
-      to: senderEmail,
-      subject: `Hesabınızı doğrulayın — The Eternal Memory`,
-      html: vaultSignupConfirmEmail({ authorName: senderName, confirmUrl }),
-    }).catch(e => console.error('[purchaseVaultAction] confirm email error:', e))
+    try {
+      await sendEmail({
+        to: senderEmail,
+        subject: `Hesabınızı doğrulayın — The Eternal Memory`,
+        html: vaultSignupConfirmEmail({ authorName: senderName, confirmUrl }),
+      })
+    } catch (e) {
+      console.error('[purchaseVaultAction] confirm email error:', e)
+    }
     return { emailConfirmationSent: true as const, email: senderEmail }
   }
 
