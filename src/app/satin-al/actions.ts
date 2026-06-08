@@ -90,6 +90,15 @@ export async function purchaseMemorialAction(_prev: unknown, formData: FormData)
   const slug = `${baseSlug}-${Date.now().toString(36)}`
 
   const service = await createServiceClient()
+
+  if (pendingEmailConfirmation) {
+    // Trigger handle_new_user may not have fired yet — ensure profiles row exists
+    await service.from('profiles').upsert(
+      { id: user.id, full_name: senderName, email: senderEmail },
+      { onConflict: 'id', ignoreDuplicates: true }
+    )
+  }
+
   // When email confirmation is pending there's no session → use service client to bypass RLS
   const dbClient = pendingEmailConfirmation ? service : supabase
 
@@ -151,6 +160,14 @@ export async function purchaseVaultAction(_prev: unknown, formData: FormData) {
   const slug = `${baseSlug}-${Date.now().toString(36)}`
 
   const service = await createServiceClient()
+
+  if (pendingEmailConfirmation) {
+    await service.from('profiles').upsert(
+      { id: user.id, full_name: senderName, email: senderEmail },
+      { onConflict: 'id', ignoreDuplicates: true }
+    )
+  }
+
   const dbClient = pendingEmailConfirmation ? service : supabase
 
   const { data: vault, error: vaultErr } = await dbClient.from('vaults').insert({
