@@ -1,0 +1,134 @@
+const BASE_STYLE = `
+  font-family: Georgia, 'Times New Roman', serif;
+  background: #fbf8f1;
+  margin: 0;
+  padding: 0;
+`
+
+const CARD_STYLE = `
+  max-width: 560px;
+  margin: 32px auto;
+  background: #ffffff;
+  border: 1px solid #e6dccb;
+  border-radius: 16px;
+  overflow: hidden;
+`
+
+const HEADER_STYLE = `
+  background: #0c3327;
+  padding: 28px 32px;
+  text-align: center;
+`
+
+const BODY_STYLE = `
+  padding: 32px;
+  color: #1f2d27;
+`
+
+const FOOTER_STYLE = `
+  padding: 20px 32px;
+  border-top: 1px solid #f0ebe0;
+  text-align: center;
+  font-size: 11px;
+  color: #adb5ab;
+  font-family: -apple-system, sans-serif;
+`
+
+function wrap(content: string): string {
+  return `<!DOCTYPE html>
+<html>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"></head>
+<body style="${BASE_STYLE}">
+  <div style="${CARD_STYLE}">
+    <div style="${HEADER_STYLE}">
+      <span style="font-size:14px;letter-spacing:0.2em;color:#c7a76f;text-transform:uppercase;">The Eternal Memory</span>
+    </div>
+    <div style="${BODY_STYLE}">
+      ${content}
+    </div>
+    <div style="${FOOTER_STYLE}">
+      © The Eternal Memory — theeternalmemory.com<br>
+      Bu email otomatik olarak gönderilmiştir, yanıtlamayınız.
+    </div>
+  </div>
+</body>
+</html>`
+}
+
+export function newGuestbookEntryEmail(params: {
+  vaultName: string
+  authorName: string
+  relation: string | null
+  message: string
+  dashboardUrl: string
+}): string {
+  return wrap(`
+    <h2 style="margin:0 0 8px;font-size:22px;color:#0c3327;">Yeni taziye mesajı</h2>
+    <p style="margin:0 0 24px;font-size:14px;color:#788177;font-family:-apple-system,sans-serif;">
+      <strong>${params.vaultName}</strong> anma sayfasına yeni bir taziye mesajı geldi.
+    </p>
+
+    <div style="background:#fbf8f1;border:1px solid #e6dccb;border-radius:12px;padding:20px;margin-bottom:24px;">
+      <p style="margin:0 0 4px;font-size:13px;color:#c7a76f;font-family:-apple-system,sans-serif;text-transform:uppercase;letter-spacing:0.1em;">
+        ${params.authorName}${params.relation ? ` · ${params.relation}` : ''}
+      </p>
+      <p style="margin:0;font-size:15px;color:#1f2d27;line-height:1.7;">${params.message}</p>
+    </div>
+
+    <p style="margin:0 0 20px;font-size:13px;color:#788177;font-family:-apple-system,sans-serif;">
+      Mesaj yayınlanmadan önce onayınızı bekliyor.
+    </p>
+
+    <a href="${params.dashboardUrl}" style="
+      display:inline-block;
+      background:#174f35;
+      color:#ffffff;
+      text-decoration:none;
+      padding:12px 24px;
+      border-radius:10px;
+      font-size:14px;
+      font-family:-apple-system,sans-serif;
+      font-weight:600;
+    ">Mesajı İncele →</a>
+  `)
+}
+
+export function messageApprovedEmail(params: {
+  vaultName: string
+  authorName: string
+  memorialUrl: string
+}): string {
+  return wrap(`
+    <h2 style="margin:0 0 8px;font-size:22px;color:#0c3327;">Mesajınız yayınlandı</h2>
+    <p style="margin:0 0 24px;font-size:14px;color:#788177;font-family:-apple-system,sans-serif;">
+      Sayın ${params.authorName},
+    </p>
+    <p style="margin:0 0 24px;font-size:15px;color:#1f2d27;line-height:1.7;font-family:-apple-system,sans-serif;">
+      <strong>${params.vaultName}</strong> anma sayfasına bıraktığınız taziye mesajı ailesi tarafından onaylandı ve sayfada yayınlandı.
+    </p>
+
+    <a href="${params.memorialUrl}" style="
+      display:inline-block;
+      background:#174f35;
+      color:#ffffff;
+      text-decoration:none;
+      padding:12px 24px;
+      border-radius:10px;
+      font-size:14px;
+      font-family:-apple-system,sans-serif;
+      font-weight:600;
+    ">Anma Sayfasını Gör →</a>
+  `)
+}
+
+export function testEmail(toName: string): string {
+  return wrap(`
+    <h2 style="margin:0 0 8px;font-size:22px;color:#0c3327;">Test emaili</h2>
+    <p style="margin:0 0 16px;font-size:15px;color:#1f2d27;font-family:-apple-system,sans-serif;">
+      Merhaba ${toName},
+    </p>
+    <p style="margin:0;font-size:15px;color:#788177;font-family:-apple-system,sans-serif;line-height:1.7;">
+      Email sistemi başarıyla yapılandırıldı. Bu mesaj The Eternal Memory admin panelinden gönderilmiştir.
+    </p>
+  `)
+}

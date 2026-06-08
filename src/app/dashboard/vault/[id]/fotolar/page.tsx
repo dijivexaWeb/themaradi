@@ -2,15 +2,26 @@ import { createClient } from '@/lib/supabase/server'
 import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
-import { addPhotoAction, deleteMediaAction } from '@/lib/actions/media'
+import { addPhotoAction, updateMediaAction, deleteMediaAction } from '@/lib/actions/media'
 import PersonHeader from '../_PersonHeader'
 
-interface Props { params: Promise<{ id: string }> }
+interface Props { params: Promise<{ id: string }>; searchParams: Promise<{ edit?: string }> }
 
 const PHOTO_LIMIT_MEMORIAL = 50
 
-export default async function FotolarPage({ params }: Props) {
+function toDatetimeLocal(iso: string | null): string {
+  if (!iso) return ''
+  const d = new Date(iso)
+  return d.getFullYear() + '-' +
+    String(d.getMonth() + 1).padStart(2, '0') + '-' +
+    String(d.getDate()).padStart(2, '0') + 'T' +
+    String(d.getHours()).padStart(2, '0') + ':' +
+    String(d.getMinutes()).padStart(2, '0')
+}
+
+export default async function FotolarPage({ params, searchParams }: Props) {
   const { id } = await params
+  const { edit: editId } = await searchParams
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
@@ -29,6 +40,9 @@ export default async function FotolarPage({ params }: Props) {
   const isMemorial = vault.product_type === 'memorial_profile'
   const atLimit = (photos?.length ?? 0) >= (isMemorial ? PHOTO_LIMIT_MEMORIAL : Infinity)
   const addPhoto = addPhotoAction.bind(null, id)
+
+  const editingPhoto = editId ? photos?.find((p) => p.id === editId) : null
+  const todayMax = new Date().toISOString().slice(0, 16)
 
   const inputCls = `w-full rounded-xl border border-[#e5dccb] bg-white px-4 py-3 text-sm text-[#1f2d27] placeholder-[#adb5ab] outline-none focus:border-[#174f35] focus:ring-2 focus:ring-[#174f35]/10`
   const labelCls = `mb-1.5 block text-xs font-semibold text-[#4a5e55]`
@@ -61,14 +75,63 @@ export default async function FotolarPage({ params }: Props) {
           </div>
         </div>
 
+        {/* Edit form */}
+        {editingPhoto && !isLocked && (
+          <div className="rounded-3xl border border-[#c7a76f]/40 bg-[#fff9ee] p-6 shadow-[0_4px_24px_rgba(64,48,24,0.08)] mb-8">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <span className="text-lg">✏️</span>
+                <h2 className="font-semibold text-[#1f2d27]">Fotoğrafı Düzenle</h2>
+              </div>
+              <Link href={`/dashboard/vault/${id}/fotolar`} className="text-xs text-[#788177] hover:text-[#174f35]">İptal</Link>
+            </div>
+            <div className="flex gap-4 items-start mb-5">
+              <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl border border-[#e5dccb] bg-[#f5efdf]">
+                <Image src={editingPhoto.thumb_url ?? editingPhoto.original_url} alt="" fill className="object-cover" unoptimized />
+              </div>
+              <p className="text-xs text-[#788177] leading-5 mt-1">Fotoğraf değiştirilemez. Değiştirmek için bu fotoğrafı silip yeniden yükleyin.</p>
+            </div>
+            <form action={updateMediaAction.bind(null, editingPhoto.id, id, `/dashboard/vault/${id}/fotolar`)} className="space-y-4">
+              <div className="grid sm:grid-cols-2 gap-4">
+                <div>
+                  <label className={labelCls}>Fotoğraf Adı</label>
+                  <input type="text" name="title" defaultValue={editingPhoto.original_filename ?? ''} placeholder="Piknik, 1985" className={inputCls} />
+                </div>
+                <div>
+                  <label className={labelCls}>Çekildiği Tarih</label>
+                  <input type="datetime-local" name="taken_at" max={todayMax} defaultValue={toDatetimeLocal(editingPhoto.taken_at)} className={inputCls} />
+                </div>
+              </div>
+              <div className="grid sm:grid-cols-2 gap-4">
+                <div>
+                  <label className={labelCls}>Görünürlük</label>
+                  <select name="visibility" defaultValue={editingPhoto.is_public ? 'public' : 'private'}
+                    className="w-full rounded-xl border border-[#e5dccb] bg-white px-4 py-3 text-sm text-[#1f2d27] outline-none focus:border-[#174f35]">
+                    <option value="private">Gizli</option>
+                    <option value="public">Herkese açık</option>
+                  </select>
+                </div>
+                <div>
+                  <label className={labelCls}>Not</label>
+                  <input type="text" name="caption" defaultValue={(editingPhoto as Record<string, unknown>).caption as string ?? ''} placeholder="Kısa bir not..." className={inputCls} />
+                </div>
+              </div>
+              <button type="submit"
+                className="rounded-xl bg-[#174f35] px-6 py-3 text-sm font-semibold text-white shadow-[0_14px_35px_rgba(23,79,53,0.18)] hover:bg-[#123f2b] transition-colors">
+                Kaydet
+              </button>
+            </form>
+          </div>
+        )}
+
         {/* Upload form */}
-        {!isLocked && !atLimit && (
+        {!isLocked && !atLimit && !editingPhoto && (
           <div className="rounded-3xl border border-[#e5dccb] bg-[#fffdf8] p-6 shadow-[0_4px_24px_rgba(64,48,24,0.05)] mb-10">
             <div className="flex items-center gap-2 mb-4">
               <span className="text-lg">📤</span>
               <h2 className="font-semibold text-[#1f2d27]">Fotoğraf Ekle</h2>
             </div>
-            <form action={addPhoto} encType="multipart/form-data" className="space-y-4">
+            <form action={addPhoto} className="space-y-4">
               <div className="grid sm:grid-cols-2 gap-4">
                 <div>
                   <label className={labelCls}>Dosya Yükle</label>
@@ -86,12 +149,12 @@ export default async function FotolarPage({ params }: Props) {
                   <input type="text" name="title" placeholder="Piknik, 1985" className={inputCls} />
                 </div>
                 <div>
-                  <label className={labelCls}>Çekildiği tarih <span className="text-[#dfbd72]">*</span></label>
-                  <input type="datetime-local" name="taken_at" required className={inputCls} />
+                  <label className={labelCls}>Çekildiği tarih</label>
+                  <input type="datetime-local" name="taken_at" max={todayMax} className={inputCls} />
                 </div>
                 <div>
-                  <label className={labelCls}>Görünürlük <span className="text-[#dfbd72]">*</span></label>
-                  <select name="visibility" required defaultValue="private"
+                  <label className={labelCls}>Görünürlük</label>
+                  <select name="visibility" defaultValue="private"
                     className="w-full rounded-xl border border-[#e5dccb] bg-white px-4 py-3 text-sm text-[#1f2d27] outline-none focus:border-[#174f35]">
                     <option value="private">Gizli</option>
                     <option value="public">Herkese açık</option>
@@ -99,8 +162,8 @@ export default async function FotolarPage({ params }: Props) {
                 </div>
               </div>
               <div>
-                <label className={labelCls}>Not <span className="text-[#dfbd72]">*</span></label>
-                <textarea name="caption" required rows={2} minLength={3}
+                <label className={labelCls}>Not</label>
+                <textarea name="caption" rows={2}
                   placeholder="Bu fotoğraf hakkında birkaç kelime..."
                   className={inputCls + ' resize-none'} />
               </div>
@@ -129,8 +192,9 @@ export default async function FotolarPage({ params }: Props) {
           <div className="columns-2 sm:columns-3 lg:columns-4 gap-3">
             {photos.map((photo) => {
               const del = deleteMediaAction.bind(null, id, photo.id)
+              const isEditing = photo.id === editId
               return (
-                <div key={photo.id} className="break-inside-avoid mb-3 group relative rounded-2xl overflow-hidden border border-[#e5dccb] bg-white hover:shadow-md hover:border-[#174f35]/20 transition-all">
+                <div key={photo.id} className={`break-inside-avoid mb-3 group relative rounded-2xl overflow-hidden border bg-white transition-all ${isEditing ? 'border-[#c7a76f]' : 'border-[#e5dccb] hover:shadow-md hover:border-[#174f35]/20'}`}>
                   <Image
                     src={photo.thumb_url ?? photo.original_url}
                     alt={photo.original_filename ?? 'Fotoğraf'}
@@ -140,35 +204,34 @@ export default async function FotolarPage({ params }: Props) {
                     style={{ width: '100%', height: 'auto' }}
                     unoptimized
                   />
-
-                  {/* Hover overlay */}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-
-                  {/* Badge */}
                   <div className="absolute top-2 left-2">
                     <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-semibold ${photo.is_public ? 'bg-[#174f35] text-white' : 'bg-black/50 text-white'}`}>
                       {photo.is_public ? 'Açık' : 'Gizli'}
                     </span>
                   </div>
-
-                  {/* Delete */}
                   {!isLocked && (
-                    <form action={del} className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <button type="submit" className="h-6 w-6 rounded-full bg-white/90 text-red-500 hover:bg-red-50 border border-red-200 text-xs font-bold shadow-sm">
-                        ×
-                      </button>
-                    </form>
+                    <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Link
+                        href={`/dashboard/vault/${id}/fotolar?edit=${photo.id}`}
+                        className="flex h-6 w-6 items-center justify-center rounded-full bg-white/90 text-[#174f35] border border-[#e5dccb] text-xs shadow-sm hover:bg-[#f5efdf]"
+                        title="Düzenle"
+                      >✏️</Link>
+                      <form action={del}>
+                        <button type="submit" className="h-6 w-6 rounded-full bg-white/90 text-red-500 hover:bg-red-50 border border-red-200 text-xs font-bold shadow-sm" title="Sil">
+                          ×
+                        </button>
+                      </form>
+                    </div>
                   )}
-
-                  {/* Caption */}
                   <div className="absolute bottom-0 left-0 right-0 px-3 py-2.5 opacity-0 group-hover:opacity-100 transition-opacity">
                     {photo.taken_at && (
                       <p className="text-[10px] text-white/80 mb-0.5">
                         {new Date(photo.taken_at).toLocaleDateString('tr-TR', { year: 'numeric', month: 'short', day: 'numeric' })}
                       </p>
                     )}
-                    {photo.caption && (
-                      <p className="text-xs text-white line-clamp-2 leading-4">{photo.caption}</p>
+                    {(photo as Record<string, unknown>).caption && (
+                      <p className="text-xs text-white line-clamp-2 leading-4">{(photo as Record<string, unknown>).caption as string}</p>
                     )}
                   </div>
                 </div>

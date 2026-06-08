@@ -70,18 +70,19 @@ async function resolveMediaLocation(vaultId: string, userId: string, formData: F
   const file = formData.get('file')
 
   if (file instanceof File && file.size > 0) {
-    const validPhoto = kind === 'image' && file.type.startsWith('image/') && file.size <= MAX_PHOTO_BYTES
-    const validVideo = kind === 'video' && file.type.startsWith('video/') && file.size <= MAX_VIDEO_BYTES
-    if (!validPhoto && !validVideo) return null
+    const maxBytes = kind === 'video' ? MAX_VIDEO_BYTES : MAX_PHOTO_BYTES
+    const validType = kind === 'video' ? file.type.startsWith('video/') : file.type.startsWith('image/')
+    if (!validType) { console.error('[resolveMediaLocation] invalid file type:', file.type, 'for kind:', kind); return null }
+    if (file.size > maxBytes) { console.error('[resolveMediaLocation] file too large:', file.size); return null }
 
     const service = await createServiceClient()
     const filename = cleanFilename(file.name)
-    const path = `${vaultId}/${userId}/${Date.now()}-${filename}`
+    const path = `${kind}s/${vaultId}/${userId}/${Date.now()}-${filename}`
     const { error } = await service.storage.from(MEDIA_BUCKET).upload(path, file, {
       contentType: file.type,
       upsert: false,
     })
-    if (error) return null
+    if (error) { console.error('[resolveMediaLocation] storage upload error:', error); return null }
 
     const { data } = service.storage.from(MEDIA_BUCKET).getPublicUrl(path)
     return {
@@ -105,6 +106,7 @@ async function resolveMediaLocation(vaultId: string, userId: string, formData: F
     }
   }
 
+  console.error('[resolveMediaLocation] no file and no url provided for kind:', kind)
   return null
 }
 
@@ -112,17 +114,16 @@ export async function addPhotoAction(vaultId: string, formData: FormData): Promi
   const owned = await getOwnedVault(vaultId, 'image')
   if (!owned) return
 
-  const caption = (formData.get('caption') as string | null)?.trim()
+  const caption = (formData.get('caption') as string | null)?.trim() || null
   const takenAt = normalizeTakenAt(formData.get('taken_at'))
   const visibility = normalizeVisibility(formData)
-  if (!caption || !takenAt) return
 
   const location = await resolveMediaLocation(vaultId, owned.user.id, formData, 'image')
   if (!location) return
 
   const title = (formData.get('title') as string | null)?.trim()
 
-  await owned.supabase.from('media').insert({
+  const { error } = await owned.supabase.from('media').insert({
     vault_id: vaultId,
     uploader_id: owned.user.id,
     original_url: location.originalUrl,
@@ -139,9 +140,11 @@ export async function addPhotoAction(vaultId: string, formData: FormData): Promi
     original_filename: title || location.filename || 'Fotoğraf',
   })
 
+  if (error) { console.error('[addPhotoAction] insert error:', error); return }
+
   revalidatePath(`/dashboard/vault/${vaultId}/fotolar`)
   revalidatePath(`/dashboard/vault/${vaultId}`)
-  revalidatePath(`/dashboard/vault/${vaultId}/onizleme`)
+  redirect(`/dashboard/vault/${vaultId}/fotolar`)
 }
 
 export async function addVideoAction(vaultId: string, formData: FormData): Promise<void> {
@@ -149,16 +152,15 @@ export async function addVideoAction(vaultId: string, formData: FormData): Promi
   if (!owned) return
 
   const visibility = normalizeVisibility(formData)
-  const caption = (formData.get('caption') as string | null)?.trim()
+  const caption = (formData.get('caption') as string | null)?.trim() || null
   const takenAt = normalizeTakenAt(formData.get('taken_at'))
-  if (!caption || !takenAt) return
 
   const location = await resolveMediaLocation(vaultId, owned.user.id, formData, 'video')
   if (!location) return
 
   const title = (formData.get('title') as string | null)?.trim()
 
-  await owned.supabase.from('media').insert({
+  const { error } = await owned.supabase.from('media').insert({
     vault_id: vaultId,
     uploader_id: owned.user.id,
     original_url: location.originalUrl,
@@ -174,9 +176,39 @@ export async function addVideoAction(vaultId: string, formData: FormData): Promi
     original_filename: title || location.filename || 'Video',
   })
 
+  if (error) { console.error('[addVideoAction] insert error:', error); return }
+
   revalidatePath(`/dashboard/vault/${vaultId}/videolar`)
   revalidatePath(`/dashboard/vault/${vaultId}`)
-  revalidatePath(`/dashboard/vault/${vaultId}/onizleme`)
+  redirect(`/dashboard/vault/${vaultId}/videolar`)
+}
+
+export async function updateMediaAction(mediaId: string, vaultId: string, redirectTo: string, formData: FormData): Promise<void> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) redirect('/login')
+
+  const { data: vault } = await supabase.from('vaults').select('id').eq('id', vaultId).eq('owner_id', user.id).single()
+  if (!vault) return
+
+  const title = (formData.get('title') as string | null)?.trim() || null
+  const caption = (formData.get('caption') as string | null)?.trim() || null
+  const takenAt = normalizeTakenAt(formData.get('taken_at'))
+  const visibility = normalizeVisibility(formData)
+  const isPublic = visibility === 'public'
+
+  await supabase.from('media').update({
+    original_filename: title,
+    caption,
+    taken_at: takenAt,
+    visibility,
+    is_public: isPublic,
+  }).eq('id', mediaId).eq('vault_id', vaultId)
+
+  revalidatePath(`/dashboard/vault/${vaultId}/fotolar`)
+  revalidatePath(`/dashboard/vault/${vaultId}/videolar`)
+  revalidatePath(`/dashboard/vault/${vaultId}`)
+  redirect(redirectTo)
 }
 
 export async function deleteMediaAction(vaultId: string, mediaId: string): Promise<void> {

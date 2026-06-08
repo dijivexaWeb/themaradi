@@ -128,7 +128,7 @@ export default function LoginPage() {
       <div className="w-full max-w-md relative">
         <div className="text-center mb-8">
           <Link href="/" className="inline-block font-bold text-2xl tracking-tight gradient-text mb-4">
-            themaradi
+            The Eternal Memory
           </Link>
 
           <div className="flex justify-center gap-1 mb-4">

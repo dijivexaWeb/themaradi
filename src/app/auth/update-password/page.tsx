@@ -45,7 +45,7 @@ export default function UpdatePasswordPage() {
       <div className="w-full max-w-md">
         <div className="mb-8 text-center">
           <Link href="/" className="gradient-text mb-4 inline-block text-2xl font-bold tracking-tight">
-            themaradi
+            The Eternal Memory
           </Link>
           <h1 className="text-xl font-semibold text-slate-100">Şifre Belirle</h1>
           <p className="mt-2 text-sm text-slate-500">

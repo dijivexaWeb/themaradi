@@ -93,7 +93,7 @@ export default async function BelgelerPage({ params }: Props) {
               <span className="text-lg">📤</span>
               <h2 className="font-semibold text-[#1f2d27]">Belge Yükle</h2>
             </div>
-            <form action={uploadAction} encType="multipart/form-data" className="space-y-4">
+            <form action={uploadAction} className="space-y-4">
               <div>
                 <label className={labelCls}>Dosya Seç <span className="text-[#dfbd72]">*</span></label>
                 <input type="file" name="files" multiple required

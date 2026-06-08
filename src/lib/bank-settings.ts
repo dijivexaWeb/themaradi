@@ -9,7 +9,7 @@ export interface BankSettings {
 const DEFAULTS: BankSettings = {
   iban: 'GE29TB7522145061700002',
   bankName: 'TBC Bank',
-  recipient: 'The Maradi LLC',
+  recipient: 'The Eternal Memory LLC',
 }
 
 export async function getBankSettings(): Promise<BankSettings> {

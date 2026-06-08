@@ -125,7 +125,7 @@ export default async function SettingsPage({ params }: Props) {
                   <span className="text-[#174f35]">🔗</span>
                   <div className="flex-1 min-w-0">
                     <p className="text-xs text-[#788177] mb-0.5">Mevcut adres</p>
-                    <p className="text-sm font-mono text-[#174f35] truncate">themaradi.com/ani-alanim/{vault.slug}</p>
+                    <p className="text-sm font-mono text-[#174f35] truncate">theeternalmemory.com/ani-alanim/{vault.slug}</p>
                   </div>
                   <Link href={`/ani-alanim/${vault.slug}`} target="_blank"
                     className="text-xs text-[#788177] hover:text-[#174f35] transition-colors shrink-0">

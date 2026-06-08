@@ -31,7 +31,7 @@ export default async function DashboardPage() {
             Anı alanınız henüz aktif değil.
           </h1>
           <p className="mt-5 max-w-2xl text-sm leading-7 text-[#6f766f]">
-            The Maradi hesabı satın alma sonrası veya admin tarafından tanımlanan muafiyetle açılır. Ücretsiz anı alanı oluşturulmaz.
+            The Eternal Memory hesabı satın alma sonrası veya admin tarafından tanımlanan muafiyetle açılır. Ücretsiz anı alanı oluşturulmaz.
           </p>
 
           <div className="mt-8 flex flex-wrap gap-3">

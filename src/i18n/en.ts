@@ -64,7 +64,7 @@ const en = {
     },
 
     whySection: {
-      heading: 'Why The Maradi?',
+      heading: 'Why The Eternal Memory?',
       sub: 'Transforms more than a gravestone into a respectful, permanent digital memorial experience.',
     },
 
@@ -91,7 +91,7 @@ const en = {
       },
       {
         title: 'Lifetime uptime commitment',
-        text: 'The Maradi commits to permanent operation. Memorial Profiles remain accessible for life; no extra charges or renewals. QR plates are never invalidated.',
+        text: 'The Eternal Memory commits to permanent operation. Memorial Profiles remain accessible for life; no extra charges or renewals. QR plates are never invalidated.',
       },
     ],
 
@@ -214,7 +214,7 @@ const en = {
       },
       {
         q: 'How long does the QR plate last?',
-        a: 'The Maradi QR code is tied to a unique ID in the database, not a slug or domain name. Even if the domain changes, the plate works. The Maradi is under a lifetime uptime commitment; QR plates are never invalidated.',
+        a: 'The Eternal Memory QR code is tied to a unique ID in the database, not a slug or domain name. Even if the domain changes, the plate works. The Eternal Memory is under a lifetime uptime commitment; QR plates are never invalidated.',
       },
       {
         q: 'Why do you require an ID document?',
@@ -222,7 +222,7 @@ const en = {
       },
       {
         q: 'What happens if the platform shuts down?',
-        a: 'The Maradi makes a lifetime uptime commitment. Created Memorial Profiles are permanent; no extra charges, subscriptions or renewals required. QR plates are never invalidated — the redirect works even if the domain or URL changes.',
+        a: 'The Eternal Memory makes a lifetime uptime commitment. Created Memorial Profiles are permanent; no extra charges, subscriptions or renewals required. QR plates are never invalidated — the redirect works even if the domain or URL changes.',
       },
       {
         q: 'Can family members add content?',
@@ -259,7 +259,7 @@ const en = {
       platformLinks: [
         { label: 'Home', href: '/' },
         { label: 'How it works', href: '#nasil-calisir' },
-        { label: 'Why The Maradi?', href: '#ozellikler' },
+        { label: 'Why The Eternal Memory?', href: '#ozellikler' },
         { label: 'Demo Profile', href: '/memorial/demo' },
         { label: 'Pricing', href: '/pricing' },
         { label: 'FAQ', href: '#sss' },
@@ -273,12 +273,12 @@ const en = {
         { label: 'Terms of Service', href: '/terms' },
         { label: 'Verification Policy', href: '/legal/verification-policy' },
       ],
-      copyright: '© 2026 The Maradi. All rights reserved.',
+      copyright: '© 2026 The Eternal Memory. All rights reserved.',
     },
   },
 
   pricing: {
-    pageTitle: 'Pricing — The Maradi',
+    pageTitle: 'Pricing — The Eternal Memory',
     nav: {
       home: 'Home',
       demoProfile: 'Demo Profile',
@@ -441,14 +441,14 @@ const en = {
       privacy: 'Privacy',
       terms: 'Terms',
       contact: 'Contact',
-      copyright: '© 2026 The Maradi',
+      copyright: '© 2026 The Eternal Memory',
     },
     bulkContact: 'For corporate or bulk orders,',
     bulkContactLink: 'contact us',
   },
 
   contact: {
-    pageTitle: 'Contact — The Maradi',
+    pageTitle: 'Contact — The Eternal Memory',
     nav: {
       home: 'Home',
       pricing: 'Pricing',
@@ -509,7 +509,7 @@ const en = {
       privacy: 'Privacy',
       terms: 'Terms',
       pricing: 'Pricing',
-      copyright: '© 2026 The Maradi',
+      copyright: '© 2026 The Eternal Memory',
     },
   },
 
@@ -545,7 +545,7 @@ const en = {
       footerPrivacy: 'Privacy',
       footerTerms: 'Terms',
       footerContact: 'Contact',
-      copyright: '© 2026 The Maradi',
+      copyright: '© 2026 The Eternal Memory',
     },
 
     privacy: {
@@ -570,11 +570,11 @@ const en = {
       sections: {
         controller: {
           h: '1. Data Controller',
-          p1: 'This policy belongs to the data controller operating under the trade name The Maradi and registered at the address below:',
+          p1: 'This policy belongs to the data controller operating under the trade name The Eternal Memory and registered at the address below:',
           address: 'Petre Bagrationi Str. 220, Batumi, Georgia',
-          email: 'privacy@themaradi.com',
+          email: 'privacy@theeternalmemory.com',
           tel: '+995 555 511 884',
-          p2: 'The Maradi processes your personal data under the Georgian Personal Data Protection Law (2012, rev. 2024), the EU General Data Protection Regulation (GDPR — 2016/679) and for users residing in Turkey, under the KVKK Law No. 6698.',
+          p2: 'The Eternal Memory processes your personal data under the Georgian Personal Data Protection Law (2012, rev. 2024), the EU General Data Protection Regulation (GDPR — 2016/679) and for users residing in Turkey, under the KVKK Law No. 6698.',
         },
         collected: {
           h: '2. Data Collected',
@@ -601,7 +601,7 @@ const en = {
         },
         special: {
           h: '4. Special Category Data',
-          p: 'Death certificates and biometric images that may be included in them fall under the category of special category personal data. The Maradi processes these documents solely for identity verification of Memorial Profile applications and permanently deletes them within 30 days.',
+          p: 'Death certificates and biometric images that may be included in them fall under the category of special category personal data. The Eternal Memory processes these documents solely for identity verification of Memorial Profile applications and permanently deletes them within 30 days.',
         },
         retention: {
           h: '5. Retention Periods',
@@ -649,7 +649,7 @@ const en = {
             'Complaint: you may file a complaint with the Georgian Personal Data Protection Service',
           ],
           contact: 'To exercise your rights:',
-          email: 'privacy@themaradi.com',
+          email: 'privacy@theeternalmemory.com',
           note: 'We respond within 30 days.',
         },
         cookies: {
@@ -658,7 +658,7 @@ const en = {
         },
         children: {
           h: '11. Children\'s Privacy',
-          p: 'The Maradi does not knowingly collect personal data from individuals under 16. If you believe a child has provided personal data, please contact us at privacy@themaradi.com.',
+          p: 'The Eternal Memory does not knowingly collect personal data from individuals under 16. If you believe a child has provided personal data, please contact us at privacy@theeternalmemory.com.',
         },
         changes: {
           h: '12. Changes',
@@ -666,7 +666,7 @@ const en = {
         },
         contactSection: {
           h: '13. Contact',
-          email: 'privacy@themaradi.com',
+          email: 'privacy@theeternalmemory.com',
           tel: '+995 555 511 884',
           address: 'Petre Bagrationi Str. 220, Batumi, Georgia',
         },
@@ -695,12 +695,12 @@ const en = {
       content: {
         parties: {
           h: '1. Parties and Scope',
-          p1: 'These Terms of Service constitute the agreement between The Maradi (Petre Bagrationi Str. 220, Batumi, Georgia — hereinafter "The Maradi", "we", "our") and the natural or legal person ("User", "you") using the platform. By starting to use the platform, you are deemed to have accepted these terms.',
+          p1: 'These Terms of Service constitute the agreement between The Eternal Memory (Petre Bagrationi Str. 220, Batumi, Georgia — hereinafter "The Eternal Memory", "we", "our") and the natural or legal person ("User", "you") using the platform. By starting to use the platform, you are deemed to have accepted these terms.',
           p2: 'If you are under 18, you cannot use the platform. If you are applying on behalf of a third person, you declare that you are authorized on behalf of that person.',
         },
         services: {
           h: '2. Services',
-          p: 'The Maradi offers two main products:',
+          p: 'The Eternal Memory offers two main products:',
           memorialH: '2.1 Memorial Profile',
           memorialP: 'A digital memorial profile created by family or authorized relatives for a deceased person, subject to a one-time fee. The profile covers biography, photos, videos, cemetery information and QR plate service. Identity verification and 14-day objection process are applied before going live.',
           vaultH: '2.2 Life Vault',
@@ -730,12 +730,12 @@ const en = {
         },
         content: {
           h: '7. Content Rights',
-          p1: 'You retain all copyright of content you upload. You grant The Maradi a non-exclusive license to store, display and back up your content for the purpose of providing the service.',
-          p2: 'The Maradi may remove content that violates the law or these terms without notice.',
+          p1: 'You retain all copyright of content you upload. You grant The Eternal Memory a non-exclusive license to store, display and back up your content for the purpose of providing the service.',
+          p2: 'The Eternal Memory may remove content that violates the law or these terms without notice.',
         },
         liability: {
           h: '8. Liability Limitation',
-          p: 'The Maradi\'s total liability for direct damages is limited to the total fees paid by the user in the last 12 months. No responsibility is accepted for indirect, incidental or consequential damages.',
+          p: 'The Eternal Memory\'s total liability for direct damages is limited to the total fees paid by the user in the last 12 months. No responsibility is accepted for indirect, incidental or consequential damages.',
         },
         suspension: {
           h: '9. Account Suspension',
@@ -752,7 +752,7 @@ const en = {
         },
         continuity: {
           h: '11. Service Continuity Commitment',
-          p: 'The Maradi undertakes to keep Memorial Profiles permanently accessible. In the event of service closure, users will be notified at least 6 months in advance and provided with data export opportunity.',
+          p: 'The Eternal Memory undertakes to keep Memorial Profiles permanently accessible. In the event of service closure, users will be notified at least 6 months in advance and provided with data export opportunity.',
         },
         law: {
           h: '12. Applicable Law',
@@ -778,7 +778,7 @@ const en = {
       sections: {
         controller: {
           h: '1. Data Controller',
-          p: 'The Maradi processes user data within the scope of digital memorial profile and life vault services in accordance with the Personal Data Protection Law (KVKK) No. 6698. Data controller: The Maradi — Petre Bagrationi Str. 220, Batumi, Georgia. Contact: privacy@themaradi.com',
+          p: 'The Eternal Memory processes user data within the scope of digital memorial profile and life vault services in accordance with the Personal Data Protection Law (KVKK) No. 6698. Data controller: The Eternal Memory — Petre Bagrationi Str. 220, Batumi, Georgia. Contact: privacy@theeternalmemory.com',
         },
         categories: {
           h: '2. Data Categories Processed',
@@ -801,7 +801,7 @@ const en = {
           h: '4. Your Rights under KVKK',
           p1: 'Under KVKK Article 11; you have the rights to learn whether your personal data is being processed, to request information if it has been processed, to learn whether it is being used in accordance with its purpose, to know the third parties to whom it has been transferred domestically or abroad, to request correction of incomplete or incorrectly processed data, to request deletion or destruction, to request notification to the persons to whom these operations have been transferred, to object to a result that is against you through automated systems, and to request compensation for damages if you suffer.',
           p2: 'For applications:',
-          email: 'privacy@themaradi.com',
+          email: 'privacy@theeternalmemory.com',
           note: '— We respond within 30 days.',
         },
       },
@@ -858,7 +858,7 @@ const en = {
       sections: {
         purpose: {
           h: '1. Purpose and Scope',
-          p: 'This policy explains the identity verification process, required documents, review steps and 14-day objection window applied when creating a Memorial Profile on The Maradi platform. All Memorial Profile applications are subject to this policy.',
+          p: 'This policy explains the identity verification process, required documents, review steps and 14-day objection window applied when creating a Memorial Profile on The Eternal Memory platform. All Memorial Profile applications are subject to this policy.',
         },
         why: {
           h: '2. Why is Verification Required?',
@@ -868,7 +868,7 @@ const en = {
             'Can cause deep psychological trauma to family members,',
             'Can become a tool for crimes such as fraud, inheritance irregularity or defamation.',
           ],
-          p2: 'For this reason, The Maradi requires document verification and objection window for every Memorial Profile application. This process is not one-sided suspicion; it is a standard procedure applied equally to all applications.',
+          p2: 'For this reason, The Eternal Memory requires document verification and objection window for every Memorial Profile application. This process is not one-sided suspicion; it is a standard procedure applied equally to all applications.',
         },
         documents: {
           h: '3. Required Documents',
@@ -876,7 +876,7 @@ const en = {
           items2a: ['National ID card or passport (front side)'],
           h2b: '3.2 Death Proof',
           items2b: ['Official death certificate', 'Or a document of equivalent official status'],
-          note: 'Documents are reviewed only by authorized The Maradi employees. They are stored encrypted and permanently deleted from the system within 30 days after review.',
+          note: 'Documents are reviewed only by authorized The Eternal Memory employees. They are stored encrypted and permanently deleted from the system within 30 days after review.',
         },
         process: {
           h: '4. Verification Process',
@@ -902,7 +902,7 @@ const en = {
           h: '6. How to Object?',
           methods: [
             'Click the "Report This Profile" button on the profile page',
-            'Send an email to: privacy@themaradi.com',
+            'Send an email to: privacy@theeternalmemory.com',
             'By phone: +995 555 511 884',
           ],
           p: 'The objection must contain: your name, your relationship to the profile, your contact information, and supporting document if possible.',
@@ -940,11 +940,11 @@ const en = {
         },
         appeal: {
           h: '11. Objection Rejection and Appeal',
-          p: 'If your objection is rejected, you can re-apply with additional evidence by contacting privacy@themaradi.com. If you believe the decision is incorrect, you can appeal to the Georgian Personal Data Protection Service.',
+          p: 'If your objection is rejected, you can re-apply with additional evidence by contacting privacy@theeternalmemory.com. If you believe the decision is incorrect, you can appeal to the Georgian Personal Data Protection Service.',
         },
         contactSection: {
           h: '12. Contact',
-          email: 'privacy@themaradi.com',
+          email: 'privacy@theeternalmemory.com',
           tel: '+995 555 511 884',
           address: 'Petre Bagrationi Str. 220, Batumi, Georgia',
         },

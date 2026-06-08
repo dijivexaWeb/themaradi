@@ -2,7 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import Image from 'next/image'
 import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
-import { Eye, Users, BookOpen, MessageCircle, ImageIcon, Video, UserRound } from 'lucide-react'
+import { Eye, Users, BookOpen, MessageCircle, ImageIcon, Video, UserRound, Mic } from 'lucide-react'
 
 interface Props {
   params: Promise<{ id: string }>
@@ -32,6 +32,8 @@ export default async function MemoryAreaPage({ params, searchParams }: Props) {
     { data: recentPhotos, count: photoCount },
     { data: recentVideos, count: videoCount },
     { data: linkedQRs },
+    { data: recentAudio, count: audioCount },
+    { count: pendingGuestbookCount },
   ] = await Promise.all([
     supabase.from('vault_family_members')
       .select('id, full_name, relationship, photo_url', { count: 'exact' })
@@ -49,6 +51,8 @@ export default async function MemoryAreaPage({ params, searchParams }: Props) {
       .eq('vault_id', id).eq('media_type', 'video')
       .order('sort_order', { ascending: true }).limit(3),
     supabase.from('dynamic_qr').select('qr_hash').eq('target_vault_id', id),
+    supabase.from('vault_audio_recordings').select('id, title, author', { count: 'exact' }).eq('vault_id', id).order('sort_order').limit(3),
+    supabase.from('guestbook_entries').select('id', { count: 'exact' }).eq('vault_id', id).eq('status', 'pending'),
   ])
 
   const isLocked = area.status === 'pending_verification'
@@ -141,7 +145,7 @@ export default async function MemoryAreaPage({ params, searchParams }: Props) {
                   {area.slug && (
                     <Link href={`/memorial/${area.slug}`} target="_blank"
                       className="mt-1 inline-block text-xs text-[#174f35] font-medium hover:underline">
-                      themaradi.com/ani-alanim/{area.slug} →
+                      theeternalmemory.com/ani-alanim/{area.slug} →
                     </Link>
                   )}
                 </div>
@@ -425,12 +429,92 @@ export default async function MemoryAreaPage({ params, searchParams }: Props) {
             </div>
           )}
 
+          {/* ══ BLOK 7: SES KAYITLARI ══ */}
+          {(audioCount ?? 0) > 0 ? (
+            <div className={blockCls}>
+              <div className={sectionHeaderCls}>
+                <div className="flex items-center gap-2">
+                  <Mic className="h-4 w-4 text-[#b08340]" />
+                  <span className="text-sm font-semibold text-[#1f2d27]">Ses Kayıtları</span>
+                  <span className="text-xs text-[#adb5ab]">{audioCount} kayıt</span>
+                </div>
+                <Link href={`/dashboard/vault/${id}/ses-kayitlari`} className={editBtnCls}>Düzenle →</Link>
+              </div>
+              <div className="p-5 space-y-2">
+                {recentAudio?.map((rec) => (
+                  <div key={rec.id} className="flex items-center gap-3 rounded-xl border border-[#f0ebe0] bg-white px-4 py-3">
+                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#174f35]/10 text-[#174f35]">
+                      <Mic className="h-4 w-4" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-medium text-[#1f2d27]">{rec.title}</p>
+                      {rec.author && <p className="truncate text-xs text-[#788177]">{rec.author}</p>}
+                    </div>
+                  </div>
+                ))}
+                {(audioCount ?? 0) > 3 && (
+                  <Link href={`/dashboard/vault/${id}/ses-kayitlari`}
+                    className="block text-center text-xs text-[#174f35] font-medium hover:underline pt-1">
+                    Tüm {audioCount} kaydı gör →
+                  </Link>
+                )}
+              </div>
+            </div>
+          ) : (
+            <div className={emptyBlockCls}>
+              <div className={sectionHeaderCls}>
+                <div className="flex items-center gap-2">
+                  <Mic className="h-4 w-4 text-[#c8bfb0]" />
+                  <span className="text-sm font-semibold text-[#adb5ab]">Ses Kayıtları</span>
+                </div>
+                <Link href={`/dashboard/vault/${id}/ses-kayitlari`} className={addBtnCls}>+ Ses Ekle</Link>
+              </div>
+              <div className="p-5 space-y-2">
+                {[0, 1].map(i => (
+                  <div key={i} className="flex items-center gap-3 rounded-xl border border-[#f0ebe0] bg-white px-4 py-3">
+                    <div className="h-9 w-9 shrink-0 rounded-full bg-[#f0ebe0]" />
+                    <div className="flex-1 space-y-1.5">
+                      <div className="h-3 w-32 rounded-full bg-[#f0ebe0]" />
+                      <div className="h-2.5 w-20 rounded-full bg-[#f0ebe0]" />
+                    </div>
+                  </div>
+                ))}
+                <p className="pt-1 text-center text-xs text-[#adb5ab]">Ses kayıtları anma sayfasında özel bir bölümde çalar.</p>
+              </div>
+            </div>
+          )}
+
+          {/* Taziye Defteri */}
+          <div className="rounded-2xl border border-[#e5dccb] bg-white overflow-hidden">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-[#f0ebe0]">
+              <div className="flex items-center gap-2">
+                <span className="text-base">🕊️</span>
+                <span className="text-sm font-semibold text-[#1f2d27]">Taziye Defteri</span>
+                {(pendingGuestbookCount ?? 0) > 0 && (
+                  <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#c7a76f] text-[10px] font-bold text-white">
+                    {pendingGuestbookCount}
+                  </span>
+                )}
+              </div>
+              <Link href={`/dashboard/vault/${id}/taziye-defteri`} className="text-xs font-medium text-[#174f35] hover:underline">
+                {(pendingGuestbookCount ?? 0) > 0 ? `${pendingGuestbookCount} mesaj bekliyor →` : 'Yönet →'}
+              </Link>
+            </div>
+            <div className="px-5 py-3">
+              <p className="text-xs text-[#788177]">
+                {(pendingGuestbookCount ?? 0) > 0
+                  ? 'Onay bekleyen taziye mesajları var. İncelemek için tıklayın.'
+                  : 'Ziyaretçilerin bıraktığı taziye mesajlarını buradan onaylayın.'}
+              </p>
+            </div>
+          </div>
+
           {/* Alt durum */}
           <div className="rounded-2xl border border-[#e5dccb] bg-white px-5 py-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className={`h-2.5 w-2.5 rounded-full ${qrActive || area.slug ? 'bg-[#174f35]' : 'bg-red-400'}`} />
               <span className="text-sm text-[#4a5e55]">
-                {qrActive ? 'QR aktif' : area.slug ? `themaradi.com/ani-alanim/${area.slug}` : 'Sayfa adresi belirlenmedi'}
+                {qrActive ? 'QR aktif' : area.slug ? `theeternalmemory.com/ani-alanim/${area.slug}` : 'Sayfa adresi belirlenmedi'}
               </span>
             </div>
             <Link href={`/dashboard/vault/${id}/settings`}

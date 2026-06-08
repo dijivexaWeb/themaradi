@@ -195,7 +195,7 @@ export default async function VasiyetPage({ params, searchParams }: Props) {
 
           {!isLocked && (
             <div className="rounded-3xl border border-[#e5dccb] bg-[#fffdf8] p-6 shadow-[0_4px_24px_rgba(64,48,24,0.05)] mb-5">
-              <form action={uploadDocs} encType="multipart/form-data" className="space-y-4">
+              <form action={uploadDocs} className="space-y-4">
                 <input type="hidden" name="category" value="will" />
                 <div>
                   <label className={labelCls}>Belge Seç <span className="text-[#dfbd72]">*</span></label>

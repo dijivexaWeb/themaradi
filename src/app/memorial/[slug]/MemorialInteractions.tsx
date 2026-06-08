@@ -1,9 +1,10 @@
 ﻿'use client'
 
-import { useState } from 'react'
+import { useState, useTransition } from 'react'
 import { ArrowRight, Feather, Flame, Heart, X } from 'lucide-react'
 import { type Lang } from '@/i18n'
 import { useLang } from '@/i18n/context'
+import { submitCondolenceAction, addReactionAction } from '@/lib/actions/condolences'
 
 interface Condolence {
   name: string
@@ -33,17 +34,24 @@ const interactionCopy: Record<Lang, any> = {
     actions: { candle: { emoji: '🕯️', title: 'Вы зажигаете свечу', desc: 'Каждая свеча освещает одно воспоминание.', confirmLabel: 'Зажечь свечу', color: 'amber' }, flower: { emoji: '🌹', title: 'Вы оставляете цветок', desc: 'Каждый цветок выражает глубокое уважение.', confirmLabel: 'Оставить цветок', color: 'rose' }, prayer: { emoji: '🤲', title: 'Вы молитесь', desc: 'Каждая молитва звучит любовью и тоской.', confirmLabel: 'Помолиться', color: 'gold' } }
   },
 }
-export default function MemorialInteractions({ condolences }: { condolences: Condolence[] }) {
+interface InitialCounts { candle: number; flower: number; prayer: number }
+
+export default function MemorialInteractions({ condolences, vaultId, initialCounts }: { condolences: Condolence[]; vaultId?: string; initialCounts?: InitialCounts }) {
   const { lang } = useLang()
   const copy = interactionCopy[lang]
-  const [candlesLit, setCandlesLit] = useState(47)
-  const [flowersLeft, setFlowersLeft] = useState(23)
-  const [prayersSent, setPrayersSent] = useState(91)
+  const [candlesLit, setCandlesLit] = useState(initialCounts?.candle ?? 0)
+  const [flowersLeft, setFlowersLeft] = useState(initialCounts?.flower ?? 0)
+  const [prayersSent, setPrayersSent] = useState(initialCounts?.prayer ?? 0)
   const [userLitCandle, setUserLitCandle] = useState(false)
   const [userLeftFlower, setUserLeftFlower] = useState(false)
   const [userPrayed, setUserPrayed] = useState(false)
   const [pendingAction, setPendingAction] = useState<ActionType>(null)
   const [showCondolenceForm, setShowCondolenceForm] = useState(false)
+  const [formOpenTime, setFormOpenTime] = useState('')
+  const [submitDone, setSubmitDone] = useState(false)
+  const [submitError, setSubmitError] = useState<string | null>(null)
+  const [isPending, startTransition] = useTransition()
+  const [, startReactTransition] = useTransition()
 
   function requestAction(type: ActionType) {
     if (type === 'candle' && userLitCandle) return
@@ -53,12 +61,16 @@ export default function MemorialInteractions({ condolences }: { condolences: Con
   }
 
   function confirmAction(name: string, contact: string) {
-    if (pendingAction === 'candle') { setUserLitCandle(true); setCandlesLit((n) => n + 1) }
-    if (pendingAction === 'flower') { setUserLeftFlower(true); setFlowersLeft((n) => n + 1) }
-    if (pendingAction === 'prayer') { setUserPrayed(true); setPrayersSent((n) => n + 1) }
+    const type = pendingAction
+    if (!type) return
+    if (type === 'candle') { setUserLitCandle(true); setCandlesLit((n) => n + 1) }
+    if (type === 'flower') { setUserLeftFlower(true); setFlowersLeft((n) => n + 1) }
+    if (type === 'prayer') { setUserPrayed(true); setPrayersSent((n) => n + 1) }
     setPendingAction(null)
-    // name / contact can be sent to API here when ready
     void name; void contact
+    if (vaultId) {
+      startReactTransition(async () => { await addReactionAction(vaultId, type) })
+    }
   }
 
   return (
@@ -134,13 +146,8 @@ export default function MemorialInteractions({ condolences }: { condolences: Con
 
           <div className="grid gap-5 lg:grid-cols-[1fr_340px]">
             <div className="overflow-hidden rounded-2xl border border-white/10 bg-[#0d1412] shadow-2xl shadow-black/25">
-              <div className="flex gap-1 border-b border-white/10 bg-white/[0.03] p-2 text-xs font-semibold text-[#cfc3ad]">
-                <button className="flex-1 rounded-lg bg-[#c7a76f] px-3 py-2.5 text-[#091712]">
-                  {lang === 'tr' ? 'Onaylanmış Mesajlar' : lang === 'ka' ? 'დამტკიცებული' : lang === 'ru' ? 'Одобренные' : 'Approved'}
-                </button>
-                <button className="flex-1 rounded-lg px-3 py-2.5 transition hover:bg-white/[0.06]">
-                  {lang === 'tr' ? 'Bekleyen Mesajlar' : lang === 'ka' ? 'მოლოდინში' : lang === 'ru' ? 'Ожидающие' : 'Pending'}
-                </button>
+              <div className="border-b border-white/10 bg-white/[0.03] px-4 py-3 text-xs font-semibold text-[#cfc3ad]">
+                {lang === 'tr' ? 'Taziye Mesajları' : lang === 'ka' ? 'სამძიმრის შეტყობინებები' : lang === 'ru' ? 'Сообщения с соболезнованиями' : 'Condolence Messages'}
               </div>
 
               <div className="divide-y divide-white/8">
@@ -168,7 +175,13 @@ export default function MemorialInteractions({ condolences }: { condolences: Con
 
           {/* Mesaj bÄ±rak CTA / Form */}
           <div className="overflow-hidden rounded-2xl border border-white/10 bg-[#0d1412] shadow-2xl shadow-black/25">
-            {!showCondolenceForm ? (
+            {submitDone ? (
+              <div className="flex h-full flex-col items-center justify-center gap-4 p-6 text-center">
+                <div className="text-4xl">🕊️</div>
+                <h3 className="font-serif text-xl text-white">Mesajınız alındı</h3>
+                <p className="text-sm text-[#b8aa93]">Varis onayından geçtikten sonra sayfada yayınlanacaktır.</p>
+              </div>
+            ) : !showCondolenceForm ? (
               <div className="flex h-full flex-col justify-between gap-5 p-6 text-center lg:text-left">
                 <div>
                   <h3 className="font-serif text-2xl text-white">{copy.ctaTitle}</h3>
@@ -184,7 +197,7 @@ export default function MemorialInteractions({ condolences }: { condolences: Con
                   </div>
                 </div>
                 <button
-                  onClick={() => setShowCondolenceForm(true)}
+                  onClick={() => { setShowCondolenceForm(true); setFormOpenTime(Date.now().toString()) }}
                   className="inline-flex w-full shrink-0 items-center justify-center gap-2 rounded-xl bg-[#c7a76f] px-7 py-3.5 text-sm font-semibold text-[#091712] shadow-lg transition hover:bg-[#d4b87c]"
                 >
                   {copy.messageButton}
@@ -192,26 +205,44 @@ export default function MemorialInteractions({ condolences }: { condolences: Con
                 </button>
               </div>
             ) : (
-              <form className="p-6" onSubmit={(e) => { e.preventDefault(); setShowCondolenceForm(false) }}>
+              <form
+                className="p-6"
+                onSubmit={(e) => {
+                  e.preventDefault()
+                  if (!vaultId) { setShowCondolenceForm(false); return }
+                  const fd = new FormData(e.currentTarget)
+                  setSubmitError(null)
+                  startTransition(async () => {
+                    const result = await submitCondolenceAction(vaultId, fd)
+                    if (result.error) { setSubmitError(result.error) } else { setSubmitDone(true) }
+                  })
+                }}
+              >
+                {/* Spam koruması: honeypot + zaman damgası */}
+                <input type="text" name="_hp" defaultValue="" tabIndex={-1} autoComplete="off" aria-hidden="true" style={{ position: 'absolute', left: '-9999px', opacity: 0, height: 0 }} />
+                <input type="hidden" name="_t" value={formOpenTime} />
                 <h3 className="font-serif text-2xl text-white">{copy.formTitle}</h3>
                 <p className="mt-1 text-sm text-[#b8aa93]">{copy.formText}</p>
+                {submitError && (
+                  <p className="mt-2 rounded-lg bg-red-900/30 px-3 py-2 text-xs text-red-300">{submitError}</p>
+                )}
                 <div className="mt-6 grid gap-4 sm:grid-cols-2">
                   <div>
                     <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-[#8f9f96]">{copy.name}</label>
-                    <input type="text" required placeholder={copy.namePlaceholder} className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-white outline-none placeholder:text-[#6b756f] focus:border-[#c7a76f] focus:ring-2 focus:ring-[#c7a76f]/10" />
+                    <input name="author_name" type="text" required placeholder={copy.namePlaceholder} className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-white outline-none placeholder:text-[#6b756f] focus:border-[#c7a76f] focus:ring-2 focus:ring-[#c7a76f]/10" />
                   </div>
                   <div>
                     <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-[#8f9f96]">{copy.relation}</label>
-                    <input type="text" placeholder={copy.relationPlaceholder} className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-white outline-none placeholder:text-[#6b756f] focus:border-[#c7a76f] focus:ring-2 focus:ring-[#c7a76f]/10" />
+                    <input name="relation" type="text" placeholder={copy.relationPlaceholder} className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-white outline-none placeholder:text-[#6b756f] focus:border-[#c7a76f] focus:ring-2 focus:ring-[#c7a76f]/10" />
                   </div>
                 </div>
                 <div className="mt-4">
                   <label className="mb-1 block text-xs font-semibold uppercase tracking-wide text-[#8f9f96]">{copy.message}</label>
-                  <textarea required rows={4} placeholder={copy.messagePlaceholder} className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-white outline-none placeholder:text-[#6b756f] focus:border-[#c7a76f] focus:ring-2 focus:ring-[#c7a76f]/10" />
+                  <textarea name="message" required rows={4} placeholder={copy.messagePlaceholder} className="w-full rounded-lg border border-white/10 bg-white/[0.04] px-4 py-3 text-sm text-white outline-none placeholder:text-[#6b756f] focus:border-[#c7a76f] focus:ring-2 focus:ring-[#c7a76f]/10" />
                 </div>
                 <div className="mt-5 flex gap-3">
-                  <button type="submit" className="inline-flex items-center gap-2 rounded-xl bg-[#c7a76f] px-7 py-3 text-sm font-semibold text-[#091712] shadow-lg transition hover:bg-[#d4b87c]">
-                    {copy.send} <ArrowRight className="h-4 w-4" />
+                  <button type="submit" disabled={isPending} className="inline-flex items-center gap-2 rounded-xl bg-[#c7a76f] px-7 py-3 text-sm font-semibold text-[#091712] shadow-lg transition hover:bg-[#d4b87c] disabled:opacity-60">
+                    {isPending ? '...' : copy.send} <ArrowRight className="h-4 w-4" />
                   </button>
                   <button type="button" onClick={() => setShowCondolenceForm(false)} className="rounded-xl border border-white/10 px-6 py-3 text-sm font-semibold text-[#cfc3ad] transition hover:bg-white/[0.06]">
                     {copy.cancel}

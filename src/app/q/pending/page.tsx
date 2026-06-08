@@ -2,7 +2,7 @@ import type { Metadata } from 'next'
 import QrPendingClient from './QrPendingClient'
 
 export const metadata: Metadata = {
-  title: 'Profil Hazırlanıyor — The Maradi',
+  title: 'Profil Hazırlanıyor — The Eternal Memory',
   robots: { index: false },
 }
 

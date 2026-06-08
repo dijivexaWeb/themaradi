@@ -476,7 +476,7 @@ export default function LocalizedLanding({ pricing }: { pricing: PricingConfig }
       {/* FINAL CTA */}
       <section className="bg-[#fbf8f1] px-5 pb-16 sm:px-8">
         <div className="relative mx-auto max-w-7xl overflow-hidden rounded-[1.35rem] px-6 py-10 text-center text-white shadow-2xl shadow-[#103b2c]/20 sm:px-10">
-          <Image src="/images/landing/final-cta-leaves.png" alt="Koyu yeşil fonda altın yapraklı The Maradi iletişim alanı" fill sizes="100vw" className="absolute inset-0 object-cover" />
+          <Image src="/images/landing/final-cta-leaves.png" alt="Koyu yeşil fonda altın yapraklı The Eternal Memory iletişim alanı" fill sizes="100vw" className="absolute inset-0 object-cover" />
           <div className="absolute inset-0 bg-[#06291f]/10" />
           <div className="relative z-10 mx-auto max-w-3xl">
             <h2 className="font-serif text-3xl sm:text-4xl">{s.finalCta.heading}</h2>
@@ -499,7 +499,7 @@ export default function LocalizedLanding({ pricing }: { pricing: PricingConfig }
           <div>
             <div className="flex items-center gap-3 font-serif text-2xl">
               <BrandMark className="h-10 w-10" />
-              The Maradi
+              The Eternal Memory
             </div>
             <p className="mt-4 max-w-xs text-sm leading-6 text-[#cfc3ad]">{s.footer.tagline}</p>
             <p className="mt-4 text-xs text-[#8a7a64]">{s.footer.commitment}</p>
@@ -510,7 +510,7 @@ export default function LocalizedLanding({ pricing }: { pricing: PricingConfig }
           <div>
             <h3 className="font-serif text-lg">{s.footer.colContact}</h3>
             <div className="mt-4 space-y-3 text-sm text-[#cfc3ad]">
-              <div className="flex items-center gap-2"><MessageCircle className="h-4 w-4" /> info@themaradi.com</div>
+              <div className="flex items-center gap-2"><MessageCircle className="h-4 w-4" /> info@theeternalmemory.com</div>
               <div className="flex items-center gap-2"><MapPin className="h-4 w-4" /> Batumi, Georgia</div>
             </div>
           </div>

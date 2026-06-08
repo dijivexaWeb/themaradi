@@ -153,7 +153,7 @@ const memorialCopyBase = {
       privacy: 'Gizlilik Politikası',
       terms: 'Kullanım Koşulları',
       kvkk: 'KVKK',
-      rights: '© 2026 The Maradi. Tüm hakları saklıdır.',
+      rights: '© 2026 The Eternal Memory. Tüm hakları saklıdır.',
     },
   },
   en: {
@@ -268,7 +268,7 @@ const memorialCopyBase = {
       privacy: 'Privacy Policy',
       terms: 'Terms of Use',
       kvkk: 'KVKK',
-      rights: '© 2026 The Maradi. All rights reserved.',
+      rights: '© 2026 The Eternal Memory. All rights reserved.',
     },
   },
 }
@@ -342,7 +342,7 @@ const memorialCopy: Record<Lang, typeof memorialCopyBase.tr> = {
       { name: 'სელიმ ილდიზი', date: '15 მაისი 2024', relation: 'ნათესავი', text: 'ღმერთმა შეიწყალოს აჰმეთ ბიძია, მის ახლობლებს მოთმინებას და ძალას ვუსურვებ.' },
     ],
     visit: { label: 'მონახულების ინფორმაცია', titleA: 'საფლავთან', titleB: 'მონახულება.', imageAlt: 'აჰმეთ ილმაზის საფლავი', cemeteryLine: '1940 - 2020 · უჩლერის სასაფლაო, კონია', infoTitle: 'საფლავის ინფორმაცია', cemetery: 'სასაფლაო', plot: 'უბანი / ნაკვეთი', row: 'რიგი / ნომერი', hours: 'მონახულების საათები', cemeteryValue: 'უჩლერის სასაფლაო, კონია', plotValue: 'უბანი: 245 · ნაკვეთი: 18', rowValue: 'რიგი: C · საფლავი No: 7', hoursValue: 'ყოველდღე 08:00 - 19:00', noteLabel: 'შენიშვნა:', note: 'მნახველებისთვის ხელმისაწვდომია კომფორტული სასეირნო ბილიკები. მთავარი შესასვლელიდან D კარიბჭისკენ გაემართეთ; C რიგამდე 50 მეტრია.', mapTitle: 'სასაფლაოს მდებარეობა' },
-    footer: { motto: 'მოგონებები ცოცხლობს, დიდი სიყვარული უსასრულოა.', platform: 'პლატფორმა', corporate: 'კომპანია', documents: 'დოკუმენტები', home: 'მთავარი', demo: 'დემო პროფილი', pricing: 'ფასები', about: 'ჩვენ შესახებ', contact: 'კონტაქტი', privacy: 'კონფიდენციალურობა', terms: 'გამოყენების პირობები', kvkk: 'KVKK', rights: '© 2026 The Maradi. ყველა უფლება დაცულია.' },
+    footer: { motto: 'მოგონებები ცოცხლობს, დიდი სიყვარული უსასრულოა.', platform: 'პლატფორმა', corporate: 'კომპანია', documents: 'დოკუმენტები', home: 'მთავარი', demo: 'დემო პროფილი', pricing: 'ფასები', about: 'ჩვენ შესახებ', contact: 'კონტაქტი', privacy: 'კონფიდენციალურობა', terms: 'გამოყენების პირობები', kvkk: 'KVKK', rights: '© 2026 The Eternal Memory. ყველა უფლება დაცულია.' },
   },
   ru: {
     ...memorialCopyBase.en,
@@ -404,7 +404,7 @@ const memorialCopy: Record<Lang, typeof memorialCopyBase.tr> = {
       { name: 'Селим Йылдыз', date: '15 мая 2024', relation: 'Родственник', text: 'Милости Ахмету-дяде, а его близким терпения и сил. Пусть его обитель будет раем.' },
     ],
     visit: { label: 'Информация о посещении', titleA: 'Посещение', titleB: 'у могилы.', imageAlt: 'Могила Ахмета Йылмаза', cemeteryLine: '1940 - 2020 · Кладбище Учлер, Кония', infoTitle: 'Информация о могиле', cemetery: 'Кладбище', plot: 'Участок / Парцелла', row: 'Ряд / Номер', hours: 'Часы посещения', cemeteryValue: 'Кладбище Учлер, Кония', plotValue: 'Участок: 245 · Парцелла: 18', rowValue: 'Ряд: C · Могила No: 7', hoursValue: 'Ежедневно 08:00 - 19:00', noteLabel: 'Примечание:', note: 'Для посетителей есть удобные пешеходные дорожки. От главного входа направляйтесь к воротам D; ряд C находится в 50 метрах.', mapTitle: 'Местоположение кладбища' },
-    footer: { motto: 'Воспоминания живут, большая любовь бесконечна.', platform: 'Платформа', corporate: 'Компания', documents: 'Документы', home: 'Главная', demo: 'Демо профиль', pricing: 'Цены', about: 'О нас', contact: 'Контакты', privacy: 'Политика конфиденциальности', terms: 'Условия использования', kvkk: 'KVKK', rights: '© 2026 The Maradi. Все права защищены.' },
+    footer: { motto: 'Воспоминания живут, большая любовь бесконечна.', platform: 'Платформа', corporate: 'Компания', documents: 'Документы', home: 'Главная', demo: 'Демо профиль', pricing: 'Цены', about: 'О нас', contact: 'Контакты', privacy: 'Политика конфиденциальности', terms: 'Условия использования', kvkk: 'KVKK', rights: '© 2026 The Eternal Memory. Все права защищены.' },
   },
 }
 const timelineEvents = [
@@ -546,7 +546,7 @@ export default function MemorialPage() {
       tabTree: 'Aile Ağacı',
       tabClose: 'Yakın Aile',
       generation: 'kuşak',
-      protected: 'Bu aile bağı The Maradi ile korunur.',
+      protected: 'Bu aile bağı The Eternal Memory ile korunur.',
       people: [
         { name: 'Mehmet Yılmaz', relation: 'Babası', years: '1915 - 1988', initials: 'MY', image: '/images/landing/profile-family-old.png', position: '35% 32%' },
         { name: 'Ayşe Yılmaz', relation: 'Annesi', years: '1918 - 1995', initials: 'AY', image: '/images/landing/profile-family-old.png', position: '68% 34%' },
@@ -565,7 +565,7 @@ export default function MemorialPage() {
       tabTree: 'Family Tree',
       tabClose: 'Close Family',
       generation: 'generations',
-      protected: 'This family bond is preserved with The Maradi.',
+      protected: 'This family bond is preserved with The Eternal Memory.',
       people: [
         { name: 'Mehmet Yilmaz', relation: 'Father', years: '1915 - 1988', initials: 'MY', image: '/images/landing/profile-family-old.png', position: '35% 32%' },
         { name: 'Ayse Yilmaz', relation: 'Mother', years: '1918 - 1995', initials: 'AY', image: '/images/landing/profile-family-old.png', position: '68% 34%' },
@@ -584,7 +584,7 @@ export default function MemorialPage() {
       tabTree: 'ოჯახის ხე',
       tabClose: 'ახლო ოჯახი',
       generation: 'თაობა',
-      protected: 'ეს ოჯახური კავშირი The Maradi-სთან ინახება.',
+      protected: 'ეს ოჯახური კავშირი The Eternal Memory-სთან ინახება.',
       people: [
         { name: 'მეჰმეთ ილმაზი', relation: 'მამა', years: '1915 - 1988', initials: 'MY', image: '/images/landing/profile-family-old.png', position: '35% 32%' },
         { name: 'აიშე ილმაზი', relation: 'დედა', years: '1918 - 1995', initials: 'AY', image: '/images/landing/profile-family-old.png', position: '68% 34%' },
@@ -603,7 +603,7 @@ export default function MemorialPage() {
       tabTree: 'Семейное дерево',
       tabClose: 'Близкая семья',
       generation: 'поколения',
-      protected: 'Эта семейная связь сохранена с The Maradi.',
+      protected: 'Эта семейная связь сохранена с The Eternal Memory.',
       people: [
         { name: 'Мехмет Йылмаз', relation: 'Отец', years: '1915 - 1988', initials: 'MY', image: '/images/landing/profile-family-old.png', position: '35% 32%' },
         { name: 'Айше Йылмаз', relation: 'Мать', years: '1918 - 1995', initials: 'AY', image: '/images/landing/profile-family-old.png', position: '68% 34%' },
@@ -1386,7 +1386,7 @@ function MemorialFooter({ copy }: { copy: typeof memorialCopy.tr.footer }) {
         <div>
           <div className="flex items-center gap-3 font-serif text-2xl">
             <BrandMark className="h-10 w-10" />
-            The Maradi
+            The Eternal Memory
           </div>
           <p className="mt-4 max-w-xs font-serif text-lg italic leading-7 text-[#cfc3ad]">
             {copy.motto}

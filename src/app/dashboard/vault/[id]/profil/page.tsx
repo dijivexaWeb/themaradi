@@ -10,6 +10,7 @@ interface Props { params: Promise<{ id: string }> }
 const NAV = [
   { id: 'temel',   icon: '🧍', label: 'Temel Bilgiler' },
   { id: 'foto',    icon: '📸', label: 'Profil Fotoğrafı' },
+  { id: 'arkaplan', icon: '🖼️', label: 'Arka Plan' },
   { id: 'tarih',   icon: '📅', label: 'Tarih & Yer' },
   { id: 'mesaj',   icon: '💬', label: 'Son Mesaj' },
   { id: 'mezar',   icon: '🪦', label: 'Mezar' },
@@ -72,7 +73,7 @@ export default async function ProfilPage({ params }: Props) {
           </aside>
 
           {/* Form */}
-          <form action={saveProfile} encType="multipart/form-data" className="flex-1 min-w-0 space-y-5">
+          <form action={saveProfile} className="flex-1 min-w-0 space-y-5">
 
             {/* Temel */}
             <section id="temel" className={sectionCls}>
@@ -118,6 +119,35 @@ export default async function ProfilPage({ params }: Props) {
                 </div>
               </div>
               <p className="text-xs text-[#adb5ab]">Dosya seçerseniz URL yerine dosya kullanılır. Otomatik boyutlandırılır.</p>
+            </section>
+
+            {/* Arka plan */}
+            <section id="arkaplan" className={sectionCls}>
+              <div className="flex items-center gap-2 pb-1">
+                <span className="text-lg">🖼️</span>
+                <h2 className="font-semibold text-[#1f2d27]">Hero Arka Plan</h2>
+              </div>
+              <p className="text-xs text-[#adb5ab]">Anma sayfasının hero bölümünde profil fotoğrafının arkasında blur olarak görünen arka plan görseli.</p>
+              <div className="flex gap-5 items-start">
+                <div className="relative h-24 w-32 shrink-0 overflow-hidden rounded-2xl border border-[#e5dccb] bg-[#f5efdf]">
+                  {(vault as Record<string, unknown>).hero_bg_url ? (
+                    <Image src={(vault as Record<string, unknown>).hero_bg_url as string} alt="Arka plan" fill className="object-cover" unoptimized />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center text-2xl text-[#c8bfb0]">🌿</div>
+                  )}
+                </div>
+                <div className="flex-1 space-y-3">
+                  <div>
+                    <label className={labelCls}>Dosya yükle</label>
+                    <input type="file" name="hero_bg_file" accept="image/*" disabled={isLocked}
+                      className="w-full cursor-pointer rounded-xl border border-[#e5dccb] bg-white px-3 py-2.5 text-sm text-[#1f2d27] file:mr-3 file:rounded-lg file:border-0 file:bg-[#174f35]/10 file:px-3 file:py-1.5 file:text-[#174f35] file:font-medium outline-none disabled:opacity-40" />
+                  </div>
+                  <div>
+                    <label className={labelCls}>veya görsel URL</label>
+                    <input type="url" name="hero_bg_url" defaultValue={((vault as Record<string, unknown>).hero_bg_url as string) ?? ''} placeholder="https://..." disabled={isLocked} className={inputCls} />
+                  </div>
+                </div>
+              </div>
             </section>
 
             {/* Tarih & Yer */}
@@ -176,6 +206,34 @@ export default async function ProfilPage({ params }: Props) {
               <div>
                 <label className={labelCls}>Mezarlık Adresi</label>
                 <input type="text" name="cemetery_address" defaultValue={vault.cemetery_address ?? ''} placeholder="Adres veya konum tarifi" disabled={isLocked} className={inputCls} />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className={labelCls}>Enlem (Lat)</label>
+                  <input type="number" step="any" name="cemetery_lat" defaultValue={(vault as Record<string, unknown>).cemetery_lat as string ?? ''} placeholder="41.0082" disabled={isLocked} className={inputCls} />
+                </div>
+                <div>
+                  <label className={labelCls}>Boylam (Lng)</label>
+                  <input type="number" step="any" name="cemetery_lng" defaultValue={(vault as Record<string, unknown>).cemetery_lng as string ?? ''} placeholder="28.9784" disabled={isLocked} className={inputCls} />
+                </div>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className={labelCls}>Ada / Parsel</label>
+                  <input type="text" name="cemetery_plot" defaultValue={((vault as Record<string, unknown>).cemetery_plot as string) ?? ''} placeholder="Ada: 245 · Parsel: 18" disabled={isLocked} className={inputCls} />
+                </div>
+                <div>
+                  <label className={labelCls}>Sıra / Numara</label>
+                  <input type="text" name="cemetery_row" defaultValue={((vault as Record<string, unknown>).cemetery_row as string) ?? ''} placeholder="Sıra: C · No: 7" disabled={isLocked} className={inputCls} />
+                </div>
+              </div>
+              <div>
+                <label className={labelCls}>Ziyaret Saatleri</label>
+                <input type="text" name="cemetery_hours" defaultValue={((vault as Record<string, unknown>).cemetery_hours as string) ?? ''} placeholder="Her gün 08:00 – 19:00" disabled={isLocked} className={inputCls} />
+              </div>
+              <div>
+                <label className={labelCls}>Ziyaretçi Notu</label>
+                <textarea name="cemetery_note" rows={2} defaultValue={((vault as Record<string, unknown>).cemetery_note as string) ?? ''} placeholder="Ana girişten D kapısına yönelin..." disabled={isLocked} className={inputCls + ' resize-none'} />
               </div>
             </section>
 

@@ -68,7 +68,7 @@ export async function addMemoryAction(vaultId: string, formData: FormData): Prom
   const content = (formData.get('content') as string)?.trim()
   const memoryDate = (formData.get('memory_date') as string) || null
   const isSecret = formData.get('is_secret') === 'true'
-  const section = (formData.get('section') as string) || 'general'
+  const section = (formData.get('section') as string)?.trim() || null
 
   if (!content || !memoryDate) return
 
@@ -102,11 +102,12 @@ export async function updateMemoryAction(memoryId: string, vaultId: string, redi
   const title = (formData.get('title') as string)?.trim() || null
   const content = (formData.get('content') as string)?.trim()
   const memoryDate = (formData.get('memory_date') as string) || null
+  const section = (formData.get('section') as string) || null
 
   if (!content) return
 
   await supabase.from('vault_memories')
-    .update({ title, content, memory_date: memoryDate, updated_at: new Date().toISOString() })
+    .update({ title, content, memory_date: memoryDate, section, updated_at: new Date().toISOString() })
     .eq('id', memoryId)
     .eq('vault_id', vaultId)
 

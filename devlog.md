@@ -5,6 +5,338 @@
 
 ---
 
+## 2026-06-08 — Oturum 35: Rebrand + Lotus Logo
+
+### Yapılanlar
+- Tüm kaynak kodda "The Maradi" → "The Eternal Memory" rename yapıldı (i18n/tr, en, ka, ru + tüm component'lar)
+- `themaradi.com` → `theeternalmemory.com` domain değişikliği (email adresleri dahil)
+- `platform_settings.email_from_address` DB'de güncellendi
+- Resend domain doğrulaması: `theeternalmemory.com` DNS kayıtları (DKIM, SPF, DMARC) Vercel'e eklendi
+- `BrandLogo.tsx` yeni lotus çiçeği logosu: 5 taçyaprak + altın merkez şerit + su çizgisi
+
+### Proje Durumu
+- [x] Email altyapısı (Resend) çalışıyor
+- [x] Marka adı güncellendi
+- [x] Domain doğrulandı
+- [x] Lotus logo uygulandı
+
+### Nerede Kaldık
+`src/components/BrandLogo.tsx` güncellendi. Logo light/dark tema için hazır.
+
+### Sıradaki Adım
+1. favicon.ico / favicon.svg lotus sembolüyle güncellenmeli
+2. OG image (open graph) için logo güncellemesi
+3. Mesaj onaylandığında göndericiye email bildirimi testi
+
+---
+
+## 2026-06-08 — Oturum 34: Email Altyapısı (Resend)
+
+### Yapılanlar
+- `resend` paketi yüklendi (v6.12.4)
+- `platform_settings` tablosuna email ayar satırları eklendi (api_key, from_address, from_name, notify flags)
+- `src/lib/email/index.ts` — `sendEmail()` ve `isNotificationEnabled()` utility fonksiyonları
+- `src/lib/email/templates.ts` — HTML email şablonları: yeni taziye mesajı, mesaj onaylandı, test emaili
+- `/admin/email` sayfası — API key, from email/name, bildirim ayarları, test email gönderimi
+- Admin sidebar'a "Email Ayarları" linki eklendi
+- `submitCondolenceAction` güncellendi: yeni mesaj gelince vault sahibine otomatik bildirim emaili
+
+### Nerede Kaldık
+Email altyapısı hazır. Admin panelinden `/admin/email` sayfasına girip Resend API key'i kaydedince sistem aktif olur.
+
+### Sıradaki Adım
+1. resend.com'dan API key al, domaini doğrula (themaradi.com)
+2. Test emaili gönder, şablonu kontrol et
+3. Mesaj onaylandığında göndericiye bildirim emaili (approveGuestbookEntryAction'a ekle)
+4. Doğrulama emaili şablonu
+
+---
+
+## 2026-06-08 — Oturum 33: Taziye Defteri RLS + Spam Koruması
+
+### Yapılanlar
+- RLS: `vaults` public_memorial_visible_to_all politikası `private_memorial`'ı da kapsayacak şekilde güncellendi
+- RLS: `guestbook_entries` — authenticated kullanıcılar insert edebilir politikası eklendi
+- RLS: `guestbook_entries` — vault sahibi tüm (pending+approved) girişleri görebilir politikası eklendi
+- RLS: `guestbook_entries` — vault sahibi UPDATE ve DELETE yapabilir politikaları eklendi
+- Memorial sayfası `private_memorial` statüsündeki vault'ları da gösterecek şekilde güncellendi
+- Önizleme modunda taziye bölümü artık gerçek bileşeni gösteriyor (placeholder kaldırıldı)
+- "Bekleyen Mesajlar" sekmesi public memorial sayfasından kaldırıldı (dashboard'a taşındı)
+- **Spam koruması (3 katman):**
+  - Katman 1: Honeypot gizli alan (bot doldurunca sessizce yoksay)
+  - Katman 2: Zaman damgası (< 3 saniye = bot, sessizce yoksay)
+  - Katman 3: IP tabanlı rate limit — 24 saatte aynı vault'a max 3 mesaj
+
+### Nerede Kaldık
+Taziye Defteri tam işlevsel: RLS politikaları düzeltildi, spam koruması aktif.
+
+### Sıradaki Adım
+1. Vault sahibine yeni taziye mesajı geldiğinde email bildirimi
+2. Tepki (mum/çiçek/dua) spam koruması (aynı IP günde 1 tepki)
+3. Onaylanan mesajların memorial sayfasında güzel görünümü
+
+---
+
+## 2026-06-08 — Oturum 32: Taziye Defteri Gerçek Veri Entegrasyonu
+
+### Yapılanlar
+- `memorial_reactions` tablosu oluşturuldu (candle/flower/prayer, public RLS ile anonim insert destekli)
+- `addReactionAction` — ziyaretçi tepkisi kaydetme server action (service client ile DB'ye yazar)
+- `approveGuestbookEntryAction` — vault sahibi bekleyen mesajı onaylar
+- `rejectGuestbookEntryAction` — vault sahibi mesajı siler/reddeder
+- `MemorialInteractions.tsx` güncellendi: hardcoded 47/23/91 sayılar → DB'den gelen `initialCounts` prop; butona tıklanınca `addReactionAction` çağrılıyor
+- `RealMemorialPage.tsx` güncellendi: reactions sorgusu Promise.all'a eklendi, `initialCounts` hesaplanıp wrapper'a geçiliyor
+- `RealMemorialInteractionsWrapper.tsx` güncellendi: `initialCounts` prop eklendi, MemorialInteractions'a iletiliyor
+- `/dashboard/vault/[id]/taziye-defteri/page.tsx` oluşturuldu: tepki sayaçları + bekleyen/onaylanmış mesaj yönetimi
+- Dashboard ana sayfasına Taziye Defteri kartı eklendi (bekleyen mesaj sayacı badge ile)
+
+### Proje Durumu
+- [x] Nested `<a>` hydration fix
+- [x] TimelineSection demo ile eşleşti
+- [x] next.config.ts — Supabase hostname + 50MB body limit
+- [x] media tablosu eksik kolumnlar migration
+- [x] vault_audio_recordings.sort_order DEFAULT 0
+- [x] Fotoğraf/video/ses dashboard edit sayfaları
+- [x] Video MIME type sorunu düzeltildi
+- [x] Silent action failure'lar giderildi
+- [x] Tarih validasyonu (max=today)
+- [x] Video inline oynatma (dashboard + önizleme)
+- [x] Taziye Defteri — gerçek tepki sayaçları + mesaj onaylama akışı
+
+### Kritik Kararlar / Notlar
+- `memorial_reactions` tablosu tekil constraint içermiyor — aynı kullanıcı birden fazla tıklayabilir (basitlik tercih edildi)
+- Tepkiler: optimistic update (local state hemen güncellenir) + arka planda server action
+- Onaylama akışı dashboard-only (vault sahibi kimlik doğrulama kontrolü var)
+- Önizleme modunda reactions ve guestbook boş döner (isPreview kontrolü)
+
+### Nerede Kaldık
+Taziye Defteri tamamen işlevsel: `/memorial/[slug]` sayfasında ziyaretçiler mum yakabilir, çiçek bırakabilir, dua edebilir ve mesaj gönderebilir. Dashboard `/dashboard/vault/[id]/taziye-defteri` sayfasında vault sahibi bekleyen mesajları onaylayabilir/reddedebilir.
+
+### Sıradaki Adım
+1. Önizleme modundaki taziye bölümünü gerçek verilerle göster (şu an "Sayfa yayınlandığında..." placeholder)
+2. Guestbook onaylama sonrası email bildirimi vault sahibine
+3. Taziye mesajı başarılı gönderim toast bildirimi
+4. Reaksiyon tablosunda tekil kısıtlama istenir mi? (IP/fingerprint ile)
+
+---
+
+## 2026-06-08 — Oturum 31: Media/Audio DB Fix + Dashboard Edit Özelliği
+
+### Yapılanlar
+- **DB Migration**: `media` tablosuna `caption`, `visibility`, `source_type`, `storage_bucket`, `storage_path` kolonları eklendi — foto/video kaydetme sessizce başarısız oluyordu
+- **DB Migration**: `vault_audio_recordings.sort_order` kolonuna `DEFAULT 0` eklendi — ses kaydı ekleme başarısız oluyordu
+- **`next.config.ts`**: `qcxsqirqlepjebkezgud.supabase.co` hostname'i `remotePatterns`'a eklendi — `next/image` hataları giderildi
+- **`RealMemorialPage.tsx`**: `<Link><BrandLogo></Link>` nested `<a>` hydration hatası düzeltildi, dış `Link` kaldırıldı
+- **`TimelineSection.tsx`**: Demo ile birebir hizalandı — her kart sağında 104×104 inline thumbnail, sağ panel 430px yükseklik, `text-5xl` yıl, `text-3xl` başlık
+- **`src/lib/actions/media.ts`**: `updateMediaAction` eklendi (title, caption, taken_at, visibility günceller)
+- **`src/lib/actions/audio.ts`**: `updateAudioRecordingAction` eklendi (title, author, is_public günceller)
+- **`fotolar/page.tsx`**: `?edit=id` URL param ile inline edit formu, dosya değişmez uyarısı
+- **`videolar/page.tsx`**: `?edit=id` URL param ile inline edit formu, video kaynağı değişmez uyarısı
+- **`ses-kayitlari/page.tsx`**: `?edit=id` URL param ile inline edit formu, görünürlük dropdown'u eklendi
+
+### Proje Durumu
+- [x] RealMemorialPage demo ile eşleşiyor
+- [x] Kronoloji interaktif timeline (TimelineSection)
+- [x] Fotoğraf/video/ses ekleme çalışıyor
+- [x] Fotoğraf/video/ses düzenleme çalışıyor
+- [ ] Önizleme → Kronoloji bölümü sadece section='kronoloji' olan anılarda görünür
+- [ ] Sesler ve videolar önizlemede gösterilmeli (test edilmedi)
+
+### Kritik Kararlar / Notlar
+- `media` tablosunda `caption`/`visibility` yoktu → sessiz insert failure sebebiydi
+- Edit: dosya/kaynak değiştirilemez, sadece metadata — URL param (`?edit=id`) yaklaşımı kullanıldı
+
+### Nerede Kaldık
+`fotolar`, `videolar`, `ses-kayitlari` sayfalarına düzenleme özelliği eklendi. DB migration uygulandı, tüm ekleme işlemleri artık çalışıyor.
+
+### Sıradaki Adım
+1. Fotoğraf/video/ses ekle → önizlemede göründüğünü doğrula
+2. Anılar → Kronoloji section seç → timeline önizlemede görün
+3. Önizleme sayfasında ses player, video player test et
+4. `devlog.md` güncel tutulacak
+
+---
+
+## 2026-06-08 — Oturum 30: RealMemorialPage Tam Yenileme + Tüm Eksik Bölümler
+
+### Yapılanlar
+- **`src/app/memorial/[slug]/RealMemorialPage.tsx`** — Komple yeniden yazıldı (demo ile birebir eşleşme)
+  - Root bg `bg-[#fbf8f1]` (açık tema), bölümler sırayla açık/koyu değişiyor
+  - Hero: `hero_bg_url` desteği (blur arka plan), 3 sütun düzeni, scroll indikatörü, motto metni
+  - Yaşam Rakamları: `bg-[#173d31]`, text-5xl rakamlar
+  - Yapışkan Sekmeler: `top-16` z-30, koşullu gösterim (tüm bölümler için)
+  - Biyografi: 2 sütun (metin sol, alıntı kartı + stat kartları sağ), açık bg
+  - Kronoloji: koyu bg `#091712`, `vault_memories` where section='kronoloji', dikey zaman çizelgesi
+  - Videolar: featured video (büyük, play overlay) + sağ yan mini liste, koyu yeşil bg
+  - Fotoğraflar: masonry `columns-2 md:columns-3`, değişken aspect ratio, hover efekti
+  - Son Mesaj: `bg-[#f7f2e9]`, büyük dekoratif tırnak, Feather ikonu, imza
+  - Ses Kayıtları: `<AudioPlayerSection>` entegre edildi
+  - Öne Çıkan Anılar: section='featured', 3 sütun quote kartları
+  - Taziye Defteri: `<RealMemorialInteractionsWrapper>` (gerçek guestbook verileri)
+  - Aile Ağacı: `<FamilyTreeCanvas>` (koyu bg, mevcut)
+  - Mezar/Ziyaret: harita (lat/lng) + detay paneli (cemetery_plot/row/hours/note)
+  - Footer: 3 sütun (logo + platform + belgeler linkleri)
+- TypeScript hatası düzeltildi (`vault as unknown as Record<string, unknown>`)
+
+### Altyapı (önceki oturumda tamamlandı)
+- DB migration: hero_bg_url, cemetery_plot/row/hours/note, vault_audio_recordings tablosu
+- `src/lib/actions/condolences.ts` — submitCondolenceAction
+- `src/lib/actions/audio.ts` — addAudioRecordingAction, deleteAudioRecordingAction
+- `src/app/memorial/[slug]/AudioPlayerSection.tsx` — client ses oynatıcı
+- `src/app/memorial/[slug]/RealMemorialInteractionsWrapper.tsx` — LangProvider wrapper
+- `src/app/memorial/[slug]/MemorialInteractions.tsx` — vaultId prop + gerçek form submit
+- `src/lib/actions/vault.ts` — saveVaultProfileAction (hero_bg + cemetery detayları)
+- `src/app/dashboard/vault/[id]/profil/page.tsx` — arka plan + mezar detay alanları
+- `src/app/dashboard/vault/[id]/ses-kayitlari/page.tsx` — ses kaydı yönetim sayfası
+
+### Proje Durumu
+- [x] RealMemorialPage → demo ile birebir tüm bölümler
+- [x] Hero arka plan görseli dashboard'dan yüklenir
+- [x] Taziye formu çalışır (gerçek DB'ye kaydeder)
+- [x] Ses kayıtları dashboard + anma sayfasında gösterilir
+- [x] Kronoloji bölümü (section='kronoloji')
+- [x] Öne çıkan anılar (section='featured')
+- [x] Mezar haritası (lat/lng veya isim bazlı)
+- [ ] Dashboard vault sayfasına "Ses Kayıtları" nav linki eklenmeli
+- [ ] Anılar dashboard'una section seçici (kronoloji/featured/genel) eklenmeli
+
+### Nerede Kaldık
+`RealMemorialPage.tsx` tamamlandı ve TypeScript hatası yok. Anma sayfası artık demo ile birebir aynı 15 bölümü içeriyor: hero (blur bg) → yaşam rakamları → sticky sekmeler → biyografi → kronoloji → videolar → fotoğraflar → son mesaj → ses kayıtları → öne çıkan anılar → taziye → aile ağacı → mezar → footer.
+
+### Sıradaki Adım
+1. Dashboard vault ana sayfasına (`/dashboard/vault/[id]/page.tsx`) "Ses Kayıtları" nav linki ekle
+2. Anılar sayfasına (`anilar/page.tsx`) section dropdown'u ekle (kronoloji / öne çıkan / genel)
+3. `/preview/[id]` rotasına hero_bg_url prop'unu ilet (VaultRow interface genişletmesi)
+4. Gerçek kullanıcı önizleme sayfasını test et
+
+---
+
+## 2026-06-08 — Oturum 29: Canvas Overlap Fix + Sol/Sağ Lateral Düzeni
+
+### Yapılanlar
+- **`src/components/FamilyTreeCanvas.tsx`** — Komple yeniden yazıldı (3. revizyon)
+  - **ROOT CAUSE FIX**: `gm_paternal`, `gf_paternal`, `grandparent` türleri `parent_member_id=null` ile eklenince anne/baba satırıyla aynı Y'ye düşüyor, üst üste biniyordu → `GP_RELS` grubu eklendi, vault owner için 2 satır yukarı konumlandırılıyor
+  - **Yön sistemi**: `LEFT_LAT_RELS = {sibling, uncle, aunt}` → profil sahibinin SOLUNA, `RIGHT_LAT_RELS = {spouse, other}` → SAĞINA
+  - `leftBranch: boolean` parametresi `lay()` fonksiyonuna eklendi — sol dalın lateralleri de sola doğru uzuyor (kardeşin eşi, kardeşin soluna gider)
+  - `fullWL()` helper eklendi — sol yönlü dal genişliği hesabı
+  - `ownerCX` hesabı güncellendi: sol zone genişliği (leftZoneW + leftGap + descW/2) ile ancestor row genişliğinin max'ı alınıyor
+  - Fatma KABAKCI (kardeş) ve Ramazan URGANCI (amca/dayı) artık sırayla solda, üst üste gelmiyor
+- **`src/lib/actions/family.ts`** — İki kritik bug fix:
+  - `parent_member_id` artık TÜM ilişki tipleri için kaydediliyor (daha önce sadece `grandchild` için kaydediliyordu → Ramazan KABAKCI babaya bağlanaması bu yüzden)
+  - `validRels` listesine `gm_maternal`, `gf_maternal`, `gm_paternal`, `gf_paternal`, `uncle`, `aunt` eklendi
+
+### Proje Durumu
+- [x] Canvas: gm_*/gf_*/grandparent → 2 satır yukarı, anne/babayla çakışmıyor
+- [x] Canvas: sibling/uncle/aunt → vault owner SOLUNDA
+- [x] Canvas: spouse/other → vault owner SAĞINDA
+- [x] Canvas: eşin sub-member'ları (kardeşler vb) eşin sağında uzuyor
+- [x] Canvas: leftBranch sistemi — sol dal lateralleri de sola gidiyor
+- [x] family.ts: parent_member_id tüm tiplerde kaydediliyor
+- [x] family.ts: tüm relationship tipleri validRels'de
+- [ ] Mevcut yanlış kaydedilmiş üyeler (parent_member_id=null) edit edilmeli
+- [ ] Badge tıklama → tam ağaç sayfası (sonraki aşama)
+- [ ] payments RLS hatası fix
+- [ ] Login "Kaydınız yoksa" → /satin-al yönlendirmesi
+
+### Kritik Kararlar / Notlar
+- `family.ts` bug: `parent_member_id: relationship === 'grandchild' ? parentMemberId : null` satırı tüm önceki girdilerde grandparent bağlantısını null kaydettiriyordu. Eski data manuel edit ile düzeltilmeli.
+- Canvas overlap kök neden: validRels'de olmayan tipler (gm_paternal vb) hiç kaydedilmiyordu, parent_member_id=null ile kaydedilen büyükannebabalar anne/baba satırına düşüyor çakışıyordu.
+
+### Nerede Kaldık
+Canvas ve family.ts fix'leri tamamlandı. Kullanıcının Fatma KABAKCI (kardeş, solda) ve Ramazan KABAKCI (babanın babası, babaya bağlı) doğru konumlanıyor. Eski yanlış kaydedilmiş üyelerin aile sayfasından edit edilmesi gerekiyor.
+
+### Sıradaki Adım
+1. Kullanıcı eski yanlış kaydedilmiş üyeleri (Ramazan KABAKCI gibi) edit edip "Kime bağlı?" seçmeli → parent_member_id düzelecek
+2. payments RLS hatası fix
+3. Login "Kaydınız yoksa" → /satin-al yönlendirmesi
+4. Badge tıklama → /aile/tam-agac sayfası (isteğe bağlı sonraki aşama)
+
+---
+
+## 2026-06-08 — Oturum 28: Canvas Derinlik Filtresi + Mimari Tartışma
+
+### Yapılanlar
+- **`src/components/FamilyTreeCanvas.tsx`** — `MAX_DEPTH = 2` filtresi eklendi
+  - `lay()` fonksiyonuna `depth` parametresi eklendi
+  - `depth >= MAX_DEPTH` olan düğümler render edilmiyor, `countAll()` ile gizli üye sayısı hesaplanıyor
+  - `FlatNode.hidden: number` alanı eklendi — kart altında `+N kişi` badge gösteriliyor
+  - `descW()` ve `fullW()` fonksiyonları da depth-aware hale getirildi (depth > MAX_DEPTH ise CW döndürüyor)
+  - Badge şimdilik görsel, tıklanmaz — sonraki aşamada `/aile/tam-agac` sayfasına bağlanacak
+- Mimari tartışma: `vault_family_relations` graph modeli vs mevcut tree modeli
+  - Karar: mevcut model yeterli, kişi iki yerde geçmiyor, akraba evliliği senaryosu yok
+  - Scope belirlendi: vault sahibi + eşi + anne/baba/büyükannebabalar + çocuklar/torunlar + kardeş dalı + amca/dayı dalı — burada biter
+
+### Proje Durumu
+- [x] Canvas: tüm ilişki tipleri görünüyor (gm_*, gf_*, uncle, aunt)
+- [x] Canvas: sub-members (babanın babası vs) doğru konumda
+- [x] Canvas: MAX_DEPTH=2 filtresi — gizli üyeler badge ile gösteriliyor
+- [x] Page: tüm ilişki tipleri dropdown'da, parentCandidates = tüm üyeler
+- [ ] Badge tıklama → tam ağaç sayfası (sonraki aşama)
+- [ ] payments RLS hatası fix
+- [ ] Login "Kaydınız yoksa" → /satin-al yönlendirmesi
+
+### Kritik Kararlar / Notlar
+- MAX_DEPTH=2: vault sahibi depth-0, doğrudan bağlılar depth-1, onların bağlıları depth-2, ötesi badge
+- Örnek: kardeşin çocuğu = depth-2 (görünür), kardeşin torunu = depth-3 (badge)
+- Aynı kişinin iki yerde geçmesi senaryo dışı → mevcut ağaç modeli yeterli
+- "Sonraki aşama": badge'e tıklayınca `/dashboard/vault/[id]/aile/tam-agac` sayfası açılacak
+
+### Nerede Kaldık
+Canvas depth filtresi + badge tamamlandı. TypeScript temiz. Sayfa yenilenmesi gerekiyor.
+
+### Sıradaki Adım
+1. Sayfayı yenile, badge'lerin görünüp görünmediğini test et
+2. Ramazan KABAKCI (depth-2, babanın babası) görünüyor mu?
+3. payments RLS hatasını araştır
+4. (Sonra) badge tıklama → tam ağaç sayfası
+
+---
+
+## 2026-06-08 — Oturum 27: FamilyTreeCanvas Yeniden Yazım + Tüm İlişki Tipleri
+
+### Yapılanlar
+- **`src/components/FamilyTreeCanvas.tsx`** — Tamamen yeniden yazıldı (direction-aware recursive layout)
+  - `isAnc()`, `isLat()`, `isDes()` → ilişki tipine göre yön belirleme
+  - `descW(id)` → yalnızca downward descendants için zone genişliği
+  - `fullW(id)` → descW + lateral alt ağaçlar (sağa genişleme)
+  - `ownerCX` = `PAD + max(vaultDescW, r1w, r2w, r3w) / 2` → büyükbabalar asla sola taşmıyor
+  - `lay(id, cx, y)` recursive: ancestors→yukarı, descendants→aşağı, laterals→sağa
+  - Tüm ilişki tipleri desteklendi: `gm_maternal`, `gf_maternal`, `gm_paternal`, `gf_paternal`, `uncle`, `aunt`
+  - Sub-members (örn. babanın babası) artık babanın üstünde görünüyor
+  - Kardeş/eş → vault sahibinin SAĞINDA (lateral, yatay bağlantı çizgisi)
+  - SVG path Y normalizasyonu: regex ile tüm koordinatlar yOff kadar öteleniyor
+  - `visible` state ile IntersectionObserver animasyonu korundu
+
+- **`src/app/dashboard/vault/[id]/aile/page.tsx`** — Hedeflenen düzeltmeler
+  - `REL_LABELS` / `REL_ICONS` → 6 yeni tip eklendi (gm_maternal, gf_maternal, gm_paternal, gf_paternal, uncle, aunt)
+  - `parentCandidates` = tüm üyeler (sadece oğul/kız değil) → artık herhangi birinin altına üye eklenebilir
+  - "Ebeveyn" selector etiketi → "Kime bağlı?" olarak güncellendi, daha açıklayıcı
+
+### Proje Durumu
+- [x] Tüm ilişki tipleri canvas'ta görünüyor
+- [x] Sub-members (babanın babası vs) doğru konumda
+- [x] Kardeşler ve eşler lateral (sağda) yerleşiyor
+- [x] Büyükannebabaları asla soldan taşmıyor
+- [x] parentCandidates = tüm üyeler artık
+- [ ] payments RLS hatası fix
+- [ ] Login "Kaydınız yoksa" → /satin-al yönlendirmesi
+
+### Kritik Kararlar / Notlar
+- Canvas'ın eski versiyonu (buildLayout) sadece 9 temel ilişki tipini destekliyordu; yeni tip eklenince görünmüyordu
+- `ownerCX` pre-hesabı kritik: torun/çocuk sayısı arttıkça vault sahibi sağa kayan, ata satırları sola taşabilirdi
+- SVG branch path'lerdeki Y koordinatları string replace ile güncelleniyor (bezier/line path format)
+
+### Nerede Kaldık
+Her iki dosya güncellendi, TypeScript temiz. Eski `tam-agac` route'dan kalan `.next/types` cache hatası silindi.
+
+### Sıradaki Adım
+1. Sayfa yenilenip ağaç test edilecek
+2. Ramazan KABAKCI (babanın babası) görünüyor mu kontrol
+3. Fatma Hanım (kardeş) sağda görünüyor mu kontrol
+4. payments RLS hatasını araştır
+
+---
+
 ## 2026-06-08 — Oturum 25: gstack Kurulumu
 
 ### Yapılanlar

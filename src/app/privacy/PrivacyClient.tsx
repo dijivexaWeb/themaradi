@@ -15,7 +15,7 @@ export default function PrivacyClient() {
         <h2>{s.controller.h}</h2>
         <p>{s.controller.p1}</p>
         <div className="not-prose my-4 rounded-xl border border-[#e1d5c3] bg-[#f7f2e9] p-5 text-sm text-[#4c463c]">
-          <p className="font-semibold text-[#173d31]">The Maradi</p>
+          <p className="font-semibold text-[#173d31]">The Eternal Memory</p>
           <p>{s.controller.address}</p>
           <p>E-mail: <a href={`mailto:${s.controller.email}`} className="text-[#9a7132]">{s.controller.email}</a></p>
           <p>Tel: {s.controller.tel}</p>

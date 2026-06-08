@@ -7,14 +7,14 @@ import "./globals.css";
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "themaradi — Dijital Miras Kasası",
+  title: "The Eternal Memory — Where memories never fade.",
   description:
     "Hayatınız boyunca biriktirdiğiniz anıları, hikayelerinizi ve dijital mirasınızı güvenle saklayın ve sevdiklerinize bırakın.",
   metadataBase: new URL(
     process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
   ),
   openGraph: {
-    title: "themaradi — Dijital Miras Kasası",
+    title: "The Eternal Memory — Where memories never fade.",
     description: "Anılarınız sonsuza kadar güvende.",
     type: "website",
   },

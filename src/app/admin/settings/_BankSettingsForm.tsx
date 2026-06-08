@@ -39,8 +39,8 @@ export default function BankSettingsForm({ settings }: { settings: Record<string
         </div>
         <div>
           <label className="block text-xs font-medium text-slate-700 mb-1">Alıcı</label>
-          <input name="bank_recipient" type="text" defaultValue={settings.bank_recipient ?? 'The Maradi LLC'}
-            placeholder="The Maradi LLC" required className={inp} />
+          <input name="bank_recipient" type="text" defaultValue={settings.bank_recipient ?? 'The Eternal Memory LLC'}
+            placeholder="The Eternal Memory LLC" required className={inp} />
         </div>
       </div>
 

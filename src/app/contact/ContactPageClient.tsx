@@ -22,8 +22,8 @@ export default function ContactPageClient() {
       icon: Mail,
       label: c.info.email,
       lines: [
-        { text: 'info@themaradi.com', href: 'mailto:info@themaradi.com', tag: c.info.emailTagGeneral },
-        { text: 'support@themaradi.com', href: 'mailto:support@themaradi.com', tag: c.info.emailTagSupport },
+        { text: 'info@theeternalmemory.com', href: 'mailto:info@theeternalmemory.com', tag: c.info.emailTagGeneral },
+        { text: 'support@theeternalmemory.com', href: 'mailto:support@theeternalmemory.com', tag: c.info.emailTagSupport },
       ],
     },
     {
@@ -46,17 +46,17 @@ export default function ContactPageClient() {
 
   const departments = [
     {
-      email: 'support@themaradi.com',
+      email: 'support@theeternalmemory.com',
       title: c.departments.support.title,
       desc: c.departments.support.desc,
     },
     {
-      email: 'partner@themaradi.com',
+      email: 'partner@theeternalmemory.com',
       title: c.departments.partnership.title,
       desc: c.departments.partnership.desc,
     },
     {
-      email: 'privacy@themaradi.com',
+      email: 'privacy@theeternalmemory.com',
       title: c.departments.privacy.title,
       desc: c.departments.privacy.desc,
     },
@@ -144,7 +144,7 @@ export default function ContactPageClient() {
               {/* Map */}
               <div className="overflow-hidden rounded-2xl border border-[#e1d5c3] shadow-sm">
                 <iframe
-                  title="The Maradi — Batumi office"
+                  title="The Eternal Memory — Batumi office"
                   src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d734.4!2d41.6265!3d41.6406!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x4053b8b9b4e4c5a7%3A0x0!2sPetre+Bagrationi+St+220%2C+Batumi!5e0!3m2!1str!2sge!4v1717750000000!5m2!1str!2sge"
                   width="100%"
                   height="220"
@@ -194,7 +194,7 @@ export default function ContactPageClient() {
       {/* FOOTER */}
       <footer className="border-t border-[#e6dccb] bg-[#fbf8f1] px-5 py-8 sm:px-8">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 text-sm text-[#8a7a64] sm:flex-row">
-          <Link href="/" className="font-serif text-lg text-[#173d31]">The Maradi</Link>
+          <Link href="/" className="font-serif text-lg text-[#173d31]">The Eternal Memory</Link>
           <div className="flex gap-6">
             <Link href="/privacy" className="hover:text-[#173d31]">{c.footer.privacy}</Link>
             <Link href="/terms" className="hover:text-[#173d31]">{c.footer.terms}</Link>

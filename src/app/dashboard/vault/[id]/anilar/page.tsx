@@ -75,10 +75,10 @@ export default async function AnilarPage({ params, searchParams }: Props) {
               <span className="text-lg">✍️</span>
               <h2 className="font-semibold text-[#1f2d27]">Yeni Anı Ekle</h2>
             </div>
-            <form action={addAction} encType="multipart/form-data" className="space-y-4">
+            <form action={addAction} className="space-y-4">
               <input type="hidden" name="is_secret" value="false" />
 
-              <div className="grid sm:grid-cols-2 gap-4">
+              <div className="grid sm:grid-cols-3 gap-4">
                 <div>
                   <label className={labelCls}>Anı Tarihi <span className="text-[#dfbd72]">*</span></label>
                   <input type="date" name="memory_date" required className={inputCls} />
@@ -87,6 +87,15 @@ export default async function AnilarPage({ params, searchParams }: Props) {
                 <div>
                   <label className={labelCls}>Başlık (opsiyonel)</label>
                   <input type="text" name="title" placeholder="Anı başlığı..." className={inputCls} />
+                </div>
+                <div>
+                  <label className={labelCls}>Bölüm</label>
+                  <select name="section" className={inputCls}>
+                    <option value="genel">Genel Anı</option>
+                    <option value="kronoloji">Kronoloji (Zaman Tüneli)</option>
+                    <option value="featured">Öne Çıkan</option>
+                  </select>
+                  <p className="mt-1 text-xs text-[#adb5ab]">Kronoloji ve öne çıkan anılar ayrı bölümlerde görünür</p>
                 </div>
               </div>
 
@@ -159,7 +168,7 @@ export default async function AnilarPage({ params, searchParams }: Props) {
                           <span>✏️</span> Anıyı Düzenle
                         </p>
                         <form action={update} className="space-y-3">
-                          <div className="grid sm:grid-cols-2 gap-3">
+                          <div className="grid sm:grid-cols-3 gap-3">
                             <div>
                               <label className={labelCls}>Tarih <span className="text-[#dfbd72]">*</span></label>
                               <input type="date" name="memory_date" required
@@ -171,6 +180,14 @@ export default async function AnilarPage({ params, searchParams }: Props) {
                               <input type="text" name="title"
                                 defaultValue={m.title ?? ''}
                                 placeholder="Başlık..." className={inputCls} />
+                            </div>
+                            <div>
+                              <label className={labelCls}>Bölüm</label>
+                              <select name="section" defaultValue={(m as Record<string, unknown>).section as string ?? 'genel'} className={inputCls}>
+                                <option value="genel">Genel Anı</option>
+                                <option value="kronoloji">Kronoloji</option>
+                                <option value="featured">Öne Çıkan</option>
+                              </select>
                             </div>
                           </div>
                           <div>
@@ -223,11 +240,19 @@ export default async function AnilarPage({ params, searchParams }: Props) {
                         <div className="p-5">
                           <div className="flex items-start justify-between gap-3">
                             <div className="flex-1">
+                              <div className="flex flex-wrap items-center gap-2 mb-1.5">
                               {m.memory_date && (
-                                <p className="text-xs font-semibold text-[#dfbd72] tracking-wide mb-1.5">
+                                <p className="text-xs font-semibold text-[#dfbd72] tracking-wide">
                                   {new Date(m.memory_date).toLocaleDateString('tr-TR', { year: 'numeric', month: 'long', day: 'numeric' })}
                                 </p>
                               )}
+                              {(m as Record<string, unknown>).section === 'kronoloji' && (
+                                <span className="rounded-full bg-[#0c3327]/10 px-2 py-0.5 text-[10px] font-semibold text-[#174f35]">Kronoloji</span>
+                              )}
+                              {(m as Record<string, unknown>).section === 'featured' && (
+                                <span className="rounded-full bg-[#dfbd72]/20 px-2 py-0.5 text-[10px] font-semibold text-[#93620f]">Öne Çıkan</span>
+                              )}
+                            </div>
                               {m.title && <h3 className="font-semibold text-[#1f2d27] mb-1.5 font-serif text-lg">{m.title}</h3>}
                               <p className="text-[#4a5e55] text-sm leading-7 whitespace-pre-wrap">{m.content}</p>
                             </div>

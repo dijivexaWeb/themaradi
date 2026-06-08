@@ -4,7 +4,7 @@ import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 
 export const metadata: Metadata = {
-  title: 'Admin Girişi — The Maradi',
+  title: 'Admin Girişi — The Eternal Memory',
   robots: { index: false, follow: false },
 }
 
@@ -27,7 +27,7 @@ export default async function AdminLoginPage() {
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="mb-8 text-center">
-          <span className="font-serif text-2xl text-white">The Maradi</span>
+          <span className="font-serif text-2xl text-white">The Eternal Memory</span>
           <p className="mt-1 text-xs tracking-[0.2em] uppercase text-slate-500">
             Yönetim Paneli
           </p>

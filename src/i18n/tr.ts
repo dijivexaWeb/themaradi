@@ -66,7 +66,7 @@ const tr: LangDict = {
     },
 
     whySection: {
-      heading: 'Neden The Maradi?',
+      heading: 'Neden The Eternal Memory?',
       sub: 'Bir mezar taşından fazlasını, saygılı ve kalıcı bir dijital anı deneyimine dönüştürür.',
     },
 
@@ -93,7 +93,7 @@ const tr: LangDict = {
       },
       {
         title: 'Ömür boyu açık kalma taahhüdü',
-        text: 'The Maradi kalıcı çalışmayı taahhüt eder. Anma Profilleri ömür boyu erişilebilir kalır; ek ücret veya yenileme gerekmez. QR plakalar hiçbir zaman geçersiz olmaz.',
+        text: 'The Eternal Memory kalıcı çalışmayı taahhüt eder. Anma Profilleri ömür boyu erişilebilir kalır; ek ücret veya yenileme gerekmez. QR plakalar hiçbir zaman geçersiz olmaz.',
       },
     ],
 
@@ -216,7 +216,7 @@ const tr: LangDict = {
       },
       {
         q: 'QR plakanın ömrü ne kadar?',
-        a: 'The Maradi QR kodu slug veya alan adına değil, veritabanındaki benzersiz bir kimliğe bağlıdır. Alan adı değişse bile plaka çalışır. The Maradi ömür boyu açık kalma taahhüdü kapsamındadır; QR plakalar hiçbir zaman geçersiz hale gelmez.',
+        a: 'The Eternal Memory QR kodu slug veya alan adına değil, veritabanındaki benzersiz bir kimliğe bağlıdır. Alan adı değişse bile plaka çalışır. The Eternal Memory ömür boyu açık kalma taahhüdü kapsamındadır; QR plakalar hiçbir zaman geçersiz hale gelmez.',
       },
       {
         q: 'Neden kimlik belgesi istiyorsunuz?',
@@ -224,7 +224,7 @@ const tr: LangDict = {
       },
       {
         q: 'Platform kapanırsa ne olur?',
-        a: 'The Maradi ömür boyu açık kalma taahhüdü vermektedir. Oluşturulan Anma Profilleri kalıcıdır; ek ücret, abonelik veya yenileme gerekmez. QR plakalar hiçbir zaman geçersiz hale gelmez — alan adı veya URL değişse bile yönlendirme çalışır.',
+        a: 'The Eternal Memory ömür boyu açık kalma taahhüdü vermektedir. Oluşturulan Anma Profilleri kalıcıdır; ek ücret, abonelik veya yenileme gerekmez. QR plakalar hiçbir zaman geçersiz hale gelmez — alan adı veya URL değişse bile yönlendirme çalışır.',
       },
       {
         q: 'Aile üyeleri içerik ekleyebilir mi?',
@@ -261,7 +261,7 @@ const tr: LangDict = {
       platformLinks: [
         { label: 'Ana sayfa', href: '/' },
         { label: 'Nasıl çalışır', href: '#nasil-calisir' },
-        { label: 'Neden The Maradi?', href: '#ozellikler' },
+        { label: 'Neden The Eternal Memory?', href: '#ozellikler' },
         { label: 'Örnek Profil', href: '/memorial/demo' },
         { label: 'Fiyatlandırma', href: '/pricing' },
         { label: 'SSS', href: '#sss' },
@@ -275,12 +275,12 @@ const tr: LangDict = {
         { label: 'Kullanım Koşulları', href: '/terms' },
         { label: 'Doğrulama Politikası', href: '/legal/verification-policy' },
       ],
-      copyright: '© 2026 The Maradi. Tüm hakları saklıdır.',
+      copyright: '© 2026 The Eternal Memory. Tüm hakları saklıdır.',
     },
   },
 
   pricing: {
-    pageTitle: 'Fiyatlandırma — The Maradi',
+    pageTitle: 'Fiyatlandırma — The Eternal Memory',
     nav: {
       home: 'Ana Sayfa',
       demoProfile: 'Örnek Profil',
@@ -443,14 +443,14 @@ const tr: LangDict = {
       privacy: 'Gizlilik',
       terms: 'Koşullar',
       contact: 'İletişim',
-      copyright: '© 2026 The Maradi',
+      copyright: '© 2026 The Eternal Memory',
     },
     bulkContact: 'Kurumsal veya toplu sipariş için',
     bulkContactLink: 'bizimle iletişime geçin',
   },
 
   contact: {
-    pageTitle: 'İletişim — The Maradi',
+    pageTitle: 'İletişim — The Eternal Memory',
     nav: {
       home: 'Ana Sayfa',
       pricing: 'Fiyatlar',
@@ -511,7 +511,7 @@ const tr: LangDict = {
       privacy: 'Gizlilik',
       terms: 'Koşullar',
       pricing: 'Fiyatlar',
-      copyright: '© 2026 The Maradi',
+      copyright: '© 2026 The Eternal Memory',
     },
   },
 
@@ -547,7 +547,7 @@ const tr: LangDict = {
       footerPrivacy: 'Gizlilik',
       footerTerms: 'Koşullar',
       footerContact: 'İletişim',
-      copyright: '© 2026 The Maradi',
+      copyright: '© 2026 The Eternal Memory',
     },
 
     privacy: {
@@ -572,11 +572,11 @@ const tr: LangDict = {
       sections: {
         controller: {
           h: '1. Veri Sorumlusu',
-          p1: 'Bu politika, The Maradi ticari unvanıyla faaliyet gösteren ve aşağıdaki adreste kayıtlı veri sorumlusuna aittir:',
+          p1: 'Bu politika, The Eternal Memory ticari unvanıyla faaliyet gösteren ve aşağıdaki adreste kayıtlı veri sorumlusuna aittir:',
           address: 'Petre Bagrationi Str. 220, Batumi, Gürcistan',
-          email: 'privacy@themaradi.com',
+          email: 'privacy@theeternalmemory.com',
           tel: '+995 555 511 884',
-          p2: 'The Maradi; Gürcistan Kişisel Verilerin Koruma Kanunu (2012, rev. 2024), AB Genel Veri Koruma Tüzüğü (GDPR — 2016/679) ve Türkiye\'de yerleşik kullanıcılar için 6698 sayılı KVKK kapsamında kişisel verilerinizi işler.',
+          p2: 'The Eternal Memory; Gürcistan Kişisel Verilerin Koruma Kanunu (2012, rev. 2024), AB Genel Veri Koruma Tüzüğü (GDPR — 2016/679) ve Türkiye\'de yerleşik kullanıcılar için 6698 sayılı KVKK kapsamında kişisel verilerinizi işler.',
         },
         collected: {
           h: '2. Toplanan Veriler',
@@ -603,7 +603,7 @@ const tr: LangDict = {
         },
         special: {
           h: '4. Özel Nitelikli Veriler',
-          p: 'Vefat belgeleri ve içerebileceği biyometrik görüntüler özel nitelikli kişisel veri kategorisine girmektedir. The Maradi bu belgeleri yalnızca Anma Profili başvurularının kimlik doğrulaması amacıyla işler ve 30 gün içinde kalıcı olarak siler.',
+          p: 'Vefat belgeleri ve içerebileceği biyometrik görüntüler özel nitelikli kişisel veri kategorisine girmektedir. The Eternal Memory bu belgeleri yalnızca Anma Profili başvurularının kimlik doğrulaması amacıyla işler ve 30 gün içinde kalıcı olarak siler.',
         },
         retention: {
           h: '5. Saklama Süreleri',
@@ -651,7 +651,7 @@ const tr: LangDict = {
             'Şikayet: Gürcistan Kişisel Verilerin Koruma Hizmetine şikayette bulunabilirsiniz',
           ],
           contact: 'Haklarınızı kullanmak için:',
-          email: 'privacy@themaradi.com',
+          email: 'privacy@theeternalmemory.com',
           note: '30 gün içinde yanıt veriyoruz.',
         },
         cookies: {
@@ -660,7 +660,7 @@ const tr: LangDict = {
         },
         children: {
           h: '11. Çocukların Gizliliği',
-          p: 'The Maradi, bilerek 16 yaşın altındaki bireylerden kişisel veri toplamaz. Bir çocuğun kişisel veri sağladığını düşünüyorsanız lütfen privacy@themaradi.com adresinden bizimle iletişime geçin.',
+          p: 'The Eternal Memory, bilerek 16 yaşın altındaki bireylerden kişisel veri toplamaz. Bir çocuğun kişisel veri sağladığını düşünüyorsanız lütfen privacy@theeternalmemory.com adresinden bizimle iletişime geçin.',
         },
         changes: {
           h: '12. Değişiklikler',
@@ -668,7 +668,7 @@ const tr: LangDict = {
         },
         contactSection: {
           h: '13. İletişim',
-          email: 'privacy@themaradi.com',
+          email: 'privacy@theeternalmemory.com',
           tel: '+995 555 511 884',
           address: 'Petre Bagrationi Str. 220, Batumi, Gürcistan',
         },
@@ -697,12 +697,12 @@ const tr: LangDict = {
       content: {
         parties: {
           h: '1. Taraflar ve Kapsam',
-          p1: 'Bu Kullanım Koşulları, The Maradi (Petre Bagrationi Str. 220, Batumi, Gürcistan — bundan böyle "The Maradi", "biz", "bizim") ile platformu kullanan gerçek ya da tüzel kişi ("Kullanıcı", "siz") arasındaki sözleşmeyi oluşturur. Platformu kullanmaya başladığınız anda bu koşulları kabul etmiş sayılırsınız.',
+          p1: 'Bu Kullanım Koşulları, The Eternal Memory (Petre Bagrationi Str. 220, Batumi, Gürcistan — bundan böyle "The Eternal Memory", "biz", "bizim") ile platformu kullanan gerçek ya da tüzel kişi ("Kullanıcı", "siz") arasındaki sözleşmeyi oluşturur. Platformu kullanmaya başladığınız anda bu koşulları kabul etmiş sayılırsınız.',
           p2: '18 yaşından küçükseniz platformu kullanamazsınız. Üçüncü bir kişi adına başvuru yapıyorsanız o kişi adına yetkili olduğunuzu beyan edersiniz.',
         },
         services: {
           h: '2. Hizmetler',
-          p: 'The Maradi iki temel ürün sunar:',
+          p: 'The Eternal Memory iki temel ürün sunar:',
           memorialH: '2.1 Anma Profili',
           memorialP: 'Vefat eden bir kişi için aile veya yetkili yakın tarafından oluşturulan, tek seferlik ücrete tabi dijital anıt profilidir. Profil; biyografi, fotoğraf, video, mezarlık bilgisi ve QR plaka hizmetini kapsar. Yayına girmeden önce kimlik doğrulama ve 14 günlük itiraz süreci uygulanır.',
           vaultH: '2.2 Yaşam Kasası',
@@ -732,12 +732,12 @@ const tr: LangDict = {
         },
         content: {
           h: '7. İçerik Hakları',
-          p1: 'Yüklediğiniz içeriklerin tüm telif hakları size aittir. The Maradi\'ye hizmetin sağlanması amacıyla içeriklerinizi depolamak, görüntülemek ve yedeklemek için münhasır olmayan lisans verirsiniz.',
-          p2: 'The Maradi, yasaları veya bu koşulları ihlal eden içerikleri önceden bildirimde bulunmaksızın kaldırabilir.',
+          p1: 'Yüklediğiniz içeriklerin tüm telif hakları size aittir. The Eternal Memory\'ye hizmetin sağlanması amacıyla içeriklerinizi depolamak, görüntülemek ve yedeklemek için münhasır olmayan lisans verirsiniz.',
+          p2: 'The Eternal Memory, yasaları veya bu koşulları ihlal eden içerikleri önceden bildirimde bulunmaksızın kaldırabilir.',
         },
         liability: {
           h: '8. Sorumluluk Sınırı',
-          p: 'The Maradi\'nin doğrudan zararlar için toplam sorumluluğu, kullanıcının son 12 ayda ödediği toplam ücretlerle sınırlıdır. Dolaylı, tesadüfi veya sonuç niteliğindeki zararlar için sorumluluk kabul edilmez.',
+          p: 'The Eternal Memory\'nin doğrudan zararlar için toplam sorumluluğu, kullanıcının son 12 ayda ödediği toplam ücretlerle sınırlıdır. Dolaylı, tesadüfi veya sonuç niteliğindeki zararlar için sorumluluk kabul edilmez.',
         },
         suspension: {
           h: '9. Hesap Askıya Alma',
@@ -754,7 +754,7 @@ const tr: LangDict = {
         },
         continuity: {
           h: '11. Hizmet Sürekliliği Taahhüdü',
-          p: 'The Maradi, Anma Profillerinin kalıcı olarak erişilebilir kalmasını taahhüt eder. Hizmetin kapanması durumunda kullanıcılara en az 6 ay önceden bildirimde bulunulur ve veri dışa aktarma imkânı sağlanır.',
+          p: 'The Eternal Memory, Anma Profillerinin kalıcı olarak erişilebilir kalmasını taahhüt eder. Hizmetin kapanması durumunda kullanıcılara en az 6 ay önceden bildirimde bulunulur ve veri dışa aktarma imkânı sağlanır.',
         },
         law: {
           h: '12. Uygulanacak Hukuk',
@@ -780,7 +780,7 @@ const tr: LangDict = {
       sections: {
         controller: {
           h: '1. Veri Sorumlusu',
-          p: 'The Maradi, dijital anıt profili ve yaşam kasası hizmetleri kapsamında kullanıcı verilerini 6698 sayılı Kişisel Verilerin Korunması Kanunu (KVKK) uyarınca işlemektedir. Veri sorumlusu: The Maradi — Petre Bagrationi Str. 220, Batumi, Gürcistan. İletişim: privacy@themaradi.com',
+          p: 'The Eternal Memory, dijital anıt profili ve yaşam kasası hizmetleri kapsamında kullanıcı verilerini 6698 sayılı Kişisel Verilerin Korunması Kanunu (KVKK) uyarınca işlemektedir. Veri sorumlusu: The Eternal Memory — Petre Bagrationi Str. 220, Batumi, Gürcistan. İletişim: privacy@theeternalmemory.com',
         },
         categories: {
           h: '2. İşlenen Veri Kategorileri',
@@ -803,7 +803,7 @@ const tr: LangDict = {
           h: '4. KVKK Kapsamındaki Haklarınız',
           p1: 'KVKK Madde 11 kapsamında; kişisel verilerinizin işlenip işlenmediğini öğrenme, işlenmişse bilgi talep etme, amacına uygun kullanılıp kullanılmadığını öğrenme, yurt içinde veya yurt dışında aktarıldığı üçüncü kişileri bilme, eksik veya yanlış işlenmiş verilerin düzeltilmesini isteme, silinmesini veya yok edilmesini talep etme, bu işlemlerin aktarıldığı kişilere bildirilmesini isteme, otomatik sistemlerle aleyhinize bir sonucun ortaya çıkmasına itiraz etme ve zarara uğramanız halinde zararın giderilmesini talep etme haklarına sahipsiniz.',
           p2: 'Başvurularınız için:',
-          email: 'privacy@themaradi.com',
+          email: 'privacy@theeternalmemory.com',
           note: '— 30 gün içinde yanıtlıyoruz.',
         },
       },
@@ -860,7 +860,7 @@ const tr: LangDict = {
       sections: {
         purpose: {
           h: '1. Amaç ve Kapsam',
-          p: 'Bu politika, The Maradi platformunda Anma Profili oluşturulurken uygulanan kimlik doğrulama sürecini, gerekli belgeleri, inceleme adımlarını ve 14 günlük itiraz penceresini açıklamaktadır. Tüm Anma Profili başvuruları bu politika kapsamındadır.',
+          p: 'Bu politika, The Eternal Memory platformunda Anma Profili oluşturulurken uygulanan kimlik doğrulama sürecini, gerekli belgeleri, inceleme adımlarını ve 14 günlük itiraz penceresini açıklamaktadır. Tüm Anma Profili başvuruları bu politika kapsamındadır.',
         },
         why: {
           h: '2. Neden Doğrulama Gerekiyor?',
@@ -870,7 +870,7 @@ const tr: LangDict = {
             'Aile üyelerinde derin psikolojik travmaya yol açabilir,',
             'Dolandırıcılık, miras usulsüzlüğü veya iftira gibi suçların aracı haline gelebilir.',
           ],
-          p2: 'Bu nedenle The Maradi, her Anma Profili başvurusunda belge doğrulama ve itiraz penceresi zorunluluğu getirmektedir. Bu süreç tek taraflı bir şüphe değil; tüm başvurulara eşit şekilde uygulanan bir standart prosedürdür.',
+          p2: 'Bu nedenle The Eternal Memory, her Anma Profili başvurusunda belge doğrulama ve itiraz penceresi zorunluluğu getirmektedir. Bu süreç tek taraflı bir şüphe değil; tüm başvurulara eşit şekilde uygulanan bir standart prosedürdür.',
         },
         documents: {
           h: '3. Gerekli Belgeler',
@@ -878,7 +878,7 @@ const tr: LangDict = {
           items2a: ['Nüfus cüzdanı veya pasaport (ön yüz)'],
           h2b: '3.2 Vefat Kanıtı',
           items2b: ['Resmi vefat belgesi', 'Veya eşdeğer resmi statüdeki bir belge'],
-          note: 'Belgeler yalnızca yetkili The Maradi çalışanları tarafından incelenir. Şifreli olarak saklanır ve inceleme sonrasında 30 gün içinde sistemden kalıcı olarak silinir.',
+          note: 'Belgeler yalnızca yetkili The Eternal Memory çalışanları tarafından incelenir. Şifreli olarak saklanır ve inceleme sonrasında 30 gün içinde sistemden kalıcı olarak silinir.',
         },
         process: {
           h: '4. Doğrulama Süreci',
@@ -904,7 +904,7 @@ const tr: LangDict = {
           h: '6. İtiraz Nasıl Yapılır?',
           methods: [
             'Profil sayfasındaki "Bu Profili Bildir" düğmesine tıklayın',
-            'E-posta gönderin: privacy@themaradi.com',
+            'E-posta gönderin: privacy@theeternalmemory.com',
             'Telefon: +995 555 511 884',
           ],
           p: 'İtirazda şunlar bulunmalıdır: adınız, profille ilişkiniz, iletişim bilgileriniz ve mümkünse destekleyici belge.',
@@ -942,11 +942,11 @@ const tr: LangDict = {
         },
         appeal: {
           h: '11. İtiraz Reddi ve İtiraz',
-          p: 'İtirazınız reddedildiyse privacy@themaradi.com adresine ek kanıtlarla yeniden başvurabilirsiniz. Kararın hatalı olduğunu düşünüyorsanız Gürcistan Kişisel Verilerin Koruma Hizmeti\'ne itiraz edebilirsiniz.',
+          p: 'İtirazınız reddedildiyse privacy@theeternalmemory.com adresine ek kanıtlarla yeniden başvurabilirsiniz. Kararın hatalı olduğunu düşünüyorsanız Gürcistan Kişisel Verilerin Koruma Hizmeti\'ne itiraz edebilirsiniz.',
         },
         contactSection: {
           h: '12. İletişim',
-          email: 'privacy@themaradi.com',
+          email: 'privacy@theeternalmemory.com',
           tel: '+995 555 511 884',
           address: 'Petre Bagrationi Str. 220, Batumi, Gürcistan',
         },

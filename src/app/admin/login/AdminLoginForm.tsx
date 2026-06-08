@@ -20,7 +20,7 @@ export default function AdminLoginForm() {
           type="email"
           required
           autoComplete="email"
-          placeholder="admin@themaradi.com"
+          placeholder="admin@theeternalmemory.com"
           className="w-full rounded-xl border border-slate-700 bg-slate-800 px-4 py-3 text-sm text-white placeholder-slate-600 outline-none transition focus:border-emerald-600 focus:ring-2 focus:ring-emerald-600/20"
         />
       </div>

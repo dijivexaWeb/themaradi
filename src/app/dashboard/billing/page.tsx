@@ -43,7 +43,7 @@ export default async function BillingPage() {
           <div className="glass rounded-2xl border border-amber-500/20 p-7">
             <h2 className="text-lg font-bold text-slate-100">Aktif ödeme veya muafiyet bulunmuyor</h2>
             <p className="mt-2 max-w-2xl text-sm leading-7 text-slate-500">
-              The Maradi’de ücretsiz plan yoktur. Anı alanı satın alma sonrası açılır; özel muafiyetler admin panelinden tanımlanır.
+              The Eternal Memory’de ücretsiz plan yoktur. Anı alanı satın alma sonrası açılır; özel muafiyetler admin panelinden tanımlanır.
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
               <Link href="/satin-al" className="rounded-xl bg-amber-500 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-amber-400">

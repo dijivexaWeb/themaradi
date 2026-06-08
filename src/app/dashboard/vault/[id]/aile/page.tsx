@@ -12,12 +12,18 @@ interface Props {
 
 const REL_LABELS: Record<string, string> = {
   mother: 'Annesi', father: 'Babası', spouse: 'Eşi', son: 'Oğlu',
-  daughter: 'Kızı', sibling: 'Kardeşi', grandparent: 'Büyükanne/Büyükbaba',
+  daughter: 'Kızı', sibling: 'Kardeşi',
+  gm_maternal: 'Anneannesi', gf_maternal: 'Dedesi (Anne T.)',
+  gm_paternal: 'Babaannesi', gf_paternal: 'Dedesi (Baba T.)',
+  uncle: 'Amcası/Dayısı', aunt: 'Halası/Teyzesi',
+  grandparent: 'Büyükanne/Büyükbabası',
   grandchild: 'Torunu', other: 'Diğer',
 }
 const REL_ICONS: Record<string, string> = {
   mother: '👩', father: '👨', spouse: '💑', son: '👦',
-  daughter: '👧', sibling: '🧑', grandparent: '👴', grandchild: '🧒', other: '👤',
+  daughter: '👧', sibling: '🧑', grandparent: '👴', grandchild: '🧒',
+  gm_maternal: '👵', gf_maternal: '👴', gm_paternal: '👵', gf_paternal: '👴',
+  uncle: '🧔', aunt: '👩', other: '👤',
 }
 
 export default async function AilePage({ params, searchParams }: Props) {
@@ -41,8 +47,8 @@ export default async function AilePage({ params, searchParams }: Props) {
   const pageUrl = `/dashboard/vault/${id}/aile`
   const editMember = editId ? (members ?? []).find(m => m.id === editId) : null
 
-  // Children/daughters available for grandchild parent selection
-  const parentCandidates = (members ?? []).filter(m => ['son', 'daughter'].includes(m.relationship))
+  // All members can be a parent for any sub-member
+  const parentCandidates = (members ?? [])
 
   const dInputCls = `w-full rounded-xl border border-white/15 bg-white/5 px-4 py-3 text-sm text-[#efe7d8] placeholder-white/30 outline-none focus:border-[#c7a76f]/60 focus:ring-1 focus:ring-[#c7a76f]/20`
   const dSelectCls = `w-full rounded-xl border border-white/15 bg-[#0d1412] px-4 py-3 text-sm text-[#efe7d8] outline-none focus:border-[#c7a76f]/60`
@@ -102,7 +108,7 @@ export default async function AilePage({ params, searchParams }: Props) {
                         </div>
                         <Link href={pageUrl} className="text-xs text-[#8f9f96] hover:text-[#c7a76f] transition-colors">← İptal</Link>
                       </div>
-                      <form action={updateFamilyMemberAction.bind(null, editMember.id, id)} encType="multipart/form-data" className="space-y-3">
+                      <form action={updateFamilyMemberAction.bind(null, editMember.id, id)} className="space-y-3">
                         <div className="grid grid-cols-2 gap-3">
                           <div>
                             <label className={dLabelCls}>Yakınlık *</label>
@@ -117,15 +123,15 @@ export default async function AilePage({ params, searchParams }: Props) {
                             <input type="text" name="full_name" required defaultValue={editMember.full_name} className={dInputCls} />
                           </div>
                         </div>
-                        {/* Parent selection for grandchildren */}
-                        {editMember.relationship === 'grandchild' && parentCandidates.length > 0 && (
+                        {/* Parent selector — who is this person connected to? */}
+                        {parentCandidates.length > 0 && (
                           <div>
-                            <label className={dLabelCls}>Ebeveyn (hangi oğul/kızın çocuğu?)</label>
+                            <label className={dLabelCls}>Kime bağlı? <span className="text-white/30 font-normal">(opsiyonel — başka birinin yakını ise seçin)</span></label>
                             <select name="parent_member_id" className={dSelectCls}
                               defaultValue={(editMember as Record<string, unknown>).parent_member_id as string ?? ''}>
-                              <option value="">Seçiniz...</option>
+                              <option value="">Profil sahibine bağlı</option>
                               {parentCandidates.map(p => (
-                                <option key={p.id} value={p.id}>{REL_ICONS[p.relationship]} {p.full_name}</option>
+                                <option key={p.id} value={p.id}>{REL_ICONS[p.relationship] ?? '👤'} {p.full_name}</option>
                               ))}
                             </select>
                           </div>
@@ -172,7 +178,7 @@ export default async function AilePage({ params, searchParams }: Props) {
                         </div>
                         <Link href={pageUrl} className="text-xs text-[#8f9f96] hover:text-[#c7a76f] transition-colors">← Kapat</Link>
                       </div>
-                      <form action={addAction} encType="multipart/form-data" className="space-y-3">
+                      <form action={addAction} className="space-y-3">
                         <div className="grid grid-cols-2 gap-3">
                           <div>
                             <label className={dLabelCls}>Yakınlık *</label>
@@ -188,14 +194,14 @@ export default async function AilePage({ params, searchParams }: Props) {
                             <input type="text" name="full_name" required placeholder="Ad Soyad" className={dInputCls} />
                           </div>
                         </div>
-                        {/* Parent selector for grandchildren (always visible if candidates exist) */}
+                        {/* Parent selector — who is this person connected to? */}
                         {parentCandidates.length > 0 && (
                           <div>
-                            <label className={dLabelCls}>Ebeveyn <span className="text-white/30 font-normal">(torun ekliyorsanız seçin)</span></label>
+                            <label className={dLabelCls}>Kime bağlı? <span className="text-white/30 font-normal">(opsiyonel — başka birinin yakını ise seçin)</span></label>
                             <select name="parent_member_id" className={dSelectCls}>
-                              <option value="">Seçiniz...</option>
+                              <option value="">Profil sahibine bağlı</option>
                               {parentCandidates.map(p => (
-                                <option key={p.id} value={p.id}>{REL_ICONS[p.relationship]} {p.full_name}</option>
+                                <option key={p.id} value={p.id}>{REL_ICONS[p.relationship] ?? '👤'} {p.full_name}</option>
                               ))}
                             </select>
                           </div>
@@ -246,6 +252,14 @@ export default async function AilePage({ params, searchParams }: Props) {
           )}
 
           {/* ── Animated family tree ── */}
+          {(members?.length ?? 0) > 0 && (
+            <div className="mb-4 flex justify-end">
+              <Link href={`/dashboard/vault/${id}/aile/tam-agac`}
+                className="inline-flex items-center gap-1.5 rounded-xl border border-[#c7a76f]/30 bg-[#c7a76f]/8 px-4 py-2 text-xs font-semibold text-[#c7a76f] hover:border-[#c7a76f]/60 hover:bg-[#c7a76f]/15 transition-colors">
+                🌳 Tam Ağacı Gör →
+              </Link>
+            </div>
+          )}
           {(members?.length ?? 0) === 0 ? (
             <div className="overflow-hidden rounded-2xl border border-white/10 bg-[#0d1412] shadow-2xl shadow-black/30">
               <div className="py-16 text-center">

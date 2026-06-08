@@ -2,9 +2,9 @@ import type { Metadata } from 'next'
 import ContactPageClient from './ContactPageClient'
 
 export const metadata: Metadata = {
-  title: 'İletişim — The Maradi',
+  title: 'İletişim — The Eternal Memory',
   description:
-    'The Maradi ile iletişime geçin. Batumi, Gürcistan ofisimiz — Anma Profili, Yaşam Kasası ve QR plaka soruları için.',
+    'The Eternal Memory ile iletişime geçin. Batumi, Gürcistan ofisimiz — Anma Profili, Yaşam Kasası ve QR plaka soruları için.',
 }
 
 export default function ContactPage() {

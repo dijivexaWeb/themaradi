@@ -56,7 +56,12 @@ export async function addFamilyMemberAction(vaultId: string, formData: FormData)
   const photoUrl = await uploadFamilyPhoto(vaultId, user.id, formData)
   const notes = (formData.get('notes') as string)?.trim() || null
 
-  const validRels = ['mother','father','spouse','son','daughter','sibling','grandparent','grandchild','other']
+  const validRels = [
+    'mother','father','spouse','son','daughter','sibling',
+    'grandparent','grandchild','other',
+    'gm_maternal','gf_maternal','gm_paternal','gf_paternal',
+    'uncle','aunt',
+  ]
   if (!fullName || !validRels.includes(relationship)) return
 
   const parentMemberId = (formData.get('parent_member_id') as string) || null
@@ -70,7 +75,7 @@ export async function addFamilyMemberAction(vaultId: string, formData: FormData)
     is_alive: isAlive,
     photo_url: photoUrl,
     notes,
-    parent_member_id: relationship === 'grandchild' ? parentMemberId : null,
+    parent_member_id: parentMemberId,
   })
 
   revalidatePath(`/dashboard/vault/${vaultId}/aile`)
@@ -106,7 +111,7 @@ export async function updateFamilyMemberAction(memberId: string, vaultId: string
       is_alive: isAlive,
       photo_url: photoUrl,
       notes,
-      parent_member_id: relationship === 'grandchild' ? parentMemberId : null,
+      parent_member_id: parentMemberId,
     })
     .eq('id', memberId)
     .eq('vault_id', vaultId)

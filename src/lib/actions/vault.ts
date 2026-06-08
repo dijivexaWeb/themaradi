@@ -155,6 +155,22 @@ export async function linkQRToVaultAction(vaultId: string, qrHash: string) {
   return { success: true }
 }
 
+async function uploadBgPhoto(vaultId: string, userId: string, formData: FormData) {
+  const file = formData.get('hero_bg_file')
+  if (!(file instanceof File) || file.size === 0) return null
+  if (!file.type.startsWith('image/') || file.size > MAX_PROFILE_PHOTO_BYTES) return null
+
+  const service = await createServiceClient()
+  const path = `${vaultId}/${userId}/hero-bg-${Date.now()}-${cleanFilename(file.name)}`
+  const { error } = await service.storage.from(MEDIA_BUCKET).upload(path, file, {
+    contentType: file.type,
+    upsert: false,
+  })
+  if (error) return null
+  const { data } = service.storage.from(MEDIA_BUCKET).getPublicUrl(path)
+  return data.publicUrl
+}
+
 export async function saveVaultProfileAction(vaultId: string, formData: FormData): Promise<void> {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -162,7 +178,7 @@ export async function saveVaultProfileAction(vaultId: string, formData: FormData
 
   const { data: vault } = await supabase
     .from('vaults')
-    .select('id, display_name, status, cover_photo_url')
+    .select('id, display_name, status, cover_photo_url, hero_bg_url')
     .eq('id', vaultId)
     .eq('owner_id', user.id)
     .single()
@@ -175,6 +191,12 @@ export async function saveVaultProfileAction(vaultId: string, formData: FormData
     ?? vault.cover_photo_url
     ?? null
 
+  const uploadedBgUrl = await uploadBgPhoto(vaultId, user.id, formData)
+  const heroBgUrl = uploadedBgUrl
+    ?? (formData.get('hero_bg_url') as string)?.trim()
+    ?? (vault as Record<string, unknown>).hero_bg_url as string | null
+    ?? null
+
   const { error } = await supabase
     .from('vaults')
     .update({
@@ -185,9 +207,16 @@ export async function saveVaultProfileAction(vaultId: string, formData: FormData
       birth_place: (formData.get('birth_place') as string)?.trim() || null,
       death_place: (formData.get('death_place') as string)?.trim() || null,
       cover_photo_url: coverPhotoUrl || null,
+      hero_bg_url: heroBgUrl || null,
       last_message: (formData.get('last_message') as string)?.trim() || null,
       cemetery_name: (formData.get('cemetery_name') as string)?.trim() || null,
       cemetery_address: (formData.get('cemetery_address') as string)?.trim() || null,
+      cemetery_lat: (formData.get('cemetery_lat') as string) ? parseFloat(formData.get('cemetery_lat') as string) : null,
+      cemetery_lng: (formData.get('cemetery_lng') as string) ? parseFloat(formData.get('cemetery_lng') as string) : null,
+      cemetery_plot: (formData.get('cemetery_plot') as string)?.trim() || null,
+      cemetery_row: (formData.get('cemetery_row') as string)?.trim() || null,
+      cemetery_hours: (formData.get('cemetery_hours') as string)?.trim() || null,
+      cemetery_note: (formData.get('cemetery_note') as string)?.trim() || null,
       updated_at: new Date().toISOString(),
     })
     .eq('id', vaultId)

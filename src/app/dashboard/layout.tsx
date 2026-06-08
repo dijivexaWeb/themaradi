@@ -103,7 +103,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
               {initial}
             </div>
             <div className="min-w-0 flex-1">
-              <div className="truncate text-sm font-semibold text-[#21372e]">{profile?.full_name ?? 'The Maradi Üyesi'}</div>
+              <div className="truncate text-sm font-semibold text-[#21372e]">{profile?.full_name ?? 'The Eternal Memory Üyesi'}</div>
               <div className="truncate text-xs text-[#7b837d]">{user.email}</div>
             </div>
           </div>

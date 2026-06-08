@@ -5,7 +5,7 @@ import { fetchPricingConfig } from '@/lib/pricing'
 export const revalidate = 3600
 
 export const metadata: Metadata = {
-  title: 'Pricing — The Maradi',
+  title: 'Pricing — The Eternal Memory',
   description:
     'Memorial Profile or Life Vault — bring your loved ones\' memories into the digital realm. QR grave plate from Georgia included.',
 }

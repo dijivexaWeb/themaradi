@@ -13,6 +13,7 @@ import {
   Users,
   HeartPulse,
   Mail,
+  Inbox,
   UserCircle,
   FileText,
   ClipboardList,
@@ -32,7 +33,8 @@ const NAV_ITEMS = [
   { href: '/admin/guestbook', label: 'Ziyaretçi Defteri', icon: MessageSquare },
   { href: '/admin/heirs', label: 'Varisler', icon: Users },
   { href: '/admin/alive-alerts', label: 'Ben Yaşıyorum', icon: HeartPulse },
-  { href: '/admin/contacts', label: 'İletişim', icon: Mail },
+  { href: '/admin/email', label: 'Email Ayarları', icon: Mail },
+  { href: '/admin/contacts', label: 'İletişim Formu', icon: Inbox },
   { href: '/admin/users', label: 'Kullanıcılar', icon: UserCircle },
   { href: '/admin/gdpr', label: 'GDPR', icon: FileText },
   { href: '/admin/audit', label: 'Audit Log', icon: ClipboardList },
@@ -58,7 +60,7 @@ export default function AdminSidebar({ adminEmail, adminName }: Props) {
       {/* Logo */}
       <div className="flex items-center justify-between px-5 py-5 border-b border-slate-700">
         <div>
-          <p className="text-xs font-semibold uppercase tracking-widest text-slate-400 mb-0.5">The Maradi</p>
+          <p className="text-xs font-semibold uppercase tracking-widest text-slate-400 mb-0.5">The Eternal Memory</p>
           <p className="text-sm font-bold text-white">Admin Panel</p>
         </div>
         <button

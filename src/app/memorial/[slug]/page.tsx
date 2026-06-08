@@ -11,7 +11,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params
   if (slug === 'demo') {
     return {
-      title: 'Ahmet Yılmaz - The Maradi',
+      title: 'Ahmet Yılmaz - The Eternal Memory',
       description: 'Ahmet Yılmaz için hazırlanmış dijital anma profili. 1940-2020.',
     }
   }
@@ -24,14 +24,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     .eq('status', 'public_memorial')
     .single()
 
-  if (!vault) return { title: 'The Maradi' }
+  if (!vault) return { title: 'The Eternal Memory' }
 
   const birthYear = vault.birth_date ? new Date(vault.birth_date).getFullYear() : null
   const deathYear = vault.death_date ? new Date(vault.death_date).getFullYear() : null
   const years = birthYear && deathYear ? ` — ${birthYear}-${deathYear}` : ''
 
   return {
-    title: `${vault.display_name}${years} - The Maradi`,
+    title: `${vault.display_name}${years} - The Eternal Memory`,
     description: vault.tagline ?? `${vault.display_name} için dijital anma sayfası.`,
   }
 }
@@ -63,8 +63,9 @@ export default async function MemorialPage({ params }: Props) {
     )
   }
 
-  // Not yet published
-  if (vault.status !== 'public_memorial') {
+  // Not yet published (hidden_vault, pending_verification etc.)
+  const isLive = vault.status === 'public_memorial' || vault.status === 'private_memorial'
+  if (!isLive) {
     return (
       <div className="min-h-screen bg-[#0c3327] flex items-center justify-center px-4">
         <div className="text-center max-w-sm">

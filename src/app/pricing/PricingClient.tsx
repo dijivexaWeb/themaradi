@@ -403,7 +403,7 @@ export default function PricingClient({ pricing }: { pricing: PricingConfig }) {
       {/* FOOTER */}
       <footer className="border-t border-[#e6dccb] bg-[#fbf8f1] px-5 py-8 sm:px-8">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 text-sm text-[#8a7a64] sm:flex-row">
-          <Link href="/" className="font-serif text-lg text-[#173d31]">The Maradi</Link>
+          <Link href="/" className="font-serif text-lg text-[#173d31]">The Eternal Memory</Link>
           <div className="flex gap-6">
             <Link href="/privacy" className="hover:text-[#173d31]">{p.footer.privacy}</Link>
             <Link href="/terms" className="hover:text-[#173d31]">{p.footer.terms}</Link>
