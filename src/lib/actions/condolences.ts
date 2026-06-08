@@ -5,7 +5,7 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { headers } from 'next/headers'
 import { sendEmail, isNotificationEnabled } from '@/lib/email'
-import { newGuestbookEntryEmail, messageApprovedEmail } from '@/lib/email/templates'
+import { newGuestbookEntryEmail, messageApprovedEmail, condolenceReceivedEmail } from '@/lib/email/templates'
 
 export async function addReactionAction(vaultId: string, type: 'candle' | 'flower' | 'prayer'): Promise<void> {
   if (!['candle', 'flower', 'prayer'].includes(type)) return
@@ -157,6 +157,16 @@ export async function submitCondolenceAction(vaultId: string, formData: FormData
         }),
       }).catch((e) => console.error('[submitCondolenceAction] email error:', e))
     }
+  }
+
+  // Taziye gönderene teşekkür emaili (fire-and-forget)
+  if (email) {
+    const memorialUrl = `${process.env.NEXT_PUBLIC_SITE_URL ?? 'https://theeternalmemory.com'}/memorial/${vault.slug}`
+    sendEmail({
+      to: email,
+      subject: `Taziye mesajınız alındı — ${vault.display_name}`,
+      html: condolenceReceivedEmail({ vaultName: vault.display_name, authorName, memorialUrl }),
+    }).catch((e) => console.error('[submitCondolenceAction] submitter email error:', e))
   }
 
   revalidatePath(`/memorial/[slug]`, 'page')

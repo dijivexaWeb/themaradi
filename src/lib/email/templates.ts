@@ -121,6 +121,42 @@ export function messageApprovedEmail(params: {
   `)
 }
 
+export function condolenceReceivedEmail(params: {
+  vaultName: string
+  authorName: string
+  memorialUrl: string
+}): string {
+  return wrap(`
+    <h2 style="margin:0 0 8px;font-size:22px;color:#0c3327;">Taziye mesajınız alındı</h2>
+    <p style="margin:0 0 24px;font-size:14px;color:#788177;font-family:-apple-system,sans-serif;">
+      Sayın ${params.authorName},
+    </p>
+    <p style="margin:0 0 20px;font-size:15px;color:#1f2d27;line-height:1.7;font-family:-apple-system,sans-serif;">
+      <strong>${params.vaultName}</strong> anma sayfasına bıraktığınız taziye mesajı tarafımıza ulaştı.
+      Aile onayının ardından sayfada yayınlanacaktır.
+    </p>
+    <p style="margin:0 0 28px;font-size:15px;color:#1f2d27;line-height:1.7;font-family:-apple-system,sans-serif;">
+      Bu zor günde destek olduğunuz için teşekkür ederiz. Paylaştığınız her söz, anının yaşatılmasına katkı sağlar.
+    </p>
+
+    <a href="${params.memorialUrl}" style="
+      display:inline-block;
+      background:#174f35;
+      color:#ffffff;
+      text-decoration:none;
+      padding:12px 24px;
+      border-radius:10px;
+      font-size:14px;
+      font-family:-apple-system,sans-serif;
+      font-weight:600;
+    ">Anma Sayfasını Gör →</a>
+
+    <p style="margin:28px 0 0;font-size:12px;color:#adb5ab;font-family:-apple-system,sans-serif;line-height:1.6;">
+      Mesajınız onaylandığında ayrıca bildirim gönderilecektir.
+    </p>
+  `)
+}
+
 export function testEmail(toName: string): string {
   return wrap(`
     <h2 style="margin:0 0 8px;font-size:22px;color:#0c3327;">Test emaili</h2>
