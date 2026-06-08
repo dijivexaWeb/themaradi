@@ -42,7 +42,7 @@ const TEMPLATES: Record<string, { label: string; subject: string; body: string }
   },
   privacy: {
     label: 'Gizlilik Talebi',
-    subject: 'Re: {{subject}} — Kişisel Veri Talebi',
+    subject: 'Re: {{subject}}',
     body: `<p>Merhaba,</p>\n<p>GDPR / KVKK kapsamındaki kişisel veri talebinizi aldık. Talebinizi 30 gün içinde sonuçlandıracağız.</p>\n<p>Saygılarımızla,<br/>The Eternal Memory Gizlilik Ekibi</p>`,
   },
   support: {

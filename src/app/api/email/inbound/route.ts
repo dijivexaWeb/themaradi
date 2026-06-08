@@ -19,7 +19,10 @@ function detectInbox(toAddresses: string[]): 'support' | 'partner' | 'privacy' |
 }
 
 function stripRePrefix(subject: string): string {
-  return subject.replace(/^(Re|Fwd|Fwd|Yanıt|YNT|TR|AW):\s*/i, '').trim()
+  return subject
+    .replace(/^(Re|Fwd|Fwd|Yanıt|YNT|TR|AW):\s*/i, '')
+    .replace(/\s*[—–-]\s*\S.*$/, '')
+    .trim()
 }
 
 export async function POST(req: NextRequest) {
