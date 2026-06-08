@@ -13,72 +13,29 @@ export default async function InboxPage({ searchParams }: Props) {
 
   const { tab = 'gelenler', inbox = 'all' } = await searchParams
 
-  // Gelenler sorgusu
-  let gelenlerQuery = supabase
+  // Tüm aktif emailleri çek (thread gruplamak için hepsine ihtiyaç var)
+  const { data: allEmails } = await supabase
     .from('inbound_emails')
-    .select('id, inbox, from_email, from_name, subject, body_text, body_html, received_at, status, replied_at, reply_subject, reply_body_html, is_flagged')
+    .select('id, inbox, from_email, from_name, subject, body_text, body_html, received_at, status, replied_at, reply_subject, reply_body_html, is_flagged, is_following_up, follow_up_note, thread_id')
     .order('received_at', { ascending: false })
-    .limit(150)
+    .limit(300)
 
-  if (inbox === 'archived') {
-    gelenlerQuery = gelenlerQuery.eq('status', 'archived')
-  } else if (inbox !== 'all') {
-    gelenlerQuery = gelenlerQuery.eq('inbox', inbox).neq('status', 'archived')
-  } else {
-    gelenlerQuery = gelenlerQuery.neq('status', 'archived')
-  }
+  const emails = allEmails ?? []
 
-  // Gidenler (yanıtlanan mailler)
-  const gidenlerQuery = supabase
-    .from('inbound_emails')
-    .select('id, inbox, from_email, from_name, subject, reply_subject, reply_body_html, replied_at, received_at, is_flagged')
-    .not('replied_at', 'is', null)
-    .order('replied_at', { ascending: false })
-    .limit(100)
-
-  // Önemliler (bayraklı)
-  const onemliQuery = supabase
-    .from('inbound_emails')
-    .select('id, inbox, from_email, from_name, subject, body_text, body_html, received_at, status, replied_at, reply_subject, reply_body_html, is_flagged')
-    .eq('is_flagged', true)
-    .order('received_at', { ascending: false })
-    .limit(100)
-
-  // Cevap bekleyenler
-  const bekleyenlerQuery = supabase
-    .from('inbound_emails')
-    .select('id, inbox, from_email, from_name, subject, body_text, body_html, received_at, status, replied_at, reply_subject, reply_body_html, is_flagged')
-    .is('replied_at', null)
-    .neq('status', 'archived')
-    .order('received_at', { ascending: false })
-    .limit(100)
-
-  const [
-    { data: gelenler },
-    { data: gidenler },
-    { data: onemli },
-    { data: bekleyenler },
-    { data: counts },
-  ] = await Promise.all([
-    gelenlerQuery,
-    gidenlerQuery,
-    onemliQuery,
-    bekleyenlerQuery,
-    supabase.from('inbound_emails').select('inbox, status, replied_at, is_flagged').neq('status', 'archived'),
-  ])
-
-  const allEmails = counts ?? []
-  const unreadTotal = allEmails.filter((e) => e.status === 'unread').length
-  const unreadByInbox = allEmails.reduce<Record<string, number>>((acc, r) => {
+  // Sayaçlar
+  const unreadTotal = emails.filter((e) => e.status === 'unread' && e.status !== 'archived').length
+  const unreadByInbox = emails.reduce<Record<string, number>>((acc, r) => {
     if (r.status === 'unread') acc[r.inbox] = (acc[r.inbox] ?? 0) + 1
     return acc
   }, {})
-  const pendingCount = allEmails.filter((e) => !e.replied_at).length
-  const flaggedCount = allEmails.filter((e) => e.is_flagged).length
+  const pendingCount = emails.filter((e) => !e.replied_at && e.status !== 'archived').length
+  const flaggedCount = emails.filter((e) => e.is_flagged).length
+  const followUpCount = emails.filter((e) => e.is_following_up).length
 
   const MAIN_TABS = [
     { key: 'gelenler', label: 'Gelenler', count: unreadTotal },
     { key: 'gidenler', label: 'Gönderilenler', count: 0 },
+    { key: 'takipte', label: 'Takipte', count: followUpCount },
     { key: 'onemli', label: 'Önemliler', count: flaggedCount },
     { key: 'bekleyenler', label: 'Cevap Bekleyenler', count: pendingCount },
   ]
@@ -106,12 +63,12 @@ export default async function InboxPage({ searchParams }: Props) {
       </div>
 
       {/* Ana sekmeler */}
-      <div className="flex gap-1 mb-4 border-b border-slate-200">
+      <div className="flex gap-0.5 mb-4 border-b border-slate-200 overflow-x-auto">
         {MAIN_TABS.map((t) => (
           <Link
             key={t.key}
             href={`/admin/inbox?tab=${t.key}&inbox=all`}
-            className={`relative px-4 py-2.5 text-sm font-medium transition-colors flex items-center gap-2 border-b-2 -mb-px ${
+            className={`relative px-4 py-2.5 text-sm font-medium transition-colors flex items-center gap-2 border-b-2 -mb-px whitespace-nowrap ${
               tab === t.key
                 ? 'border-slate-900 text-slate-900'
                 : 'border-transparent text-slate-500 hover:text-slate-700'
@@ -129,18 +86,18 @@ export default async function InboxPage({ searchParams }: Props) {
         ))}
       </div>
 
-      {/* Alt sekmeler — sadece Gelenler'de */}
+      {/* Alt sekmeler — sadece Gelenler */}
       {tab === 'gelenler' && (
-        <div className="flex gap-1 mb-5 bg-slate-100 p-1 rounded-xl w-fit">
+        <div className="flex gap-1 mb-5 bg-slate-100 p-1 rounded-xl w-fit overflow-x-auto">
           {INBOX_TABS.map((t) => {
-            const unread = t.key === 'all'
-              ? unreadTotal
-              : t.key === 'archived' ? 0 : (unreadByInbox[t.key] ?? 0)
+            const unread = t.key === 'all' ? unreadTotal
+              : t.key === 'archived' ? 0
+              : (unreadByInbox[t.key] ?? 0)
             return (
               <Link
                 key={t.key}
                 href={`/admin/inbox?tab=gelenler&inbox=${t.key}`}
-                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors flex items-center gap-1.5 ${
+                className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors flex items-center gap-1.5 whitespace-nowrap ${
                   inbox === t.key
                     ? 'bg-white text-slate-900 shadow-sm'
                     : 'text-slate-500 hover:text-slate-700'
@@ -160,10 +117,8 @@ export default async function InboxPage({ searchParams }: Props) {
 
       <InboxClient
         tab={tab}
-        emails={gelenler ?? []}
-        gidenler={gidenler ?? []}
-        onemli={onemli ?? []}
-        bekleyenler={bekleyenler ?? []}
+        inboxFilter={inbox}
+        allEmails={emails}
       />
     </div>
   )

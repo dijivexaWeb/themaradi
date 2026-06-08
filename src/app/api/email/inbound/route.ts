@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceClient } from '@/lib/supabase/server'
+import crypto from 'crypto'
 
 function parseFrom(raw: string): { email: string; name: string | null } {
   const match = raw.match(/^(.*?)\s*<([^>]+)>$/)
@@ -15,6 +16,10 @@ function detectInbox(toAddresses: string[]): 'support' | 'partner' | 'privacy' |
     if (local === 'privacy') return 'privacy'
   }
   return 'other'
+}
+
+function stripRePrefix(subject: string): string {
+  return subject.replace(/^(Re|Fwd|Fwd|Yanıt|YNT|TR|AW):\s*/i, '').trim()
 }
 
 export async function POST(req: NextRequest) {
@@ -42,7 +47,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'Invalid JSON' }, { status: 400 })
   }
 
-  // Resend inbound format: payload ya direkt ya da payload.data altında olabilir
   const data = (payload.data as Record<string, unknown>) ?? payload
 
   const fromRaw = (data.from as string) ?? ''
@@ -55,6 +59,34 @@ export async function POST(req: NextRequest) {
   const { email: fromEmail, name: fromName } = parseFrom(fromRaw)
   const inbox = detectInbox(toArr)
 
+  // Thread algılama: aynı from_email + benzer konu → aynı thread
+  let threadId: string | null = null
+  const cleanedSubject = stripRePrefix(subject)
+
+  if (cleanedSubject) {
+    const { data: existing } = await supabase
+      .from('inbound_emails')
+      .select('id, thread_id')
+      .eq('from_email', fromEmail)
+      .ilike('subject', `%${cleanedSubject}%`)
+      .order('received_at', { ascending: false })
+      .limit(1)
+      .maybeSingle()
+
+    if (existing) {
+      if (existing.thread_id) {
+        threadId = existing.thread_id
+      } else {
+        // İlk defa thread oluşturuluyor — her iki emaili de bağla
+        threadId = crypto.randomUUID()
+        await supabase
+          .from('inbound_emails')
+          .update({ thread_id: threadId })
+          .eq('id', existing.id)
+      }
+    }
+  }
+
   const { error } = await supabase.from('inbound_emails').insert({
     inbox,
     from_email: fromEmail,
@@ -63,6 +95,7 @@ export async function POST(req: NextRequest) {
     body_text: bodyText,
     body_html: bodyHtml,
     received_at: (payload.created_at as string) ?? new Date().toISOString(),
+    thread_id: threadId,
     raw_payload: payload,
   })
 

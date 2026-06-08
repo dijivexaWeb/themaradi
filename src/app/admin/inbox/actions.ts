@@ -24,6 +24,22 @@ export async function toggleFlagAction(id: string, current: boolean): Promise<{ 
   return {}
 }
 
+export async function setFollowUpAction(
+  id: string,
+  isFollowingUp: boolean,
+  note?: string
+): Promise<{ error?: string }> {
+  await requireAdmin()
+  const supabase = await createServiceClient()
+  const { error } = await supabase.from('inbound_emails').update({
+    is_following_up: isFollowingUp,
+    follow_up_note: isFollowingUp ? (note ?? null) : null,
+  }).eq('id', id)
+  if (error) return { error: error.message }
+  revalidatePath('/admin/inbox')
+  return {}
+}
+
 export async function sendInboxReplyAction(
   id: string,
   formData: FormData
@@ -60,12 +76,22 @@ export async function sendInboxReplyAction(
 
   if (sendError) return { error: sendError.message }
 
-  // Yanıt kaydını güncelle
+  // Yanıt kaydı + thread_id yoksa yeni thread oluştur
+  const { data: email } = await supabase
+    .from('inbound_emails')
+    .select('thread_id')
+    .eq('id', id)
+    .single()
+
+  const threadId = email?.thread_id ?? crypto.randomUUID()
+
   await supabase.from('inbound_emails').update({
     status: 'read',
     replied_at: new Date().toISOString(),
     reply_subject: subject,
     reply_body_html: body,
+    thread_id: threadId,
+    is_following_up: false,
   }).eq('id', id)
 
   revalidatePath('/admin/inbox')
