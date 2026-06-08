@@ -5,6 +5,37 @@
 
 ---
 
+## 2026-06-08 — Oturum 25: gstack Kurulumu
+
+### Yapılanlar
+- **gstack** skill paketi kuruldu (`~/.claude/skills/gstack`)
+  - `bun` kuruldu (`~/.bun/bin/bun v1.3.14`)
+  - `git clone https://github.com/garrytan/gstack.git ~/.claude/skills/gstack`
+  - `./setup` çalıştırıldı — Chrome indirme ağ hatası aldı (ECONNRESET), `/browse` binary eksik kaldı
+  - 53 skill dizini manuel olarak `~/.claude/skills/` altına kopyalandı
+- **`CLAUDE.md`** — gstack bölümü eklendi: `/browse` zorunlu, `mcp__claude-in-chrome__*` yasaklı, 35 skill listelendi
+
+### Proje Durumu
+- [x] gstack global kurulum (`~/.claude/skills/`)
+- [ ] `/browse` binary — Playwright Chromium indirilemedi (ağ hatası), tarayıcı tabanlı skill'ler çalışmayabilir
+- [ ] payments RLS hatası fix
+- [ ] Login "Kaydınız yoksa" → /satin-al yönlendirmesi
+
+### Kritik Kararlar / Notlar
+- Windows'ta `./setup` symlink yerine `cp -R` kullanıyor; Chrome binary indirmesi ECONNRESET ile kesildi
+- Skill doc'lar üretildi, 53 skill dizini `~/.claude/skills/` altına kopyalandı
+- Claude Code yeniden başlatılması gerekiyor (skill'ler startup'ta yükleniyor)
+
+### Nerede Kaldık
+gstack kuruldu, skill'ler kopyalandı. Claude Code yeniden açıldığında `/browse`, `/qa`, `/review` vb. çalışacak. `/browse` binary'sinin çalışıp çalışmadığı henüz test edilmedi.
+
+### Sıradaki Adım
+1. Claude Code yeniden açılıp `/browse http://localhost:3010` ile test et
+2. Animasyonlu aile ağacını önizleme sayfasında test et
+3. payments RLS hatasını araştır
+
+---
+
 ## 2026-06-08 — Oturum 24: Animasyonlu Aile Ağacı (FamilyTreeCanvas)
 
 ### Yapılanlar
