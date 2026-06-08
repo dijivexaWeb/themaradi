@@ -121,6 +121,86 @@ export function messageApprovedEmail(params: {
   `)
 }
 
+export function memorialSignupConfirmEmail(params: {
+  authorName: string
+  vaultName: string
+  confirmUrl: string
+}): string {
+  return wrap(`
+    <h2 style="margin:0 0 8px;font-size:22px;color:#0c3327;">Başsağlığı dileriz</h2>
+    <p style="margin:0 0 20px;font-size:14px;color:#788177;font-family:-apple-system,sans-serif;">
+      Sayın ${params.authorName},
+    </p>
+    <p style="margin:0 0 20px;font-size:15px;color:#1f2d27;line-height:1.7;font-family:-apple-system,sans-serif;">
+      <strong>${params.vaultName}</strong> için anma sayfası talebiniz alındı. Bu zor süreçte sevdiklerinizin anısını yaşatmak istemenizi saygıyla karşılıyoruz.
+    </p>
+    <p style="margin:0 0 28px;font-size:15px;color:#1f2d27;line-height:1.7;font-family:-apple-system,sans-serif;">
+      Hesabınızı aktifleştirmek ve anma sayfanızı oluşturmaya başlamak için lütfen aşağıdaki butona tıklayın.
+    </p>
+
+    <div style="text-align:center;margin:32px 0;">
+      <a href="${params.confirmUrl}" style="
+        display:inline-block;
+        background:#174f35;
+        color:#ffffff;
+        text-decoration:none;
+        padding:14px 32px;
+        border-radius:12px;
+        font-size:15px;
+        font-family:-apple-system,sans-serif;
+        font-weight:600;
+        letter-spacing:0.02em;
+      ">E-postamı Doğrula →</a>
+    </div>
+
+    <p style="margin:0 0 8px;font-size:13px;color:#788177;line-height:1.6;font-family:-apple-system,sans-serif;">
+      Bu bağlantı <strong>24 saat</strong> geçerlidir. Eğer bu hesabı siz açmadıysanız bu emaili görmezden gelebilirsiniz.
+    </p>
+    <p style="margin:0;font-size:12px;color:#adb5ab;font-family:-apple-system,sans-serif;line-height:1.6;">
+      Buton çalışmıyorsa bu adresi tarayıcınıza kopyalayın:<br>
+      <span style="color:#5a9e7a;word-break:break-all;">${params.confirmUrl}</span>
+    </p>
+  `)
+}
+
+export function vaultSignupConfirmEmail(params: {
+  authorName: string
+  confirmUrl: string
+}): string {
+  return wrap(`
+    <h2 style="margin:0 0 8px;font-size:22px;color:#0c3327;">E-postanızı doğrulayın</h2>
+    <p style="margin:0 0 20px;font-size:14px;color:#788177;font-family:-apple-system,sans-serif;">
+      Sayın ${params.authorName},
+    </p>
+    <p style="margin:0 0 28px;font-size:15px;color:#1f2d27;line-height:1.7;font-family:-apple-system,sans-serif;">
+      The Eternal Memory'e hoş geldiniz. Hesabınızı aktifleştirmek için aşağıdaki butona tıklayın.
+    </p>
+
+    <div style="text-align:center;margin:32px 0;">
+      <a href="${params.confirmUrl}" style="
+        display:inline-block;
+        background:#174f35;
+        color:#ffffff;
+        text-decoration:none;
+        padding:14px 32px;
+        border-radius:12px;
+        font-size:15px;
+        font-family:-apple-system,sans-serif;
+        font-weight:600;
+        letter-spacing:0.02em;
+      ">E-postamı Doğrula →</a>
+    </div>
+
+    <p style="margin:0 0 8px;font-size:13px;color:#788177;line-height:1.6;font-family:-apple-system,sans-serif;">
+      Bu bağlantı <strong>24 saat</strong> geçerlidir.
+    </p>
+    <p style="margin:0;font-size:12px;color:#adb5ab;font-family:-apple-system,sans-serif;line-height:1.6;">
+      Buton çalışmıyorsa bu adresi tarayıcınıza kopyalayın:<br>
+      <span style="color:#5a9e7a;word-break:break-all;">${params.confirmUrl}</span>
+    </p>
+  `)
+}
+
 export function condolenceReceivedEmail(params: {
   vaultName: string
   authorName: string

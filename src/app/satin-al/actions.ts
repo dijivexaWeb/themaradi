@@ -3,6 +3,10 @@
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { fetchPricingConfig } from '@/lib/pricing'
+import { sendEmail } from '@/lib/email'
+import { memorialSignupConfirmEmail, vaultSignupConfirmEmail } from '@/lib/email/templates'
+
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://theeternalmemory.com'
 
 function slugify(text: string): string {
   return text
@@ -18,6 +22,7 @@ function slugify(text: string): string {
 
 async function getOrCreatePurchaseUser(
   supabase: Awaited<ReturnType<typeof createClient>>,
+  service: Awaited<ReturnType<typeof createServiceClient>>,
   formData: FormData,
   senderName: string,
   senderEmail: string
@@ -28,46 +33,56 @@ async function getOrCreatePurchaseUser(
   const password = (formData.get('password') as string)?.trim()
   const passwordConfirm = (formData.get('password_confirm') as string)?.trim()
 
-  if (!password || password.length < 6) {
-    return { error: 'Şifre en az 6 karakter olmalıdır' }
-  }
+  if (!password || password.length < 6) return { error: 'Şifre en az 6 karakter olmalıdır' }
+  if (password !== passwordConfirm) return { error: 'Şifreler eşleşmiyor' }
 
-  if (password !== passwordConfirm) {
-    return { error: 'Şifreler eşleşmiyor' }
-  }
-
-  const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
+  // admin.createUser: Supabase otomatik email göndermez, biz göndereceğiz
+  const { data: createData, error: createError } = await service.auth.admin.createUser({
     email: senderEmail,
     password,
-    options: {
-      data: { full_name: senderName },
-      emailRedirectTo: `${process.env.NEXT_PUBLIC_SITE_URL ?? 'http://localhost:3010'}/auth/callback`,
-    },
+    user_metadata: { full_name: senderName },
+    email_confirm: false,
   })
 
-  if (!signUpError && signUpData.user) {
-    if (!signUpData.session) {
-      // Email confirmation is enabled — user must verify before logging in
-      return { user: signUpData.user, pendingEmailConfirmation: true as const }
-    }
-    return { user: signUpData.user }
+  if (!createError && createData.user) {
+    return { user: createData.user, pendingEmailConfirmation: true as const }
   }
 
-  // Signup failed — user might already exist, try login
-  const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({
-    email: senderEmail,
-    password,
-  })
-
+  // Kullanıcı zaten varsa giriş yapmayı dene
+  const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({ email: senderEmail, password })
   if (signInError || !signInData.user) {
-    return { error: signUpError?.message ?? signInError?.message ?? 'Hesap oluşturulamadı' }
+    const msg = createError?.message?.toLowerCase().includes('already')
+      ? 'Bu email adresi zaten kayıtlı. Şifrenizi kontrol edin veya giriş yapın.'
+      : (createError?.message ?? signInError?.message ?? 'Hesap oluşturulamadı')
+    return { error: msg }
   }
 
   return { user: signInData.user }
 }
 
+async function generateAndSendConfirmEmail(
+  service: Awaited<ReturnType<typeof createServiceClient>>,
+  senderEmail: string,
+  emailHtml: string,
+  emailSubject: string
+) {
+  const { data: linkData } = await service.auth.admin.generateLink({
+    type: 'signup',
+    email: senderEmail,
+    options: { redirectTo: `${SITE_URL}/auth/callback` },
+  })
+
+  const confirmUrl = linkData?.properties?.action_link
+  if (!confirmUrl) return
+
+  sendEmail({ to: senderEmail, subject: emailSubject, html: emailHtml.replace('__CONFIRM_URL__', confirmUrl) })
+    .catch(e => console.error('[generateAndSendConfirmEmail] error:', e))
+}
+
 export async function purchaseMemorialAction(_prev: unknown, formData: FormData) {
   const supabase = await createClient()
+  const service = await createServiceClient()
+
   const displayName = (formData.get('display_name') as string)?.trim()
   const senderName = (formData.get('sender_name') as string)?.trim()
   const senderEmail = (formData.get('sender_email') as string)?.trim().toLowerCase()
@@ -76,7 +91,7 @@ export async function purchaseMemorialAction(_prev: unknown, formData: FormData)
   if (!senderName) return { error: 'Ad Soyad zorunludur' }
   if (!senderEmail || !senderEmail.includes('@')) return { error: 'Geçerli bir e-posta girin' }
 
-  const authResult = await getOrCreatePurchaseUser(supabase, formData, senderName, senderEmail)
+  const authResult = await getOrCreatePurchaseUser(supabase, service, formData, senderName, senderEmail)
   if ('error' in authResult) return { error: authResult.error }
   const user = authResult.user
   const pendingEmailConfirmation = 'pendingEmailConfirmation' in authResult && authResult.pendingEmailConfirmation
@@ -89,17 +104,13 @@ export async function purchaseMemorialAction(_prev: unknown, formData: FormData)
   const baseSlug = slugify(displayName)
   const slug = `${baseSlug}-${Date.now().toString(36)}`
 
-  const service = await createServiceClient()
-
   if (pendingEmailConfirmation) {
-    // Trigger handle_new_user may not have fired yet — ensure profiles row exists
     await service.from('profiles').upsert(
       { id: user.id, full_name: senderName, email: senderEmail },
       { onConflict: 'id', ignoreDuplicates: true }
     )
   }
 
-  // When email confirmation is pending there's no session → use service client to bypass RLS
   const dbClient = pendingEmailConfirmation ? service : supabase
 
   const { data: vault, error: vaultErr } = await dbClient.from('vaults').insert({
@@ -130,6 +141,20 @@ export async function purchaseMemorialAction(_prev: unknown, formData: FormData)
   if (paymentErr) return { error: 'Ödeme kaydı oluşturulamadı: ' + paymentErr.message }
 
   if (pendingEmailConfirmation) {
+    // Taziye mesajlı onay emaili — link sonradan enjekte edilecek
+    const { data: linkData } = await service.auth.admin.generateLink({
+      type: 'signup',
+      email: senderEmail,
+      options: { redirectTo: `${SITE_URL}/auth/callback` },
+    })
+    const confirmUrl = linkData?.properties?.action_link ?? ''
+    if (confirmUrl) {
+      sendEmail({
+        to: senderEmail,
+        subject: `Anma sayfanızı oluşturun — The Eternal Memory`,
+        html: memorialSignupConfirmEmail({ authorName: senderName, vaultName: displayName, confirmUrl }),
+      }).catch(e => console.error('[purchaseMemorialAction] confirm email error:', e))
+    }
     return { emailConfirmationSent: true as const, email: senderEmail }
   }
 
@@ -138,6 +163,8 @@ export async function purchaseMemorialAction(_prev: unknown, formData: FormData)
 
 export async function purchaseVaultAction(_prev: unknown, formData: FormData) {
   const supabase = await createClient()
+  const service = await createServiceClient()
+
   const displayName = (formData.get('display_name') as string)?.trim()
   const senderName = (formData.get('sender_name') as string)?.trim()
   const senderEmail = (formData.get('sender_email') as string)?.trim().toLowerCase()
@@ -146,7 +173,7 @@ export async function purchaseVaultAction(_prev: unknown, formData: FormData) {
   if (!senderName) return { error: 'Ad Soyad zorunludur' }
   if (!senderEmail || !senderEmail.includes('@')) return { error: 'Geçerli bir e-posta girin' }
 
-  const authResult = await getOrCreatePurchaseUser(supabase, formData, senderName, senderEmail)
+  const authResult = await getOrCreatePurchaseUser(supabase, service, formData, senderName, senderEmail)
   if ('error' in authResult) return { error: authResult.error }
   const user = authResult.user
   const pendingEmailConfirmation = 'pendingEmailConfirmation' in authResult && authResult.pendingEmailConfirmation
@@ -158,8 +185,6 @@ export async function purchaseVaultAction(_prev: unknown, formData: FormData) {
 
   const baseSlug = slugify(displayName)
   const slug = `${baseSlug}-${Date.now().toString(36)}`
-
-  const service = await createServiceClient()
 
   if (pendingEmailConfirmation) {
     await service.from('profiles').upsert(
@@ -198,6 +223,19 @@ export async function purchaseVaultAction(_prev: unknown, formData: FormData) {
   if (paymentErr) return { error: 'Ödeme kaydı oluşturulamadı: ' + paymentErr.message }
 
   if (pendingEmailConfirmation) {
+    const { data: linkData } = await service.auth.admin.generateLink({
+      type: 'signup',
+      email: senderEmail,
+      options: { redirectTo: `${SITE_URL}/auth/callback` },
+    })
+    const confirmUrl = linkData?.properties?.action_link ?? ''
+    if (confirmUrl) {
+      sendEmail({
+        to: senderEmail,
+        subject: `Hesabınızı doğrulayın — The Eternal Memory`,
+        html: vaultSignupConfirmEmail({ authorName: senderName, confirmUrl }),
+      }).catch(e => console.error('[purchaseVaultAction] confirm email error:', e))
+    }
     return { emailConfirmationSent: true as const, email: senderEmail }
   }
 
