@@ -5,6 +5,69 @@
 
 ---
 
+## 2026-06-09 — Oturum 39: Gelen Kutusu (Inbound Email) + Admin İnbox
+
+### Yapılanlar
+
+**DB:**
+- `inbound_emails` tablosu oluşturuldu: `inbox` (support/partner/privacy/other), `from_email`, `from_name`, `subject`, `body_text`, `body_html`, `received_at`, `status` (unread/read/archived), `replied_at`, `reply_subject`, `reply_body_html`, `raw_payload`
+
+**Webhook endpoint (`src/app/api/email/inbound/route.ts`):**
+- `POST /api/email/inbound?token=SECRET` — Resend inbound email payload alır
+- Token doğrulaması: `platform_settings.inbound_webhook_secret` ile karşılaştırır
+- `from` alanından `name <email>` formatını parse eder
+- `to` adresi üzerinden inbox türünü belirler (support/partner/privacy/other)
+- Raw payload JSON olarak da kaydedilir
+
+**Admin Gelen Kutusu (`src/app/admin/inbox/`):**
+- `page.tsx`: inbox filtre tabları (Tümü/Destek/İş Birliği/Gizlilik/Arşiv) + okunmamış rozet
+- `_InboxClient.tsx`: email kartları, expand/collapse, HTML body görüntüleme
+  - Açılınca otomatik "okundu" olarak işaretlenir
+  - **Yanıtla butonu**: 4 hazır template (Genel/İş Birliği/Gizlilik/Teknik Destek)
+  - Template seçince konu + HTML body doldurulur, düzenlenebilir
+  - HTML önizleme `<details>` ile açılabilir
+  - Gönderilince replied_at + reply_subject kaydedilir
+- `actions.ts`: `markEmailStatusAction`, `sendInboxReplyAction`, `regenerateWebhookSecretAction`
+  - `sendInboxReplyAction`: Resend ile inbox'a uygun from (support/partner/privacy@theeternalmemory.com) kullanır
+  - `regenerateWebhookSecretAction`: `crypto.randomBytes(24)` ile yeni token, platform_settings'e kaydeder
+
+**Email Ayarları güncellendi (`src/app/admin/email/`):**
+- `page.tsx`: `inbound_webhook_secret` de settings'e dahil edildi
+- `_EmailSettingsForm.tsx`: "Gelen Kutusu Webhook" bölümü eklendi
+  - Tam webhook URL gösterimi (tıklayınca seçilir, Kopyala butonu)
+  - Token Oluştur / Yeni Token Oluştur butonu
+  - 4 adımlı kurulum talimatı (Resend paneli adımları)
+
+**Sidebar (`AdminSidebar.tsx`):**
+- "Gelen Kutusu" → `/admin/inbox` (Inbox ikonu)
+- "İletişim Formu" → `/admin/contacts` (MessageSquare ikonu) — ikonlar ayrıştırıldı
+
+### Proje Durumu
+- [x] Resend inbound webhook endpoint
+- [x] inbound_emails DB tablosu
+- [x] Admin inbox sayfası (filtre + okunmamış rozet)
+- [x] Yanıt gönderme + template seçici (4 template)
+- [x] Email Ayarları sayfasında webhook URL + token yönetimi
+- [ ] Resend dashboard'da webhook URL konfigürasyonu (kullanıcı yapacak)
+
+### Kritik Kararlar / Notlar
+- Webhook token `platform_settings` tablosunda saklanıyor — admin panelinden yönetilebilir
+- Token yoksa webhook tüm istekleri kabul eder (geliştirme ortamı için); token varsa doğrulama zorunlu
+- Yanıt gönderiminde `from` adresi: inbox türüne göre otomatik (support@/partner@/privacy@theeternalmemory.com)
+- Template içerikleri UI'da hardcoded — basit kullanım için yeterli, gelecekte DB'ye taşınabilir
+
+### Nerede Kaldık
+Gelen kutusu ve webhook sistemi tamamlandı, build temiz, push edildi (`473acb0`).
+Kullanıcının yapması gereken: Email Ayarları sayfasından token oluşturup Resend Inbound webhook olarak kaydetmek.
+
+### Sıradaki Adım
+1. Resend Inbound panelinde webhook URL'yi kaydet (admin sayfasından URL alınır)
+2. Test için bir mail gönder ve admin inbox'ta görünüp görünmediğini kontrol et
+3. Yanıt template'lerini ihtiyaca göre özelleştir
+4. İsteğe bağlı: template'leri DB'ye taşı (email_templates tablosu)
+
+---
+
 ## 2026-06-09 — Oturum 38: Telefon + KVKK Rıza Kaydı
 
 ### Yapılanlar
