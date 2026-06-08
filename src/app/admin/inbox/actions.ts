@@ -15,6 +15,15 @@ export async function markEmailStatusAction(id: string, status: 'read' | 'archiv
   return {}
 }
 
+export async function toggleFlagAction(id: string, current: boolean): Promise<{ error?: string }> {
+  await requireAdmin()
+  const supabase = await createServiceClient()
+  const { error } = await supabase.from('inbound_emails').update({ is_flagged: !current }).eq('id', id)
+  if (error) return { error: error.message }
+  revalidatePath('/admin/inbox')
+  return {}
+}
+
 export async function sendInboxReplyAction(
   id: string,
   formData: FormData
