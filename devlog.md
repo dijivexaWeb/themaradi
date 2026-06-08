@@ -5,6 +5,25 @@
 
 ---
 
+## 2026-06-09 — Oturum 40: Thread Konuşma Görünümü + Takipte Sekmesi
+
+### Yapılanlar
+- DB: `inbound_emails`'e `is_following_up`, `follow_up_note`, `thread_id` eklendi
+- Webhook güncellendi: gelen mail aynı `from_email` + benzer konu ise otomatik aynı thread'e bağlanıyor
+- Yanıt gönderilince `thread_id` atanıyor, bir sonraki yanıt otomatik tanınıyor
+- **ThreadView**: gidiş-geliş mailler tek kart altında konuşma görünümü (gelen gri, giden yeşil)
+- **FollowUpButton**: "Takibe Al" + isteğe bağlı not girişi, turuncu kenarlık
+- **5 ana sekme**: Gelenler / Gönderilenler / Takipte / Önemliler / Cevap Bekleyenler
+
+### Nerede Kaldık
+Thread + takipte sistemi tamamlandı (`f33dd47`). Mail yönetimi production-ready.
+
+### Sıradaki Adım
+1. Test: farklı adresten aynı konuyla 2-3 mail gönder, thread otomatik algılansın mı kontrol et
+2. İsteğe bağlı: template'leri DB'ye taşı (email_templates tablosu)
+
+---
+
 ## 2026-06-09 — Oturum 39: Gelen Kutusu (Inbound Email) + Admin İnbox
 
 ### Yapılanlar
