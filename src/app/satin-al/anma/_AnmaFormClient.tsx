@@ -140,6 +140,19 @@ export default function AnmaFormClient({ bank, amount }: { bank: BankSettings; a
                   </label>
                   <input type="email" name="sender_email" placeholder="Bildirim gönderilecek adres" required className={inp} />
                 </div>
+                <div>
+                  <label className="block text-xs text-slate-400 mb-1.5 font-medium">
+                    Telefon Numarası <span className="text-amber-400">*</span>
+                  </label>
+                  <input
+                    type="tel"
+                    name="phone"
+                    placeholder="+90 555 000 00 00"
+                    required
+                    className={inp}
+                  />
+                  <p className="text-xs text-slate-600 mt-1">Uluslararası format: +ülke kodu ile yazın</p>
+                </div>
                 <div className="grid sm:grid-cols-2 gap-3">
                   <div>
                     <label className="block text-xs text-slate-400 mb-1.5 font-medium">
@@ -157,6 +170,57 @@ export default function AnmaFormClient({ bank, amount }: { bank: BankSettings; a
                 <p className="text-xs text-slate-600 leading-5">
                   Bu e-posta ve şifreyle hesabınız oluşturulur. Ödeme onaylandıktan sonra aynı bilgilerle panelinize giriş yapabilirsiniz.
                 </p>
+
+                {/* İzinler & KVKK */}
+                <div className="border border-slate-700/60 bg-slate-800/30 rounded-xl p-4 space-y-4">
+                  <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">İzinler & Aydınlatma</p>
+
+                  <label className="flex items-start gap-3 cursor-pointer group">
+                    <input
+                      type="checkbox"
+                      name="email_consent"
+                      required
+                      className="mt-0.5 h-4 w-4 shrink-0 rounded accent-amber-500 cursor-pointer"
+                    />
+                    <div>
+                      <span className="text-sm text-slate-200 leading-5">
+                        Hesabıma ait bilgilendirme e-postalarını almayı kabul ediyorum.{' '}
+                        <span className="text-amber-400 text-xs">*</span>
+                      </span>
+                      <p className="text-xs text-slate-500 mt-1 leading-5">
+                        Sipariş onayı, ödeme durumu ve hesap güvenliği bildirimleri gönderilir.
+                        Pazarlama veya reklam içerikleri iletilmez.
+                      </p>
+                    </div>
+                  </label>
+
+                  <label className="flex items-start gap-3 cursor-pointer group">
+                    <input
+                      type="checkbox"
+                      name="phone_consent"
+                      required
+                      className="mt-0.5 h-4 w-4 shrink-0 rounded accent-amber-500 cursor-pointer"
+                    />
+                    <div>
+                      <span className="text-sm text-slate-200 leading-5">
+                        Kimlik doğrulama ve müşteri desteği amacıyla belirttiğim numaradan aranmayı kabul ediyorum.{' '}
+                        <span className="text-amber-400 text-xs">*</span>
+                      </span>
+                      <p className="text-xs text-slate-500 mt-1 leading-5">
+                        Yalnızca hesap doğrulama ve sipariş takibi için sizi arayabiliriz.
+                        Telefonunuz üçüncü taraflarla paylaşılmaz.
+                      </p>
+                    </div>
+                  </label>
+
+                  <p className="text-xs text-slate-600 leading-5 pt-1 border-t border-slate-700/50">
+                    Kişisel verileriniz 6698 sayılı KVKK kapsamında işlenmektedir.{' '}
+                    <Link href="/kvkk" className="text-amber-400/70 hover:text-amber-400 underline underline-offset-2">
+                      Kişisel Verilerin Korunması Politikası →
+                    </Link>
+                  </p>
+                </div>
+
                 {state?.error && (
                   <p className="text-red-400 text-sm bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3">{state.error}</p>
                 )}

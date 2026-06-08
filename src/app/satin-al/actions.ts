@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation'
 import { fetchPricingConfig } from '@/lib/pricing'
 import { sendEmail } from '@/lib/email'
 import { memorialSignupConfirmEmail, vaultSignupConfirmEmail } from '@/lib/email/templates'
+import { headers } from 'next/headers'
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://theeternalmemory.com'
 
@@ -71,10 +72,16 @@ export async function purchaseMemorialAction(_prev: unknown, formData: FormData)
   const displayName = (formData.get('display_name') as string)?.trim()
   const senderName = (formData.get('sender_name') as string)?.trim()
   const senderEmail = (formData.get('sender_email') as string)?.trim().toLowerCase()
+  const phone = (formData.get('phone') as string)?.trim()
+  const emailConsent = formData.get('email_consent') === 'on'
+  const phoneConsent = formData.get('phone_consent') === 'on'
 
   if (!displayName) return { error: 'Anma profili sahibinin adı zorunludur' }
   if (!senderName) return { error: 'Ad Soyad zorunludur' }
   if (!senderEmail || !senderEmail.includes('@')) return { error: 'Geçerli bir e-posta girin' }
+  if (!phone) return { error: 'Telefon numarası zorunludur' }
+  if (!emailConsent) return { error: 'E-posta bilgilendirme iznini onaylamanız gerekmektedir' }
+  if (!phoneConsent) return { error: 'Telefon araması iznini onaylamanız gerekmektedir' }
 
   const authResult = await getOrCreatePurchaseUser(supabase, service, formData, senderName, senderEmail)
   if ('error' in authResult) return { error: authResult.error }
@@ -91,13 +98,28 @@ export async function purchaseMemorialAction(_prev: unknown, formData: FormData)
   const baseSlug = slugify(displayName)
   const slug = `${baseSlug}-${Date.now().toString(36)}`
 
+  // Profiles: telefon dahil upsert
+  const hdrs = await headers()
+  const consentIp = hdrs.get('x-forwarded-for')?.split(',')[0]?.trim() || hdrs.get('x-real-ip') || null
+
   if (pendingEmailConfirmation) {
-    // generateLink trigger'ı tetikliyor ama yedek olarak profiles upsert
     await service.from('profiles').upsert(
-      { id: user.id, full_name: senderName, email: senderEmail },
-      { onConflict: 'id', ignoreDuplicates: true }
+      { id: user.id, full_name: senderName, email: senderEmail, phone },
+      { onConflict: 'id', ignoreDuplicates: false }
     )
+  } else {
+    await service.from('profiles').update({ phone }).eq('id', user.id)
   }
+
+  // KVKK rıza kaydı
+  await service.from('user_consents').insert({
+    user_id: user.id,
+    email_consent: emailConsent,
+    phone_consent: phoneConsent,
+    consent_ip: consentIp,
+    consent_version: 'v1.0',
+    source: 'purchase_memorial',
+  })
 
   const dbClient = pendingEmailConfirmation ? service : supabase
 
@@ -124,7 +146,7 @@ export async function purchaseMemorialAction(_prev: unknown, formData: FormData)
     status: 'pending',
     payment_method: 'bank_transfer',
     due_date: dueDate.toISOString().split('T')[0],
-    notes: `Gönderen: ${senderName} <${senderEmail}>`,
+    notes: `Gönderen: ${senderName} <${senderEmail}> | Tel: ${phone}`,
   })
   if (paymentErr) return { error: 'Ödeme kaydı oluşturulamadı: ' + paymentErr.message }
 
@@ -151,10 +173,16 @@ export async function purchaseVaultAction(_prev: unknown, formData: FormData) {
   const displayName = (formData.get('display_name') as string)?.trim()
   const senderName = (formData.get('sender_name') as string)?.trim()
   const senderEmail = (formData.get('sender_email') as string)?.trim().toLowerCase()
+  const phone = (formData.get('phone') as string)?.trim()
+  const emailConsent = formData.get('email_consent') === 'on'
+  const phoneConsent = formData.get('phone_consent') === 'on'
 
   if (!displayName) return { error: 'Anı alanı adı zorunludur' }
   if (!senderName) return { error: 'Ad Soyad zorunludur' }
   if (!senderEmail || !senderEmail.includes('@')) return { error: 'Geçerli bir e-posta girin' }
+  if (!phone) return { error: 'Telefon numarası zorunludur' }
+  if (!emailConsent) return { error: 'E-posta bilgilendirme iznini onaylamanız gerekmektedir' }
+  if (!phoneConsent) return { error: 'Telefon araması iznini onaylamanız gerekmektedir' }
 
   const authResult = await getOrCreatePurchaseUser(supabase, service, formData, senderName, senderEmail)
   if ('error' in authResult) return { error: authResult.error }
@@ -171,12 +199,26 @@ export async function purchaseVaultAction(_prev: unknown, formData: FormData) {
   const baseSlug = slugify(displayName)
   const slug = `${baseSlug}-${Date.now().toString(36)}`
 
+  const hdrs2 = await headers()
+  const consentIp2 = hdrs2.get('x-forwarded-for')?.split(',')[0]?.trim() || hdrs2.get('x-real-ip') || null
+
   if (pendingEmailConfirmation) {
     await service.from('profiles').upsert(
-      { id: user.id, full_name: senderName, email: senderEmail },
-      { onConflict: 'id', ignoreDuplicates: true }
+      { id: user.id, full_name: senderName, email: senderEmail, phone },
+      { onConflict: 'id', ignoreDuplicates: false }
     )
+  } else {
+    await service.from('profiles').update({ phone }).eq('id', user.id)
   }
+
+  await service.from('user_consents').insert({
+    user_id: user.id,
+    email_consent: emailConsent,
+    phone_consent: phoneConsent,
+    consent_ip: consentIp2,
+    consent_version: 'v1.0',
+    source: 'purchase_vault',
+  })
 
   const dbClient = pendingEmailConfirmation ? service : supabase
 
@@ -203,7 +245,7 @@ export async function purchaseVaultAction(_prev: unknown, formData: FormData) {
     status: 'pending',
     payment_method: 'bank_transfer',
     due_date: dueDate.toISOString().split('T')[0],
-    notes: `Gönderen: ${senderName} <${senderEmail}>`,
+    notes: `Gönderen: ${senderName} <${senderEmail}> | Tel: ${phone}`,
   })
   if (paymentErr) return { error: 'Ödeme kaydı oluşturulamadı: ' + paymentErr.message }
 

@@ -5,6 +5,48 @@
 
 ---
 
+## 2026-06-09 — Oturum 38: Telefon + KVKK Rıza Kaydı
+
+### Yapılanlar
+
+**Telefon alanı ve KVKK uyumlu rıza checkboxları eklendi:**
+- `profiles` tablosuna `phone text` kolonu eklendi
+- `user_consents` tablosu oluşturuldu: `user_id`, `email_consent`, `phone_consent`, `consented_at`, `consent_ip`, `consent_version`, `source`, `created_at`
+
+**Her iki satın alma formuna eklendi:**
+- `src/app/satin-al/anma/_AnmaFormClient.tsx` — Telefon alanı (zorunlu) + "İzinler & Aydınlatma" bölümü
+- `src/app/satin-al/kasa/_KasaFormClient.tsx` — Aynı bölüm (emerald tema)
+- E-posta bilgilendirme izni (zorunlu, checkbox) — pazarlama değil sadece hizmet bildirimleri
+- Telefon araması izni (zorunlu, checkbox) — yalnızca doğrulama ve destek
+- KVKK politikası linki
+
+**Server actions güncellendi (`src/app/satin-al/actions.ts`):**
+- `phone`, `email_consent`, `phone_consent` validasyonu eklendi
+- `profiles` upsert/update'e `phone` alanı eklendi
+- `user_consents` tablosuna IP adresi + zaman damgası + kaynak ile rıza kaydediliyor
+- Payment notes'a telefon numarası eklendi
+
+### Proje Durumu
+- [x] Telefon numarası alanı (zorunlu)
+- [x] E-posta bilgilendirme izni (zorunlu, KVKK uyumlu)
+- [x] Telefon araması izni (zorunlu, KVKK uyumlu)
+- [x] KVKK rıza kaydı: IP + zaman damgası + versiyon + kaynak
+
+### Kritik Kararlar / Notlar
+- `user_consents` ayrı tablo olarak tutuldu — rıza geçmişi değişmez (audit trail)
+- IP adresi `x-forwarded-for` başlığından okunuyor (Vercel proxy uyumlu)
+- consent_version = 'v1.0' — metin değişirse 'v1.1' yapılır
+- Rıza metni: pazarlama DEĞİL, sadece hizmet bildirimleri + kimlik doğrulama
+
+### Nerede Kaldık
+Her iki satın alma formu tamamlandı, build temiz, push edildi.
+
+### Sıradaki Adım
+1. Admin paneline rıza kayıtlarını görüntüleme tablosu eklenebilir
+2. Profil sayfasında kullanıcının kendi rıza geçmişini görmesi sağlanabilir
+
+---
+
 ## 2026-06-09 — Oturum 37: Cloudflare Turnstile CAPTCHA Entegrasyonu
 
 ### Yapılanlar
