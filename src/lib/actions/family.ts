@@ -59,6 +59,8 @@ export async function addFamilyMemberAction(vaultId: string, formData: FormData)
   const validRels = ['mother','father','spouse','son','daughter','sibling','grandparent','grandchild','other']
   if (!fullName || !validRels.includes(relationship)) return
 
+  const parentMemberId = (formData.get('parent_member_id') as string) || null
+
   await supabase.from('vault_family_members').insert({
     vault_id: vaultId,
     relationship,
@@ -68,6 +70,7 @@ export async function addFamilyMemberAction(vaultId: string, formData: FormData)
     is_alive: isAlive,
     photo_url: photoUrl,
     notes,
+    parent_member_id: relationship === 'grandchild' ? parentMemberId : null,
   })
 
   revalidatePath(`/dashboard/vault/${vaultId}/aile`)
@@ -92,8 +95,19 @@ export async function updateFamilyMemberAction(memberId: string, vaultId: string
 
   if (!fullName) return
 
+  const parentMemberId = (formData.get('parent_member_id') as string) || null
+
   await supabase.from('vault_family_members')
-    .update({ relationship, full_name: fullName, birth_date: birthDate, death_date: isAlive ? null : deathDate, is_alive: isAlive, photo_url: photoUrl, notes })
+    .update({
+      relationship,
+      full_name: fullName,
+      birth_date: birthDate,
+      death_date: isAlive ? null : deathDate,
+      is_alive: isAlive,
+      photo_url: photoUrl,
+      notes,
+      parent_member_id: relationship === 'grandchild' ? parentMemberId : null,
+    })
     .eq('id', memberId)
     .eq('vault_id', vaultId)
 

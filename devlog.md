@@ -5,6 +5,104 @@
 
 ---
 
+## 2026-06-08 — Oturum 24: Animasyonlu Aile Ağacı (FamilyTreeCanvas)
+
+### Yapılanlar
+- **`src/components/FamilyTreeCanvas.tsx`** — Yeni client component (sıfırdan yazıldı)
+  - Büyükanne/Büyükbaba → Anne/Baba → Kişi + Eş → Çocuklar → Torunlar hiyerarşisi
+  - `parent_member_id` ile torunlar kendi ebeveyninin altına konumlanır
+  - Animasyonlu SVG dallar: `stroke-dashoffset` animation (bezier eğri)
+  - Merkezi gövde (trunk), couple connector (kalp nokta), anchor dot'lar
+  - `IntersectionObserver` ile scroll'da tetiklenen giriş animasyonu
+  - Fixed 1000px canvas, küçük ekranda `overflow-x-auto`
+  - Vault kişisi featured card (gold border + ring), diğerleri standart dark card
+- **`src/lib/actions/family.ts`** — `parent_member_id` desteği eklendi
+  - `addFamilyMemberAction`: `parent_member_id` formdan okunuyor, sadece `grandchild` için kaydediliyor
+  - `updateFamilyMemberAction`: aynı şekilde update edildi
+- **`src/app/memorial/[slug]/RealMemorialPage.tsx`** — Aile bağları bölümü `FamilyTreeCanvas` ile değiştirildi
+  - Eski manuel grid/absolute layout kaldırıldı
+  - `FamilyTreeCanvas` component import edildi
+- **`src/app/dashboard/vault/[id]/aile/page.tsx`** — `FamilyTreeCanvas` entegrasyonu
+  - Eski tree layout kaldırıldı, yerine `FamilyTreeCanvas` kullanılıyor
+  - Torun eklerken ebeveyn seçim dropdow'u (mevcut oğul/kızlar listeleniyor)
+  - Ağaç altına "Üye Yönetimi" list paneli eklendi (düzenle/kaldır butonları)
+- **DB Migration** (önceki oturumda): `vault_family_members.parent_member_id UUID FK`
+
+### Proje Durumu
+- [x] Auth sistemi
+- [x] Dashboard ana sayfa
+- [x] Sol sidebar
+- [x] Vasiyetname, Anılar, Gizli Kasa, Belgeler
+- [x] Aile bağları — düzenleme + silme + animasyonlu ağaç
+- [x] Preview sayfası (`/preview/[id]`) — demo ile birebir aynı görünüm
+- [x] Animasyonlu `FamilyTreeCanvas` component
+- [ ] payments RLS hatası fix
+- [ ] Login "Kaydınız yoksa" → /satin-al yönlendirmesi
+- [ ] Rehber/kılavuz sayfası
+- [ ] Vefat bildirimi alanı
+
+### Kritik Kararlar / Notlar
+- `FamilyTreeCanvas` pure display component — edit/delete props taşımıyor
+- `aile/page.tsx`'te yönetim "Üye Yönetimi" listesi olarak ayrıldı (tree altında)
+- Torun konumlaması: `parent_member_id` ile hangi çocuğun altına geleceği belirleniyor
+- Build: `npx next build` → hatasız, TypeScript clean
+
+### Nerede Kaldık
+`FamilyTreeCanvas.tsx` yazıldı, `RealMemorialPage.tsx` ve `aile/page.tsx` güncellendi, `family.ts` `parent_member_id` aldı. Build temiz.
+
+### Sıradaki Adım
+1. Önizleme (`/preview/[id]`) açılarak animasyonlu ağacın doğru çalıştığını test etmek
+2. Torun ekleme → doğru ebeveyn altına yerleştirilmesini doğrulamak
+3. payments RLS hatası araştırılması
+4. Login sayfasında "Kaydınız yoksa" → `/satin-al` yönlendirmesi
+
+---
+
+## 2026-06-07 — Oturum 23: Aile Sayfası — Demo ile Tam Eşleştirme
+
+### Yapılanlar
+- `aile/page.tsx` — Tüm sayfa demo memorial sayfasının aile bölümüyle birebir eşleşecek şekilde yeniden yazıldı
+  - Tüm sayfa koyu tema: `bg-[#091712]`, `bg-[#0d1412]`, `bg-[#121b17]`
+  - Başlık: "Köklerden / yeni nesillere." — demo ile aynı
+  - FamilyCard: `h-16 w-16` yuvarlak fotoğraf, featured=gold border+ring, serif isim, gold yakınlık, muted yıllar
+  - Desktop: absolute konumlandırılmış aile ağacı; gold connector çizgiler (7 adet)
+  - Mobile: nesile göre 2 sütun grid düzeni
+  - Add/Edit formu koyu tema içine entegre (collapsible, `?add=1` / `?edit=<id>`)
+  - Footer: "{N} kuşak / Bu aile bağı The Maradi ile korunur."
+  - TypeScript temiz (npx tsc --noEmit → hata yok)
+
+### Proje Durumu
+- [x] Auth sistemi
+- [x] Dashboard ana sayfa
+- [x] Sol sidebar
+- [x] Tüm alt sayfa layout overhaul
+- [x] Vasiyetname sayfası
+- [x] Anılar — edit + sil
+- [x] Gizli kasa — edit + sil
+- [x] Aile bağları — edit + sil + fotoğraf + demo ile eşleşen görünüm
+- [x] Belgeler kasası — sil
+- [x] Varis bilgileri — kaldır
+- [ ] payments RLS hatası
+- [ ] Login "Kaydınız yoksa" → /satin-al yönlendirmesi
+- [ ] Rehber/kılavuz sayfası
+- [ ] Vefat bildirimi alanı
+
+### Kritik Kararlar / Notlar
+- Kullanıcı talebi: dashboard'daki aile sayfası ile public memorial sayfası tamamen aynı görünecek
+- Demo sayfası (`/memorial/demo`) değiştirilmedi — sadece dashboard sayfası güncellendi
+- Form (ekle/düzenle) koyu tema içine entegre edildi, ayrı light-theme bölümü kaldırıldı
+
+### Nerede Kaldık
+`aile/page.tsx` rewrite tamamlandı, TypeScript temiz.
+
+### Sıradaki Adım
+1. payments RLS hatası düzeltmesi
+2. Login "Kaydınız yoksa" → /satin-al yönlendirmesi
+3. Rehber/kılavuz sayfası
+4. Vefat bildirimi alanı
+
+---
+
 ## 2026-06-07 — Oturum 22: Inline Edit + Aile Fotoğraf Yükleme
 
 ### Yapılanlar

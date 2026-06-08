@@ -20,6 +20,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
   const initial = (profile?.full_name?.[0] ?? user.email?.[0] ?? '?').toUpperCase()
   const areaHref = firstArea ? `/dashboard/vault/${firstArea.id}` : '/dashboard'
   const v = (path: string) => firstArea ? `/dashboard/vault/${firstArea.id}/${path}` : '/dashboard'
+  const previewHref = firstArea ? `/preview/${firstArea.id}` : '/dashboard'
 
   const mainNav = [
     { href: areaHref,          label: 'Anı Alanım', icon: Home },
@@ -77,7 +78,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
             </Link>
           )}
 
-          <Link href={v('onizleme')}
+          <Link href={previewHref} target="_blank"
             className="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm text-[#69766f] hover:bg-[#f5efdf] transition-colors">
             <Eye className="h-4 w-4" />
             Profil Önizleme

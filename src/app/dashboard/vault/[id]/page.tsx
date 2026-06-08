@@ -84,7 +84,7 @@ export default async function MemoryAreaPage({ params, searchParams }: Props) {
             <span>/</span>
             <span className="font-semibold text-[#22362e]">{area.display_name}</span>
           </div>
-          <Link href={`/dashboard/vault/${id}/onizleme`}
+          <Link href={`/preview/${id}`} target="_blank"
             className="hidden sm:inline-flex items-center gap-1.5 text-xs font-medium text-[#788177] hover:text-[#174f35] transition-colors">
             <Eye className="h-3.5 w-3.5" />
             Önizle

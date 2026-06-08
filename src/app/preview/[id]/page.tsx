@@ -6,7 +6,7 @@ interface Props {
   params: Promise<{ id: string }>
 }
 
-export default async function OnizlemePage({ params }: Props) {
+export default async function PreviewPage({ params }: Props) {
   const { id } = await params
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -21,9 +21,5 @@ export default async function OnizlemePage({ params }: Props) {
 
   if (!vault) notFound()
 
-  return (
-    <div className="[&>div]:!pt-0">
-      <RealMemorialPage vault={vault} isPreview />
-    </div>
-  )
+  return <RealMemorialPage vault={vault} isPreview />
 }
