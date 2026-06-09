@@ -5,6 +5,38 @@
 
 ---
 
+## 2026-06-10 — Oturum 56: Kalan Dosyaların Toplu Push Hazırlığı
+
+### Yapılanlar
+- Admin memorial detayına modern önizleme bağlantısı ekleyen local değişiklikler push kapsamına alındı
+- Admin modern önizleme route'u push kapsamına alındı
+- Inbound email route'undaki Resend gövde çekme ve payload ayrıştırma değişiklikleri push kapsamına alındı
+- `scripts/get-inbound-raw-payload.sql` debug sorgusu push kapsamına alındı
+- `.claude` yerel ayar/agent dosyaları push kapsamına alındı
+- `RealMemorialPageModern.tsx` içindeki kullanılmayan importlar ve render sırasında çalışan kullanılmayan `Date.now()` hesabı kaldırıldı
+
+### Proje Durumu
+- [x] Kullanıcının istediği şekilde kalan tüm local dosyalar commit'e hazırlanıyor
+- [x] Modern önizleme dosyasındaki lint kırılması giderildi
+
+### Doğrulama
+- `npx eslint src/app/api/email/inbound/route.ts src/app/admin/memorials/[id]/page.tsx src/app/admin/memorials/[id]/preview/page.tsx src/app/memorial/[slug]/RealMemorialPageModern.tsx` geçti
+- `npx tsc --noEmit --pretty false` geçti
+- `git diff --check` geçti
+
+### Kritik Kararlar / Notlar
+- Bu oturumda önceki alakasız local dosyalar da kullanıcı isteğiyle commit kapsamına alınıyor
+- `RealMemorialPageModern.tsx` 250 satır üstünde büyük bir bileşen; şu an sadece kıran lint düzeltmesi yapıldı
+
+### Nerede Kaldık
+Tüm kalan local değişiklikler commit ve push için hazırlandı.
+
+### Sıradaki Adım
+1. Tüm dosyalar stage edilip commit alınacak
+2. Commit GitHub `master` branch'ine pushlanacak
+
+---
+
 ## 2026-06-10 — Oturum 55: Kişisel Bilgi ve Bağış Yerleşimi
 
 ### Yapılanlar

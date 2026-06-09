@@ -22,11 +22,19 @@ export default async function VaultDetailPage({ params }: { params: Promise<{ id
 
   return (
     <div className="p-6 max-w-5xl mx-auto">
-      <div className="mb-6 flex items-center gap-3">
+      <div className="mb-6 flex flex-wrap items-center gap-3">
         <Link href="/admin/memorials" className="text-xs text-slate-400 hover:text-slate-700">← Memoriallar</Link>
         <span className="text-slate-300">/</span>
         <h1 className="text-xl font-bold text-slate-900">{vault.display_name}</h1>
         <StatusBadge status={vault.status ?? ''} />
+        <Link
+          href={`/admin/memorials/${vault.id}/preview`}
+          target="_blank"
+          rel="noreferrer"
+          className="ml-auto inline-flex items-center rounded-lg bg-emerald-700 px-3 py-2 text-xs font-semibold text-white transition hover:bg-emerald-800"
+        >
+          Modern Önizleme
+        </Link>
       </div>
 
       <div className="grid lg:grid-cols-2 gap-6 mb-6">
