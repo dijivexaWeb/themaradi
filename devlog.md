@@ -5,6 +5,241 @@
 
 ---
 
+## 2026-06-09 — Oturum 47: Anı Önizleme ve Medya Eksikleri
+
+### Yapılanlar
+- `/preview/[id]` için imzalı token desteği eklendi
+- Dashboard `/onizleme` sayfasına paylaşılabilir önizleme linki eklendi
+- Token yoksa `/preview/[id]` hâlâ login ister; token varsa girişsiz önizleme açılır
+- Public anı sayfasındaki sticky sekmelere `Anılar` eklendi
+- Genel anılar bölümüne `id="anilar"` eklendi
+- Genel anılarda dosya olarak yüklenen video için `<video controls>` fallback'i eklendi
+- Anı medya yüklemede dosya türü ve 50 MB boyut limiti eklendi
+- Storage upload hataları artık sessizce yutulmuyor; kullanıcı `Anılar` sayfasında hata mesajı görüyor
+
+### Proje Durumu
+- [x] Paylaşılabilir preview linki giriş yapmadan çalışıyor
+- [x] Tokensız preview güvenli kalıyor ve login'e yönleniyor
+- [x] Genel anılara üst menüden erişilebiliyor
+- [x] YouTube/Vimeo dışındaki video dosyaları public preview'da oynatılabiliyor
+- [x] Hatalı/çok büyük medya yükleme kullanıcıya görünür hata veriyor
+- [ ] Paylaşılabilir preview linki tarayıcıda görsel olarak manuel test edilmedi
+
+### Doğrulama
+- `npm run lint` geçti
+- `npx tsc --noEmit` geçti
+- `npm run build` geçti
+- Token'lı `/preview/35dc2d67-b36a-407e-8f19-0fb9fc792ef5?token=...` HTTP `200 OK` döndü
+- Tokensız `/preview/35dc2d67-b36a-407e-8f19-0fb9fc792ef5` HTTP `307 /login` döndü
+
+### Kritik Kararlar / Notlar
+- Preview token DB migration gerektirmeden HMAC ile üretildi
+- Token secret olarak önce `PREVIEW_TOKEN_SECRET`, yoksa server-only `SUPABASE_SERVICE_ROLE_KEY` kullanılıyor
+- Token sadece server tarafında üretilip doğrulanıyor; client'a secret gönderilmiyor
+- Anı medyası hâlâ `vault_memories` içinde tutuluyor; ana fotoğraf/video galerileri `media` tablosundan beslenmeye devam ediyor
+
+### Nerede Kaldık
+Anı önizleme ve medya tarafında görülen eksikler kod seviyesinde tamamlandı ve doğrulandı.
+
+### Sıradaki Adım
+1. Girişli kullanıcıyla `/dashboard/vault/[id]/onizleme` ekranında linkin görünümü kontrol edilmeli
+2. Gerçek foto/video yükleyip hata ve başarı akışı tarayıcıda test edilmeli
+3. İstenirse preview linklerine süreli token/iptal mekanizması eklenebilir
+
+---
+
+## 2026-06-09 — Oturum 46: Idle Logout ve Genel Lint Temizliği
+
+### Yapılanlar
+- Admin ve dashboard alanlarına 5 dakika hareketsizlik sonrası otomatik logout eklendi
+- Ortak `IdleLogout` client bileşeni oluşturuldu
+- Admin idle logout `/admin/signout` üzerinden çalışacak ve `/admin/login` sayfasına dönecek şekilde bağlandı
+- Dashboard idle logout `/auth/signout` üzerinden çalışacak ve `/login` sayfasına dönecek şekilde bağlandı
+- Proje genelindeki ESLint hata ve uyarıları temizlendi
+- React compiler purity hataları için `Date.now()` kullanımları düzenlendi
+- JSX metin kaçışları, unused import/değişkenler ve cookie banner effect uyarısı temizlendi
+
+### Proje Durumu
+- [x] Admin ve dashboard oturumları 5 dakika işlem yoksa otomatik kapanıyor
+- [x] Public sayfalar idle logout davranışından etkilenmiyor
+- [x] `npm run lint` sıfır hata ve sıfır uyarı ile geçiyor
+- [x] `npx tsc --noEmit` geçiyor
+- [x] `npm run build` geçiyor
+- [ ] Idle logout gerçek tarayıcıda 5 dakika bekleme senaryosuyla manuel QA edilmedi
+
+### Doğrulama
+- `npm run lint` geçti
+- `npx tsc --noEmit` geçti
+- `npm run build` geçti
+
+### Kritik Kararlar / Notlar
+- Idle logout server-side signout route'larını kullanıyor; cookie temizliği client-only yapılmadı
+- Timer her mouse, klavye, touch, scroll ve wheel aktivitesinde yenileniyor
+- Login sayfaları admin layout'ta auth context yoksa guard almadığı için sonsuz logout/login döngüsü oluşmuyor
+
+### Nerede Kaldık
+Admin ban sistemi, idle logout ve proje genel lint/build temizliği tamamlandı.
+
+### Sıradaki Adım
+1. Admin ve dashboard idle logout gerçek tarayıcıda test edilmeli
+2. Admin doğrulama/itiraz aksiyonlarında DB hata kontrolü sağlamlaştırılabilir
+3. Admin login rate limit TODO'su ele alınabilir
+
+---
+
+## 2026-06-09 — Oturum 45: Admin Kullanıcı Ban Yönetimi
+
+### Yapılanlar
+- Admin kullanıcı aksiyonları `src/app/admin/users/actions.ts` dosyasına ayrıldı
+- Kullanıcı listesi Supabase Auth `banned_until` bilgisini okuyacak şekilde güncellendi
+- Kullanıcı tablosuna `Aktif` / `Banlı` durum kolonu eklendi
+- Ban işlemi süre ve sebep alacak şekilde yenilendi
+- Ban kaldırma aksiyonu eklendi
+- Rol değiştirme aksiyonu yeni users action dosyasına taşındı
+
+### Proje Durumu
+- [x] Admin kullanıcı listesinde gerçek ban durumu görünüyor
+- [x] Ban sebebi audit log'a yazılıyor
+- [x] Ban süresi seçenekleri eklendi: 1 gün, 7 gün, 30 gün, kalıcı
+- [x] Adminin kendisini banlaması engelleniyor
+- [x] Ban kaldırma Supabase Auth Admin API üzerinden çalışıyor
+- [ ] Admin users ekranı gerçek admin oturumuyla tarayıcıda uçtan uca test edilmedi
+
+### Doğrulama
+- `npx tsc --noEmit` geçti
+- `npm run build` geçti
+- `npx eslint src/app/admin/users/page.tsx src/app/admin/users/_BanUserButton.tsx src/app/admin/users/_UserRoleForm.tsx src/app/admin/users/actions.ts src/app/admin/actions.ts` geçti
+- `npm run lint` proje genelinde eski/bağımsız lint hatalarına takılıyor
+
+### Kritik Kararlar / Notlar
+- `src/app/admin/actions.ts` zaten büyük olduğu için kullanıcı aksiyonları aynı dosyada büyütülmedi
+- Ban durumu local client state yerine server tarafında Supabase Auth verisinden okunuyor
+- Süresi geçmiş `banned_until` değeri gelirse kullanıcı aktif kabul ediliyor
+
+### Nerede Kaldık
+Admin users ban/ban-kaldır akışı kod seviyesinde tamamlandı ve hedefli kontrollerden geçti.
+
+### Sıradaki Adım
+1. Admin hesabıyla `/admin/users` ekranında gerçek ban/ban kaldır QA yapılmalı
+2. Proje genelindeki mevcut lint hataları ayrı temizlik işi olarak ele alınmalı
+3. Sonraki sağlamlaştırma adayı: admin doğrulama/itiraz aksiyonlarında DB hata kontrolü
+
+---
+
+## 2026-06-09 — Oturum 44: Admin Panel İncelemesi
+
+### Yapılanlar
+- `src/app/admin` ve `src/lib/admin` dosya yapısı incelendi
+- Admin auth, layout/sidebar, dashboard, ödeme/doğrulama, kullanıcı, email ayarları ve inbox akışları okundu
+- Kod değişikliği yapılmadı
+
+### Proje Durumu
+- [x] Admin panel merkezi `requireAdmin()` kontrolüyle korunuyor
+- [x] Admin dashboard, doğrulama, kasa/ödemeler, memoriallar, itirazlar, guestbook, varisler, alive-alerts, email, inbox, contacts, users, GDPR, audit ve settings sayfaları mevcut
+- [x] Email/Turnstile/inbound webhook yönetimi admin paneline bağlanmış
+- [ ] Admin login rate limit TODO olarak duruyor
+- [ ] Bazı kritik doğrulama aksiyonlarında DB hata sonuçları kontrol edilmiyor
+- [ ] Admin tarafında büyük dosyalar refactor adayı: `_InboxClient.tsx`, `actions.ts`, `_EmailSettingsForm.tsx`
+
+### Kritik Kararlar / Notlar
+- Middleware yalnızca oturum kontrolü yapıyor; rol yetkisi sayfa/action seviyesinde `requireAdmin()` ile doğrulanıyor
+- Service role client sadece server tarafında kullanılıyor
+- Admin aksiyonlarında audit log yaygın kullanılmış, ancak bazı özel action dosyalarında merkezi `logAdminAction()` yerine doğrudan insert var
+
+### Nerede Kaldık
+Admin panel incelemesi tamamlandı; tespit edilen riskler kullanıcıya aktarılacak.
+
+### Sıradaki Adım
+1. Admin login rate limit eklenebilir
+2. `verifications/actions.ts` hata kontrollü ve transactional mantığa yaklaştırılabilir
+3. Büyük admin dosyaları parçalara ayrılabilir
+
+---
+
+## 2026-06-09 — Oturum 43: Proje ve Devlog Yeniden Okuma
+
+### Yapılanlar
+- `devlog.md`, `proje.md`, `AGENTS.md`, `README.md`, `package.json`, `next.config.ts` ve ana `src` ağacı tekrar incelendi
+- Proje dokümanı ile güncel kod/devlog durumu karşılaştırıldı
+- Kod değişikliği yapılmadı
+
+### Proje Durumu
+- [x] PRD adı hâlâ `themaradi`; güncel ürün markası kodda `The Eternal Memory`
+- [x] Next.js 16.2.7, React 19.2.4, Supabase, Resend, Tailwind 4 stack'i doğrulandı
+- [x] Admin, dashboard, satın alma, memorial, inbox, i18n, Turnstile ve email modülleri kod ağacında mevcut
+- [ ] Son DB değişiklikleri repo migration dosyalarında tam görünmüyor; Supabase tarafında uygulanmış olabilir
+
+### Kritik Kararlar / Notlar
+- `proje.md` başlangıç PRD'si olarak kalmış; devlog ve kod, PRD'den daha güncel
+- `supabase/migrations` altında yalnızca ilk 3 migration dosyası var; devlog'da anlatılan sonraki tablo/kolon değişiklikleri repo içinde migration olarak arşivlenmemiş görünüyor
+- `/api/qr/[hash]` ve `/q/[code]` rotaları birlikte var; QR mimarisi eski ve yeni akış arasında kontrol edilmeli
+
+### Nerede Kaldık
+Projenin güncel resmi çıkarıldı; uygulama koduna müdahale edilmedi.
+
+### Sıradaki Adım
+1. Kullanıcıya proje özeti ve açık riskler aktarılacak
+2. İstenirse DB migration drift'i kontrol edilecek
+3. İstenirse güncel öncelik olarak inbound mail + Turnstile gerçek QA yapılacak
+
+---
+
+## 2026-06-09 — Oturum 42: Codex PostToolUse Hook Hatası Teşhisi
+
+### Yapılanlar
+- Codex ekranında görünen `PostToolUse hook (failed) error: hook exited with code 1` hatası incelendi
+- Hatanın uygulama kodundan değil, OMO/LazyCodex plugin hook cache'inden kaynaklandığı doğrulandı
+- Eksik hook build çıktıları tespit edildi: `components/comment-checker/dist/cli.js`, `components/lsp/dist/cli.js`, `components/rules/dist/cli.js`
+- OMO plugin cache dependency'leri kuruldu ve component `dist` dosyaları yeniden build edildi
+
+### Proje Durumu
+- [x] Hook hata kaynağı tespit edildi
+- [x] Eksik OMO component build çıktıları oluşturuldu
+- [x] Manuel hook kontrolleri `exit 0` döndü
+- [ ] Codex oturumu yeniden başlatılırsa hook state/cache davranışı tekrar gözlemlenmeli
+
+### Kritik Kararlar / Notlar
+- Hata proje uygulamasını veya Next.js build'ini ilgilendirmiyor; Codex plugin tarafındaki PostToolUse otomasyonundan geliyor
+- `apply_patch` sonrası comment-checker, LSP diagnostics ve rules hook'ları tetiklendiği için hata ekranda birkaç kez görünebiliyordu
+- OMO paketleme script'lerinde sürüm klasörü path uyuşmazlığı var; bu yüzden tam root build yerine component build çalıştırıldı
+
+### Nerede Kaldık
+PostToolUse hook hatasının ana nedeni giderildi; sonraki komutlarda aynı hata tekrarlanırsa kalan spesifik hook yeniden ayrıştırılacak.
+
+### Sıradaki Adım
+1. Yeni tool çağrılarında PostToolUse hatası tekrar ediyor mu gözlemle
+2. Tekrar ederse ilgili hook adı ve stderr çıktısı üzerinden OMO bug raporu hazırlanabilir
+3. Devam edilecek asıl proje işi için kullanıcı yönlendirmesi bekleniyor
+
+---
+
+## 2026-06-09 — Oturum 41: Devlog İncelemesi
+
+### Yapılanlar
+- `devlog.md`, `proje.md`, `README.md`, `CLAUDE.md` ve `AGENTS.md` incelendi
+- Son 40 oturumun tamamlanan işleri ve açık kalan maddeleri çıkarıldı
+- Kod değişikliği yapılmadı
+
+### Proje Durumu
+- [x] Devlog okundu ve özetlendi
+- [x] Son durum: mail inbox/thread/takip sistemi en güncel tamamlanan iş olarak görünüyor
+- [ ] Resend inbound webhook gerçek panel konfigürasyonu ve testleri doğrulanmalı
+- [ ] Turnstile ve satın alma/mail akışları gerçek tarayıcıda uçtan uca test edilmeli
+
+### Kritik Kararlar / Notlar
+- Bu oturum yalnızca inceleme ve durum çıkarımıdır; uygulama dosyalarına müdahale edilmedi
+- AGENTS.md gereği devlog, kod değişikliği olmasa da güncellendi
+
+### Nerede Kaldık
+Devlog incelemesi tamamlandı; sıradaki teknik işe başlamadan önce kullanıcıya mevcut durum ve önerilen öncelikler aktarılacak.
+
+### Sıradaki Adım
+1. Kullanıcıdan hangi açık kalemle devam edileceği netleştirilecek
+2. Öncelikli aday: inbound mail thread/takip sistemi için gerçek webhook ve yanıt akışı testi
+3. Alternatif aday: Turnstile/login/contact/taziye formları için tarayıcı tabanlı QA
+
+---
+
 ## 2026-06-09 — Oturum 40: Thread Konuşma Görünümü + Takipte Sekmesi
 
 ### Yapılanlar

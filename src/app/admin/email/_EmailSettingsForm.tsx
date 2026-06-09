@@ -203,7 +203,7 @@ export default function EmailSettingsForm({ settings }: { settings: Record<strin
       <div className={sectionCls}>
         <h2 className="font-semibold text-[#1f2d27] mb-1">Gelen Kutusu Webhook</h2>
         <p className="text-xs text-[#788177] mb-5">
-          Bu URL'yi{' '}
+          Bu URL&apos;yi{' '}
           <a href="https://resend.com/inbound-webhooks" target="_blank" rel="noopener noreferrer" className="underline text-[#174f35]">
             Resend Inbound
           </a>{' '}
@@ -250,7 +250,7 @@ export default function EmailSettingsForm({ settings }: { settings: Record<strin
           </button>
           {webhookSecret && (
             <span className="text-xs text-[#788177]">
-              ⚠ Token değişirse Resend'de URL'yi güncellemeniz gerekir.
+              ⚠ Token değişirse Resend&apos;de URL&apos;yi güncellemeniz gerekir.
             </span>
           )}
         </div>
@@ -258,10 +258,10 @@ export default function EmailSettingsForm({ settings }: { settings: Record<strin
         <div className="mt-4 bg-[#fffdf8] border border-[#f0ebe0] rounded-xl p-4 text-xs text-[#788177] space-y-1.5">
           <p className="font-semibold text-[#4a5e55]">Kurulum adımları:</p>
           <ol className="list-decimal list-inside space-y-1">
-            <li>Yukarıdaki "Token Oluştur" butonuna tıklayın.</li>
+            <li>Yukarıdaki &quot;Token Oluştur&quot; butonuna tıklayın.</li>
             <li>Resend panelini açın → Inbound → Add Webhook.</li>
-            <li>Webhook URL'yi yapıştırın, etki alanı olarak <code className="bg-[#f0ebe0] px-1 rounded">theeternalmemory.com</code> yazın.</li>
-            <li>Kaydedin. Artık gelen mailler admin panelinde "Gelen Kutusu"nda görünür.</li>
+            <li>Webhook URL&apos;yi yapıştırın, etki alanı olarak <code className="bg-[#f0ebe0] px-1 rounded">theeternalmemory.com</code> yazın.</li>
+            <li>Kaydedin. Artık gelen mailler admin panelinde &quot;Gelen Kutusu&quot;nda görünür.</li>
           </ol>
         </div>
       </div>

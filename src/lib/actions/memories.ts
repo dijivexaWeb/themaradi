@@ -5,6 +5,11 @@ import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 
 const MEDIA_BUCKET = 'vault-media'
+const MAX_MEMORY_MEDIA_BYTES = 50 * 1024 * 1024
+
+type MemoryMediaResult =
+  | { ok: true; mediaUrl: string | null; mediaType: string | null }
+  | { ok: false; error: string }
 
 function cleanFilename(name: string) {
   const cleaned = name
@@ -25,14 +30,15 @@ async function resolveMemoryMedia(
   vaultId: string,
   userId: string,
   formData: FormData,
-): Promise<{ mediaUrl: string | null; mediaType: string | null }> {
+): Promise<MemoryMediaResult> {
   const file = formData.get('media_file')
   const urlInput = (formData.get('media_url') as string)?.trim() || null
 
   if (file instanceof File && file.size > 0) {
     const isImage = file.type.startsWith('image/')
     const isVideo = file.type.startsWith('video/')
-    if (!isImage && !isVideo) return { mediaUrl: null, mediaType: null }
+    if (!isImage && !isVideo) return { ok: false, error: 'Sadece fotoğraf veya video dosyası yükleyebilirsiniz.' }
+    if (file.size > MAX_MEMORY_MEDIA_BYTES) return { ok: false, error: 'Dosya boyutu 50 MB sınırını aşıyor.' }
 
     const service = await createServiceClient()
     const filename = cleanFilename(file.name)
@@ -41,22 +47,28 @@ async function resolveMemoryMedia(
       contentType: file.type,
       upsert: false,
     })
-    if (error) return { mediaUrl: null, mediaType: null }
+    if (error) return { ok: false, error: `Dosya yüklenemedi: ${error.message}` }
 
     const { data } = service.storage.from(MEDIA_BUCKET).getPublicUrl(path)
-    return { mediaUrl: data.publicUrl, mediaType: isImage ? 'image' : 'video' }
+    return { ok: true, mediaUrl: data.publicUrl, mediaType: isImage ? 'image' : 'video' }
   }
 
   if (urlInput) {
     const explicitType = (formData.get('media_type') as string) || null
     const mediaType = explicitType === 'video' ? 'video' : 'image'
-    return { mediaUrl: urlInput, mediaType }
+    return { ok: true, mediaUrl: urlInput, mediaType }
   }
 
-  return { mediaUrl: null, mediaType: null }
+  return { ok: true, mediaUrl: null, mediaType: null }
 }
 
-export async function addMemoryAction(vaultId: string, formData: FormData): Promise<void> {
+function redirectWithMemoryError(redirectTo: string | null, message: string): never {
+  const target = redirectTo ?? '/dashboard'
+  const separator = target.includes('?') ? '&' : '?'
+  redirect(`${target}${separator}error=${encodeURIComponent(message)}`)
+}
+
+export async function addMemoryAction(vaultId: string, redirectTo: string | null, formData: FormData): Promise<void> {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
@@ -72,7 +84,8 @@ export async function addMemoryAction(vaultId: string, formData: FormData): Prom
 
   if (!content || !memoryDate) return
 
-  const { mediaUrl, mediaType } = await resolveMemoryMedia(vaultId, user.id, formData)
+  const mediaResult = await resolveMemoryMedia(vaultId, user.id, formData)
+  if (!mediaResult.ok) redirectWithMemoryError(redirectTo, mediaResult.error)
 
   await supabase.from('vault_memories').insert({
     vault_id: vaultId,
@@ -81,8 +94,8 @@ export async function addMemoryAction(vaultId: string, formData: FormData): Prom
     memory_date: memoryDate,
     is_secret: isSecret,
     section,
-    media_url: mediaUrl,
-    media_type: mediaType,
+    media_url: mediaResult.mediaUrl,
+    media_type: mediaResult.mediaType,
   })
 
   revalidatePath(`/dashboard/vault/${vaultId}/anilar`)

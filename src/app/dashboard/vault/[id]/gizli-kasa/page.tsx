@@ -36,8 +36,8 @@ export default async function GizliKasaPage({ params, searchParams }: Props) {
     .order('created_at', { ascending: false })
 
   const isLocked = vault.status === 'pending_verification'
-  const addAction = addMemoryAction.bind(null, id)
   const pageUrl = `/dashboard/vault/${id}/gizli-kasa`
+  const addAction = addMemoryAction.bind(null, id, pageUrl)
 
   const inputCls = `w-full rounded-xl border border-[#e5dccb] bg-white px-4 py-3 text-sm text-[#1f2d27] placeholder-[#adb5ab] outline-none focus:border-[#174f35] focus:ring-2 focus:ring-[#174f35]/10`
   const labelCls = `mb-1.5 block text-xs font-semibold text-[#4a5e55]`

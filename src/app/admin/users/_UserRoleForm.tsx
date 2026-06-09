@@ -1,6 +1,6 @@
 'use client'
 
-import { updateUserRole } from '../actions'
+import { updateUserRole } from './actions'
 import { useState } from 'react'
 
 export default function UserRoleForm({ userId, currentRole }: { userId: string; currentRole: string }) {

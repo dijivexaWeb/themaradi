@@ -7,7 +7,7 @@ import PersonHeader from '../_PersonHeader'
 
 interface Props {
   params: Promise<{ id: string }>
-  searchParams: Promise<{ edit?: string }>
+  searchParams: Promise<{ edit?: string; error?: string }>
 }
 
 function getVideoEmbed(url: string): string | null {
@@ -20,7 +20,7 @@ function getVideoEmbed(url: string): string | null {
 
 export default async function AnilarPage({ params, searchParams }: Props) {
   const { id } = await params
-  const { edit: editId } = await searchParams
+  const { edit: editId, error } = await searchParams
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
@@ -36,8 +36,8 @@ export default async function AnilarPage({ params, searchParams }: Props) {
     .order('memory_date', { ascending: false })
 
   const isLocked = vault.status === 'pending_verification'
-  const addAction = addMemoryAction.bind(null, id)
   const pageUrl = `/dashboard/vault/${id}/anilar`
+  const addAction = addMemoryAction.bind(null, id, pageUrl)
 
   const inputCls = `w-full rounded-xl border border-[#e5dccb] bg-white px-4 py-3 text-sm text-[#1f2d27] placeholder-[#adb5ab] outline-none focus:border-[#174f35] focus:ring-2 focus:ring-[#174f35]/10`
   const labelCls = `mb-1.5 block text-xs font-semibold text-[#4a5e55]`
@@ -58,6 +58,12 @@ export default async function AnilarPage({ params, searchParams }: Props) {
         {isLocked && (
           <div className="mb-5 rounded-2xl border border-[#dfbd72]/50 bg-[#fff7e6] px-5 py-4 text-sm text-[#725212]">
             Ödeme doğrulandıktan sonra anı ekleyebilirsiniz.
+          </div>
+        )}
+
+        {error && (
+          <div className="mb-5 rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-sm text-red-700">
+            {error}
           </div>
         )}
 

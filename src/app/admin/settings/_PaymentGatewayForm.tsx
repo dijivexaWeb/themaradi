@@ -96,7 +96,7 @@ export default function PaymentGatewayForm({ settings }: { settings: Record<stri
           </div>
           <div className="sm:col-span-2">
             <p className="text-xs text-amber-700 bg-amber-100 rounded-lg px-3 py-2">
-              ⚠️ API anahtarları şifresiz saklanır. Güvenlik için production'da environment variable kullanmanız önerilir.
+              ⚠️ API anahtarları şifresiz saklanır. Güvenlik için production&apos;da environment variable kullanmanız önerilir.
             </p>
           </div>
         </div>

@@ -1,4 +1,5 @@
 import { getAdminContext } from '@/lib/admin/auth'
+import IdleLogout from '@/components/IdleLogout'
 import AdminSidebar from './AdminSidebar'
 
 export default async function AdminLayout({
@@ -17,6 +18,7 @@ export default async function AdminLayout({
 
   return (
     <div className="flex h-screen overflow-hidden bg-slate-50 text-slate-900">
+      <IdleLogout signoutPath="/admin/signout" redirectPath="/admin/login" />
       <AdminSidebar
         adminEmail={ctx.user.email ?? ''}
         adminName={(ctx.profile as { full_name?: string }).full_name ?? 'Admin'}

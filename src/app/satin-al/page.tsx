@@ -3,9 +3,6 @@ import Link from 'next/link'
 
 export default async function SatinAlPage() {
   const pricing = await fetchPricingConfig()
-  const memorialPrice = pricing.campaignActive && pricing.campaignMemorial ? pricing.campaignMemorial : pricing.memorialPrice
-  const vaultSetup = pricing.campaignActive && pricing.campaignVaultSetup ? pricing.campaignVaultSetup : pricing.vaultSetup
-  const vaultMonthly = pricing.campaignActive && pricing.campaignVaultMonthly ? pricing.campaignVaultMonthly : pricing.vaultMonthly
 
   return (
     <div className="min-h-screen bg-slate-950 text-white flex flex-col items-center justify-center px-4 py-16">

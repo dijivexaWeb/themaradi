@@ -11,11 +11,9 @@ import {
   Feather,
   Heart,
   MapPin,
-  Mic,
   Navigation,
   PenLine,
   Play,
-  Users,
 } from 'lucide-react'
 import MemorialInteractions from './MemorialInteractions'
 import { langs, type Lang } from '@/i18n'
@@ -407,55 +405,6 @@ const memorialCopy: Record<Lang, typeof memorialCopyBase.tr> = {
     footer: { motto: 'Воспоминания живут, большая любовь бесконечна.', platform: 'Платформа', corporate: 'Компания', documents: 'Документы', home: 'Главная', demo: 'Демо профиль', pricing: 'Цены', about: 'О нас', contact: 'Контакты', privacy: 'Политика конфиденциальности', terms: 'Условия использования', kvkk: 'KVKK', rights: '© 2026 The Eternal Memory. Все права защищены.' },
   },
 }
-const timelineEvents = [
-  {
-    year: '1940',
-    title: 'DÃ¼nyaya geldi',
-    desc: "Konya'nÄ±n tarihi dokusunda, mÃ¼tevazÄ± bir ailenin Ã§ocuÄŸu olarak doÄŸdu. KÃ¼Ã§Ã¼k yaÅŸÄ±ndan itibaren kitap ve Ã¶ÄŸrenmeye olan aÅŸkÄ±yla dikkat Ã§ekti.",
-  },
-  {
-    year: '1958',
-    title: 'Ã–ÄŸretmenlik yolculuÄŸu baÅŸladÄ±',
-    desc: "Ankara'ya taÅŸÄ±ndÄ±. Ã–ÄŸretmenlik sÄ±navÄ±nÄ± birincilikle geÃ§ti. 'Ä°nsanlara Ã¶ÄŸretmek, onlara Ä±ÅŸÄ±k vermektir' derdi.",
-  },
-  {
-    year: '1965',
-    title: 'Fatma ile hayatÄ±nÄ± birleÅŸtirdi',
-    desc: "55 yÄ±l boyunca birlikte yÃ¼rÃ¼yecekleri yola adÄ±m attÄ±lar. Ankara'da mÃ¼tevazÄ± bir dÃ¼ÄŸÃ¼nle baÅŸlayan bu yolculuk Ã¶mÃ¼r boyu sÃ¼rdÃ¼.",
-  },
-  {
-    year: '1967',
-    title: 'Baba oldu',
-    desc: 'Ä°lk oÄŸlu Hasan dÃ¼nyaya geldi. Sonraki yÄ±llarda Zeynep ve Ali de aileye katÄ±ldÄ±. ÃœÃ§ evlat, yedi torun â€” en bÃ¼yÃ¼k mirasÄ± bunlardÄ±.',
-  },
-  {
-    year: '1985',
-    title: 'EmekliliÄŸe veda etti',
-    desc: '27 yÄ±l binlerce Ã¶ÄŸrenci yetiÅŸtirdi. Son gÃ¼n tÃ¼m okul veda iÃ§in toplandÄ±. GÃ¶zyaÅŸlarÄ±nÄ± tutmak kimse iÃ§in mÃ¼mkÃ¼n olmadÄ±.',
-  },
-  {
-    year: '2020',
-    title: 'Ebediyete yÃ¼rÃ¼dÃ¼',
-    desc: 'Seksen yÄ±llÄ±k bereketli bir Ã¶mrÃ¼n ardÄ±ndan, sevdiklerinin ortasÄ±nda huzurla veda etti. ArkasÄ±nda sayÄ±sÄ±z anÄ± ve derin bir sevgi bÄ±raktÄ±.',
-  },
-]
-
-const photos = [
-  { src: '/images/landing/memorial-family-old.png', title: 'Ä°lk Aile FotoÄŸrafÄ±', year: '1968' },
-  { src: '/images/landing/memorial-family-dinner.png', title: 'Bayram SofrasÄ±', year: '1975' },
-  { src: '/images/landing/memorial-georgia.png', title: 'GÃ¼rcistan Gezisi', year: '1990' },
-  { src: '/images/landing/memorial-family-main.png', title: 'Son Aile FotoÄŸrafÄ±', year: '2019' },
-  { src: '/images/landing/memorial-hero-cemetery.png', title: 'BahÃ§ede Bir Ã–ÄŸleden Sonra', year: '2005' },
-  { src: '/images/landing/memorial-ahmet.png', title: 'Emeklilik YÄ±llarÄ±', year: '2012' },
-]
-
-const videoMemories = [
-  { thumb: '/images/landing/memorial-family-main.png', title: '70. DoÄŸum GÃ¼nÃ¼ KutlamasÄ±', duration: '4:32', featured: true },
-  { thumb: '/images/landing/memorial-family-old.png', title: 'Torunlarla Son Bayram', duration: '2:15' },
-  { thumb: '/images/landing/memorial-georgia.png', title: 'GÃ¼rcistan Tatili', duration: '8:47' },
-  { thumb: '/images/landing/memorial-family-dinner.png', title: 'Emeklilik TÃ¶reni', duration: '6:20' },
-]
-
 const voiceMemoryBars = [
   {
     title: 'Sabah duasÄ±',
@@ -472,31 +421,6 @@ const voiceMemoryBars = [
     author: 'KÄ±zÄ± Zeynep anlatÄ±yor',
     bars: [4, 7, 5, 3, 8, 6, 4, 7, 5, 3, 6, 8, 4, 5, 7, 3, 6, 8, 5, 4],
   },
-]
-
-const featuredMemories = [
-  {
-    quote: 'SabahlarÄ± erkenden kalkar, kahvesini iÃ§erken okuduÄŸu duayÄ± hiÃ§ atlamazdÄ±. O sesin olmadÄ±ÄŸÄ± sabahlarÄ± hÃ¢lÃ¢ Ã¶zlÃ¼yorum.',
-    author: 'Zeynep YÄ±lmaz',
-    relation: 'KÄ±zÄ±',
-  },
-  {
-    quote: 'Bize ders deÄŸil, hayat Ã¶ÄŸretti. Tahtaya yazdÄ±ÄŸÄ± her cÃ¼mle aslÄ±nda bir yaÅŸam dersi gibiydi. Onu hiÃ§ unutmayacaÄŸÄ±z.',
-    author: 'Mehmet Arslan',
-    relation: 'Eski Ã¶ÄŸrencisi',
-  },
-  {
-    quote: 'Elimi tuttuÄŸunda dÃ¼nya duruyordu sanki. O gÃ¼ven baÅŸka hiÃ§bir yerde yoktu. Elli beÅŸ yÄ±l boyunca hep Ã¶yleydi.',
-    author: 'Fatma YÄ±lmaz',
-    relation: 'EÅŸi',
-  },
-]
-
-const condolences = [
-  { name: 'AyÅŸe Demir', date: '20 MayÄ±s 2024', relation: 'KomÅŸusu', text: "Ahmet hocamÄ±za Allah'tan rahmet. MekanÄ± cennet olsun. O bir insanlÄ±k abidesi gibiydi, herkes onu severdi." },
-  { name: 'Mehmet Arslan', date: '18 MayÄ±s 2024', relation: 'Ã–ÄŸrencisi', text: 'DeÄŸerli hocam, Ã¶ÄŸrencilerinizden biri olarak sizi hiÃ§ unutmayacaÄŸÄ±m. IÅŸÄ±klar iÃ§inde uyuyun.' },
-  { name: 'Fatma Kaya', date: '16 MayÄ±s 2024', relation: 'KomÅŸusu', text: 'Zarafetiniz ve iyiliÄŸiniz her zaman hatÄ±rlanacak. Geride gÃ¼zel hatÄ±ralar bÄ±raktÄ±nÄ±z.' },
-  { name: 'Selim YÄ±ldÄ±z', date: '15 MayÄ±s 2024', relation: 'AkrabasÄ±', text: 'Ahmet amcama rahmet, yakÄ±nlarÄ±na sabÄ±r ve gÃ¼Ã§ diliyorum. MekanÄ± cennet olsun.' },
 ]
 
 export default function MemorialPage() {
@@ -698,7 +622,7 @@ export default function MemorialPage() {
               <span className="h-px w-8 bg-[#c7a76f] sm:w-10" />
               <span className="text-xs tracking-[0.22em] uppercase">{copy.hero.messageTitle}</span>
             </div>
-            <div className="font-serif text-5xl leading-none text-[#c7a76f]/35 sm:text-6xl">"</div>
+            <div className="font-serif text-5xl leading-none text-[#c7a76f]/35 sm:text-6xl">&quot;</div>
             <p className="mt-1 font-serif text-lg italic leading-8 text-white sm:text-2xl sm:leading-9">
               {copy.hero.messageNote}
             </p>
@@ -750,7 +674,7 @@ export default function MemorialPage() {
 
           <div className="flex flex-col justify-center gap-6">
             <div className="rounded-2xl border border-[#e1d5c3] bg-[#fffdf8] p-8 shadow-lg shadow-[#4d3d26]/6">
-              <div className="font-serif text-6xl leading-none text-[#c7a76f]">"</div>
+              <div className="font-serif text-6xl leading-none text-[#c7a76f]">&quot;</div>
               <p className="mt-2 font-serif text-xl italic leading-9 text-[#4c463c]">
                 {copy.story.quote}
               </p>
@@ -992,7 +916,7 @@ export default function MemorialPage() {
         </div>
 
         <div className="relative mx-auto mt-12 max-w-2xl">
-          <div className="absolute -top-5 -left-5 font-serif text-[120px] leading-none text-[#c7a76f]/15 select-none">"</div>
+          <div className="absolute -top-5 -left-5 font-serif text-[120px] leading-none text-[#c7a76f]/15 select-none">&quot;</div>
           <div className="relative overflow-hidden rounded-2xl border border-[#d7c7ae] bg-[#fffdf6] shadow-2xl shadow-[#4d3d26]/12">
             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-[#c7a76f]/60 to-transparent" />
             <div className="p-6 sm:p-10 lg:p-14">
@@ -1072,10 +996,10 @@ export default function MemorialPage() {
           <div className="grid gap-6 lg:grid-cols-3">
             {featuredMemories.map((memory) => (
               <div key={memory.author} className="group relative overflow-hidden rounded-2xl border border-[#e1d5c3] bg-[#fffdf8] p-6 shadow-lg shadow-[#4d3d26]/6 transition hover:shadow-xl hover:shadow-[#4d3d26]/10">
-                <div className="absolute top-5 right-6 font-serif text-7xl leading-none text-[#f4eee3] select-none">"</div>
+                <div className="absolute top-5 right-6 font-serif text-7xl leading-none text-[#f4eee3] select-none">&quot;</div>
                 <Heart className="mb-5 h-6 w-6 text-[#b08340]/60" />
                 <p className="relative z-10 font-serif text-lg italic leading-8 text-[#4c463c]">
-                  "{memory.quote}"
+                  &quot;{memory.quote}&quot;
                 </p>
                 <div className="mt-6 flex items-center gap-3 border-t border-[#e1d5c3] pt-5">
                   <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#f4eee3] text-sm font-semibold text-[#b08340]">

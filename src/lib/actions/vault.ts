@@ -7,15 +7,6 @@ import { revalidatePath } from 'next/cache'
 const MEDIA_BUCKET = 'vault-media'
 const MAX_PROFILE_PHOTO_BYTES = 15 * 1024 * 1024
 
-function slugify(text: string): string {
-  return text
-    .toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, '')
-    .replace(/\s+/g, '-')
-    .replace(/-+/g, '-')
-    .trim()
-}
-
 function cleanFilename(name: string) {
   const cleaned = name
     .toLowerCase()

@@ -198,7 +198,6 @@ export default async function VideolarPage({ params, searchParams }: Props) {
                     </div>
                   ) : (
                     <div className="aspect-video bg-black">
-                      {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
                       <video
                         controls
                         src={video.original_url}

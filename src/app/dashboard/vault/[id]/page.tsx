@@ -140,7 +140,7 @@ export default async function MemoryAreaPage({ params, searchParams }: Props) {
                     <p className="font-serif text-sm text-[#788177]">{birthYear ?? '?'} – {deathYear ?? '...'}</p>
                   )}
                   {area.tagline && (
-                    <p className="font-serif text-sm italic text-[#7a7467] mt-1">"{area.tagline}"</p>
+                    <p className="font-serif text-sm italic text-[#7a7467] mt-1">&quot;{area.tagline}&quot;</p>
                   )}
                   {area.slug && (
                     <Link href={`/memorial/${area.slug}`} target="_blank"

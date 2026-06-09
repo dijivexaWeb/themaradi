@@ -1,24 +1,26 @@
 'use client'
 
 import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useLang } from '@/i18n/context'
 
 const STORAGE_KEY = 'tm_cookie_consent'
 
 type Consent = 'all' | 'essential'
 
+function shouldShowBanner() {
+  if (typeof window === 'undefined') return false
+
+  try {
+    return !window.localStorage.getItem(STORAGE_KEY)
+  } catch {
+    return false
+  }
+}
+
 export default function CookieBanner() {
   const { t } = useLang()
-  const [visible, setVisible] = useState(false)
-
-  useEffect(() => {
-    try {
-      if (!localStorage.getItem(STORAGE_KEY)) setVisible(true)
-    } catch {
-      // localStorage unavailable (SSR / private mode)
-    }
-  }, [])
+  const [visible, setVisible] = useState(shouldShowBanner)
 
   function save(choice: Consent) {
     try {

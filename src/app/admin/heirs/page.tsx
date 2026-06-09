@@ -14,7 +14,7 @@ export default async function HeirsPage() {
     .eq('status', 'pending')
     .order('created_at', { ascending: true })
 
-  const now = Date.now()
+  const now = new Date().getTime()
 
   return (
     <div className="p-6 max-w-7xl mx-auto">

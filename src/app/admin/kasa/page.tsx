@@ -8,9 +8,13 @@ export default async function KasaPage() {
   await requireAdmin()
   const supabase = await createServiceClient()
 
-  const today = new Date().toISOString().split('T')[0]
-  const in7Days = new Date(Date.now() + 7 * 86400000).toISOString().split('T')[0]
-  const monthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString()
+  const currentDate = new Date()
+  const in7DaysDate = new Date(currentDate)
+  in7DaysDate.setDate(currentDate.getDate() + 7)
+
+  const today = currentDate.toISOString().split('T')[0]
+  const in7Days = in7DaysDate.toISOString().split('T')[0]
+  const monthStart = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1).toISOString()
 
   const paymentSelect = `
     id, amount, currency, product_type, status, due_date, paid_at, created_at, notes,

@@ -256,11 +256,11 @@ export default function LocalizedLanding({ pricing }: { pricing: PricingConfig }
             <h3 className="font-serif text-xl text-[#173d31]">{h.scenarioA.heading}</h3>
             <div className="mt-5 space-y-4">
               {h.scenarioA.steps.map((text, i) => {
-                const Icon = scenarioAIcons[i]
+                const Icon = scenarioAIcons[i] ?? BookOpen
                 return (
                   <div key={i} className="flex gap-4">
                     <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#c7a76f] bg-[#f4eee3]">
-                      <span className="font-serif text-xs font-bold text-[#b08340]">{String(i + 1).padStart(2, '0')}</span>
+                      <Icon className="h-4 w-4 text-[#b08340]" />
                     </div>
                     <p className="pt-1 text-sm leading-6 text-[#5b5245]">{text}</p>
                   </div>
@@ -286,11 +286,11 @@ export default function LocalizedLanding({ pricing }: { pricing: PricingConfig }
             <h3 className="font-serif text-xl text-[#173d31]">{h.scenarioB.heading}</h3>
             <div className="mt-5 space-y-4">
               {h.scenarioB.steps.map((text, i) => {
-                const Icon = scenarioBIcons[i]
+                const Icon = scenarioBIcons[i] ?? Heart
                 return (
                   <div key={i} className="flex gap-4">
                     <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#c7a76f] bg-[#f4eee3]">
-                      <span className="font-serif text-xs font-bold text-[#b08340]">{String(i + 1).padStart(2, '0')}</span>
+                      <Icon className="h-4 w-4 text-[#b08340]" />
                     </div>
                     <p className="pt-1 text-sm leading-6 text-[#5b5245]">{text}</p>
                   </div>

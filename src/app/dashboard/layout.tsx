@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import BrandLogo from '@/components/BrandLogo'
+import IdleLogout from '@/components/IdleLogout'
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import {
@@ -37,6 +38,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
 
   return (
     <div className="theme-memorial min-h-screen bg-[#fbf8f0] text-[#173d31]">
+      <IdleLogout signoutPath="/auth/signout" redirectPath="/login" />
       <aside className="fixed left-0 top-0 z-40 hidden h-full w-72 flex-col border-r border-[#e5dccb] bg-[#fffdf7]/95 px-4 py-7 shadow-[18px_0_55px_rgba(64,48,24,0.06)] lg:flex">
         <div className="px-4">
           <BrandLogo href="/" className="text-[#173d31]" />

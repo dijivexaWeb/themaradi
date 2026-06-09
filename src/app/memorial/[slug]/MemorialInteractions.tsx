@@ -15,9 +15,52 @@ interface Condolence {
 }
 
 type ActionType = 'candle' | 'flower' | 'prayer' | null
+type ConcreteActionType = Exclude<ActionType, null>
 type ActionColor = 'amber' | 'rose' | 'gold'
 
-const interactionCopy: Record<Lang, any> = {
+type ActionCopy = {
+  readonly emoji: string
+  readonly title: string
+  readonly desc: string
+  readonly confirmLabel: string
+  readonly color: ActionColor
+}
+
+type InteractionCopy = {
+  readonly title: string
+  readonly titleAccent: string
+  readonly candle: string
+  readonly candleDone: string
+  readonly flower: string
+  readonly flowerDone: string
+  readonly prayer: string
+  readonly prayerDone: string
+  readonly candleUnit: string
+  readonly flowerUnit: string
+  readonly prayerUnit: string
+  readonly ctaTitle: string
+  readonly ctaText: string
+  readonly messageButton: string
+  readonly formTitle: string
+  readonly formText: string
+  readonly name: string
+  readonly namePlaceholder: string
+  readonly relation: string
+  readonly relationPlaceholder: string
+  readonly message: string
+  readonly messagePlaceholder: string
+  readonly send: string
+  readonly cancel: string
+  readonly optional: string
+  readonly contact: string
+  readonly contactOptional: string
+  readonly contactPlaceholder: string
+  readonly contactHelp: string
+  readonly anonymous: string
+  readonly actions: Record<ConcreteActionType, ActionCopy>
+}
+
+const interactionCopy: Record<Lang, InteractionCopy> = {
   tr: {
     title: 'Hislerinizi', titleAccent: 'paylaşın.', candle: 'Mum yak', candleDone: 'Mum yaktınız', flower: 'Çiçek bırak', flowerDone: 'Çiçek bıraktınız', prayer: 'Dua et', prayerDone: 'Dua edildi', candleUnit: 'mum', flowerUnit: 'çiçek', prayerUnit: 'dua', ctaTitle: 'Taziye mesajı bırakmak ister misiniz?', ctaText: 'Mesajınız varis onayından geçtikten sonra yayınlanır.', messageButton: 'Mesaj Bırak', formTitle: 'Taziye mesajınız', formText: 'Onaydan sonra sayfada yayınlanacaktır.', name: 'Adınız', namePlaceholder: 'Adınız Soyadınız', relation: 'Yakınlık', relationPlaceholder: 'Komşusu, Öğrencisi, ...', message: 'Mesajınız', messagePlaceholder: 'Taziye mesajınızı buraya yazın...', send: 'Gönder', cancel: 'Vazgeç', optional: 'opsiyonel', contact: 'İletişim', contactOptional: 'opsiyonel · aileye iletilir', contactPlaceholder: 'E-posta veya telefon', contactHelp: 'İletişim bilgisi yalnızca aile ile paylaşılır, sayfada görünmez.', anonymous: 'Anonim olarak devam et',
     actions: { candle: { emoji: '🕯️', title: 'Mum yakıyorsunuz', desc: 'Yakılan her mum bir hatırayı aydınlatır.', confirmLabel: 'Mumu Yak', color: 'amber' }, flower: { emoji: '🌹', title: 'Çiçek bırakıyorsunuz', desc: 'Bırakılan her çiçek derin bir saygının ifadesidir.', confirmLabel: 'Çiçeği Bırak', color: 'rose' }, prayer: { emoji: '🤲', title: 'Dua ediyorsunuz', desc: 'Her dua bir sevginin, bir özlemin yankısıdır.', confirmLabel: 'Dua Et', color: 'gold' } }
@@ -268,7 +311,7 @@ function ActionModal({
   onClose,
 }: {
   action: ActionType
-  copy: typeof interactionCopy.tr
+  copy: InteractionCopy
   onConfirm: (name: string, contact: string) => void
   onClose: () => void
 }) {
@@ -276,13 +319,7 @@ function ActionModal({
   const [contact, setContact] = useState('')
 
   if (!action) return null
-  const meta = copy.actions[action] as {
-    emoji: string
-    title: string
-    desc: string
-    confirmLabel: string
-    color: ActionColor
-  }
+  const meta = copy.actions[action]
 
   const activeStyles = {
     amber: 'bg-[#fffbeb] border-[#f59e0b]/30',

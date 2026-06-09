@@ -1,6 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
-import { ArrowRight, CalendarDays, Clock, Feather, Heart, MapPin, Navigation, PenLine, Play } from 'lucide-react'
+import { ArrowRight, CalendarDays, Clock, Feather, Heart, MapPin, Navigation, PenLine } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import BrandLogo from '@/components/BrandLogo'
 import FamilyTreeCanvas from '@/components/FamilyTreeCanvas'
@@ -99,8 +99,9 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
   const birthYear = vault.birth_date ? new Date(vault.birth_date).getFullYear() : null
   const deathYear = vault.death_date ? new Date(vault.death_date).getFullYear() : null
   const yearsLived = birthYear && deathYear ? deathYear - birthYear : null
+  const currentTime = new Date().getTime()
   const daysSince = vault.death_date
-    ? Math.floor((Date.now() - new Date(vault.death_date).getTime()) / (1000 * 60 * 60 * 24))
+    ? Math.floor((currentTime - new Date(vault.death_date).getTime()) / (1000 * 60 * 60 * 24))
     : null
   const vaultInitial = vault.display_name?.[0]?.toUpperCase() ?? '?'
 
@@ -121,6 +122,7 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
     { href: '#videolar', label: 'Videolar', show: hasVideos },
     { href: '#fotograflar', label: 'Fotoğraflar', show: hasPhotos },
     { href: '#son-mesaj', label: 'Son Mesaj', show: !!vault.last_message },
+    { href: '#anilar', label: 'Anılar', show: hasRegularMemories },
     { href: '#taziye', label: 'Taziye', show: true },
     { href: '#ziyaret', label: 'Ziyaret', show: hasCemetery },
   ].filter((t) => t.show)
@@ -439,7 +441,6 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
                       </div>
                     ) : (
                       <div className="aspect-video bg-black">
-                        {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
                         <video controls src={vid0.original_url} poster={thumb ?? undefined} className="h-full w-full" preload="metadata" />
                       </div>
                     )}
@@ -462,7 +463,6 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
                           <div className="aspect-video"><iframe src={embed} className="h-full w-full" allowFullScreen title={vid.original_filename ?? ''} /></div>
                         ) : (
                           <div className="aspect-video">
-                            {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
                             <video controls src={vid.original_url} poster={thumb ?? undefined} className="h-full w-full" preload="metadata" />
                           </div>
                         )}
@@ -622,7 +622,7 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
 
       {/* ── ANILAR (regular) ── */}
       {hasRegularMemories && (
-        <section className="px-5 py-14 sm:px-8">
+        <section id="anilar" className="px-5 py-14 sm:px-8">
           <div className="mx-auto max-w-4xl">
             <div className="mb-6 flex items-center gap-3 text-[#b08340]">
               <span className="h-px w-10 bg-[#c7a76f]" />
@@ -654,6 +654,11 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
                       {embedUrl && (
                         <div className="relative h-20 w-32 shrink-0 overflow-hidden rounded-xl border border-[#e1d5c3] bg-[#f4eee3] sm:h-24 sm:w-40">
                           <iframe src={embedUrl} className="h-full w-full" allowFullScreen title={m.title ?? ''} />
+                        </div>
+                      )}
+                      {m.media_type === 'video' && m.media_url && !embedUrl && (
+                        <div className="relative h-20 w-32 shrink-0 overflow-hidden rounded-xl border border-[#e1d5c3] bg-black sm:h-24 sm:w-40">
+                          <video controls src={m.media_url} className="h-full w-full object-cover" preload="metadata" />
                         </div>
                       )}
                       {/* Content */}

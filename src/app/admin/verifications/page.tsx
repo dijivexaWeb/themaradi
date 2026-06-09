@@ -17,7 +17,7 @@ export default async function VerificationsPage() {
     .eq('status', 'pending_verification')
     .order('created_at', { ascending: true })
 
-  const now = Date.now()
+  const now = new Date().getTime()
 
   return (
     <div className="p-6 max-w-7xl mx-auto">

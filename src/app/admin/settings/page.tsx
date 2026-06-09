@@ -73,7 +73,7 @@ export default async function SettingsPage() {
           Ödeme Entegrasyonu (Kartla Ödeme)
         </h2>
         <p className="text-slate-500 text-xs mb-4">
-          PayBall, Stripe veya diğer sağlayıcılar için API anahtarları. Sağlayıcı seçilip aktif edilene kadar satın alma sayfasında "Çok Yakında" gösterilmeye devam eder.
+          PayBall, Stripe veya diğer sağlayıcılar için API anahtarları. Sağlayıcı seçilip aktif edilene kadar satın alma sayfasında &quot;Çok Yakında&quot; gösterilmeye devam eder.
         </p>
         <PaymentGatewayForm settings={s} />
       </section>

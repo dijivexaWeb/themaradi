@@ -11,7 +11,6 @@ import {
   HelpCircle,
   Lock,
   MessageCircle,
-  QrCode,
   Shield,
   ShieldCheck,
   Sparkles,

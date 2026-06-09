@@ -118,7 +118,7 @@ export default async function SettingsPage({ params }: Props) {
                 <span>🔗</span> Sayfa Adresi
               </div>
               <p className="text-xs text-[#788177] mb-5">
-                Anma sayfanızın herkese açık URL'i. Kısa, akılda kalıcı bir adres seçin.
+                Anma sayfanızın herkese açık URL&apos;i. Kısa, akılda kalıcı bir adres seçin.
               </p>
               {vault.slug && (
                 <div className="mb-4 rounded-xl border border-[#174f35]/20 bg-[#f0fdf4] px-4 py-3 flex items-center gap-3">

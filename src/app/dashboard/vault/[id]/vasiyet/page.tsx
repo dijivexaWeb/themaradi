@@ -34,9 +34,9 @@ export default async function VasiyetPage({ params, searchParams }: Props) {
   ])
 
   const isLocked = vault.status === 'pending_verification'
-  const addNote = addMemoryAction.bind(null, id)
   const uploadDocs = uploadDocumentsAction.bind(null, id)
   const pageUrl = `/dashboard/vault/${id}/vasiyet`
+  const addNote = addMemoryAction.bind(null, id, pageUrl)
 
   const today = new Date().toISOString().split('T')[0]
 
