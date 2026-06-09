@@ -5,6 +5,43 @@
 
 ---
 
+## 2026-06-10 — Oturum 55: Kişisel Bilgi ve Bağış Yerleşimi
+
+### Yapılanlar
+- Meslek ve hobiler hero altındaki bilgi bandına taşındı
+- Hikaye bölümündeki eski `Kişisel Bilgiler` kartı kaldırıldı
+- Bağış yönlendirmesi hero içinde `Kaydır` alanının altına taşındı
+- Mobil görünüm için hero içinde ayrı bağış kutusu eklendi
+- Bağış linki alanı eklendi
+- Bağış linki varsa önizleme/public sayfada `Bağış yapmak için tıklayın` butonu gösteriliyor
+- `vaults` tablosuna `donation_url` migration'ı eklendi
+- Profil kaydetme action'ı `donation_url` alanını kaydedecek şekilde güncellendi
+- Supabase TypeScript tipleri `donation_url` ile güncellendi
+
+### Proje Durumu
+- [x] Meslek/hobi artık hero altı bilgi bandında görünüyor
+- [x] Bağış yönlendirmesi hero alanında daha görünür konumda
+- [x] Bağış kurum linki girilebiliyor ve public sayfada dış bağlantı olarak açılıyor
+- [ ] `007_vault_donation_url.sql` migration'ı canlı Supabase ortamına uygulanmadı
+
+### Doğrulama
+- Değişen dosyalar için hedefli `eslint` geçti
+- `git diff --check` geçti
+- Tam `npm run lint` ve `npx tsc --noEmit`, git'e dahil olmayan local `RealMemorialPageModern.tsx` dosyasındaki mevcut hatalar nedeniyle tamamlanmadı
+
+### Kritik Kararlar / Notlar
+- Bağış ödeme akışı sisteme alınmadı; kullanıcı kurumun kendi bağış sayfasına dış linkle yönleniyor
+- Bağış linki opsiyonel; link yoksa sadece yönlendirme metni gösteriliyor
+
+### Nerede Kaldık
+Kişisel bilgi ve bağış yerleşimi kod seviyesinde tamamlandı.
+
+### Sıradaki Adım
+1. `007_vault_donation_url.sql` migration'ı Supabase'e uygulanmalı
+2. Önizleme sayfasında bağış metni/linki ve meslek/hobi bandı tarayıcıda kontrol edilmeli
+
+---
+
 ## 2026-06-10 — Oturum 54: Harita İçinde Konum Arama
 
 ### Yapılanlar

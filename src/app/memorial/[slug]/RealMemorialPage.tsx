@@ -24,6 +24,7 @@ interface VaultRow {
   favorite_song_title: string | null
   favorite_song_url: string | null
   donation_preference: string | null
+  donation_url: string | null
   last_message: string | null
   cemetery_name: string | null
   cemetery_address: string | null
@@ -127,7 +128,7 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
   const hasPersonalDetails = !!vault.profession || !!vault.hobbies
   const hasFavoriteSong = !!vault.favorite_song_url
   const hasDonationPreference = !!vault.donation_preference
-  const hasStory = !!vault.biography || hasPersonalDetails || hasFavoriteSong || hasDonationPreference
+  const hasStory = !!vault.biography || hasFavoriteSong
 
   const heroBgUrl = v.hero_bg_url as string | null | undefined
   const cemeteryLat = getCoordinate(v.cemetery_lat)
@@ -238,12 +239,6 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
                 📍 {vault.birth_place}
               </p>
             )}
-            {vault.profession && (
-              <p className="mx-auto mt-2 max-w-xs text-xs font-semibold uppercase tracking-[0.18em] text-[#c7a76f]">
-                {vault.profession}
-              </p>
-            )}
-
             <div className="mt-5 grid grid-cols-2 gap-3 sm:mt-6">
               {yearsLived !== null && (
                 <div className="rounded-xl border border-[#c7a76f]/25 bg-white/5 px-3 py-3 backdrop-blur-sm">
@@ -282,17 +277,64 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
               Anıları Keşfet <ArrowRight className="h-4 w-4" />
             </a>
           </div>
+
+          {hasDonationPreference && (
+            <div className="order-4 rounded-2xl border border-[#c7a76f]/25 bg-[#091712]/65 p-5 text-center shadow-2xl shadow-black/20 backdrop-blur-sm lg:hidden">
+              <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#c7a76f]">Bağış Yönlendirmesi</div>
+              <p className="mt-2 text-xs leading-5 text-[#efe7d8]">{vault.donation_preference}</p>
+              {vault.donation_url && (
+                <a
+                  href={vault.donation_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-3 inline-flex items-center justify-center rounded-lg bg-[#c7a76f] px-4 py-2 text-xs font-semibold text-[#091712] transition hover:bg-[#d4b87c]"
+                >
+                  Bağış yapmak için tıklayın
+                </a>
+              )}
+            </div>
+          )}
         </div>
 
-        {/* Scroll indicator */}
-        <div className="absolute bottom-8 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-2 lg:flex">
+        <div className="absolute bottom-4 left-1/2 hidden w-[min(520px,calc(100%-48px))] -translate-x-1/2 flex-col items-center gap-2 lg:flex">
           <span className="text-[10px] tracking-[0.2em] text-[#c7a76f]/50 uppercase">Kaydır</span>
           <div className="h-10 w-px bg-gradient-to-b from-[#c7a76f]/50 to-transparent" />
+          {hasDonationPreference && (
+            <div className="w-full rounded-2xl border border-[#c7a76f]/25 bg-[#091712]/70 px-5 py-4 text-center shadow-2xl shadow-black/20 backdrop-blur-sm">
+              <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#c7a76f]">Bağış Yönlendirmesi</div>
+              <p className="mt-2 text-xs leading-5 text-[#efe7d8]">{vault.donation_preference}</p>
+              {vault.donation_url && (
+                <a
+                  href={vault.donation_url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="mt-3 inline-flex items-center justify-center rounded-lg bg-[#c7a76f] px-4 py-2 text-xs font-semibold text-[#091712] transition hover:bg-[#d4b87c]"
+                >
+                  Bağış yapmak için tıklayın
+                </a>
+              )}
+            </div>
+          )}
         </div>
       </section>
 
-      {/* ── YAŞAM RAKAMLARI ── */}
       <section className="bg-[#173d31] px-5 py-0 sm:px-8">
+        {hasPersonalDetails && (
+          <div className="mx-auto grid max-w-7xl border-b border-[#2a5a45] text-[#efe7d8] md:grid-cols-2">
+            {vault.profession && (
+              <div className="border-[#2a5a45] px-6 py-6 md:border-r">
+                <div className="text-xs font-semibold uppercase tracking-[0.2em] text-[#c7a76f]">Meslek</div>
+                <div className="mt-2 font-serif text-2xl text-white">{vault.profession}</div>
+              </div>
+            )}
+            {vault.hobbies && (
+              <div className="px-6 py-6">
+                <div className="text-xs font-semibold uppercase tracking-[0.2em] text-[#c7a76f]">Hobileri</div>
+                <div className="mt-2 font-serif text-2xl text-white">{vault.hobbies}</div>
+              </div>
+            )}
+          </div>
+        )}
         <div className="mx-auto grid max-w-7xl grid-cols-2 divide-x divide-y divide-[#2a5a45] sm:grid-cols-4 sm:divide-y-0">
           {yearsLived !== null && (
             <div className="flex flex-col items-center justify-center gap-1 px-6 py-7 text-center">
@@ -369,28 +411,6 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
             </div>
 
             <div className="flex flex-col justify-center gap-6">
-              {hasPersonalDetails && (
-                <div className="rounded-2xl border border-[#e1d5c3] bg-[#fffdf8] p-6 shadow-lg shadow-[#4d3d26]/6">
-                  <div className="flex items-center gap-3 text-[#b08340]">
-                    <span className="h-px w-8 bg-[#c7a76f]" />
-                    <span className="text-xs tracking-[0.2em] uppercase">Kişisel Bilgiler</span>
-                  </div>
-                  <div className="mt-5 grid gap-3">
-                    {vault.profession && (
-                      <div className="rounded-xl border border-[#eadfca] bg-[#fbf8f1] px-4 py-3">
-                        <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#8a7a64]">Meslek</div>
-                        <div className="mt-1 font-serif text-lg text-[#173d31]">{vault.profession}</div>
-                      </div>
-                    )}
-                    {vault.hobbies && (
-                      <div className="rounded-xl border border-[#eadfca] bg-[#fbf8f1] px-4 py-3">
-                        <div className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#8a7a64]">Hobileri</div>
-                        <div className="mt-1 text-sm leading-6 text-[#4c463c]">{vault.hobbies}</div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
               {hasFavoriteSong && (
                 <div className="rounded-2xl border border-[#e1d5c3] bg-[#fffdf8] p-6 shadow-lg shadow-[#4d3d26]/6">
                   <div className="flex items-center gap-3 text-[#b08340]">
@@ -403,17 +423,6 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
                     </div>
                     <audio controls src={vault.favorite_song_url ?? undefined} className="mt-3 h-9 w-full" />
                   </div>
-                </div>
-              )}
-              {hasDonationPreference && (
-                <div className="rounded-2xl border border-[#e1d5c3] bg-[#fffdf8] p-6 shadow-lg shadow-[#4d3d26]/6">
-                  <div className="flex items-center gap-3 text-[#b08340]">
-                    <span className="h-px w-8 bg-[#c7a76f]" />
-                    <span className="text-xs tracking-[0.2em] uppercase">Bağış Yönlendirmesi</span>
-                  </div>
-                  <p className="mt-4 rounded-xl border border-[#eadfca] bg-[#fbf8f1] px-4 py-3 text-sm leading-7 text-[#4c463c]">
-                    {vault.donation_preference}
-                  </p>
                 </div>
               )}
               {vault.tagline && (

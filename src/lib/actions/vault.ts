@@ -232,6 +232,7 @@ export async function saveVaultProfileAction(vaultId: string, formData: FormData
       favorite_song_title: (formData.get('favorite_song_title') as string)?.trim() || null,
       favorite_song_url: favoriteSongUrl || null,
       donation_preference: (formData.get('donation_preference') as string)?.trim() || null,
+      donation_url: (formData.get('donation_url') as string)?.trim() || null,
       birth_date: (formData.get('birth_date') as string) || null,
       death_date: (formData.get('death_date') as string) || null,
       birth_place: (formData.get('birth_place') as string)?.trim() || null,

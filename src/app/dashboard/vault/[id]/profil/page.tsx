@@ -159,6 +159,18 @@ export default async function ProfilPage({ params, searchParams }: Props) {
                 />
                 <p className="mt-1 text-xs text-[#adb5ab]">Anma sayfasında ziyaretçilere çiçek yerine bağış önerisi olarak gösterilir</p>
               </div>
+              <div>
+                <label className={labelCls}>Bağış Linki</label>
+                <input
+                  type="url"
+                  name="donation_url"
+                  defaultValue={vault.donation_url ?? ''}
+                  placeholder="https://... (LÖSEV, cami, kilise veya kurum bağış sayfası)"
+                  disabled={isLocked}
+                  className={inputCls}
+                />
+                <p className="mt-1 text-xs text-[#adb5ab]">Link girilirse önizleme sayfasında bağış yapmak için tıklanabilir buton çıkar</p>
+              </div>
             </section>
 
             {/* Profil fotoğrafı */}
