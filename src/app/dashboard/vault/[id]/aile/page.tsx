@@ -4,6 +4,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { addFamilyMemberAction, updateFamilyMemberAction, deleteFamilyMemberAction } from '@/lib/actions/family'
 import FamilyTreeCanvas from '@/components/FamilyTreeCanvas'
+import { ImageUploadInput } from '@/components/ImageUploadInput'
 
 interface Props {
   params: Promise<{ id: string }>
@@ -155,8 +156,10 @@ export default async function AilePage({ params, searchParams }: Props) {
                         </div>
                         <div>
                           <label className={dLabelCls}>Fotoğraf <span className="text-white/30 font-normal">(boş bırakırsan mevcut kalır)</span></label>
-                          <input type="file" name="photo_file" accept="image/*"
-                            className="w-full cursor-pointer rounded-xl border border-white/15 bg-white/5 px-3 py-3 text-sm text-[#efe7d8] file:mr-3 file:rounded-lg file:border-0 file:bg-[#c7a76f]/20 file:px-3 file:py-1.5 file:text-[#c7a76f] file:font-medium outline-none mb-2" />
+                          <ImageUploadInput
+                            name="photo_file"
+                            className="w-full cursor-pointer rounded-xl border border-white/15 bg-white/5 px-3 py-3 text-sm text-[#efe7d8] file:mr-3 file:rounded-lg file:border-0 file:bg-[#c7a76f]/20 file:px-3 file:py-1.5 file:text-[#c7a76f] file:font-medium outline-none"
+                          />
                           <input type="url" name="photo_url" defaultValue={editMember.photo_url ?? ''} placeholder="veya URL..." className={dInputCls} />
                         </div>
                         <div>
@@ -225,8 +228,10 @@ export default async function AilePage({ params, searchParams }: Props) {
                         </div>
                         <div>
                           <label className={dLabelCls}>Fotoğraf <span className="text-white/30 font-normal">(opsiyonel)</span></label>
-                          <input type="file" name="photo_file" accept="image/*"
-                            className="w-full cursor-pointer rounded-xl border border-white/15 bg-white/5 px-3 py-3 text-sm text-[#efe7d8] file:mr-3 file:rounded-lg file:border-0 file:bg-[#c7a76f]/20 file:px-3 file:py-1.5 file:text-[#c7a76f] file:font-medium outline-none mb-2" />
+                          <ImageUploadInput
+                            name="photo_file"
+                            className="w-full cursor-pointer rounded-xl border border-white/15 bg-white/5 px-3 py-3 text-sm text-[#efe7d8] file:mr-3 file:rounded-lg file:border-0 file:bg-[#c7a76f]/20 file:px-3 file:py-1.5 file:text-[#c7a76f] file:font-medium outline-none"
+                          />
                           <input type="url" name="photo_url" placeholder="veya fotoğraf URL'si..." className={dInputCls} />
                         </div>
                         <div>

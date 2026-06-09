@@ -3,6 +3,7 @@ import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
 import { saveVaultProfileAction } from '@/lib/actions/vault'
 import Image from 'next/image'
+import { ImageUploadInput } from '@/components/ImageUploadInput'
 import PersonHeader from '../_PersonHeader'
 
 interface Props { params: Promise<{ id: string }> }
@@ -90,6 +91,46 @@ export default async function ProfilPage({ params }: Props) {
                 <input type="text" name="tagline" defaultValue={vault.tagline ?? ''} placeholder="Sevgiyle yaşadı, sevgiyle hatırlanıyor." disabled={isLocked} className={inputCls} />
                 <p className="mt-1 text-xs text-[#adb5ab]">Anma sayfasının hero bölümünde görünür</p>
               </div>
+              <div className="grid gap-4 sm:grid-cols-2">
+                <div>
+                  <label className={labelCls}>Meslek</label>
+                  <input type="text" name="profession" defaultValue={vault.profession ?? ''} placeholder="Öğretmen, mühendis, esnaf..." disabled={isLocked} className={inputCls} />
+                  <p className="mt-1 text-xs text-[#adb5ab]">Önizleme ve anma sayfasında kişisel bilgi olarak görünür</p>
+                </div>
+                <div>
+                  <label className={labelCls}>Hobileri / İlgi Alanları</label>
+                  <input type="text" name="hobbies" defaultValue={vault.hobbies ?? ''} placeholder="Bahçecilik, şiir, müzik..." disabled={isLocked} className={inputCls} />
+                  <p className="mt-1 text-xs text-[#adb5ab]">Kısa ve virgülle ayrılmış yazabilirsiniz</p>
+                </div>
+              </div>
+              <div className="rounded-2xl border border-[#e5dccb] bg-white p-4">
+                <label className={labelCls}>En Sevdiği Şarkı</label>
+                <input type="text" name="favorite_song_title" defaultValue={vault.favorite_song_title ?? ''} placeholder="Şarkı adı veya kısa açıklama..." disabled={isLocked} className={inputCls} />
+                <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                  <div>
+                    <label className={labelCls}>Müzik dosyası yükle</label>
+                    <input type="file" name="favorite_song_file" accept="audio/*" disabled={isLocked}
+                      className="w-full cursor-pointer rounded-xl border border-[#e5dccb] bg-white px-3 py-2.5 text-sm text-[#1f2d27] file:mr-3 file:rounded-lg file:border-0 file:bg-[#174f35]/10 file:px-3 file:py-1.5 file:text-[#174f35] file:font-medium outline-none disabled:opacity-40" />
+                  </div>
+                  <div>
+                    <label className={labelCls}>veya müzik URL</label>
+                    <input type="url" name="favorite_song_url" defaultValue={vault.favorite_song_url ?? ''} placeholder="https://... (mp3, wav, ogg)" disabled={isLocked} className={inputCls} />
+                  </div>
+                </div>
+                <p className="mt-2 text-xs text-[#adb5ab]">Dosya yüklerseniz URL yerine dosya kullanılır. En fazla 25 MB ses dosyası önerilir.</p>
+              </div>
+              <div>
+                <label className={labelCls}>Bağış Yönlendirmesi</label>
+                <textarea
+                  name="donation_preference"
+                  rows={3}
+                  defaultValue={vault.donation_preference ?? ''}
+                  placeholder="Çiçek getirmek yerine cemaatine, bir camiye, kiliseye veya hayır kurumuna bağış yapılmasını rica ederiz..."
+                  disabled={isLocked}
+                  className={inputCls + ' resize-none'}
+                />
+                <p className="mt-1 text-xs text-[#adb5ab]">Anma sayfasında ziyaretçilere çiçek yerine bağış önerisi olarak gösterilir</p>
+              </div>
             </section>
 
             {/* Profil fotoğrafı */}
@@ -109,8 +150,11 @@ export default async function ProfilPage({ params }: Props) {
                 <div className="flex-1 space-y-3">
                   <div>
                     <label className={labelCls}>Dosya yükle</label>
-                    <input type="file" name="cover_photo_file" accept="image/*" disabled={isLocked}
-                      className="w-full cursor-pointer rounded-xl border border-[#e5dccb] bg-white px-3 py-2.5 text-sm text-[#1f2d27] file:mr-3 file:rounded-lg file:border-0 file:bg-[#174f35]/10 file:px-3 file:py-1.5 file:text-[#174f35] file:font-medium outline-none disabled:opacity-40" />
+                    <ImageUploadInput
+                      name="cover_photo_file"
+                      disabled={isLocked}
+                      className="w-full cursor-pointer rounded-xl border border-[#e5dccb] bg-white px-3 py-2.5 text-sm text-[#1f2d27] file:mr-3 file:rounded-lg file:border-0 file:bg-[#174f35]/10 file:px-3 file:py-1.5 file:text-[#174f35] file:font-medium outline-none disabled:opacity-40"
+                    />
                   </div>
                   <div>
                     <label className={labelCls}>veya fotoğraf URL</label>
@@ -139,8 +183,11 @@ export default async function ProfilPage({ params }: Props) {
                 <div className="flex-1 space-y-3">
                   <div>
                     <label className={labelCls}>Dosya yükle</label>
-                    <input type="file" name="hero_bg_file" accept="image/*" disabled={isLocked}
-                      className="w-full cursor-pointer rounded-xl border border-[#e5dccb] bg-white px-3 py-2.5 text-sm text-[#1f2d27] file:mr-3 file:rounded-lg file:border-0 file:bg-[#174f35]/10 file:px-3 file:py-1.5 file:text-[#174f35] file:font-medium outline-none disabled:opacity-40" />
+                    <ImageUploadInput
+                      name="hero_bg_file"
+                      disabled={isLocked}
+                      className="w-full cursor-pointer rounded-xl border border-[#e5dccb] bg-white px-3 py-2.5 text-sm text-[#1f2d27] file:mr-3 file:rounded-lg file:border-0 file:bg-[#174f35]/10 file:px-3 file:py-1.5 file:text-[#174f35] file:font-medium outline-none disabled:opacity-40"
+                    />
                   </div>
                   <div>
                     <label className={labelCls}>veya görsel URL</label>

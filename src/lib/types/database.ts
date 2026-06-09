@@ -384,6 +384,11 @@ export type Database = {
           encryption_enabled: boolean | null
           id: string
           owner_id: string
+          profession: string | null
+          hobbies: string | null
+          favorite_song_title: string | null
+          favorite_song_url: string | null
+          donation_preference: string | null
           slug: string | null
           status: string | null
           transition_date: string | null
@@ -400,6 +405,11 @@ export type Database = {
           encryption_enabled?: boolean | null
           id?: string
           owner_id: string
+          profession?: string | null
+          hobbies?: string | null
+          favorite_song_title?: string | null
+          favorite_song_url?: string | null
+          donation_preference?: string | null
           slug?: string | null
           status?: string | null
           transition_date?: string | null
@@ -416,6 +426,11 @@ export type Database = {
           encryption_enabled?: boolean | null
           id?: string
           owner_id?: string
+          profession?: string | null
+          hobbies?: string | null
+          favorite_song_title?: string | null
+          favorite_song_url?: string | null
+          donation_preference?: string | null
           slug?: string | null
           status?: string | null
           transition_date?: string | null

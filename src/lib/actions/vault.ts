@@ -6,6 +6,7 @@ import { revalidatePath } from 'next/cache'
 
 const MEDIA_BUCKET = 'vault-media'
 const MAX_PROFILE_PHOTO_BYTES = 15 * 1024 * 1024
+const MAX_FAVORITE_SONG_BYTES = 25 * 1024 * 1024
 
 function cleanFilename(name: string) {
   const cleaned = name
@@ -162,6 +163,23 @@ async function uploadBgPhoto(vaultId: string, userId: string, formData: FormData
   return data.publicUrl
 }
 
+async function uploadFavoriteSong(vaultId: string, userId: string, formData: FormData) {
+  const file = formData.get('favorite_song_file')
+  if (!(file instanceof File) || file.size === 0) return null
+  if (!file.type.startsWith('audio/') || file.size > MAX_FAVORITE_SONG_BYTES) return null
+
+  const service = await createServiceClient()
+  const path = `${vaultId}/${userId}/favorite-song-${Date.now()}-${cleanFilename(file.name)}`
+  const { error } = await service.storage.from(MEDIA_BUCKET).upload(path, file, {
+    contentType: file.type,
+    upsert: false,
+  })
+  if (error) return null
+
+  const { data } = service.storage.from(MEDIA_BUCKET).getPublicUrl(path)
+  return data.publicUrl
+}
+
 export async function saveVaultProfileAction(vaultId: string, formData: FormData): Promise<void> {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -169,7 +187,7 @@ export async function saveVaultProfileAction(vaultId: string, formData: FormData
 
   const { data: vault } = await supabase
     .from('vaults')
-    .select('id, display_name, status, cover_photo_url, hero_bg_url')
+    .select('id, display_name, status, cover_photo_url, hero_bg_url, favorite_song_url')
     .eq('id', vaultId)
     .eq('owner_id', user.id)
     .single()
@@ -188,11 +206,22 @@ export async function saveVaultProfileAction(vaultId: string, formData: FormData
     ?? (vault as Record<string, unknown>).hero_bg_url as string | null
     ?? null
 
+  const uploadedSongUrl = await uploadFavoriteSong(vaultId, user.id, formData)
+  const favoriteSongUrl = uploadedSongUrl
+    ?? (formData.get('favorite_song_url') as string)?.trim()
+    ?? (vault as Record<string, unknown>).favorite_song_url as string | null
+    ?? null
+
   const { error } = await supabase
     .from('vaults')
     .update({
       display_name: (formData.get('display_name') as string)?.trim() || vault.display_name,
       tagline: (formData.get('tagline') as string)?.trim() || null,
+      profession: (formData.get('profession') as string)?.trim() || null,
+      hobbies: (formData.get('hobbies') as string)?.trim() || null,
+      favorite_song_title: (formData.get('favorite_song_title') as string)?.trim() || null,
+      favorite_song_url: favoriteSongUrl || null,
+      donation_preference: (formData.get('donation_preference') as string)?.trim() || null,
       birth_date: (formData.get('birth_date') as string) || null,
       death_date: (formData.get('death_date') as string) || null,
       birth_place: (formData.get('birth_place') as string)?.trim() || null,

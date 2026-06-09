@@ -3,6 +3,7 @@ import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 import { addMemoryAction, updateMemoryAction, deleteMemoryAction } from '@/lib/actions/memories'
+import { ImageUploadInput } from '@/components/ImageUploadInput'
 import PersonHeader from '../_PersonHeader'
 
 interface Props {
@@ -118,8 +119,11 @@ export default async function AnilarPage({ params, searchParams }: Props) {
                 </p>
                 <div>
                   <label className={labelCls}>Dosya Yükle</label>
-                  <input type="file" name="media_file" accept="image/*,video/*"
-                    className="w-full cursor-pointer rounded-xl border border-[#e5dccb] bg-[#fbf8f0] px-3 py-2.5 text-sm text-[#1f2d27] file:mr-3 file:rounded-lg file:border-0 file:bg-[#174f35]/10 file:px-3 file:py-1.5 file:text-[#174f35] file:font-medium outline-none" />
+                  <ImageUploadInput
+                    name="media_file"
+                    accept="image/*,video/*"
+                    className="w-full cursor-pointer rounded-xl border border-[#e5dccb] bg-[#fbf8f0] px-3 py-2.5 text-sm text-[#1f2d27] file:mr-3 file:rounded-lg file:border-0 file:bg-[#174f35]/10 file:px-3 file:py-1.5 file:text-[#174f35] file:font-medium outline-none"
+                  />
                 </div>
                 <div className="flex items-end gap-3">
                   <div className="flex-1">

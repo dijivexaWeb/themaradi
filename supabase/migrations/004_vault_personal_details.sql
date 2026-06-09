@@ -1,0 +1,3 @@
+ALTER TABLE public.vaults
+  ADD COLUMN IF NOT EXISTS profession TEXT,
+  ADD COLUMN IF NOT EXISTS hobbies TEXT;

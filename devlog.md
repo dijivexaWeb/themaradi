@@ -5,6 +5,151 @@
 
 ---
 
+## 2026-06-10 — Oturum 51: Bağış Yönlendirmesi Alanı
+
+### Yapılanlar
+- Kişisel bilgiler formuna `Bağış Yönlendirmesi` alanı eklendi
+- Profil kaydetme action'ı bağış yönlendirmesi metnini `vaults` kaydına yazacak şekilde güncellendi
+- Önizleme ve public anma sayfasında `Bağış Yönlendirmesi` kartı eklendi
+- Yalnızca bağış yönlendirmesi girilmiş olsa bile Hayat Hikayesi bölümü görünür hale getirildi
+- `vaults` tablosuna `donation_preference` migration'ı eklendi
+- Supabase TypeScript tipleri yeni alanla güncellendi
+
+### Proje Durumu
+- [x] Dashboard kişisel bilgiler ekranında bağış yönlendirmesi girilebiliyor
+- [x] Önizleme/public sayfada çiçek yerine bağış talebi gösteriliyor
+- [ ] Migration canlı Supabase ortamına uygulanmadı
+
+### Doğrulama
+- `npm run lint` geçti
+- `npx tsc --noEmit` geçti
+- `git diff --check` geçti
+
+### Kritik Kararlar / Notlar
+- Alan serbest metin tutuldu; cami, kilise, cemaat veya hayır kurumu bilgisi tek metinle yazılabiliyor
+- Bağış ödeme entegrasyonu eklenmedi; bu adım sadece yönlendirme metni gösterimi
+
+### Nerede Kaldık
+Bağış yönlendirmesi kod seviyesinde eklendi ve temel kontroller geçti.
+
+### Sıradaki Adım
+1. `006_vault_donation_preference.sql` migration'ı Supabase'e uygulanmalı
+2. Gerçek profil kaydıyla `/preview/[id]` görünümü tarayıcıda kontrol edilmeli
+
+---
+
+## 2026-06-10 — Oturum 50: En Sevdiği Şarkı Alanı
+
+### Yapılanlar
+- Kişisel bilgiler formuna `En Sevdiği Şarkı` alanı eklendi
+- Şarkı adı/açıklaması için `favorite_song_title` alanı eklendi
+- Kullanıcının müzik dosyası yükleyebilmesi için `favorite_song_file` upload alanı eklendi
+- Alternatif olarak müzik URL girebilmesi için `favorite_song_url` alanı eklendi
+- Profil kaydetme action'ı ses dosyasını `vault-media` bucket'a yükleyip URL'yi `vaults` kaydına yazacak şekilde güncellendi
+- Önizleme ve public anma sayfasında `En Sevdiği Şarkı` kartı ve audio player eklendi
+- `vaults` tablosuna `favorite_song_title` ve `favorite_song_url` migration'ı eklendi
+- `vault-media` bucket allowed mime listesine audio tipleri eklendi
+- Supabase TypeScript tipleri yeni şarkı alanlarıyla güncellendi
+
+### Proje Durumu
+- [x] Dashboard kişisel bilgiler ekranında sevdiği şarkı girilebiliyor
+- [x] Müzik dosyası yüklenebiliyor veya URL kullanılabiliyor
+- [x] Önizleme/public sayfada şarkı player olarak görünüyor
+- [x] Yalnızca şarkı girilmiş olsa bile Hayat Hikayesi bölümü görünür kalıyor
+- [ ] Migration canlı Supabase ortamına uygulanmadı
+
+### Doğrulama
+- `npm run lint` geçti
+- `npx tsc --noEmit` geçti
+
+### Kritik Kararlar / Notlar
+- Şarkı dosyası limiti action tarafında 25 MB ile sınırlandı
+- Ses dosyası profilin parçası olarak `vaults` üzerinde tutuldu; ayrı ses kayıtları listesine eklenmedi
+- Dosya seçilirse URL yerine yüklenen dosya kullanılıyor
+
+### Nerede Kaldık
+En sevdiği şarkı alanı kod seviyesinde eklendi ve tip/lint doğrulaması geçti.
+
+### Sıradaki Adım
+1. `005_vault_favorite_song.sql` migration'ı Supabase'e uygulanmalı
+2. Gerçek MP3 dosyasıyla profil kaydetme ve `/preview/[id]` player görünümü test edilmeli
+
+---
+
+## 2026-06-10 — Oturum 49: Kişisel Bilgiler Alanları
+
+### Yapılanlar
+- Kişisel bilgiler formuna `Meslek` ve `Hobileri / İlgi Alanları` alanları eklendi
+- Profil kaydetme action'ı meslek ve hobi değerlerini `vaults` kaydına yazacak şekilde güncellendi
+- Önizleme ve public anma sayfasında meslek bilgisi hero altında gösterildi
+- Hayat Hikayesi bölümüne `Kişisel Bilgiler` kartı eklendi
+- Biyografi olmasa bile meslek veya hobi varsa Hayat Hikayesi bölümü görünür hale getirildi
+- `vaults` tablosu için `profession` ve `hobbies` migration'ı eklendi
+- Supabase TypeScript tipleri yeni alanlarla güncellendi
+
+### Proje Durumu
+- [x] Dashboard kişisel bilgiler ekranında meslek/hobi girilebiliyor
+- [x] Kaydedilen meslek/hobi önizlemede görünüyor
+- [x] Public anma sayfası aynı `RealMemorialPage` üzerinden bu alanları gösteriyor
+- [ ] Migration canlı Supabase ortamına uygulanmadı
+
+### Doğrulama
+- `npm run lint` geçti
+- `npx tsc --noEmit` geçti
+
+### Kritik Kararlar / Notlar
+- Hobi alanı şimdilik serbest metin tutuldu; kullanıcı virgülle kısa ilgi alanları yazabilir
+- Ayrı tablo veya etiket yapısı eklenmedi; kapsam kişisel bilgi gösterimiyle sınırlı tutuldu
+
+### Nerede Kaldık
+Kod tarafında meslek/hobi ekleme ve önizleme gösterimi tamamlandı.
+
+### Sıradaki Adım
+1. `004_vault_personal_details.sql` migration'ı Supabase'e uygulanmalı
+2. Gerçek kullanıcıyla profil kaydetme ve `/preview/[id]` görünümü tarayıcıda kontrol edilmeli
+
+---
+
+## 2026-06-10 — Oturum 48: Fotoğraf Sıkıştırma
+
+### Yapılanlar
+- Ortak `ImageUploadInput` client bileşeni eklendi
+- JPEG, PNG ve WebP fotoğraflar upload öncesi tarayıcıda WebP olarak optimize ediliyor
+- Büyük görsellerin uzun kenarı 2048 px ile sınırlandı
+- Küçük ya da zaten yeterince optimize fotoğraflar orijinal haliyle bırakılıyor
+- Video, desteklenmeyen görsel formatları ve çoklu dosya alanları sıkıştırmadan geçirilmiyor
+- Kullanıcıya "hazırlanıyor", "sıkıştırıldı", "orijinal yüklenecek" ve hata durumları gösteriliyor
+- Sıkıştırma devam ederken form gönderimi engellenip kullanıcı uyarılıyor
+- Fotoğraf galerisi, profil fotoğrafı, hero arka planı, anı medyası ve aile üyesi fotoğraf formları yeni bileşene bağlandı
+
+### Proje Durumu
+- [x] Fotoğraf yüklemeleri Storage'a gitmeden önce client tarafında sıkıştırılıyor
+- [x] Mevcut server action alan adları korundu
+- [x] Video, belge ve ses yüklemeleri etkilenmedi
+- [x] Küçük görseller gereksiz yeniden kodlanmıyor
+- [ ] Gerçek tarayıcıda büyük JPEG/PNG seçilerek görsel kalite manuel kontrol edilmedi
+
+### Doğrulama
+- `npm run lint` geçti
+- `npx tsc --noEmit` geçti
+- `npm run build` geçti
+- İlk build denemesi Google font indirme hatasıyla düştü; tekrar denemede build başarıyla tamamlandı
+
+### Kritik Kararlar / Notlar
+- Yeni native dependency eklenmedi; sıkıştırma tarayıcı Canvas API ile yapılıyor
+- Animasyon kaybı yaşamamak için GIF sıkıştırılmıyor
+- HEIC gibi tarayıcının decode edemeyebileceği formatlar orijinal bırakılıyor
+- Orijinalden en az 80 KB küçük olmayan çıktı kullanılmıyor
+
+### Nerede Kaldık
+Fotoğraf sıkıştırma kod seviyesinde tamamlandı ve build doğrulaması geçti.
+
+### Sıradaki Adım
+1. Gerçek büyük JPEG/PNG dosyalarıyla dashboard formlarında manuel upload testi yapılmalı
+2. Kalite/kota dengesine göre `MAX_IMAGE_DIMENSION` ve `WEBP_QUALITY` değerleri ayarlanabilir
+
+---
+
 ## 2026-06-09 — Oturum 47: Anı Önizleme ve Medya Eksikleri
 
 ### Yapılanlar
