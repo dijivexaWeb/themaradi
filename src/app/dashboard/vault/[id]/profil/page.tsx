@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { saveVaultProfileAction } from '@/lib/actions/vault'
 import Image from 'next/image'
 import { ImageUploadInput } from '@/components/ImageUploadInput'
+import { CemeteryLocationPicker } from '@/components/CemeteryLocationPicker'
 import PersonHeader from '../_PersonHeader'
 
 interface Props {
@@ -19,6 +20,15 @@ const NAV = [
   { id: 'mesaj',   icon: '💬', label: 'Son Mesaj' },
   { id: 'mezar',   icon: '🪦', label: 'Mezar' },
 ]
+
+function toNullableNumber(value: unknown): number | null {
+  if (typeof value === 'number') return Number.isFinite(value) ? value : null
+  if (typeof value === 'string' && value.trim()) {
+    const parsed = Number(value)
+    return Number.isFinite(parsed) ? parsed : null
+  }
+  return null
+}
 
 export default async function ProfilPage({ params, searchParams }: Props) {
   const { id } = await params
@@ -36,6 +46,8 @@ export default async function ProfilPage({ params, searchParams }: Props) {
   const inputCls = `w-full rounded-xl border border-[#e5dccb] bg-white px-4 py-3 text-sm text-[#1f2d27] placeholder-[#adb5ab] outline-none focus:border-[#174f35] focus:ring-2 focus:ring-[#174f35]/10 disabled:opacity-40`
   const labelCls = `mb-1.5 block text-xs font-semibold text-[#4a5e55]`
   const sectionCls = `rounded-3xl border border-[#e5dccb] bg-[#fffdf8] p-6 shadow-[0_4px_24px_rgba(64,48,24,0.05)] space-y-4 scroll-mt-6`
+  const cemeteryLat = toNullableNumber((vault as Record<string, unknown>).cemetery_lat)
+  const cemeteryLng = toNullableNumber((vault as Record<string, unknown>).cemetery_lng)
 
   return (
     <div className="px-5 py-8 sm:px-8">
@@ -270,16 +282,7 @@ export default async function ProfilPage({ params, searchParams }: Props) {
                 <label className={labelCls}>Mezarlık Adresi</label>
                 <input type="text" name="cemetery_address" defaultValue={vault.cemetery_address ?? ''} placeholder="Adres veya konum tarifi" disabled={isLocked} className={inputCls} />
               </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className={labelCls}>Enlem (Lat)</label>
-                  <input type="number" step="any" name="cemetery_lat" defaultValue={(vault as Record<string, unknown>).cemetery_lat as string ?? ''} placeholder="41.0082" disabled={isLocked} className={inputCls} />
-                </div>
-                <div>
-                  <label className={labelCls}>Boylam (Lng)</label>
-                  <input type="number" step="any" name="cemetery_lng" defaultValue={(vault as Record<string, unknown>).cemetery_lng as string ?? ''} placeholder="28.9784" disabled={isLocked} className={inputCls} />
-                </div>
-              </div>
+              <CemeteryLocationPicker initialLat={cemeteryLat} initialLng={cemeteryLng} disabled={isLocked} />
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className={labelCls}>Ada / Parsel</label>

@@ -56,6 +56,12 @@ function getVideoThumb(url: string, fallback?: string | null): string | null {
   return fallback ?? null
 }
 
+function getCoordinate(value: unknown): string | null {
+  if (typeof value === 'number' && Number.isFinite(value)) return String(value)
+  if (typeof value === 'string' && value.trim()) return value.trim()
+  return null
+}
+
 export default async function RealMemorialPage({ vault, isPreview = false }: Props) {
   const id = vault.id
   const supabase = await createClient()
@@ -124,6 +130,17 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
   const hasStory = !!vault.biography || hasPersonalDetails || hasFavoriteSong || hasDonationPreference
 
   const heroBgUrl = v.hero_bg_url as string | null | undefined
+  const cemeteryLat = getCoordinate(v.cemetery_lat)
+  const cemeteryLng = getCoordinate(v.cemetery_lng)
+  const cemeteryQuery = cemeteryLat && cemeteryLng
+    ? `${cemeteryLat},${cemeteryLng}`
+    : `${vault.cemetery_name ?? ''} ${vault.cemetery_address ?? ''}`.trim()
+  const cemeteryMapUrl = cemeteryQuery
+    ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(cemeteryQuery)}`
+    : null
+  const cemeteryDirectionsUrl = cemeteryQuery
+    ? `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(cemeteryQuery)}`
+    : null
 
   const tabs = [
     { href: '#hikaye', label: 'Hayat Hikayesi', show: hasStory },
@@ -873,13 +890,39 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
                       </p>
                     </div>
                   )}
+                  {(cemeteryDirectionsUrl || cemeteryMapUrl) && (
+                    <div className="grid gap-2 sm:grid-cols-2">
+                      {cemeteryDirectionsUrl && (
+                        <a
+                          href={cemeteryDirectionsUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#174f35] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#123f2b]"
+                        >
+                          <Navigation className="h-4 w-4" />
+                          Yol Tarifi Al
+                        </a>
+                      )}
+                      {cemeteryMapUrl && (
+                        <a
+                          href={cemeteryMapUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center justify-center gap-2 rounded-xl border border-[#e1d5c3] bg-white px-4 py-3 text-sm font-semibold text-[#174f35] transition hover:bg-[#f7f2e9]"
+                        >
+                          <MapPin className="h-4 w-4" />
+                          Haritada Aç
+                        </a>
+                      )}
+                    </div>
+                  )}
                 </div>
 
                 {/* Harita */}
                 <div className="relative min-h-[320px] overflow-hidden">
-                  {(v.cemetery_lat && v.cemetery_lng) ? (
+                  {(cemeteryLat && cemeteryLng) ? (
                     <iframe
-                      src={`https://maps.google.com/maps?q=${v.cemetery_lat},${v.cemetery_lng}&t=&z=15&ie=UTF8&iwloc=&output=embed`}
+                      src={`https://maps.google.com/maps?q=${cemeteryLat},${cemeteryLng}&t=&z=18&ie=UTF8&iwloc=&output=embed`}
                       className="h-full min-h-[320px] w-full border-0"
                       loading="lazy"
                       title="Mezarlık konumu"

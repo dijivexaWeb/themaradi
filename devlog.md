@@ -5,6 +5,45 @@
 
 ---
 
+## 2026-06-10 — Oturum 53: Mezarlık Harita Seçimi ve Yol Tarifi
+
+### Yapılanlar
+- Profildeki ham `Enlem` ve `Boylam` inputları kaldırıldı
+- `CemeteryLocationPicker` client bileşeni eklendi
+- Mezarlık konumu harita üzerinden yakınlaştırıp tıklayarak seçilebilir hale getirildi
+- Harita seçici Leaflet/OpenStreetMap ile çalışacak şekilde eklendi
+- Seçilen koordinatlar hidden `cemetery_lat` ve `cemetery_lng` alanlarıyla mevcut kayıt action'ına bağlandı
+- Mevcut konumu kullanma ve Google Maps'te arama aksiyonları eklendi
+- Önizleme/public anma sayfasında `Yol Tarifi Al` ve `Haritada Aç` butonları eklendi
+- Koordinat varsa Google Maps embed mezarın seçilen noktasına daha yakın zoom ile açılıyor
+- `leaflet` ve `@types/leaflet` dependency'leri eklendi
+
+### Proje Durumu
+- [x] Kullanıcı artık enlem/boylam bilmeden mezar konumunu haritadan seçebiliyor
+- [x] Ziyaretçi önizleme/public sayfadan doğrudan yol tarifi alabiliyor
+- [x] Koordinat yoksa harita mezarlık adı/adres üzerinden açılmaya devam ediyor
+- [ ] Gerçek tarayıcıda harita tıklama ve mobil yol tarifi akışı manuel test edilmedi
+
+### Doğrulama
+- `npm run lint` geçti
+- `npx tsc --noEmit` geçti
+- `git diff --check` geçti
+- `npm run build` geçti
+
+### Kritik Kararlar / Notlar
+- Google Maps API key gerektirmemek için seçim arayüzü Leaflet/OpenStreetMap ile kuruldu
+- Public yönlendirme Google Maps URL'leriyle yapıldı; mobil cihazlarda Google Maps uygulamasına geçebilir
+- DB migration gerekmedi; mevcut `cemetery_lat` ve `cemetery_lng` alanları kullanıldı
+
+### Nerede Kaldık
+Harita seçimi ve ziyaretçi yol tarifi kod seviyesinde tamamlandı.
+
+### Sıradaki Adım
+1. Profil sayfasında mezar noktasını haritadan seçip kaydetme gerçek tarayıcıda test edilmeli
+2. `/preview/[id]` sayfasında `Yol Tarifi Al` butonu mobil ve masaüstünde kontrol edilmeli
+
+---
+
 ## 2026-06-10 — Oturum 52: Profil Kaydetme Bildirimi
 
 ### Yapılanlar
