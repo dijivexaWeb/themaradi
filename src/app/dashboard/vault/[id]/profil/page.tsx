@@ -6,7 +6,10 @@ import Image from 'next/image'
 import { ImageUploadInput } from '@/components/ImageUploadInput'
 import PersonHeader from '../_PersonHeader'
 
-interface Props { params: Promise<{ id: string }> }
+interface Props {
+  params: Promise<{ id: string }>
+  searchParams: Promise<{ saved?: string; error?: string }>
+}
 
 const NAV = [
   { id: 'temel',   icon: '🧍', label: 'Temel Bilgiler' },
@@ -17,8 +20,9 @@ const NAV = [
   { id: 'mezar',   icon: '🪦', label: 'Mezar' },
 ]
 
-export default async function ProfilPage({ params }: Props) {
+export default async function ProfilPage({ params, searchParams }: Props) {
   const { id } = await params
+  const { saved, error } = await searchParams
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
@@ -46,6 +50,18 @@ export default async function ProfilPage({ params }: Props) {
         </div>
 
         <PersonHeader vault={vault} sectionLabel="Kişisel Bilgiler" sectionIcon="🧍" />
+
+        {saved === '1' && (
+          <div className="mb-6 rounded-2xl border border-[#b9dfc2] bg-[#edf8ef] px-5 py-4 text-sm font-medium text-[#176b3f]">
+            Kişisel bilgiler kaydedildi.
+          </div>
+        )}
+
+        {error && (
+          <div className="mb-6 rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-sm font-medium text-red-700">
+            {error}
+          </div>
+        )}
 
         {isLocked && (
           <div className="mb-6 rounded-2xl border border-[#dfbd72]/50 bg-[#fff7e6] px-5 py-4 text-sm text-[#725212]">

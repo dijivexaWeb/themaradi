@@ -180,6 +180,15 @@ async function uploadFavoriteSong(vaultId: string, userId: string, formData: For
   return data.publicUrl
 }
 
+function redirectToProfileWithMessage(vaultId: string, params: URLSearchParams): never {
+  redirect(`/dashboard/vault/${vaultId}/profil?${params.toString()}`)
+}
+
+function redirectToProfileError(vaultId: string, message: string): never {
+  const params = new URLSearchParams({ error: message })
+  redirectToProfileWithMessage(vaultId, params)
+}
+
 export async function saveVaultProfileAction(vaultId: string, formData: FormData): Promise<void> {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -192,7 +201,8 @@ export async function saveVaultProfileAction(vaultId: string, formData: FormData
     .eq('owner_id', user.id)
     .single()
 
-  if (!vault || vault.status === 'pending_verification') return
+  if (!vault) redirectToProfileError(vaultId, 'Anı alanı bulunamadı.')
+  if (vault.status === 'pending_verification') redirectToProfileError(vaultId, 'Ödeme doğrulanmadan kayıt yapılamaz.')
 
   const uploadedCoverUrl = await uploadProfilePhoto(vaultId, user.id, formData)
   const coverPhotoUrl = uploadedCoverUrl
@@ -242,9 +252,10 @@ export async function saveVaultProfileAction(vaultId: string, formData: FormData
     .eq('id', vaultId)
     .eq('owner_id', user.id)
 
-  if (error) return
+  if (error) redirectToProfileError(vaultId, `Kayıt yapılamadı: ${error.message}`)
 
   revalidatePath(`/dashboard/vault/${vaultId}`)
   revalidatePath(`/dashboard/vault/${vaultId}/profil`)
   revalidatePath(`/dashboard/vault/${vaultId}/onizleme`)
+  redirectToProfileWithMessage(vaultId, new URLSearchParams({ saved: '1' }))
 }

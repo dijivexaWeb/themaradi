@@ -5,6 +5,38 @@
 
 ---
 
+## 2026-06-10 — Oturum 52: Profil Kaydetme Bildirimi
+
+### Yapılanlar
+- Kişisel bilgiler sayfasına başarılı kayıt bildirimi eklendi
+- Profil kaydetme action'ı başarıda `saved=1` ile profil sayfasına dönüyor
+- Profil kaydetme action'ı hatada `error` mesajıyla profil sayfasına dönüyor
+- Supabase update hataları artık sessizce yutulmuyor; kullanıcı kırmızı uyarı olarak görüyor
+- Ödeme doğrulanmadı veya anı alanı bulunamadı durumları da kullanıcıya görünür hale getirildi
+
+### Proje Durumu
+- [x] Kayıt başarılıysa sayfada `Kişisel bilgiler kaydedildi.` mesajı çıkıyor
+- [x] Kayıt başarısızsa hata mesajı sayfada görünüyor
+- [x] Migration eksikliği gibi DB hataları artık kullanıcıya/admindeki teste açık şekilde yansıyor
+
+### Doğrulama
+- `npm run lint` geçti
+- `npx tsc --noEmit` geçti
+- `git diff --check` geçti
+
+### Kritik Kararlar / Notlar
+- Ayrı client state eklenmedi; server action sonrası query param ile sade ve güvenilir geri bildirim verildi
+- Bu değişiklik migration gerektirmiyor
+
+### Nerede Kaldık
+Profil kaydetme akışı artık sessiz kalmıyor.
+
+### Sıradaki Adım
+1. Canlı Supabase migration'ları uygulanmalı
+2. Profil formu gerçek kayıtla tekrar denenmeli
+
+---
+
 ## 2026-06-10 — Oturum 51: Bağış Yönlendirmesi Alanı
 
 ### Yapılanlar
