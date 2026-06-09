@@ -5,6 +5,42 @@
 
 ---
 
+## 2026-06-10 — Oturum 54: Harita İçinde Konum Arama
+
+### Yapılanlar
+- Mezarlık harita seçicide dışarı Google Maps açan arama kaldırıldı
+- `/api/geocode` route handler eklendi
+- Harita seçici artık aramayı sayfa içinde yapıyor ve sonuçları liste olarak gösteriyor
+- Kullanıcı arama sonucunu seçince harita o noktaya yakınlaşıyor ve konum kayda hazırlanıyor
+- Büyük harita modu eklendi; kullanıcı mezar noktasına daha rahat zoom yapabiliyor
+- Sonuç seçildikten sonra kullanıcı haritada mezarın tam noktasına tıklayarak koordinatı netleştirebiliyor
+
+### Proje Durumu
+- [x] Harita araması sayfa içinde çalışacak şekilde kodlandı
+- [x] Arama olmadan dış haritaya gitme davranışı kaldırıldı
+- [x] Seçilen arama sonucu hidden koordinat alanlarına bağlanıyor
+- [ ] Gerçek tarayıcıda arama sonucu seçme ve kaydetme manuel test edilmedi
+
+### Doğrulama
+- `npm run lint` geçti
+- `npx tsc --noEmit` geçti
+- `git diff --check` geçti
+- `npm run build` geçti
+
+### Kritik Kararlar / Notlar
+- Arama için Nominatim/OpenStreetMap proxy route'u kullanıldı
+- Otomatik her tuşta arama yapılmadı; kullanıcı `Ara` butonuyla bilinçli arama başlatıyor
+- Arama sonucu sadece başlangıç noktasıdır; mezar konumu için haritada son tıklama yine kullanıcıda
+
+### Nerede Kaldık
+Harita içinde arama ve büyük harita modu kod seviyesinde tamamlandı.
+
+### Sıradaki Adım
+1. Profil sayfasında mezarlık adıyla arama yapıp sonuç seçme akışı test edilmeli
+2. Seçilen konum kaydedilip `/preview/[id]` yol tarifi butonu kontrol edilmeli
+
+---
+
 ## 2026-06-10 — Oturum 53: Mezarlık Harita Seçimi ve Yol Tarifi
 
 ### Yapılanlar
