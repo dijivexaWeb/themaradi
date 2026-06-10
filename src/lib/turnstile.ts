@@ -3,6 +3,9 @@
 import { createServiceClient } from '@/lib/supabase/server'
 
 export async function getTurnstileSiteKey(): Promise<string> {
+  if (process.env.NODE_ENV === 'development') {
+    return ''
+  }
   const supabase = await createServiceClient()
   const { data } = await supabase
     .from('platform_settings')

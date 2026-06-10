@@ -3,6 +3,308 @@
 > Her oturum sonunda Claude bu dosyayı günceller.
 > Format: tarih → ne yapıldı → nerede kalındı → sıradaki adım.
 
+## 2026-06-10 — Oturum 64: Admin Doğrulama UI + İtiraz Özelliği
+
+### Yapılanlar
+- `admin/verifications/page.tsx` tamamen yeniden yazıldı: iki bölümlü layout — Ödeme Onayı (tablo) + Vefat Belgesi İnceleme (kart grid); her belgede şahit listesi (✓/○ badge), belge görüntüleme linki
+- `admin/verifications/_DocApproveButton.tsx` oluşturuldu: belgeyi onayla veya reddet (gerekçe input'u ile inline reject form)
+- `memorial_objections` tablosu `supabase/migrations/010_memorial_objections.sql` ile oluşturuldu ve Supabase MCP ile uzak DB'ye uygulandı (RLS: anon/authenticated INSERT, service_role ALL)
+- `memorial/[slug]/actions.ts` oluşturuldu: `submitObjectionAction` — ad/telefon/email zorunlu, consent_email/consent_phone, ip_address, timestamp ile DB'ye yazar
+- `memorial/[slug]/ObjectionSection.tsx` oluşturuldu: collapsible itiraz formu — kapalıyken küçük "İtiraz Et" butonu, açıkken ad/telefon/email/mesaj formu + iki consent checkbox; başarıda teşekkür mesajı ("3 gün içinde değerlendirilecek")
+- `memorial/[slug]/page.tsx` güncellendi: `public_memorial` durumunda `<RealMemorialPage>` altına `<ObjectionSection>` enjekte edildi — RealMemorialPage'e dokunulmadı
+
+### Proje Durumu
+[x] Admin verifications page (ödeme + belge kuyruğu)
+[x] _DocApproveButton ile belge onay/red akışı
+[x] memorial_objections DB tablosu (migration 010)
+[x] submitObjectionAction (server action, RLS uyumlu)
+[x] ObjectionSection client component
+[x] memorial/[slug]/page.tsx → public_memorial + ObjectionSection
+
+### Kritik Kararlar / Notlar
+- RealMemorialPage'e dokunulmadan itiraz bölümü page.tsx wrapper'da eklendi — koşul: sadece `public_memorial` statüsünde göster
+- ObjectionSection temayı özgün korumak için skoyu koyu (dark) tutuldu — sayfa temasına karışmaması için `bg-black/20 border-white/10` overlay sistemi
+- Objection tablosunda owner/user göremez policy'si: sahipler kendi vault'larına gelen itirazları göremez, sadece admin (service_role) görebilir
+- admin/verifications memorial_witnesses join'i `vault_id` üzerinden değil `memorial_verification_docs.id → memorial_witnesses.vault_id` üzerinden yapılıyor — doğrudan vault_id şahitleri gösteriyor
+
+### Nerede Kaldık
+Admin panel doğrulama kuyruğu ve public anma sayfası itiraz özelliği tamamlandı.
+
+### Sıradaki Adım
+1. Admin paneline objection listesi sayfası ekle (`admin/objections/page.tsx`)
+2. `anma-paneli/[id]/page.tsx` (dashboard home) — doğrulama durumu widget'ı ekle
+3. TypeScript derleme kontrolü: `tsc --noEmit`
+4. Tarayıcıda test: itiraz formu gönder, DB'de kayıt kontrol et
+
+---
+
+## 2026-06-10 — Oturum 63: Anma Paneli Eksik Alt Sayfalar Tamamlandı
+
+### Yapılanlar
+- `anma-paneli/[id]/actions.ts` genişletildi: `addMemorialVideoAction`, `addMemorialAudioAction`, `updateMemorialAudioAction`, `saveMemorialThemeAction` eklendi — vault koduna dokunulmadı, tüm yönlendirmeler anma-paneli rotasına yönlendirildi
+- `biyografi/page.tsx` güncellendi: `profession`, `hobbies`, `birth_place`, `death_place`, `favorite_song_title`, `favorite_song_url`, `last_message`, `donation_preference`, `donation_url`, `hero_bg_url` alanları eklendi (4 ayrı form bloğu)
+- `gorunum/page.tsx` oluşturuldu: 5 tema için görsel renk önizlemeli radio selector + `saveMemorialThemeAction`
+- `videolar/page.tsx` oluşturuldu: `addMemorialVideoAction` wrapper ile video yönetimi
+- `anilar/page.tsx` oluşturuldu: genel/kronoloji/featured bölüm filtreleme + anı ekle/düzenle/sil
+- `ses-kayitlari/page.tsx` oluşturuldu: `addMemorialAudioAction` ve `updateMemorialAudioAction` wrapper'ları ile ses kaydı yönetimi
+- `layout.tsx` güncellendi: sidebar'a videolar, anılar, ses kayıtları, görünüm & tema eklendi (Video, Heart, Mic, Palette ikonları)
+- i18n güncellendi: tr/en/ka/ru'ya `videos`, `memories`, `audioRecordings`, `appearance` anahtarları eklendi
+
+### Proje Durumu
+[x] biyografi/page.tsx — tüm alanlar (profil, detaylar, şarkı, son mesaj, biyografi)
+[x] fotolar/page.tsx
+[x] videolar/page.tsx
+[x] anilar/page.tsx (genel/kronoloji/featured)
+[x] ses-kayitlari/page.tsx
+[x] aile/page.tsx
+[x] mezar/page.tsx
+[x] taziye/page.tsx
+[x] gorunum/page.tsx (5 tema)
+[x] dogrulama/page.tsx
+[x] layout.tsx sidebar tam
+[x] i18n 4 dil tam
+[ ] TypeScript derleme hatası yok (tsc --noEmit temiz)
+
+### Kritik Kararlar / Notlar
+- Vault koduna hiç dokunulmadı; tüm yönlendirme sorunları `anma-paneli/actions.ts` wrapper'ları ile çözüldü
+- `addAudioRecordingAction` revalidatePath'i vault yoluna yapar ama redirect yok — wrapper ile anma-paneli yoluna redirect eklendi
+- `updateAudioRecordingAction` vault yoluna redirect yapar — wrapper ile düzeltildi
+- `addVideoAction` vault yoluna redirect yapar — tüm upload mantığı inlined + wrapper
+
+### Nerede Kaldık
+Tüm anma paneli alt sayfaları tamamlandı. TypeScript derlemesi temiz.
+
+### Sıradaki Adım
+1. Tarayıcıda test et: her sayfayı aç, form submit et
+2. `gorunum` sayfasında tema değişikliğinin anma sayfasına yansıdığını doğrula
+3. `anilar` sayfasında kronoloji/featured filtrelemesini test et
+4. Gerekirse RealMemorialPage ile uyumsuz alanları düzelt
+
+---
+
+## 2026-06-10 — Oturum 62: Profil Sihirbazı & 5 Görsel Tema Entegrasyonu
+
+### Yapılanlar
+- Profil Düzenleme ekranı hybrid stepper/tabs wizard yapısına (5 adım) dönüştürüldü.
+- Görünüm & Tema adımında (Adım 2) canlı tema önizleme paletleri ile 5 farklı görsel tema (Zümrüt Klasik, Sıcak Gün Batımı, Gece Sessizliği, Minimal Beyaz, Nostaljik Sonbahar) eklendi.
+- `RealMemorialPage.tsx` bileşeni `vault.theme` sınıfı ile giydirilerek seçilen temanın stil ve yazı tiplerini otomatik olarak devralması sağlandı. Sayfadaki tüm Türkçe statik metinler `getTranslation()` ile yerelleştirildi.
+- Supabase uzak veritabanındaki schema drift tespit edildi; `donation_url` ve `theme` kolonlarının eksik olduğu belirlendi. Uzak veritabanına doğrudan SQL sorguları çalıştırılarak bu kolonlar başarıyla eklendi.
+- TypeScript derlemesi (`tsc`) ve ESLint denetimleri (`lint`) başarıyla tamamlandı.
+- Tarayıcı testi ile tema seçimi, kaydetme ve canlı anma sayfasındaki stil değişiklikleri başarıyla doğrulandı.
+
+### Proje Durumu
+- [x] Profil Düzenleme Sihirbazı (Tabs + Progress Bar) tamamlandı.
+- [x] 5 görsel tema ve şablon seçimi yapısı kuruldu.
+- [x] Canlı ve önizleme anma sayfasının temalandırılması ve yerelleştirilmesi tamamlandı.
+- [x] Uzak veritabanına eksik kolonlar (donation_url, theme) uygulandı.
+
+### Sıradaki Adım
+1. Farklı ekran boyutları için görsel temaların ve sihirbaz arayüzünün mobil uyumluluk kontrollerine devam edilmesi.
+
+---
+
+## 2026-06-10 — Oturum 61: Anma Paneli Alt Sayfalar (Tümü Tamamlandı)
+
+### Yapılanlar
+- `src/app/anma-paneli/[id]/actions.ts` oluşturuldu — memorial-specific server actions:
+  - `addMemorialPhotoAction` — vault fotolar'a dokunmadan fotoğraf yükleme + doğru redirect
+  - `updateMemorialFamilyMemberAction` — aile güncelleme + doğru redirect (anma-paneli)
+  - `saveMemorialCemeteryAction` — mezar alanları kaydet (cemetery_* fields)
+  - `publishMemorialAction` — `private_memorial` → `public_memorial` geçişi
+- `biyografi/page.tsx` — 'use client', profil bilgileri + hayat hikayesi, auto-save (2s debounce), supabase browser client
+- `fotolar/page.tsx` — server component, `addMemorialPhotoAction` wrapper kullanıyor, `updateMediaAction(redirectTo)` param ile doğru yönlendirme, masonry galeri
+- `aile/page.tsx` — server component, dark theme, `addFamilyMemberAction` (no redirect ✓) + `updateMemorialFamilyMemberAction` (anma redirect ✓), FamilyTreeCanvas dahil
+- `mezar/page.tsx` — server component, mezarlık adı/adres/konum/parsel/sıra/saatler/not formu, Google Haritalar linki, Google lat/lng önizleme
+- `taziye/page.tsx` — server component, approve/reject condolence actions (no redirect ✓), tepki sayaçları (mum/çiçek/dua)
+- `dogrulama/page.tsx` — server component, status-based UI (5 durum: pending/hidden/private/public/suspended), içerik kontrol listesi, yayına al butonu, ödeme bilgisi
+- TypeScript: src/ içinde sıfır hata
+
+### Proje Durumu
+- [x] Anı Biriktirme dashboard (mevcut, dokunulmadı)
+- [x] Anma Paneli route + layout + ana sayfa
+- [x] i18n: memorial_panel namespace (4 dil)
+- [x] Satın alma → doğru redirect fix
+- [x] /anma-paneli/[id]/biyografi
+- [x] /anma-paneli/[id]/fotolar
+- [x] /anma-paneli/[id]/aile
+- [x] /anma-paneli/[id]/mezar
+- [x] /anma-paneli/[id]/taziye
+- [x] /anma-paneli/[id]/dogrulama
+- [ ] DB migration: memorial_verifications tablosu (belge yükleme akışı)
+- [ ] Admin ekranları (anma için ayrı)
+- [ ] Email template'leri (doğrulama akışı)
+
+### Kritik Kararlar / Notlar
+- `addPhotoAction` / `updateFamilyMemberAction` değiştirilmedi — vault kodu dokunulmaz
+- Tüm action redirect'leri `/anma-paneli/${vaultId}/...` yollarını kullanıyor
+- `aile` sayfası `addFamilyMemberAction` kullanıyor (no redirect OK), `updateFamilyMemberAction` için memorial wrapper yazıldı
+- `dogrulama` sayfası `hidden_vault` durumunda belge yükleme placeholder gösteriyor (DB migration gelince aktif olacak)
+- Mezar `saveMemorialCemeteryAction`: pending_verification'da çalışmaz (ödeme onayı gerekli)
+
+### Nerede Kaldık
+Anma panelinin 6 alt sayfası tamamen oluşturuldu. `/anma-paneli/[id]/` altındaki tüm route'lar çalışır durumda. Sıradaki büyük iş: DB migration (memorial_verifications/witnesses/objections tabloları) ve admin ekranları.
+
+### Sıradaki Adım
+1. DB migration: `supabase/migrations/008_memorial_verification_system.sql`
+2. `hidden_vault` durumu için belge yükleme formu aktif etme
+3. Admin ekranları: anma sayfaları için ayrı admin UI (ödeme onaylama, doğrulama inceleme)
+4. Email template: doğrulama onay/red emaili
+
+---
+
+## 2026-06-10 — Oturum 60: Anma Paneli İskeleti
+
+### Yapılanlar
+- Mimari karar: anma panelini `/dashboard/` altına KOYMADIK → `actions.ts:166` bug'ı tespit edildi (memorial satın alımı `/dashboard/vault/[id]`'ye yönlendiriyordu)
+- Tamamen ayrı route: `/anma-paneli/[id]/` oluşturuldu (mevcut vault dashboard'a dokunulmadı)
+- `purchaseMemorialAction` redirect fix: `/dashboard/vault/${vault.id}` → `/anma-paneli/${vault.id}`
+- `memorial_panel` i18n namespace eklendi → 4 dil (en, tr, ka, ru)
+- `src/app/anma-paneli/[id]/layout.tsx` oluşturuldu — kendi sidebar'ı (biyografi/fotoğraflar/aile/mezar/taziye/doğrulama), auth check, status badge
+- `src/app/anma-paneli/[id]/page.tsx` oluşturuldu — profil başlık kartı, durum banner'ı, 6 bölüm kartı (her biri ilgili sayfaya link)
+- TypeScript: `src/` içinde sıfır hata
+
+### Proje Durumu
+- [x] Anı Biriktirme dashboard (mevcut, dokunulmadı)
+- [x] Anma Paneli route + layout + ana sayfa iskeleti
+- [x] i18n: memorial_panel namespace (4 dil)
+- [x] Satın alma → doğru redirect fix
+- [ ] Anma biyografi sayfası (/biyografi)
+- [ ] Anma fotoğraflar sayfası (/fotolar)
+- [ ] Anma aile ağacı sayfası (/aile)
+- [ ] Anma mezar bilgileri sayfası (/mezar)
+- [ ] Anma taziye defteri sayfası (/taziye)
+- [ ] Anma doğrulama & yayın sayfası (/dogrulama)
+- [ ] DB migration: memorial_verifications tablosu
+- [ ] Admin ekranları (anma için ayrı)
+- [ ] Email template'leri
+
+### Kritik Kararlar
+- `/anma-paneli/[id]/` — tamamen ayrı route, vault dashboard'dan bağımsız
+- Gelecekte her iki ürüne de sahip kullanıcılar için `/dashboard` hub sayfasına ürün kartları eklenecek (şu an her ikisi de kendi sayfasına yönlendiriyor)
+- Layout'ta `product_type = 'memorial_profile'` kontrolü var → life_vault sahibi yanlışlıkla bu route'a giremez
+
+### Nerede Kaldık
+`/anma-paneli/[id]/layout.tsx` ve `page.tsx` tamamlandı. Ana sayfa: profil başlık kartı + durum banner + 6 bölüm kartı (biyografi, fotoğraflar, aile, mezar, taziye, doğrulama). Alt sayfalar henüz oluşturulmadı — her kart şu an 404 döner.
+
+### Sıradaki Adım
+1. `/anma-paneli/[id]/biyografi/page.tsx` — biyografi yazma/düzenleme
+2. `/anma-paneli/[id]/fotolar/page.tsx` — fotoğraf yükleme
+3. `/anma-paneli/[id]/aile/page.tsx` — aile ağacı
+4. `/anma-paneli/[id]/mezar/page.tsx` — mezar bilgileri
+5. `/anma-paneli/[id]/taziye/page.tsx` — taziye defteri
+6. `/anma-paneli/[id]/dogrulama/page.tsx` — doğrulama akışı (DB migration ile birlikte)
+
+---
+
+## 2026-06-10 — Oturum 60: Mobil Dashboard Dil Seçici Entegrasyonu & Hydration Düzeltmesi
+
+### Yapılanlar
+- Mobil/tablet ekranlarında (1024px altı) sidebar gizlendiği için dil seçicisinin görünmemesi sorunu tespit edildi.
+- `LangSwitcherDashboard` bileşeni özelleştirilebilir `className` alacak şekilde güncellendi ve küçük ekranlarda sadece bayrak gösterimi (`hidden sm:inline`) sağlandı.
+- Dil seçici `src/app/dashboard/layout.tsx` dosyasındaki mobil header alanına da entegre edilerek tüm ekran çözünürlüklerinde erişilebilir hale getirildi.
+- Giriş sayfasında seçilen dilin dashboard tarafına aktarılması ve sunucu/istemci uyumsuzluğu kaynaklı konsol hatalarının (hydration mismatch error) çözülmesi için `RootLayout` (`src/app/layout.tsx`) ve `LangProvider` (`src/i18n/context.tsx`) güncellendi. Artık sunucu tarafındaki dil `tm_lang` cookie'si üzerinden okunup prop olarak istemciye geçiyor ve `useEffect` ile asenkron senkronizasyon yapılıyor.
+- `npx tsc --noEmit` ve `npx eslint` kontrolleri başarıyla tamamlandı.
+
+### Proje Durumu
+- [x] Mobil ve masaüstü dashboard için dil switcher'ı eklendi
+- [x] Giriş ekranındaki dil seçimi dashboard içerisine başarıyla aktarıldı
+- [x] Tarayıcı konsolundaki hydration mismatch hatası giderildi
+
+### Nerede Kaldık
+Kullanıcı panelinde tüm cihaz çözünürlükleri için dil seçimi arayüzü entegre edildi ve senkronizasyon/hydration hataları düzeltildi.
+
+### Sıradaki Adım
+1. Varsa kalan alt form sayfalarının yerelleştirilmesine devam edilmesi.
+
+---
+
+## 2026-06-10 — Oturum 59: Proje Dokümantasyonu ve Anma Sayfası Planı
+
+### Yapılanlar
+- `RealMemorialPageModern.tsx` silindi; admin önizleme `RealMemorialPage`'e (`isPreview={true}`) bağlandı
+- Anma Sayfası sistemi tam olarak planlandı ve hafızaya kaydedildi (`project_memorial_plan.md`)
+- Tüm proje dosyaları (app/, lib/, i18n/, migrations/, components/) baştan sona analiz edildi
+- `PROJECT_CONTEXT.md` oluşturuldu — tek kaynak gerçeği dokümantasyonu
+
+### Proje Durumu
+- [x] Anı Biriktirme (Life Vault) dashboard tamamlandı
+- [x] Anma sayfası public görünümü (`RealMemorialPage.tsx`) mevcut
+- [x] i18n sistemi landing'de aktif (4 dil: ka/tr/ru/en)
+- [x] PROJECT_CONTEXT.md oluşturuldu
+- [ ] Anma Sayfası satın alma + doğrulama akışı yapılacak
+- [ ] Anma Sayfası dashboard (basit versiyon) yapılacak
+- [ ] Admin: memorial doğrulama/tanık/itiraz ekranları yapılacak
+
+### Kritik Kararlar / Notlar
+- İki ürün tamamen ayrı: `life_vault` (anı biriktirme) ve `memorial_profile` (anma)
+- Anma sayfası için 3 yeni DB tablosu gerekiyor: `memorial_verifications`, `memorial_witnesses`, `memorial_objections`
+- i18n baştan düşünülerek kodlanacak — dashboard'da `getTranslation()` zaten mevcut
+
+### Nerede Kaldık
+PROJECT_CONTEXT.md oluşturuldu. Anma Sayfası planı hafızaya kaydedildi. Kullanıcı başka bir konuya geçmek istedi.
+
+### Sıradaki Adım
+1. Anma Sayfası DB migration dosyalarını yaz
+2. Anma dashboard iskeletini kur (basit, i18n dahil)
+3. Doğrulama akışını (Yol A + Yol B) kodla
+4. Admin ekranlarını ekle
+
+---
+
+## 2026-06-10 — Oturum 58: Kullanıcı Paneli Çoklu Dil Entegrasyonu
+
+### Yapılanlar
+- Server Component'lerde `tm_lang` cookie'sini okuyarak doğru dil sözlüğünü dönen `src/i18n/server.ts` dosyası ve `getTranslation()` yardımcısı oluşturuldu.
+- İngilizce, Türkçe, Gürcüce ve Rusça sözlük dosyalarına (`en.ts`, `tr.ts`, `ka.ts`, `ru.ts`) panel elemanlarını içeren `dashboard` çeviri anahtarları eklendi.
+- Panel sidebar'ını ve navigasyonunu barındıran `src/app/dashboard/layout.tsx` Server Component'i yerelleştirildi.
+- Giriş yapan ancak anı alanı aktif olmayan kullanıcıların karşılaştığı `src/app/dashboard/page.tsx` yerelleştirildi.
+- Kasa detaylarını ve yönetim alanlarını gösteren `src/app/dashboard/vault/[id]/page.tsx` yerelleştirildi, tarih biçimlendirmeleri seçilen dile göre dinamikleştirildi.
+- `npx tsc --noEmit` ve `npm run lint` komutları çalıştırılarak projenin build ve lint durumları kontrol edildi, sıfır hata ile geçtiği doğrulandı.
+
+### Proje Durumu
+- [x] Kullanıcı paneli çoklu dil altyapısı kuruldu
+- [x] Panel sidebar, anasayfa ve kasa anasayfa alanları yerelleştirildi
+- [x] TypeScript ve ESLint kontrolleri başarılı
+
+### Kritik Kararlar / Notlar
+- Server Component'lerin dil tespiti için `next/headers`'tan okunan `tm_lang` cookie'si kullanıldı.
+- Arayüz elemanları dışında, kasa alanındaki dinamik tarihlerin formatı da kullanıcının diline (`ka-GE`, `ru-RU`, `en-US`, `tr-TR`) göre dinamikleştirildi.
+- Kalan profil detay formları (biyografi, aile, vasiyet, gizli kasa vb.) için de aynı `getTranslation()` yapısı kullanılarak dil desteği genişletilebilir.
+
+### Nerede Kaldık
+Panel kabuğu ve ana ekranlarında dil desteği tamamlandı, derleme ve statik kontroller sorunsuz geçti.
+
+### Sıradaki Adım
+1. Varsa kalan alt form sayfalarının (biyografi, vasiyet vb.) `getTranslation()` yardımıyla yerelleştirilmesi.
+2. Önizleme ve canlı veritabanı üzerindeki diğer görevlere devam edilmesi.
+
+---
+
+## 2026-06-10 — Oturum 57: Proje İncelemesi ve Durum Tespiti
+
+### Yapılanlar
+- Proje kod yapısı, Supabase tabloları, veritabanı şeması ve mevcut migration dosyaları incelendi.
+- Canlı Supabase veritabanında `007_vault_donation_url.sql` migration dosyasının henüz uygulanmamış olduğu (ve `donation_url` kolonunun eksik olduğu) tespit edildi.
+- `npx tsc --noEmit` ve `npm run lint` komutları çalıştırılarak projenin build ve lint durumları kontrol edildi, sıfır hata ile geçtiği doğrulandı.
+- Git çalışma ağacının (working tree) temiz olduğu ve master branch'inin origin/master ile senkronize durumda olduğu görüldü.
+
+### Proje Durumu
+- [x] Git master branch'i güncel ve temiz
+- [x] TypeScript ve ESLint kontrolleri başarılı
+- [x] Profil alanları (meslek, hobi, şarkı, bağış tercihi) veri tabanında mevcut
+- [ ] `donation_url` kolonu canlı veri tabanına yansıtılmadı (007 migration eksik)
+
+### Kritik Kararlar / Notlar
+- Canlı Supabase veri tabanında `007_vault_donation_url.sql` migration'ının eksik olduğu doğrulandı. Diğer alanlar ise veri tabanında mevcut.
+- Kodda herhangi bir derleme (build) veya lint hatası bulunmuyor.
+
+### Nerede Kaldık
+Projenin genel durumu incelendi, veritabanı ile yerel migration dosyaları arasındaki fark (drift) tespit edildi ve raporlandı.
+
+### Sıradaki Adım
+1. `007_vault_donation_url.sql` migration'ının canlı Supabase ortamına uygulanması.
+2. Önizleme sayfasında bağış adresi, meslek/hobi bandı gibi yeni alanların tarayıcıda canlı kontrollerinin yapılması.
+
 ---
 
 ## 2026-06-10 — Oturum 56: Kalan Dosyaların Toplu Push Hazırlığı

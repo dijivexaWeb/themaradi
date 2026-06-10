@@ -1,4 +1,4 @@
-﻿'use server'
+'use server'
 
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
@@ -196,7 +196,7 @@ export async function saveVaultProfileAction(vaultId: string, formData: FormData
 
   const { data: vault } = await supabase
     .from('vaults')
-    .select('id, display_name, status, cover_photo_url, hero_bg_url, favorite_song_url')
+    .select('id, display_name, status, cover_photo_url, hero_bg_url, favorite_song_url, theme')
     .eq('id', vaultId)
     .eq('owner_id', user.id)
     .single()
@@ -248,6 +248,7 @@ export async function saveVaultProfileAction(vaultId: string, formData: FormData
       cemetery_row: (formData.get('cemetery_row') as string)?.trim() || null,
       cemetery_hours: (formData.get('cemetery_hours') as string)?.trim() || null,
       cemetery_note: (formData.get('cemetery_note') as string)?.trim() || null,
+      theme: (formData.get('theme') as string)?.trim() || vault.theme || 'classic_emerald',
       updated_at: new Date().toISOString(),
     })
     .eq('id', vaultId)
@@ -258,5 +259,7 @@ export async function saveVaultProfileAction(vaultId: string, formData: FormData
   revalidatePath(`/dashboard/vault/${vaultId}`)
   revalidatePath(`/dashboard/vault/${vaultId}/profil`)
   revalidatePath(`/dashboard/vault/${vaultId}/onizleme`)
-  redirectToProfileWithMessage(vaultId, new URLSearchParams({ saved: '1' }))
+  
+  const nextStep = (formData.get('next_step') as string) || '1'
+  redirectToProfileWithMessage(vaultId, new URLSearchParams({ step: nextStep, saved: '1' }))
 }

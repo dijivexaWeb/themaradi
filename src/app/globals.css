@@ -334,3 +334,152 @@ body {
 .theme-corporate .security-band .text-teal-200 {
   color: #99f6e4 !important;
 }
+
+/* ═══════════════════════════════════════════
+   MEMORIAL PAGE THEME SYSTEM (5 TEMPLATE THEMES)
+   ═══════════════════════════════════════════ */
+
+/* 1. Classic Emerald (Varsayılan - Zümrüt Yeşili & Bej & Altın) */
+.theme-classic_emerald {
+  /* No overrides needed since it's the base style */
+}
+
+/* 2. Warm Sunset (Sıcak Kiremit & Kum Beji & Bronz) */
+.theme-warm_sunset {
+  font-family: 'Lora', Georgia, serif;
+}
+.theme-warm_sunset .font-serif {
+  font-family: 'Lora', Georgia, serif !important;
+}
+.theme-warm_sunset .bg-\[\#0c3327\] { background-color: #8c3b1a !important; }
+.theme-warm_sunset .bg-\[\#091712\] { background-color: #4c1d0b !important; }
+.theme-warm_sunset .bg-\[\#173d31\] { background-color: #632912 !important; }
+.theme-warm_sunset .from-\[\#0c3327\] { --tw-gradient-from: #8c3b1a !important; --tw-gradient-to: rgb(140 59 26 / 0) !important; --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important; }
+.theme-warm_sunset .via-\[\#0c3327\]\/85 { --tw-gradient-stops: var(--tw-gradient-from), #8c3b1ab0 85%, var(--tw-gradient-to) !important; }
+.theme-warm_sunset .to-\[\#0c3327\]\/20 { --tw-gradient-to: #8c3b1a33 !important; }
+
+.theme-warm_sunset .text-\[\#173d31\] { color: #8c3b1a !important; }
+.theme-warm_sunset .text-\[\#0c3327\] { color: #8c3b1a !important; }
+.theme-warm_sunset .bg-\[\#173d31\] { background-color: #8c3b1a !important; }
+
+.theme-warm_sunset .text-\[\#c7a76f\] { color: #d49f6a !important; }
+.theme-warm_sunset .text-\[\#b08340\] { color: #a66a38 !important; }
+.theme-warm_sunset .bg-\[\#c7a76f\] { background-color: #d49f6a !important; }
+.theme-warm_sunset .hover\:bg-\[\#d4b87c\]:hover { background-color: #c48b53 !important; }
+.theme-warm_sunset .border-\[\#c7a76f\]\/25 { border-color: rgba(212, 159, 106, 0.25) !important; }
+.theme-warm_sunset .border-\[\#c7a76f\]\/20 { border-color: rgba(212, 159, 106, 0.2) !important; }
+.theme-warm_sunset .border-\[\#dfbd72\]\/35 { border-color: rgba(212, 159, 106, 0.35) !important; }
+.theme-warm_sunset .border-\[\#dfbd72\]\/30 { border-color: rgba(212, 159, 106, 0.3) !important; }
+
+.theme-warm_sunset .bg-\[\#fbf8f1\] { background-color: #fcf9f4 !important; }
+.theme-warm_sunset .bg-\[\#f7f2e9\] { background-color: #f5ede0 !important; }
+.theme-warm_sunset .bg-\[\#fffdf8\] { background-color: #fffefa !important; }
+.theme-warm_sunset .border-\[\#e6dccb\] { border-color: #ecdcc3 !important; }
+.theme-warm_sunset .border-\[\#e1d5c3\] { border-color: #ebd9be !important; }
+
+/* 3. Midnight Silence (Gece Mavisi/Kömür & Gümüş & Platin) */
+.theme-midnight_silence {
+  font-family: var(--font-geist-sans), Inter, sans-serif;
+}
+.theme-midnight_silence .font-serif {
+  font-family: var(--font-geist-sans), Inter, sans-serif !important;
+}
+.theme-midnight_silence .bg-\[\#0c3327\] { background-color: #0f172a !important; }
+.theme-midnight_silence .bg-\[\#091712\] { background-color: #090d16 !important; }
+.theme-midnight_silence .bg-\[\#173d31\] { background-color: #1e293b !important; }
+.theme-midnight_silence .from-\[\#0c3327\] { --tw-gradient-from: #0f172a !important; --tw-gradient-to: rgb(15 23 42 / 0) !important; --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important; }
+.theme-midnight_silence .via-\[\#0c3327\]\/85 { --tw-gradient-stops: var(--tw-gradient-from), #0f172ab0 85%, var(--tw-gradient-to) !important; }
+.theme-midnight_silence .to-\[\#0c3327\]\/20 { --tw-gradient-to: #0f172a33 !important; }
+
+.theme-midnight_silence .text-\[\#173d31\] { color: #1e293b !important; }
+.theme-midnight_silence .text-\[\#0c3327\] { color: #0f172a !important; }
+.theme-midnight_silence .bg-\[\#173d31\] { background-color: #334155 !important; }
+
+.theme-midnight_silence .text-\[\#c7a76f\] { color: #94a3b8 !important; }
+.theme-midnight_silence .text-\[\#b08340\] { color: #64748b !important; }
+.theme-midnight_silence .bg-\[\#c7a76f\] { background-color: #64748b !important; }
+.theme-midnight_silence .hover\:bg-\[\#d4b87c\]:hover { background-color: #475569 !important; }
+.theme-midnight_silence .border-\[\#c7a76f\]\/25 { border-color: rgba(148, 163, 184, 0.25) !important; }
+.theme-midnight_silence .border-\[\#c7a76f\]\/20 { border-color: rgba(148, 163, 184, 0.2) !important; }
+.theme-midnight_silence .border-\[\#dfbd72\]\/35 { border-color: rgba(148, 163, 184, 0.35) !important; }
+.theme-midnight_silence .border-\[\#dfbd72\]\/30 { border-color: rgba(148, 163, 184, 0.3) !important; }
+
+.theme-midnight_silence .bg-\[\#fbf8f1\] { background-color: #f8fafc !important; }
+.theme-midnight_silence .bg-\[\#f7f2e9\] { background-color: #f1f5f9 !important; }
+.theme-midnight_silence .bg-\[\#fffdf8\] { background-color: #ffffff !important; }
+.theme-midnight_silence .border-\[\#e6dccb\] { border-color: #e2e8f0 !important; }
+.theme-midnight_silence .border-\[\#e1d5c3\] { border-color: #cbd5e1 !important; }
+
+/* 4. Pure Light (Kar Beyazı & Açık Gri & İnce Altın) */
+.theme-pure_light {
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+}
+.theme-pure_light .font-serif {
+  font-family: var(--font-geist-sans), system-ui, sans-serif !important;
+}
+.theme-pure_light .bg-\[\#0c3327\] { background-color: #f8fafc !important; }
+.theme-pure_light .bg-\[\#091712\] { background-color: #f1f5f9 !important; }
+.theme-pure_light .bg-\[\#173d31\] { background-color: #e2e8f0 !important; }
+.theme-pure_light .from-\[\#0c3327\] { --tw-gradient-from: #f8fafc !important; --tw-gradient-to: rgb(248 250 252 / 0) !important; --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important; }
+.theme-pure_light .via-\[\#0c3327\]\/85 { --tw-gradient-stops: var(--tw-gradient-from), #f8fafcb0 85%, var(--tw-gradient-to) !important; }
+.theme-pure_light .to-\[\#0c3327\]\/20 { --tw-gradient-to: #f8fafc33 !important; }
+
+.theme-pure_light .text-white { color: #0f172a !important; }
+.theme-pure_light .text-\[\#efe7d8\]\/80 { color: #475569 !important; }
+.theme-pure_light .text-\[\#cfc3ad\] { color: #64748b !important; }
+.theme-pure_light .bg-white\/5 { background-color: rgba(15, 23, 42, 0.04) !important; border-color: rgba(15, 23, 42, 0.1) !important; }
+.theme-pure_light .bg-\[\#091712\]\/55 { background-color: rgba(255, 255, 255, 0.8) !important; border-color: #e2e8f0 !important; }
+.theme-pure_light .bg-\[\#091712\]\/65 { background-color: rgba(255, 255, 255, 0.8) !important; border-color: #e2e8f0 !important; }
+.theme-pure_light .text-\[\#efe7d8\] { color: #334155 !important; }
+
+.theme-pure_light .text-\[\#173d31\] { color: #0f172a !important; }
+.theme-pure_light .text-\[\#0c3327\] { color: #0f172a !important; }
+.theme-pure_light .bg-\[\#173d31\] { background-color: #f1f5f9 !important; }
+
+.theme-pure_light .text-\[\#c7a76f\] { color: #b45309 !important; }
+.theme-pure_light .text-\[\#b08340\] { color: #b45309 !important; }
+.theme-pure_light .bg-\[\#c7a76f\] { background-color: #b45309 !important; color: #ffffff !important; }
+.theme-pure_light .hover\:bg-\[\#d4b87c\]:hover { background-color: #92400e !important; }
+.theme-pure_light .border-\[\#c7a76f\]\/25 { border-color: rgba(180, 83, 9, 0.25) !important; }
+.theme-pure_light .border-\[\#c7a76f\]\/20 { border-color: rgba(180, 83, 9, 0.2) !important; }
+.theme-pure_light .border-\[\#dfbd72\]\/35 { border-color: rgba(180, 83, 9, 0.3) !important; }
+.theme-pure_light .border-\[\#dfbd72\]\/30 { border-color: rgba(180, 83, 9, 0.25) !important; }
+
+.theme-pure_light .bg-\[\#fbf8f1\] { background-color: #ffffff !important; }
+.theme-pure_light .bg-\[\#f7f2e9\] { background-color: #f8fafc !important; }
+.theme-pure_light .bg-\[\#fffdf8\] { background-color: #ffffff !important; }
+.theme-pure_light .border-\[\#e6dccb\] { border-color: #f1f5f9 !important; }
+.theme-pure_light .border-\[\#e1d5c3\] { border-color: #e2e8f0 !important; }
+
+/* 5. Rustic Autumn (Doğasever/Nostaljik - Zeytin/Haki & Sonbahar & Garamond) */
+.theme-rustic_autumn {
+  font-family: Garamond, Georgia, serif;
+}
+.theme-rustic_autumn .font-serif {
+  font-family: Garamond, Georgia, serif !important;
+}
+.theme-rustic_autumn .bg-\[\#0c3327\] { background-color: #3f4e3f !important; }
+.theme-rustic_autumn .bg-\[\#091712\] { background-color: #2b352b !important; }
+.theme-rustic_autumn .bg-\[\#173d31\] { background-color: #323e32 !important; }
+.theme-rustic_autumn .from-\[\#0c3327\] { --tw-gradient-from: #3f4e3f !important; --tw-gradient-to: rgb(63 78 63 / 0) !important; --tw-gradient-stops: var(--tw-gradient-from), var(--tw-gradient-to) !important; }
+.theme-rustic_autumn .via-\[\#0c3327\]\/85 { --tw-gradient-stops: var(--tw-gradient-from), #3f4e3fb0 85%, var(--tw-gradient-to) !important; }
+.theme-rustic_autumn .to-\[\#0c3327\]\/20 { --tw-gradient-to: #3f4e3f33 !important; }
+
+.theme-rustic_autumn .text-\[\#173d31\] { color: #3f4e3f !important; }
+.theme-rustic_autumn .text-\[\#0c3327\] { color: #3f4e3f !important; }
+.theme-rustic_autumn .bg-\[\#173d31\] { background-color: #3f4e3f !important; }
+
+.theme-rustic_autumn .text-\[\#c7a76f\] { color: #ca8a04 !important; }
+.theme-rustic_autumn .text-\[\#b08340\] { color: #a16207 !important; }
+.theme-rustic_autumn .bg-\[\#c7a76f\] { background-color: #ca8a04 !important; }
+.theme-rustic_autumn .hover\:bg-\[\#d4b87c\]:hover { background-color: #a16207 !important; }
+.theme-rustic_autumn .border-\[\#c7a76f\]\/25 { border-color: rgba(202, 138, 4, 0.25) !important; }
+.theme-rustic_autumn .border-\[\#c7a76f\]\/20 { border-color: rgba(202, 138, 4, 0.2) !important; }
+.theme-rustic_autumn .border-\[\#dfbd72\]\/35 { border-color: rgba(202, 138, 4, 0.3) !important; }
+.theme-rustic_autumn .border-\[\#dfbd72\]\/30 { border-color: rgba(202, 138, 4, 0.25) !important; }
+
+.theme-rustic_autumn .bg-\[\#fbf8f1\] { background-color: #fbfaf7 !important; }
+.theme-rustic_autumn .bg-\[\#f7f2e9\] { background-color: #f5f3ed !important; }
+.theme-rustic_autumn .bg-\[\#fffdf8\] { background-color: #ffffff !important; }
+.theme-rustic_autumn .border-\[\#e6dccb\] { border-color: #e5e3dd !important; }
+.theme-rustic_autumn .border-\[\#e1d5c3\] { border-color: #dcdad2 !important; }

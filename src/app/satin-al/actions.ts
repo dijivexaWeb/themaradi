@@ -163,7 +163,7 @@ export async function purchaseMemorialAction(_prev: unknown, formData: FormData)
     return { emailConfirmationSent: true as const, email: senderEmail }
   }
 
-  redirect(`/dashboard/vault/${vault.id}?purchased=1`)
+  redirect(`/anma-paneli/${vault.id}?purchased=1`)
 }
 
 export async function purchaseVaultAction(_prev: unknown, formData: FormData) {

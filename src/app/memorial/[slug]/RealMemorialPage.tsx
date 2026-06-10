@@ -8,6 +8,7 @@ import AudioPlayerSection from './AudioPlayerSection'
 import RealMemorialInteractionsWrapper from './RealMemorialInteractionsWrapper'
 import TimelineSection from './TimelineSection'
 import { getTurnstileSiteKey } from '@/lib/turnstile'
+import { getTranslation } from '@/i18n/server'
 
 interface VaultRow {
   id: string
@@ -31,6 +32,7 @@ interface VaultRow {
   product_type: string
   status: string
   pub_settings: Record<string, boolean> | null
+  theme: string | null
 }
 
 interface Props {
@@ -66,9 +68,9 @@ function getCoordinate(value: unknown): string | null {
 export default async function RealMemorialPage({ vault, isPreview = false }: Props) {
   const id = vault.id
   const supabase = await createClient()
+  const { t, lang } = await getTranslation()
 
   const v = vault as unknown as Record<string, unknown>
-
   const [
     { data: photos },
     { data: videos },
@@ -144,23 +146,23 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
     : null
 
   const tabs = [
-    { href: '#hikaye', label: 'Hayat Hikayesi', show: hasStory },
-    { href: '#kronoloji', label: 'Kronoloji', show: hasTimeline },
-    { href: '#videolar', label: 'Videolar', show: hasVideos },
-    { href: '#fotograflar', label: 'Fotoğraflar', show: hasPhotos },
-    { href: '#son-mesaj', label: 'Son Mesaj', show: !!vault.last_message },
-    { href: '#anilar', label: 'Anılar', show: hasRegularMemories },
-    { href: '#taziye', label: 'Taziye', show: true },
-    { href: '#ziyaret', label: 'Ziyaret', show: hasCemetery },
+    { href: '#hikaye', label: t.memorial.lifeStory, show: hasStory },
+    { href: '#kronoloji', label: t.memorial.chronology, show: hasTimeline },
+    { href: '#videolar', label: t.memorial.videoMemories, show: hasVideos },
+    { href: '#fotograflar', label: t.memorial.photoArchive, show: hasPhotos },
+    { href: '#son-mesaj', label: t.memorial.lastMessageTitle, show: !!vault.last_message },
+    { href: '#anilar', label: t.memorial.memories, show: hasRegularMemories },
+    { href: '#taziye', label: t.memorial.guestbook, show: true },
+    { href: '#ziyaret', label: t.memorial.visitInfo, show: hasCemetery },
   ].filter((t) => t.show)
 
   return (
-    <div className="min-h-screen bg-[#fbf8f1] text-[#173d31]">
+    <div className={`theme-${vault.theme || 'classic_emerald'} min-h-screen bg-[#fbf8f1] text-[#173d31]`}>
 
       {/* ── Preview banner ── */}
       {isPreview && (
         <div className="bg-[#c7a76f] px-4 py-2 text-center text-xs font-semibold text-[#091712]">
-          Önizleme Modu — Bu sayfa henüz yayınlanmamış
+          {t.memorial.previewModeBanner}
         </div>
       )}
 
@@ -168,7 +170,7 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
       <nav className="sticky top-0 z-40 border-b border-[#e6dccb]/50 bg-[#fbf8f1]/96 shadow-sm backdrop-blur">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5 sm:px-8">
           <BrandLogo />
-          <div className="text-xs text-[#8a7a64]">Dijital Anma Profili</div>
+          <div className="text-xs text-[#8a7a64]">{t.memorial.digitalMemorialProfile}</div>
         </div>
       </nav>
 
@@ -194,7 +196,7 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
           <div className="order-2 rounded-2xl border border-[#c7a76f]/20 bg-[#091712]/55 p-5 shadow-2xl shadow-black/20 backdrop-blur-sm sm:p-6 lg:order-1">
             <div className="mb-3 flex items-center gap-3 text-[#c7a76f]">
               <span className="h-px w-8 bg-[#c7a76f]" />
-              <span className="text-xs tracking-[0.22em] uppercase">Ailesinden</span>
+              <span className="text-xs tracking-[0.22em] uppercase">{t.memorial.fromFamily}</span>
             </div>
             <p className="font-serif text-lg leading-8 text-white sm:text-xl sm:leading-9">
               {vault.tagline ?? 'Saygıyla anıyoruz. Bize bıraktığı sevgi ve hatıralar her zaman kalbimizde yaşayacak.'}
@@ -203,7 +205,7 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
               href="#taziye"
               className="mt-5 inline-flex items-center gap-2 rounded-lg bg-[#c7a76f] px-4 py-2.5 text-xs font-semibold text-[#0c3327] transition hover:bg-[#d4b87c]"
             >
-              Anı Defteri <PenLine className="h-4 w-4" />
+              {t.memorial.guestbook} <PenLine className="h-4 w-4" />
             </a>
           </div>
 
@@ -211,7 +213,7 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
           <div className="order-1 text-center lg:order-2">
             <div className="mx-auto mb-4 flex w-fit items-center gap-3 text-[#c7a76f]">
               <span className="h-px w-8 bg-[#c7a76f]" />
-              <span className="text-xs tracking-[0.25em] uppercase">Dijital Anıt Profili</span>
+              <span className="text-xs tracking-[0.25em] uppercase">{t.memorial.digitalMonumentProfile}</span>
               <span className="h-px w-8 bg-[#c7a76f]" />
             </div>
 
@@ -243,19 +245,19 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
               {yearsLived !== null && (
                 <div className="rounded-xl border border-[#c7a76f]/25 bg-white/5 px-3 py-3 backdrop-blur-sm">
                   <div className="font-serif text-2xl text-white sm:text-3xl">{yearsLived}</div>
-                  <div className="mt-1 text-xs text-[#c7a76f]">yıl</div>
+                  <div className="mt-1 text-xs text-[#c7a76f]">{t.memorial.years}</div>
                 </div>
               )}
               {daysSince !== null && (
                 <div className="rounded-xl border border-[#c7a76f]/25 bg-white/5 px-3 py-3 backdrop-blur-sm">
-                  <div className="font-serif text-2xl text-white sm:text-3xl">{daysSince.toLocaleString('tr-TR')}</div>
-                  <div className="mt-1 text-xs text-[#c7a76f]">gün oldu</div>
+                  <div className="font-serif text-2xl text-white sm:text-3xl">{daysSince.toLocaleString(lang)}</div>
+                  <div className="mt-1 text-xs text-[#c7a76f]">{t.memorial.daysAgo}</div>
                 </div>
               )}
             </div>
             {daysSince !== null && (
               <div className="mt-3 rounded-xl border border-[#c7a76f]/25 bg-white/5 px-3 py-2.5 text-[10px] uppercase tracking-[0.16em] text-[#c7a76f] backdrop-blur-sm">
-                Ebediyete yürüyeli
+                {t.memorial.sincePassing}
               </div>
             )}
           </div>
@@ -264,23 +266,23 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
           <div className="order-3 rounded-2xl border border-[#c7a76f]/20 bg-[#091712]/55 p-5 shadow-2xl shadow-black/20 backdrop-blur-sm sm:p-6">
             <div className="mb-3 flex items-center gap-3 text-[#c7a76f]">
               <span className="h-px w-8 bg-[#c7a76f]" />
-              <span className="text-xs tracking-[0.22em] uppercase">Ondan kalan söz</span>
+              <span className="text-xs tracking-[0.22em] uppercase">{t.memorial.wordsFromThemLimit}</span>
             </div>
             <div className="font-serif text-5xl leading-none text-[#c7a76f]/35">&ldquo;</div>
             <p className="mt-1 font-serif text-lg italic leading-8 text-white sm:text-xl sm:leading-9">
-              {vault.last_message ?? 'Bu kişi için henüz bir son mesaj eklenmemiş.'}
+              {vault.last_message ?? t.memorial.noLastMessage}
             </p>
             <a
               href="#son-mesaj"
               className="mt-5 inline-flex items-center gap-2 rounded-lg border border-[#c7a76f]/40 bg-white/5 px-4 py-2.5 text-xs font-semibold text-white transition hover:bg-white/10"
             >
-              Anıları Keşfet <ArrowRight className="h-4 w-4" />
+              {t.memorial.exploreMemories} <ArrowRight className="h-4 w-4" />
             </a>
           </div>
 
           {hasDonationPreference && (
             <div className="order-4 rounded-2xl border border-[#c7a76f]/25 bg-[#091712]/65 p-5 text-center shadow-2xl shadow-black/20 backdrop-blur-sm lg:hidden">
-              <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#c7a76f]">Bağış Yönlendirmesi</div>
+              <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#c7a76f]">{t.memorial.donationPreference}</div>
               <p className="mt-2 text-xs leading-5 text-[#efe7d8]">{vault.donation_preference}</p>
               {vault.donation_url && (
                 <a
@@ -289,7 +291,7 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
                   rel="noopener noreferrer"
                   className="mt-3 inline-flex items-center justify-center rounded-lg bg-[#c7a76f] px-4 py-2 text-xs font-semibold text-[#091712] transition hover:bg-[#d4b87c]"
                 >
-                  Bağış yapmak için tıklayın
+                  {t.memorial.clickToDonate}
                 </a>
               )}
             </div>
@@ -297,11 +299,11 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
         </div>
 
         <div className="absolute bottom-4 left-1/2 hidden w-[min(520px,calc(100%-48px))] -translate-x-1/2 flex-col items-center gap-2 lg:flex">
-          <span className="text-[10px] tracking-[0.2em] text-[#c7a76f]/50 uppercase">Kaydır</span>
+          <span className="text-[10px] tracking-[0.2em] text-[#c7a76f]/50 uppercase">{t.memorial.scroll}</span>
           <div className="h-10 w-px bg-gradient-to-b from-[#c7a76f]/50 to-transparent" />
           {hasDonationPreference && (
             <div className="w-full rounded-2xl border border-[#c7a76f]/25 bg-[#091712]/70 px-5 py-4 text-center shadow-2xl shadow-black/20 backdrop-blur-sm">
-              <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#c7a76f]">Bağış Yönlendirmesi</div>
+              <div className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#c7a76f]">{t.memorial.donationPreference}</div>
               <p className="mt-2 text-xs leading-5 text-[#efe7d8]">{vault.donation_preference}</p>
               {vault.donation_url && (
                 <a
@@ -310,7 +312,7 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
                   rel="noopener noreferrer"
                   className="mt-3 inline-flex items-center justify-center rounded-lg bg-[#c7a76f] px-4 py-2 text-xs font-semibold text-[#091712] transition hover:bg-[#d4b87c]"
                 >
-                  Bağış yapmak için tıklayın
+                  {t.memorial.clickToDonate}
                 </a>
               )}
             </div>
@@ -323,13 +325,13 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
           <div className="mx-auto grid max-w-7xl border-b border-[#2a5a45] text-[#efe7d8] md:grid-cols-2">
             {vault.profession && (
               <div className="border-[#2a5a45] px-6 py-6 md:border-r">
-                <div className="text-xs font-semibold uppercase tracking-[0.2em] text-[#c7a76f]">Meslek</div>
+                <div className="text-xs font-semibold uppercase tracking-[0.2em] text-[#c7a76f]">{t.memorial.profession}</div>
                 <div className="mt-2 font-serif text-2xl text-white">{vault.profession}</div>
               </div>
             )}
             {vault.hobbies && (
               <div className="px-6 py-6">
-                <div className="text-xs font-semibold uppercase tracking-[0.2em] text-[#c7a76f]">Hobileri</div>
+                <div className="text-xs font-semibold uppercase tracking-[0.2em] text-[#c7a76f]">{t.memorial.hobbies}</div>
                 <div className="mt-2 font-serif text-2xl text-white">{vault.hobbies}</div>
               </div>
             )}
@@ -339,29 +341,29 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
           {yearsLived !== null && (
             <div className="flex flex-col items-center justify-center gap-1 px-6 py-7 text-center">
               <div className="font-serif text-5xl text-white">{yearsLived}</div>
-              <div className="text-sm font-semibold text-[#c7a76f]">yıl</div>
-              <div className="mt-1 text-xs text-[#6b9e86]">Bereketli bir ömür</div>
+              <div className="text-sm font-semibold text-[#c7a76f]">{t.memorial.yearsLived}</div>
+              <div className="mt-1 text-xs text-[#6b9e86]">{t.memorial.blessedLife}</div>
             </div>
           )}
           {(allMemories?.length ?? 0) > 0 && (
             <div className="flex flex-col items-center justify-center gap-1 px-6 py-7 text-center">
               <div className="font-serif text-5xl text-white">{allMemories!.length}</div>
-              <div className="text-sm font-semibold text-[#c7a76f]">anı</div>
-              <div className="mt-1 text-xs text-[#6b9e86]">Paylaşılan hatıra</div>
+              <div className="text-sm font-semibold text-[#c7a76f]">{t.memorial.memoriesCount}</div>
+              <div className="mt-1 text-xs text-[#6b9e86]">{t.memorial.sharedMemory}</div>
             </div>
           )}
           {hasFamilyMembers && (
             <div className="flex flex-col items-center justify-center gap-1 px-6 py-7 text-center">
               <div className="font-serif text-5xl text-white">{familyMembers!.length}</div>
-              <div className="text-sm font-semibold text-[#c7a76f]">kişi</div>
-              <div className="mt-1 text-xs text-[#6b9e86]">Aile ağacı</div>
+              <div className="text-sm font-semibold text-[#c7a76f]">{t.memorial.people}</div>
+              <div className="mt-1 text-xs text-[#6b9e86]">{t.memorial.familyTree}</div>
             </div>
           )}
           {hasPhotos && (
             <div className="flex flex-col items-center justify-center gap-1 px-6 py-7 text-center">
               <div className="font-serif text-5xl text-white">{photos!.length}</div>
-              <div className="text-sm font-semibold text-[#c7a76f]">fotoğraf</div>
-              <div className="mt-1 text-xs text-[#6b9e86]">Arşivlenen an</div>
+              <div className="text-sm font-semibold text-[#c7a76f]">{t.memorial.photosCount}</div>
+              <div className="mt-1 text-xs text-[#6b9e86]">{t.memorial.archivedMoments}</div>
             </div>
           )}
         </div>
@@ -391,11 +393,10 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
             <div>
               <div className="flex items-center gap-3 text-[#b08340]">
                 <span className="h-px w-10 bg-[#c7a76f]" />
-                <span className="text-xs tracking-[0.2em] uppercase">Hayat Hikayesi</span>
+                <span className="text-xs tracking-[0.2em] uppercase">{t.memorial.lifeStory}</span>
               </div>
               <h2 className="mt-3 font-serif text-5xl leading-tight text-[#173d31]">
-                Bir insanın<br />
-                <span className="text-[#b08340]">dolu dolu hayatı.</span>
+                {t.memorial.lifeStoryHeading}
               </h2>
               {vault.biography ? (
                 <div className="mt-7 space-y-5 text-base leading-8 text-[#4c463c]">
@@ -405,7 +406,7 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
                 </div>
               ) : (
                 <p className="mt-7 max-w-2xl text-base leading-8 text-[#4c463c]">
-                  Bu sayfada onun hayatından izler, kişisel bilgileri ve sevdiklerinin bıraktığı hatıralar yer alıyor.
+                  {t.memorial.defaultStoryText}
                 </p>
               )}
             </div>
@@ -415,11 +416,11 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
                 <div className="rounded-2xl border border-[#e1d5c3] bg-[#fffdf8] p-6 shadow-lg shadow-[#4d3d26]/6">
                   <div className="flex items-center gap-3 text-[#b08340]">
                     <span className="h-px w-8 bg-[#c7a76f]" />
-                    <span className="text-xs tracking-[0.2em] uppercase">En Sevdiği Şarkı</span>
+                    <span className="text-xs tracking-[0.2em] uppercase">{t.memorial.favoriteSong}</span>
                   </div>
                   <div className="mt-4 rounded-xl border border-[#eadfca] bg-[#fbf8f1] p-4">
                     <div className="font-serif text-lg text-[#173d31]">
-                      {vault.favorite_song_title ?? 'Onu hatırlatan şarkı'}
+                      {vault.favorite_song_title ?? t.memorial.songReminder}
                     </div>
                     <audio controls src={vault.favorite_song_url ?? undefined} className="mt-3 h-9 w-full" />
                   </div>
@@ -435,7 +436,7 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
                     <div className="h-px flex-1 bg-[#e1d5c3]" />
                     <div className="text-right">
                       <div className="font-serif text-base text-[#173d31]">{vault.display_name}</div>
-                      <div className="text-xs text-[#8a7a64]">Ailesinden</div>
+                      <div className="text-xs text-[#8a7a64]">{t.memorial.fromFamily}</div>
                     </div>
                   </div>
                 </div>
@@ -446,14 +447,14 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
                     <div className="rounded-xl border border-[#e1d5c3] bg-[#fffdf8] p-5 text-center">
                       <Feather className="mx-auto h-7 w-7 text-[#b08340]" />
                       <div className="mt-2 font-serif text-3xl text-[#173d31]">{yearsLived}</div>
-                      <div className="mt-1 text-xs text-[#665d50]">Yıl yaşadı</div>
+                      <div className="mt-1 text-xs text-[#665d50]">{t.memorial.yearsLived}</div>
                     </div>
                   )}
                   {daysSince !== null && (
                     <div className="rounded-xl border border-[#e1d5c3] bg-[#fffdf8] p-5 text-center">
                       <CalendarDays className="mx-auto h-7 w-7 text-[#b08340]" />
-                      <div className="mt-2 font-serif text-3xl text-[#173d31]">{daysSince.toLocaleString('tr-TR')}</div>
-                      <div className="mt-1 text-xs text-[#665d50]">Gün oldu</div>
+                      <div className="mt-2 font-serif text-3xl text-[#173d31]">{daysSince.toLocaleString(lang)}</div>
+                      <div className="mt-1 text-xs text-[#665d50]">{t.memorial.daysAgo}</div>
                     </div>
                   )}
                 </div>
@@ -471,15 +472,15 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
               <div>
                 <div className="flex items-center gap-3 text-[#c7a76f]">
                   <span className="h-px w-10 bg-[#c7a76f]" />
-                  <span className="text-xs tracking-[0.2em] uppercase">Yaşam Kronolojisi</span>
+                  <span className="text-xs tracking-[0.2em] uppercase">{t.memorial.chronology}</span>
                 </div>
-                <h2 className="mt-3 font-serif text-5xl text-white">Zaman Yolculuğu</h2>
+                <h2 className="mt-3 font-serif text-5xl text-white">{t.memorial.timeTravel}</h2>
                 <p className="mt-4 max-w-xl text-sm leading-7 text-[#b8aa93]">
-                  Önemli anlara bir yolculuk.{yearsLived !== null ? ` ${yearsLived} yıllık hikaye.` : ''}
+                  {t.memorial.journeyToMoments}{yearsLived !== null ? ` ${yearsLived} ${t.memorial.yearsStory}` : ''}
                 </p>
               </div>
               <div className="flex w-full gap-1 rounded-xl border border-white/10 bg-white/[0.04] p-1 text-xs font-semibold text-[#cfc3ad] sm:w-auto">
-                {['Zaman Çizgisi', 'Slayt Gösterisi', 'Yaş Seçimi'].map((label, i) => (
+                {[t.memorial.timeline, t.memorial.slideshow, t.memorial.ageSelection].map((label, i) => (
                   <div
                     key={label}
                     className={`flex-1 rounded-lg px-4 py-2.5 text-center transition sm:flex-none ${
@@ -512,11 +513,10 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
             <div className="mb-10">
               <div className="flex items-center gap-3 text-[#c7a76f]">
                 <span className="h-px w-10 bg-[#c7a76f]" />
-                <span className="text-xs tracking-[0.2em] uppercase">Video Anılar</span>
+                <span className="text-xs tracking-[0.2em] uppercase">{t.memorial.videoMemories}</span>
               </div>
               <h2 className="mt-3 font-serif text-5xl text-white">
-                Hareket eden<br />
-                <span className="text-[#c7a76f]">anlar.</span>
+                {t.memorial.movingMoments}
               </h2>
             </div>
 
@@ -577,14 +577,13 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
               <div>
                 <div className="flex items-center gap-3 text-[#b08340]">
                   <span className="h-px w-10 bg-[#c7a76f]" />
-                  <span className="text-xs tracking-[0.2em] uppercase">Fotoğraf Arşivi</span>
+                  <span className="text-xs tracking-[0.2em] uppercase">{t.memorial.photoArchive}</span>
                 </div>
                 <h2 className="mt-3 font-serif text-5xl text-[#173d31]">
-                  Donmuş anlar,<br />
-                  <span className="text-[#b08340]">canlı hatıralar.</span>
+                  {t.memorial.frozenMoments}
                 </h2>
               </div>
-              <span className="hidden text-sm text-[#8a7a64] sm:block">{photos!.length} fotoğraf</span>
+              <span className="hidden text-sm text-[#8a7a64] sm:block">{photos!.length} {t.memorial.photos}</span>
             </div>
 
             <div className="columns-2 gap-4 md:columns-3">
@@ -624,11 +623,10 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
           <div className="mx-auto max-w-4xl text-center">
             <div className="flex items-center justify-center gap-3 text-[#b08340]">
               <span className="h-px w-10 bg-[#c7a76f]" />
-              <span className="text-xs tracking-[0.2em] uppercase">Bıraktığı Son Mesaj</span>
+              <span className="text-xs tracking-[0.2em] uppercase">{t.memorial.lastMessageTitle}</span>
             </div>
             <h2 className="mt-3 font-serif text-5xl text-[#173d31]">
-              Hayattayken<br />
-              sevdiklerine bıraktığı satırlar.
+              {t.memorial.linesLeftForLovedOnes}
             </h2>
           </div>
 
@@ -677,11 +675,10 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
             <div className="mb-12 text-center">
               <div className="flex items-center justify-center gap-3 text-[#b08340]">
                 <span className="h-px w-10 bg-[#c7a76f]" />
-                <span className="text-xs tracking-[0.2em] uppercase">Öne Çıkan Anılar</span>
+                <span className="text-xs tracking-[0.2em] uppercase">{t.memorial.featuredMemories}</span>
               </div>
               <h2 className="mt-3 font-serif text-5xl text-[#173d31]">
-                Sevenlerinin<br />
-                <span className="text-[#b08340]">sözleriyle.</span>
+                {t.memorial.withWordsOfLovedOnes}
               </h2>
             </div>
 
@@ -701,7 +698,7 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
                       <div className="font-serif text-base text-[#173d31]">{mem.title}</div>
                       {mem.memory_date && (
                         <div className="text-xs text-[#8a7a64]">
-                          {new Date(mem.memory_date).toLocaleDateString('tr-TR', { year: 'numeric', month: 'long' })}
+                          {new Date(mem.memory_date).toLocaleDateString(lang, { year: 'numeric', month: 'long' })}
                         </div>
                       )}
                     </div>
@@ -719,11 +716,10 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
           <div className="mx-auto max-w-4xl">
             <div className="mb-6 flex items-center gap-3 text-[#b08340]">
               <span className="h-px w-10 bg-[#c7a76f]" />
-              <span className="text-xs tracking-[0.2em] uppercase">Anılar</span>
+              <span className="text-xs tracking-[0.2em] uppercase">{t.memorial.memories}</span>
             </div>
             <h2 className="mb-8 font-serif text-4xl text-[#173d31] sm:text-5xl">
-              Sevenlerinin<br />
-              <span className="text-[#b08340]">bıraktığı izler.</span>
+              {t.memorial.tracesLeftByLovedOnes}
             </h2>
             <div className="space-y-3">
               {regularMemories.map((m) => {
@@ -758,7 +754,7 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
                       <div className="min-w-0 flex-1">
                         {m.memory_date && (
                           <p className="mb-1 text-xs font-semibold tracking-wide text-[#b08340]">
-                            {new Date(m.memory_date).toLocaleDateString('tr-TR', { year: 'numeric', month: 'long', day: 'numeric' })}
+                            {new Date(m.memory_date).toLocaleDateString(lang, { year: 'numeric', month: 'long', day: 'numeric' })}
                           </p>
                         )}
                         {m.title && <h3 className="mb-1.5 font-serif text-base text-[#173d31] sm:text-lg">{m.title}</h3>}
@@ -786,11 +782,10 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
               <div>
                 <div className="flex items-center justify-center gap-3 text-[#c7a76f] lg:justify-start">
                   <span className="h-px w-10 bg-[#c7a76f]" />
-                  <span className="text-xs tracking-[0.2em] uppercase">Aile Bağları</span>
+                  <span className="text-xs tracking-[0.2em] uppercase">{t.memorial.familyBonds}</span>
                 </div>
                 <h2 className="mt-3 font-serif text-4xl text-white sm:text-5xl">
-                  Köklerden<br />
-                  <span className="text-[#c7a76f]">yeni nesillere.</span>
+                  {t.memorial.rootsToNewGenerations}
                 </h2>
               </div>
             </div>
@@ -831,11 +826,10 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
             <div className="mb-10">
               <div className="flex items-center gap-3 text-[#b08340]">
                 <span className="h-px w-10 bg-[#c7a76f]" />
-                <span className="text-xs tracking-[0.2em] uppercase">Ziyaret Bilgisi</span>
+                <span className="text-xs tracking-[0.2em] uppercase">{t.memorial.visitInfo}</span>
               </div>
               <h2 className="mt-3 font-serif text-5xl text-[#173d31]">
-                Mezarda<br />
-                <span className="text-[#b08340]">bir ziyaret.</span>
+                {t.memorial.visitAtGrave}
               </h2>
             </div>
 
@@ -843,12 +837,12 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
               <div className="grid bg-[#fffdf8] lg:grid-cols-[1fr_1.5fr]">
                 {/* Bilgi paneli */}
                 <div className="space-y-5 border-b border-[#e1d5c3] p-5 lg:border-b-0 lg:border-r lg:p-7">
-                  <h3 className="font-serif text-2xl text-[#173d31]">Mezar Bilgileri</h3>
+                  <h3 className="font-serif text-2xl text-[#173d31]">{t.memorial.graveInfo}</h3>
                   <div className="space-y-4 text-sm">
                     <div className="flex items-start gap-3">
                       <MapPin className="mt-0.5 h-5 w-5 shrink-0 text-[#b08340]" />
                       <div>
-                        <div className="text-xs text-[#8a7a64]">Mezarlık</div>
+                        <div className="text-xs text-[#8a7a64]">{t.memorial.cemetery}</div>
                         <div className="font-serif text-base text-[#173d31]">{vault.cemetery_name}</div>
                         {vault.cemetery_address && (
                           <div className="mt-0.5 text-xs text-[#8a7a64]">{vault.cemetery_address}</div>
@@ -859,7 +853,7 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
                       <div className="flex items-start gap-3">
                         <Navigation className="mt-0.5 h-5 w-5 shrink-0 text-[#b08340]" />
                         <div>
-                          <div className="text-xs text-[#8a7a64]">Ada / Parsel</div>
+                          <div className="text-xs text-[#8a7a64]">{t.memorial.plot}</div>
                           <div className="font-serif text-base text-[#173d31]">{v.cemetery_plot as string}</div>
                         </div>
                       </div>
@@ -868,7 +862,7 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
                       <div className="flex items-start gap-3">
                         <Navigation className="mt-0.5 h-5 w-5 shrink-0 text-[#b08340]" />
                         <div>
-                          <div className="text-xs text-[#8a7a64]">Sıra / Numara</div>
+                          <div className="text-xs text-[#8a7a64]">{t.memorial.row}</div>
                           <div className="font-serif text-base text-[#173d31]">{v.cemetery_row as string}</div>
                         </div>
                       </div>
@@ -877,7 +871,7 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
                       <div className="flex items-start gap-3">
                         <Clock className="mt-0.5 h-5 w-5 shrink-0 text-[#b08340]" />
                         <div>
-                          <div className="text-xs text-[#8a7a64]">Ziyaret Saatleri</div>
+                          <div className="text-xs text-[#8a7a64]">{t.memorial.visitHours}</div>
                           <div className="font-serif text-base text-[#173d31]">{v.cemetery_hours as string}</div>
                         </div>
                       </div>
@@ -886,7 +880,7 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
                       <div className="flex items-start gap-3">
                         <MapPin className="mt-0.5 h-5 w-5 shrink-0 text-[#b08340]" />
                         <div>
-                          <div className="text-xs text-[#8a7a64]">Vefat Yeri</div>
+                          <div className="text-xs text-[#8a7a64]">{t.memorial.deathPlace}</div>
                           <div className="font-serif text-base text-[#173d31]">{vault.death_place}</div>
                         </div>
                       </div>
@@ -895,7 +889,7 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
                   {(v.cemetery_note as string | null) && (
                     <div className="rounded-xl border border-[#e1d5c3] bg-[#f7f2e9] p-4">
                       <p className="text-xs leading-6 text-[#5b5245]">
-                        <span className="font-semibold text-[#173d31]">Not:</span> {v.cemetery_note as string}
+                        <span className="font-semibold text-[#173d31]">{t.memorial.note}</span> {v.cemetery_note as string}
                       </p>
                     </div>
                   )}
@@ -909,7 +903,7 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
                           className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#174f35] px-4 py-3 text-sm font-semibold text-white transition hover:bg-[#123f2b]"
                         >
                           <Navigation className="h-4 w-4" />
-                          Yol Tarifi Al
+                          {t.memorial.getDirections}
                         </a>
                       )}
                       {cemeteryMapUrl && (
@@ -920,7 +914,7 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
                           className="inline-flex items-center justify-center gap-2 rounded-xl border border-[#e1d5c3] bg-white px-4 py-3 text-sm font-semibold text-[#174f35] transition hover:bg-[#f7f2e9]"
                         >
                           <MapPin className="h-4 w-4" />
-                          Haritada Aç
+                          {t.memorial.openInMap}
                         </a>
                       )}
                     </div>
@@ -949,7 +943,7 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
                     <div className="flex min-h-[320px] items-center justify-center bg-[#f7f2e9] text-[#8a7a64]">
                       <div className="text-center">
                         <div className="mb-2 text-4xl">🗺️</div>
-                        <p className="text-sm">Konum bilgisi eklenmemiş</p>
+                        <p className="text-sm">{t.memorial.noLocationInfo}</p>
                       </div>
                     </div>
                   )}
@@ -967,28 +961,28 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
           <div>
             <BrandLogo light />
             <p className="mt-4 max-w-xs font-serif text-lg italic leading-7 text-[#cfc3ad]">
-              Anılar yaşar, büyük sevgiler sonsuzdur.
+              {t.memorial.memoriesLiveLoveIsInfinite}
             </p>
           </div>
           <div>
-            <h3 className="font-serif text-lg">Platform</h3>
+            <h3 className="font-serif text-lg">{t.landing.footer.colPlatform}</h3>
             <div className="mt-4 space-y-2">
-              <Link href="/" className="block text-sm text-[#cfc3ad] transition hover:text-white">Ana Sayfa</Link>
-              <Link href="/memorial/demo" className="block text-sm text-[#cfc3ad] transition hover:text-white">Örnek Profil</Link>
-              <Link href="/pricing" className="block text-sm text-[#cfc3ad] transition hover:text-white">Fiyatlandırma</Link>
+              <Link href="/" className="block text-sm text-[#cfc3ad] transition hover:text-white">{t.nav.home}</Link>
+              <Link href="/memorial/demo" className="block text-sm text-[#cfc3ad] transition hover:text-white">{t.nav.demoProfile}</Link>
+              <Link href="/pricing" className="block text-sm text-[#cfc3ad] transition hover:text-white">{t.nav.pricing}</Link>
             </div>
           </div>
           <div>
-            <h3 className="font-serif text-lg">Belgeler</h3>
+            <h3 className="font-serif text-lg">{t.landing.footer.colDocs}</h3>
             <div className="mt-4 space-y-2">
-              <Link href="/privacy" className="block text-sm text-[#cfc3ad] transition hover:text-white">Gizlilik Politikası</Link>
-              <Link href="/terms" className="block text-sm text-[#cfc3ad] transition hover:text-white">Kullanım Koşulları</Link>
+              <Link href="/privacy" className="block text-sm text-[#cfc3ad] transition hover:text-white">{t.landing.footer.docLinks[0].label}</Link>
+              <Link href="/terms" className="block text-sm text-[#cfc3ad] transition hover:text-white">{t.landing.footer.docLinks[1].label}</Link>
               <Link href="/kvkk" className="block text-sm text-[#cfc3ad] transition hover:text-white">KVKK</Link>
             </div>
           </div>
         </div>
         <div className="mx-auto mt-10 max-w-7xl border-t border-white/10 pt-6 text-center text-xs text-[#b8aa93]">
-          © {new Date().getFullYear()} The Eternal Memory. Tüm hakları saklıdır.
+          © {new Date().getFullYear()} The Eternal Memory. {t.memorial.allRightsReserved}
         </div>
       </footer>
 

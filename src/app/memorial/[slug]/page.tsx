@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { createClient } from '@/lib/supabase/server'
 import MemorialPageClient from './MemorialPageClient'
 import RealMemorialPage from './RealMemorialPage'
+import ObjectionSection from './ObjectionSection'
 
 export const revalidate = 3600
 
@@ -80,5 +81,10 @@ export default async function MemorialPage({ params }: Props) {
     )
   }
 
-  return <RealMemorialPage vault={vault} />
+  return (
+    <>
+      <RealMemorialPage vault={vault} />
+      {vault.status === 'public_memorial' && <ObjectionSection vaultId={vault.id} />}
+    </>
+  )
 }

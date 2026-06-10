@@ -3,6 +3,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { notFound, redirect } from 'next/navigation'
 import { Eye, Users, BookOpen, MessageCircle, ImageIcon, Video, UserRound, Mic } from 'lucide-react'
+import { getTranslation } from '@/i18n/server'
 
 interface Props {
   params: Promise<{ id: string }>
@@ -15,6 +16,7 @@ const REL_ICONS: Record<string, string> = {
 }
 
 export default async function MemoryAreaPage({ params, searchParams }: Props) {
+  const { lang, t } = await getTranslation()
   const { id } = await params
   const { purchased } = await searchParams
   const supabase = await createClient()
@@ -63,11 +65,11 @@ export default async function MemoryAreaPage({ params, searchParams }: Props) {
   const deathYear = area.death_date ? new Date(area.death_date).getFullYear() : null
 
   const statusConfig: Record<string, { label: string; cls: string }> = {
-    pending_verification: { label: 'Doğrulama Bekliyor', cls: 'bg-[#fff4dc] text-[#93620f] border-[#ead4a5]' },
-    hidden_vault:        { label: 'Gizli Alan',          cls: 'bg-[#eef1ea] text-[#496056] border-[#dfe6d8]' },
-    private_memorial:    { label: 'Özel Anma',           cls: 'bg-[#eef1ea] text-[#174f35] border-[#dfe6d8]' },
-    public_memorial:     { label: 'Yayında',             cls: 'bg-[#e9f5ec] text-[#176b3f] border-[#cfe7d3]' },
-    suspended:           { label: 'Askıda',              cls: 'bg-red-50 text-red-700 border-red-200' },
+    pending_verification: { label: t.dashboard.vault.statusPendingVerification, cls: 'bg-[#fff4dc] text-[#93620f] border-[#ead4a5]' },
+    hidden_vault:        { label: t.dashboard.vault.statusHiddenVault,          cls: 'bg-[#eef1ea] text-[#496056] border-[#dfe6d8]' },
+    private_memorial:    { label: t.dashboard.vault.statusPrivateMemorial,           cls: 'bg-[#eef1ea] text-[#174f35] border-[#dfe6d8]' },
+    public_memorial:     { label: t.dashboard.vault.statusPublicMemorial,             cls: 'bg-[#e9f5ec] text-[#176b3f] border-[#cfe7d3]' },
+    suspended:           { label: t.dashboard.vault.statusSuspended,              cls: 'bg-red-50 text-red-700 border-red-200' },
   }
   const status = statusConfig[area.status ?? 'hidden_vault'] ?? statusConfig.hidden_vault
 
@@ -77,6 +79,8 @@ export default async function MemoryAreaPage({ params, searchParams }: Props) {
   const addBtnCls = 'inline-flex items-center gap-1.5 rounded-xl bg-[#174f35] px-4 py-2 text-xs font-semibold text-white shadow-[0_4px_14px_rgba(23,79,53,0.2)] hover:bg-[#123f2b] transition-colors'
   const editBtnCls = 'text-xs font-medium text-[#174f35] hover:underline transition-colors'
 
+  const dateLocale = lang === 'ka' ? 'ka-GE' : lang === 'ru' ? 'ru-RU' : lang === 'en' ? 'en-US' : 'tr-TR'
+
   return (
     <div className="min-h-screen px-5 py-6 sm:px-8">
       <div className="mx-auto max-w-3xl">
@@ -84,25 +88,25 @@ export default async function MemoryAreaPage({ params, searchParams }: Props) {
         {/* Breadcrumb */}
         <div className="mb-4 flex items-center justify-between">
           <div className="flex items-center gap-2 text-sm text-[#788177]">
-            <Link href="/dashboard" className="hover:text-[#174f35] transition-colors">Anı Alanım</Link>
+            <Link href="/dashboard" className="hover:text-[#174f35] transition-colors">{t.dashboard.sidebar.myMemorialArea}</Link>
             <span>/</span>
             <span className="font-semibold text-[#22362e]">{area.display_name}</span>
           </div>
           <Link href={`/preview/${id}`} target="_blank"
             className="hidden sm:inline-flex items-center gap-1.5 text-xs font-medium text-[#788177] hover:text-[#174f35] transition-colors">
             <Eye className="h-3.5 w-3.5" />
-            Önizle
+            {t.dashboard.vault.preview}
           </Link>
         </div>
 
         {purchased && (
           <div className="mb-4 rounded-2xl border border-[#dfbd72]/40 bg-[#fff7e6] px-5 py-4 text-sm text-[#725212]">
-            Alanınız oluşturuldu. Ödeme doğrulandıktan sonra içerikleri kaydedebilirsiniz.
+            {t.dashboard.vault.purchasedMessage}
           </div>
         )}
         {isLocked && (
           <div className="mb-4 rounded-2xl border border-[#dfbd72]/50 bg-[#fff7e6] px-5 py-4 text-sm text-[#725212]">
-            Ödeme doğrulaması bekleniyor. Bu sırada sayfaları gezebilirsiniz.
+            {t.dashboard.vault.lockedMessage}
           </div>
         )}
 
@@ -114,9 +118,9 @@ export default async function MemoryAreaPage({ params, searchParams }: Props) {
               <div className={sectionHeaderCls}>
                 <div className="flex items-center gap-2">
                   <UserRound className="h-4 w-4 text-[#b08340]" />
-                  <span className="text-sm font-semibold text-[#1f2d27]">Profil</span>
+                  <span className="text-sm font-semibold text-[#1f2d27]">{t.dashboard.vault.profile}</span>
                 </div>
-                <Link href={`/dashboard/vault/${id}/profil`} className={editBtnCls}>Düzenle →</Link>
+                <Link href={`/dashboard/vault/${id}/profil`} className={editBtnCls}>{t.dashboard.vault.edit}</Link>
               </div>
               <div className="p-6 flex items-center gap-6">
                 <div className="relative h-24 w-24 shrink-0 rounded-full border-2 border-[#dfbd72] bg-[#f8efd8] overflow-hidden shadow-lg">
@@ -133,7 +137,7 @@ export default async function MemoryAreaPage({ params, searchParams }: Props) {
                   <div className="flex flex-wrap gap-1.5 mb-2">
                     <span className={`rounded-full border px-2 py-0.5 text-[11px] font-semibold ${status.cls}`}>{status.label}</span>
                     <span className="rounded-full border border-[#eadfca] bg-[#fbf5e8] px-2 py-0.5 text-[11px] font-semibold text-[#9a6b22]">
-                      {isMemorial ? 'Anı Profili' : 'Yaşam Anısı'}
+                      {isMemorial ? t.dashboard.vault.productMemorialProfile : t.dashboard.vault.productLifeVault}
                     </span>
                   </div>
                   {(birthYear || deathYear) && (
@@ -156,9 +160,9 @@ export default async function MemoryAreaPage({ params, searchParams }: Props) {
               <div className={sectionHeaderCls}>
                 <div className="flex items-center gap-2">
                   <UserRound className="h-4 w-4 text-[#c8bfb0]" />
-                  <span className="text-sm font-semibold text-[#adb5ab]">Profil</span>
+                  <span className="text-sm font-semibold text-[#adb5ab]">{t.dashboard.vault.profile}</span>
                 </div>
-                <Link href={`/dashboard/vault/${id}/profil`} className={addBtnCls}>+ Profil Ekle</Link>
+                <Link href={`/dashboard/vault/${id}/profil`} className={addBtnCls}>{t.dashboard.vault.addProfile}</Link>
               </div>
               <div className="p-6 flex items-center gap-6">
                 <div className="h-24 w-24 shrink-0 rounded-full bg-[#f0ebe0] flex items-center justify-center">
@@ -179,14 +183,14 @@ export default async function MemoryAreaPage({ params, searchParams }: Props) {
               <div className={sectionHeaderCls}>
                 <div className="flex items-center gap-2">
                   <BookOpen className="h-4 w-4 text-[#b08340]" />
-                  <span className="text-sm font-semibold text-[#1f2d27]">Hayat Hikayesi</span>
+                  <span className="text-sm font-semibold text-[#1f2d27]">{t.dashboard.vault.lifeStory}</span>
                 </div>
-                <Link href={`/dashboard/vault/${id}/biography`} className={editBtnCls}>Düzenle →</Link>
+                <Link href={`/dashboard/vault/${id}/biography`} className={editBtnCls}>{t.dashboard.vault.edit}</Link>
               </div>
               <div className="p-6">
                 <p className="text-sm text-[#4a5e55] leading-7 line-clamp-4">{area.biography}</p>
                 {area.biography!.length > 300 && (
-                  <p className="mt-2 text-xs text-[#adb5ab]">{area.biography!.length} karakter — tam metin anma sayfasında görünür</p>
+                  <p className="mt-2 text-xs text-[#adb5ab]">{area.biography!.length} {t.dashboard.vault.charsVisibleOnMemorial}</p>
                 )}
               </div>
             </div>
@@ -195,9 +199,9 @@ export default async function MemoryAreaPage({ params, searchParams }: Props) {
               <div className={sectionHeaderCls}>
                 <div className="flex items-center gap-2">
                   <BookOpen className="h-4 w-4 text-[#c8bfb0]" />
-                  <span className="text-sm font-semibold text-[#adb5ab]">Hayat Hikayesi</span>
+                  <span className="text-sm font-semibold text-[#adb5ab]">{t.dashboard.vault.lifeStory}</span>
                 </div>
-                <Link href={`/dashboard/vault/${id}/biography`} className={addBtnCls}>+ Hikaye Yaz</Link>
+                <Link href={`/dashboard/vault/${id}/biography`} className={addBtnCls}>{t.dashboard.vault.writeStory}</Link>
               </div>
               <div className="p-6 space-y-2.5">
                 <div className="h-3.5 w-full rounded-full bg-[#f0ebe0]" />
@@ -205,7 +209,7 @@ export default async function MemoryAreaPage({ params, searchParams }: Props) {
                 <div className="h-3.5 w-3/4 rounded-full bg-[#f0ebe0]" />
                 <div className="h-3.5 w-full rounded-full bg-[#f0ebe0]" />
                 <div className="h-3.5 w-5/6 rounded-full bg-[#f0ebe0]" />
-                <p className="pt-1 text-xs text-[#adb5ab]">Hayat hikayesini yazdığınızda anma sayfasında görünecek.</p>
+                <p className="pt-1 text-xs text-[#adb5ab]">{t.dashboard.vault.biographyEmptyText}</p>
               </div>
             </div>
           )}
@@ -216,10 +220,10 @@ export default async function MemoryAreaPage({ params, searchParams }: Props) {
               <div className={sectionHeaderCls}>
                 <div className="flex items-center gap-2">
                   <Users className="h-4 w-4 text-[#b08340]" />
-                  <span className="text-sm font-semibold text-[#1f2d27]">Aile Bağları</span>
-                  <span className="text-xs text-[#adb5ab]">{familyCount} kişi</span>
+                  <span className="text-sm font-semibold text-[#1f2d27]">{t.dashboard.vault.familyBonds}</span>
+                  <span className="text-xs text-[#adb5ab]">{familyCount} {familyCount === 1 ? t.dashboard.vault.personCount : t.dashboard.vault.peopleCount}</span>
                 </div>
-                <Link href={`/dashboard/vault/${id}/aile`} className={editBtnCls}>Düzenle →</Link>
+                <Link href={`/dashboard/vault/${id}/aile`} className={editBtnCls}>{t.dashboard.vault.edit}</Link>
               </div>
               <div className="p-6">
                 <div className="flex flex-wrap gap-4">
@@ -242,7 +246,7 @@ export default async function MemoryAreaPage({ params, searchParams }: Props) {
                       <div className="h-14 w-14 rounded-full border-2 border-dashed border-[#e5dccb] bg-[#f5efdf] flex items-center justify-center text-sm font-bold text-[#788177]">
                         +{(familyCount ?? 0) - 6}
                       </div>
-                      <p className="text-[11px] text-[#adb5ab] text-center">daha</p>
+                      <p className="text-[11px] text-[#adb5ab] text-center">{t.dashboard.vault.morePeople}</p>
                     </div>
                   )}
                 </div>
@@ -253,9 +257,9 @@ export default async function MemoryAreaPage({ params, searchParams }: Props) {
               <div className={sectionHeaderCls}>
                 <div className="flex items-center gap-2">
                   <Users className="h-4 w-4 text-[#c8bfb0]" />
-                  <span className="text-sm font-semibold text-[#adb5ab]">Aile Bağları</span>
+                  <span className="text-sm font-semibold text-[#adb5ab]">{t.dashboard.vault.familyBonds}</span>
                 </div>
-                <Link href={`/dashboard/vault/${id}/aile`} className={addBtnCls}>+ Aile Ekle</Link>
+                <Link href={`/dashboard/vault/${id}/aile`} className={addBtnCls}>{t.dashboard.vault.addFamily}</Link>
               </div>
               <div className="p-6 flex gap-4">
                 {[0, 1, 2, 3].map(i => (
@@ -274,10 +278,10 @@ export default async function MemoryAreaPage({ params, searchParams }: Props) {
               <div className={sectionHeaderCls}>
                 <div className="flex items-center gap-2">
                   <MessageCircle className="h-4 w-4 text-[#b08340]" />
-                  <span className="text-sm font-semibold text-[#1f2d27]">Anılar</span>
-                  <span className="text-xs text-[#adb5ab]">{memoriesCount} anı</span>
+                  <span className="text-sm font-semibold text-[#1f2d27]">{t.dashboard.vault.memories}</span>
+                  <span className="text-xs text-[#adb5ab]">{memoriesCount} {t.dashboard.vault.memories.toLowerCase()}</span>
                 </div>
-                <Link href={`/dashboard/vault/${id}/anilar`} className={editBtnCls}>Düzenle →</Link>
+                <Link href={`/dashboard/vault/${id}/anilar`} className={editBtnCls}>{t.dashboard.vault.edit}</Link>
               </div>
               <div className="relative p-6">
                 <div className="absolute left-9 top-8 bottom-8 w-0.5 rounded-full bg-[#e5dccb]" />
@@ -287,7 +291,7 @@ export default async function MemoryAreaPage({ params, searchParams }: Props) {
                       <div className="absolute left-[5px] top-1.5 h-3.5 w-3.5 rounded-full border-2 border-[#174f35] bg-white shadow-sm" />
                       {m.memory_date && (
                         <p className="text-[11px] font-semibold text-[#dfbd72] tracking-wide mb-0.5">
-                          {new Date(m.memory_date).toLocaleDateString('tr-TR', { year: 'numeric', month: 'long', day: 'numeric' })}
+                          {new Date(m.memory_date).toLocaleDateString(dateLocale, { year: 'numeric', month: 'long', day: 'numeric' })}
                         </p>
                       )}
                       {m.title && <p className="font-serif text-sm font-semibold text-[#1f2d27]">{m.title}</p>}
@@ -298,7 +302,7 @@ export default async function MemoryAreaPage({ params, searchParams }: Props) {
                 {(memoriesCount ?? 0) > 3 && (
                   <Link href={`/dashboard/vault/${id}/anilar`}
                     className="mt-4 block text-center text-xs text-[#174f35] font-medium hover:underline">
-                    Tüm {memoriesCount} anıyı gör →
+                    {t.dashboard.vault.seeAllMemories.replace('{count}', String(memoriesCount))}
                   </Link>
                 )}
               </div>
@@ -308,9 +312,9 @@ export default async function MemoryAreaPage({ params, searchParams }: Props) {
               <div className={sectionHeaderCls}>
                 <div className="flex items-center gap-2">
                   <MessageCircle className="h-4 w-4 text-[#c8bfb0]" />
-                  <span className="text-sm font-semibold text-[#adb5ab]">Anılar</span>
+                  <span className="text-sm font-semibold text-[#adb5ab]">{t.dashboard.vault.memories}</span>
                 </div>
-                <Link href={`/dashboard/vault/${id}/anilar`} className={addBtnCls}>+ Anı Ekle</Link>
+                <Link href={`/dashboard/vault/${id}/anilar`} className={addBtnCls}>{t.dashboard.vault.addMemory}</Link>
               </div>
               <div className="relative p-6">
                 <div className="absolute left-9 top-8 bottom-8 w-0.5 rounded-full bg-[#f0ebe0]" />
@@ -334,23 +338,23 @@ export default async function MemoryAreaPage({ params, searchParams }: Props) {
               <div className={sectionHeaderCls}>
                 <div className="flex items-center gap-2">
                   <ImageIcon className="h-4 w-4 text-[#b08340]" />
-                  <span className="text-sm font-semibold text-[#1f2d27]">Fotoğraflar</span>
-                  <span className="text-xs text-[#adb5ab]">{photoCount} fotoğraf</span>
+                  <span className="text-sm font-semibold text-[#1f2d27]">{t.dashboard.vault.photos}</span>
+                  <span className="text-xs text-[#adb5ab]">{photoCount} {t.dashboard.vault.photos.toLowerCase()}</span>
                 </div>
-                <Link href={`/dashboard/vault/${id}/fotolar`} className={editBtnCls}>Düzenle →</Link>
+                <Link href={`/dashboard/vault/${id}/fotolar`} className={editBtnCls}>{t.dashboard.vault.edit}</Link>
               </div>
               <div className="p-4">
                 <div className="columns-3 sm:columns-4 gap-2">
                   {recentPhotos?.map((p) => (
                     <div key={p.id} className="break-inside-avoid mb-2 overflow-hidden rounded-xl">
                       <Image
-                        src={p.thumb_url ?? p.original_url}
-                        alt="Fotoğraf"
-                        width={0} height={0}
-                        sizes="(max-width: 640px) 33vw, 25vw"
-                        style={{ width: '100%', height: 'auto' }}
-                        className="rounded-xl"
-                        unoptimized
+                         src={p.thumb_url ?? p.original_url}
+                         alt="Fotoğraf"
+                         width={0} height={0}
+                         sizes="(max-width: 640px) 33vw, 25vw"
+                         style={{ width: '100%', height: 'auto' }}
+                         className="rounded-xl"
+                         unoptimized
                       />
                     </div>
                   ))}
@@ -358,7 +362,7 @@ export default async function MemoryAreaPage({ params, searchParams }: Props) {
                 {(photoCount ?? 0) > 8 && (
                   <Link href={`/dashboard/vault/${id}/fotolar`}
                     className="mt-3 block text-center text-xs text-[#174f35] font-medium hover:underline">
-                    Tüm {photoCount} fotoğrafı gör →
+                    {t.dashboard.vault.seeAllPhotos.replace('{count}', String(photoCount))}
                   </Link>
                 )}
               </div>
@@ -368,9 +372,9 @@ export default async function MemoryAreaPage({ params, searchParams }: Props) {
               <div className={sectionHeaderCls}>
                 <div className="flex items-center gap-2">
                   <ImageIcon className="h-4 w-4 text-[#c8bfb0]" />
-                  <span className="text-sm font-semibold text-[#adb5ab]">Fotoğraflar</span>
+                  <span className="text-sm font-semibold text-[#adb5ab]">{t.dashboard.vault.photos}</span>
                 </div>
-                <Link href={`/dashboard/vault/${id}/fotolar`} className={addBtnCls}>+ Fotoğraf Ekle</Link>
+                <Link href={`/dashboard/vault/${id}/fotolar`} className={addBtnCls}>{t.dashboard.vault.addPhoto}</Link>
               </div>
               <div className="p-4">
                 <div className="grid grid-cols-4 gap-2">
@@ -388,10 +392,10 @@ export default async function MemoryAreaPage({ params, searchParams }: Props) {
               <div className={sectionHeaderCls}>
                 <div className="flex items-center gap-2">
                   <Video className="h-4 w-4 text-[#b08340]" />
-                  <span className="text-sm font-semibold text-[#1f2d27]">Videolar</span>
-                  <span className="text-xs text-[#adb5ab]">{videoCount} video</span>
+                  <span className="text-sm font-semibold text-[#1f2d27]">{t.dashboard.vault.videos}</span>
+                  <span className="text-xs text-[#adb5ab]">{videoCount} {t.dashboard.vault.videos.toLowerCase()}</span>
                 </div>
-                <Link href={`/dashboard/vault/${id}/videolar`} className={editBtnCls}>Düzenle →</Link>
+                <Link href={`/dashboard/vault/${id}/videolar`} className={editBtnCls}>{t.dashboard.vault.edit}</Link>
               </div>
               <div className="p-4 grid grid-cols-2 sm:grid-cols-3 gap-3">
                 {recentVideos?.map((v) => (
@@ -415,9 +419,9 @@ export default async function MemoryAreaPage({ params, searchParams }: Props) {
               <div className={sectionHeaderCls}>
                 <div className="flex items-center gap-2">
                   <Video className="h-4 w-4 text-[#c8bfb0]" />
-                  <span className="text-sm font-semibold text-[#adb5ab]">Videolar</span>
+                  <span className="text-sm font-semibold text-[#adb5ab]">{t.dashboard.vault.videos}</span>
                 </div>
-                <Link href={`/dashboard/vault/${id}/videolar`} className={addBtnCls}>+ Video Ekle</Link>
+                <Link href={`/dashboard/vault/${id}/videolar`} className={addBtnCls}>{t.dashboard.vault.addVideo}</Link>
               </div>
               <div className="p-4 grid grid-cols-3 gap-3">
                 {[1, 2, 3].map(i => (
@@ -435,10 +439,10 @@ export default async function MemoryAreaPage({ params, searchParams }: Props) {
               <div className={sectionHeaderCls}>
                 <div className="flex items-center gap-2">
                   <Mic className="h-4 w-4 text-[#b08340]" />
-                  <span className="text-sm font-semibold text-[#1f2d27]">Ses Kayıtları</span>
-                  <span className="text-xs text-[#adb5ab]">{audioCount} kayıt</span>
+                  <span className="text-sm font-semibold text-[#1f2d27]">{t.dashboard.vault.audioRecordings}</span>
+                  <span className="text-xs text-[#adb5ab]">{audioCount} {t.dashboard.vault.audioRecordings.toLowerCase()}</span>
                 </div>
-                <Link href={`/dashboard/vault/${id}/ses-kayitlari`} className={editBtnCls}>Düzenle →</Link>
+                <Link href={`/dashboard/vault/${id}/ses-kayitlari`} className={editBtnCls}>{t.dashboard.vault.edit}</Link>
               </div>
               <div className="p-5 space-y-2">
                 {recentAudio?.map((rec) => (
@@ -455,7 +459,7 @@ export default async function MemoryAreaPage({ params, searchParams }: Props) {
                 {(audioCount ?? 0) > 3 && (
                   <Link href={`/dashboard/vault/${id}/ses-kayitlari`}
                     className="block text-center text-xs text-[#174f35] font-medium hover:underline pt-1">
-                    Tüm {audioCount} kaydı gör →
+                    {t.dashboard.vault.seeAllAudios.replace('{count}', String(audioCount))}
                   </Link>
                 )}
               </div>
@@ -465,9 +469,9 @@ export default async function MemoryAreaPage({ params, searchParams }: Props) {
               <div className={sectionHeaderCls}>
                 <div className="flex items-center gap-2">
                   <Mic className="h-4 w-4 text-[#c8bfb0]" />
-                  <span className="text-sm font-semibold text-[#adb5ab]">Ses Kayıtları</span>
+                  <span className="text-sm font-semibold text-[#adb5ab]">{t.dashboard.vault.audioRecordings}</span>
                 </div>
-                <Link href={`/dashboard/vault/${id}/ses-kayitlari`} className={addBtnCls}>+ Ses Ekle</Link>
+                <Link href={`/dashboard/vault/${id}/ses-kayitlari`} className={addBtnCls}>{t.dashboard.vault.addAudio}</Link>
               </div>
               <div className="p-5 space-y-2">
                 {[0, 1].map(i => (
@@ -479,7 +483,12 @@ export default async function MemoryAreaPage({ params, searchParams }: Props) {
                     </div>
                   </div>
                 ))}
-                <p className="pt-1 text-center text-xs text-[#adb5ab]">Ses kayıtları anma sayfasında özel bir bölümde çalar.</p>
+                <p className="pt-1 text-center text-xs text-[#adb5ab]">
+                  {lang === 'ka' ? 'ხმის ჩანაწერები დაუკრავს მემორიალური გვერდის სპეციალურ სექციაში.' :
+                   lang === 'ru' ? 'Аудиозаписи будут воспроизводиться в специальном разделе мемориальной страницы.' :
+                   lang === 'en' ? 'Audio recordings play in a special section on the memorial page.' :
+                   'Ses kayıtları anma sayfasında özel bir bölümde çalar.'}
+                </p>
               </div>
             </div>
           )}
@@ -489,7 +498,7 @@ export default async function MemoryAreaPage({ params, searchParams }: Props) {
             <div className="flex items-center justify-between px-5 py-4 border-b border-[#f0ebe0]">
               <div className="flex items-center gap-2">
                 <span className="text-base">🕊️</span>
-                <span className="text-sm font-semibold text-[#1f2d27]">Taziye Defteri</span>
+                <span className="text-sm font-semibold text-[#1f2d27]">{t.dashboard.vault.guestbook}</span>
                 {(pendingGuestbookCount ?? 0) > 0 && (
                   <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#c7a76f] text-[10px] font-bold text-white">
                     {pendingGuestbookCount}
@@ -497,14 +506,14 @@ export default async function MemoryAreaPage({ params, searchParams }: Props) {
                 )}
               </div>
               <Link href={`/dashboard/vault/${id}/taziye-defteri`} className="text-xs font-medium text-[#174f35] hover:underline">
-                {(pendingGuestbookCount ?? 0) > 0 ? `${pendingGuestbookCount} mesaj bekliyor →` : 'Yönet →'}
+                {(pendingGuestbookCount ?? 0) > 0 ? `${pendingGuestbookCount} ${t.dashboard.vault.messagesWaiting} →` : `${t.dashboard.vault.manage}`}
               </Link>
             </div>
             <div className="px-5 py-3">
               <p className="text-xs text-[#788177]">
                 {(pendingGuestbookCount ?? 0) > 0
-                  ? 'Onay bekleyen taziye mesajları var. İncelemek için tıklayın.'
-                  : 'Ziyaretçilerin bıraktığı taziye mesajlarını buradan onaylayın.'}
+                  ? t.dashboard.vault.pendingGuestbookMessages
+                  : t.dashboard.vault.approveGuestbookMessages}
               </p>
             </div>
           </div>
@@ -514,12 +523,12 @@ export default async function MemoryAreaPage({ params, searchParams }: Props) {
             <div className="flex items-center gap-3">
               <div className={`h-2.5 w-2.5 rounded-full ${qrActive || area.slug ? 'bg-[#174f35]' : 'bg-red-400'}`} />
               <span className="text-sm text-[#4a5e55]">
-                {qrActive ? 'QR aktif' : area.slug ? `theeternalmemory.com/ani-alanim/${area.slug}` : 'Sayfa adresi belirlenmedi'}
+                {qrActive ? t.dashboard.vault.qrActive : area.slug ? `theeternalmemory.com/ani-alanim/${area.slug}` : t.dashboard.vault.slugNotSet}
               </span>
             </div>
             <Link href={`/dashboard/vault/${id}/settings`}
               className="text-xs font-medium text-[#174f35] hover:underline">
-              {area.slug || qrActive ? 'Ayarları Düzenle →' : 'Adres Belirle →'}
+              {area.slug || qrActive ? t.dashboard.vault.editSettings : t.dashboard.vault.setAddress}
             </Link>
           </div>
 

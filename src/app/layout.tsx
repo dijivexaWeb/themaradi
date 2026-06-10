@@ -20,18 +20,21 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+import { getTranslation } from "@/i18n/server";
+
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const { lang } = await getTranslation()
   return (
     <html
-      lang="tr"
+      lang={lang}
       className={`${geistSans.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-zinc-950 text-zinc-100">
-        <LangProvider>{children}</LangProvider>
+        <LangProvider serverLang={lang}>{children}</LangProvider>
         <CookieBanner />
       </body>
     </html>

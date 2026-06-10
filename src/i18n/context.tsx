@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, useContext, useState, type ReactNode } from 'react'
+import { createContext, useContext, useState, useEffect, type ReactNode } from 'react'
 import { dictionaries, detectLang, saveLang, type Lang, type LangDict } from './index'
 
 interface LangContext {
@@ -15,8 +15,18 @@ const Ctx = createContext<LangContext>({
   setLang: () => {},
 })
 
-export function LangProvider({ children }: { children: ReactNode }) {
-  const [lang, setLangState] = useState<Lang>(() => detectLang())
+export function LangProvider({ children, serverLang = 'tr' }: { children: ReactNode; serverLang?: Lang }) {
+  const [lang, setLangState] = useState<Lang>(serverLang)
+
+  useEffect(() => {
+    const clientLang = detectLang()
+    if (clientLang !== serverLang) {
+      const timer = setTimeout(() => {
+        setLangState(clientLang)
+      }, 0)
+      return () => clearTimeout(timer)
+    }
+  }, [serverLang])
 
   function setLang(l: Lang) {
     setLangState(l)
