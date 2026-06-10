@@ -71,11 +71,16 @@ export default async function MemorialPage({ params, searchParams }: PropsWithSe
 
   const isLive = vault.status === 'public_memorial' || vault.status === 'private_memorial'
 
-  // Owner preview — yayınlanmamış sayfalarda sadece sahibi görebilir
+  // Owner/admin preview — yayınlanmamış sayfalarda sahibi veya admin görebilir
   if (!isLive && preview === '1') {
     const { data: { user } } = await supabase.auth.getUser()
     const isOwner = user?.id === vault.owner_id
-    if (!isOwner) {
+    let isAdmin = false
+    if (user && !isOwner) {
+      const { data: profile } = await supabase.from('profiles').select('role').eq('id', user.id).single()
+      isAdmin = profile?.role === 'admin'
+    }
+    if (!isOwner && !isAdmin) {
       return (
         <div className="min-h-screen bg-[#0c3327] flex items-center justify-center px-4">
           <div className="text-center max-w-sm">
@@ -86,13 +91,15 @@ export default async function MemorialPage({ params, searchParams }: PropsWithSe
         </div>
       )
     }
+    const backLink = isAdmin ? '/admin/verifications' : `/anma-paneli/${vault.id}`
+    const backLabel = isAdmin ? 'Admin Paneli' : 'Panele Dön'
     return (
       <>
         {/* Önizleme bandı */}
         <div className="sticky top-0 z-50 flex items-center justify-between bg-amber-500 px-4 py-2 text-sm font-semibold text-white">
           <span>👁 Önizleme Modu — Bu sayfa henüz yayınlanmadı</span>
-          <a href={`/anma-paneli/${vault.id}`} className="rounded bg-white/20 px-3 py-1 text-xs hover:bg-white/30">
-            Panele Dön
+          <a href={backLink} className="rounded bg-white/20 px-3 py-1 text-xs hover:bg-white/30">
+            {backLabel}
           </a>
         </div>
         <RealMemorialPage vault={vault} />
