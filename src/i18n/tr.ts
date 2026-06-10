@@ -966,6 +966,7 @@ const tr: LangDict = {
       guestbook: 'Taziye Defteri',
       appearance: 'Görünüm & Tema',
       memorialStyle: 'Anma Tarzı',
+      linkAndQr: 'Link & QR Kod',
       verification: 'Doğrulama & Yayın',
       adminPanel: 'Admin Paneli',
       helpAndSupport: 'Yardım & Destek',

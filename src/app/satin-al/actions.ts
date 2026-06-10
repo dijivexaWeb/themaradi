@@ -88,7 +88,7 @@ export async function purchaseMemorialAction(_prev: unknown, formData: FormData)
 
   const user = authResult.user
   const pendingEmailConfirmation = 'pendingEmailConfirmation' in authResult
-  let confirmUrl = 'confirmUrl' in authResult ? authResult.confirmUrl : undefined
+  const confirmUrl = 'confirmUrl' in authResult ? authResult.confirmUrl : undefined
 
   const pricing = await fetchPricingConfig()
   const amount = pricing.campaignActive && pricing.campaignMemorial

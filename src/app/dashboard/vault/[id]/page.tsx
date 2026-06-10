@@ -147,7 +147,7 @@ export default async function MemoryAreaPage({ params, searchParams }: Props) {
                     <p className="font-serif text-sm italic text-[#7a7467] mt-1">&quot;{area.tagline}&quot;</p>
                   )}
                   {area.slug && (
-                    <Link href={`/memorial/${area.slug}`} target="_blank"
+                    <Link href={`/ani-alanim/${area.slug}`} target="_blank"
                       className="mt-1 inline-block text-xs text-[#174f35] font-medium hover:underline">
                       theeternalmemory.com/ani-alanim/{area.slug} →
                     </Link>

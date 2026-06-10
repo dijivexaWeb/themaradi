@@ -966,6 +966,7 @@ const ka: LangDict = {
       guestbook: 'გამოხმაურების წიგნი',
       appearance: 'გამოჩენა და თემა',
       memorialStyle: 'მოხსენების სტილი',
+      linkAndQr: 'ბმული და QR კოდი',
       verification: 'დადასტურება და გამოქვეყნება',
       adminPanel: 'ადმინ პანელი',
       helpAndSupport: 'დახმარება',

@@ -964,6 +964,7 @@ const en = {
       guestbook: 'Condolence Book',
       appearance: 'Appearance & Theme',
       memorialStyle: 'Memorial Style',
+      linkAndQr: 'Link & QR Code',
       verification: 'Verification & Publish',
       adminPanel: 'Admin Panel',
       helpAndSupport: 'Help & Support',

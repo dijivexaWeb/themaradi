@@ -91,7 +91,8 @@
       "Bash(xargs sed -i 's/The Maradi/The Eternal Memory/g')",
       "Bash(xargs sed -i 's/themaradi\\\\.com/theeternalmemory.com/g')",
       "Bash('C:\\\\Users\\\\Akif-MaccBook/.claude/skills/gstack/browse/dist/browse' goto *)",
-      "Bash(findstr /r \"\\\\\"@supabase\" package.json)"
+      "Bash(findstr /r \"\\\\\"@supabase\" package.json)",
+      "Bash(del \"c:\\\\Users\\\\Akif-MaccBook\\\\Documents\\\\themaradi\\\\src\\\\app\\\\memorial\\\\[slug]\\\\RealMemorialPageModern.tsx\")"
     ]
   },
   "enabledMcpjsonServers": [

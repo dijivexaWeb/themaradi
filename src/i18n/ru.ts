@@ -966,6 +966,7 @@ const ru: LangDict = {
       guestbook: 'Книга соболезнований',
       appearance: 'Внешний вид и тема',
       memorialStyle: 'Стиль поминовения',
+      linkAndQr: 'Ссылка и QR-код',
       verification: 'Верификация и публикация',
       adminPanel: 'Панель администратора',
       helpAndSupport: 'Помощь и поддержка',

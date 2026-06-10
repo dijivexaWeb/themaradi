@@ -30,6 +30,7 @@ export default async function VerificationsPage() {
     .eq('status', 'pending')
     .order('created_at', { ascending: true })
 
+  // eslint-disable-next-line react-hooks/purity
   const now = Date.now()
 
   return (

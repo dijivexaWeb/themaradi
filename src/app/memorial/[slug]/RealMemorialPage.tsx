@@ -1,7 +1,7 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowRight, CalendarDays, Clock, Feather, Heart, MapPin, Navigation, PenLine } from 'lucide-react'
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createServiceClient } from '@/lib/supabase/server'
 import BrandLogo from '@/components/BrandLogo'
 import FamilyTreeCanvas from '@/components/FamilyTreeCanvas'
 import AudioPlayerSection from './AudioPlayerSection'
@@ -67,7 +67,7 @@ function getCoordinate(value: unknown): string | null {
 
 export default async function RealMemorialPage({ vault, isPreview = false }: Props) {
   const id = vault.id
-  const supabase = await createClient()
+  const supabase = isPreview ? await createServiceClient() : await createClient()
   const { t, lang } = await getTranslation()
 
   const v = vault as unknown as Record<string, unknown>

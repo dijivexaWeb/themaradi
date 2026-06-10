@@ -8,7 +8,7 @@ import Link from 'next/link'
 import {
   BookOpen, Camera, Users, MapPin, MessageCircle,
   Settings, LogOut, Eye, Headphones, Home,
-  Video, Mic, Heart, Palette, Sparkles,
+  Video, Mic, Heart, Palette, Sparkles, QrCode,
 } from 'lucide-react'
 
 export default async function AnmaPaneliLayout({
@@ -64,6 +64,7 @@ export default async function AnmaPaneliLayout({
     { href: `/anma-paneli/${id}/taziye`,        label: m.sidebar.guestbook,       icon: MessageCircle },
     { href: `/anma-paneli/${id}/gorunum`,       label: m.sidebar.appearance,      icon: Palette },
     { href: `/anma-paneli/${id}/anma-tarzi`,   label: m.sidebar.memorialStyle,   icon: Sparkles },
+    { href: `/anma-paneli/${id}/link-ayari`,   label: m.sidebar.linkAndQr,       icon: QrCode },
     { href: `/anma-paneli/${id}/dogrulama`,     label: m.sidebar.verification,    icon: Settings },
   ]
 

@@ -27,6 +27,20 @@ interface Props {
   maxDepth?: number   // default 2; pass 99 for full/unlimited tree
 }
 
+function formatTreeName(fullName: string): string {
+  if (!fullName) return ''
+  const parts = fullName.trim().split(/\s+/)
+  if (parts.length <= 1) return fullName
+
+  const lastName = parts[parts.length - 1]
+  const initials = parts.slice(0, parts.length - 1)
+    .map(p => p[0] ? `${p[0].toUpperCase()}.` : '')
+    .filter(Boolean)
+    .join('')
+
+  return `${initials} ${lastName}`
+}
+
 const CW  = 118
 const CH  = 148
 const HG  = 24
@@ -301,6 +315,23 @@ export default function FamilyTreeCanvas({ vault, members, maxDepth = 2 }: Props
     <div ref={ref} className="w-full overflow-x-auto">
       <div className="relative" style={{ width: W, height: H }}>
         <svg width={W} height={H} className="absolute inset-0 pointer-events-none" aria-hidden>
+          <style>{`
+            @keyframes tree-flow {
+              0% { stroke-dashoffset: 32; }
+              100% { stroke-dashoffset: 0; }
+            }
+            .branch-flow-path {
+              animation: tree-flow 1.2s linear infinite;
+            }
+            @keyframes pulse-ring {
+              0% { box-shadow: 0 0 0 0 rgba(199, 167, 111, 0.45), 0 12px 30px rgba(0,0,0,0.3); }
+              70% { box-shadow: 0 0 0 8px rgba(199, 167, 111, 0), 0 12px 30px rgba(0,0,0,0.3); }
+              100% { box-shadow: 0 0 0 0 rgba(199, 167, 111, 0), 0 12px 30px rgba(0,0,0,0.3); }
+            }
+            .owner-pulse {
+              animation: pulse-ring 2.2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+            }
+          `}</style>
           <defs>
             <linearGradient id="ftGrad" x1="0" y1="0" x2="0" y2="1">
               <stop offset="0%" stopColor="#c7a76f" stopOpacity="0.55" />
@@ -308,16 +339,31 @@ export default function FamilyTreeCanvas({ vault, members, maxDepth = 2 }: Props
             </linearGradient>
           </defs>
           {branches.map((b, i) => (
-            <path key={i} d={b.d} fill="none"
-              stroke={b.kind === 'couple' ? '#c7a76f' : 'url(#ftGrad)'}
-              strokeWidth={2} strokeOpacity={b.kind === 'couple' ? 0.70 : 1}
-              strokeLinecap="round"
-              style={{
-                strokeDasharray: DASH,
-                strokeDashoffset: visible ? 0 : DASH,
-                transition: visible ? `stroke-dashoffset 0.7s ease ${b.delay}ms` : 'none',
-              }}
-            />
+            <g key={i}>
+              <path d={b.d} fill="none"
+                stroke={b.kind === 'couple' ? '#c7a76f' : 'url(#ftGrad)'}
+                strokeWidth={2} strokeOpacity={b.kind === 'couple' ? 0.50 : 0.8}
+                strokeLinecap="round"
+                style={{
+                  strokeDasharray: DASH,
+                  strokeDashoffset: visible ? 0 : DASH,
+                  transition: visible ? `stroke-dashoffset 0.7s ease ${b.delay}ms` : 'none',
+                }}
+              />
+              {visible && (
+                <path d={b.d} fill="none"
+                  stroke="#c7a76f"
+                  strokeWidth={1.5}
+                  strokeOpacity={0.65}
+                  strokeLinecap="round"
+                  className="branch-flow-path"
+                  style={{
+                    strokeDasharray: '4, 12',
+                    animationDelay: `${b.delay}ms`,
+                  }}
+                />
+              )}
+            </g>
           ))}
         </svg>
 
@@ -339,10 +385,10 @@ export default function FamilyTreeCanvas({ vault, members, maxDepth = 2 }: Props
                   ? `opacity 0.5s ease ${node.isVault ? 50 : 260}ms, transform 0.5s ease ${node.isVault ? 50 : 260}ms`
                   : 'none',
               }}>
-              <div className={`overflow-hidden rounded-xl p-2.5 text-center shadow-xl shadow-black/30 ${
+              <div className={`overflow-hidden rounded-xl p-2.5 text-center shadow-xl shadow-black/30 transition-all duration-300 hover:-translate-y-1 hover:scale-[1.03] hover:shadow-[0_20px_50px_rgba(199,167,111,0.12)] hover:border-[#c7a76f]/60 ${
                 node.isVault
-                  ? 'border-2 border-[#c7a76f] ring-4 ring-[#c7a76f]/15 bg-[#0f1c16]'
-                  : 'border border-white/10 bg-[#121b17]'
+                  ? 'border-2 border-[#c7a76f] ring-4 ring-[#c7a76f]/15 bg-[#0f1c16] owner-pulse'
+                  : 'border border-white/10 bg-[#121b17] hover:bg-[#15201b]'
               }`} style={{ height: CH }}>
                 <div className={`relative mx-auto mb-1.5 flex items-center justify-center overflow-hidden rounded-full border-2 ${
                   node.isVault ? 'h-[52px] w-[52px] border-[#c7a76f]/70' : 'h-[44px] w-[44px] border-[#c7a76f]/35'
@@ -359,12 +405,12 @@ export default function FamilyTreeCanvas({ vault, members, maxDepth = 2 }: Props
                     </div>
                   )}
                 </div>
-                <div className="font-serif text-[11px] leading-snug text-white"
+                <div className="font-serif text-[11px] leading-snug text-neutral-100"
                   style={{ display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
-                  {node.name}
+                  {formatTreeName(node.name)}
                 </div>
                 {label && (
-                  <div className="mt-0.5 text-[9px] font-medium uppercase tracking-wider text-[#c7a76f] truncate">
+                  <div className="mt-0.5 text-[9px] font-medium uppercase tracking-wider text-amber-400 truncate">
                     {label}
                   </div>
                 )}

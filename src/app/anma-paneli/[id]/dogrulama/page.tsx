@@ -79,13 +79,9 @@ export default async function MemorialDogrulamaPage({ params }: Props) {
   const [
     { data: docs },
     { data: witnesses },
-    { count: photoCount },
-    { count: familyCount },
   ] = await Promise.all([
     supabase.from('memorial_verification_docs').select('*').eq('vault_id', id).order('created_at', { ascending: false }),
     supabase.from('memorial_witnesses').select('*').eq('vault_id', id).order('created_at', { ascending: true }),
-    supabase.from('media').select('id', { count: 'exact', head: true }).eq('vault_id', id).eq('media_type', 'image'),
-    supabase.from('vault_family_members').select('id', { count: 'exact', head: true }).eq('vault_id', id),
   ])
 
   const status = (vault.status ?? 'pending_verification') as keyof typeof STATUS_CONFIG
@@ -97,7 +93,6 @@ export default async function MemorialDogrulamaPage({ params }: Props) {
   const activeDoc = (docs ?? []).find(d => d.status !== 'rejected') as Doc | undefined
   const typedWitnesses = (witnesses ?? []) as Witness[]
   const confirmedWitnesses = typedWitnesses.filter(w => w.status === 'confirmed')
-  const pendingWitnesses = typedWitnesses.filter(w => w.status === 'pending')
 
   // Doğrulama adımları
   const docOk = activeDoc?.status === 'approved'

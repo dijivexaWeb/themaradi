@@ -608,6 +608,65 @@ function witnessEmailHtml(witnessName: string, deceasedName: string, confirmUrl:
 </body></html>`
 }
 
+// ─── QR / Slug Actions ───────────────────────────────────────────────────────
+
+export async function checkSlugAvailabilityAction(
+  slug: string,
+  currentVaultId: string,
+): Promise<{ available: boolean }> {
+  if (!slug || slug.length < 3) return { available: false }
+  const supabase = await createClient()
+  const { data } = await supabase
+    .from('vaults')
+    .select('id')
+    .eq('slug', slug)
+    .neq('id', currentVaultId)
+    .maybeSingle()
+  return { available: !data }
+}
+
+export async function updateMemorialSlugAction(
+  vaultId: string,
+  newSlug: string,
+): Promise<{ success: boolean; error?: string }> {
+  if (!newSlug || newSlug.length < 3) return { success: false, error: 'Slug çok kısa' }
+
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { success: false, error: 'Oturum bulunamadı' }
+
+  const { data: vault } = await supabase
+    .from('vaults')
+    .select('id, slug')
+    .eq('id', vaultId)
+    .eq('owner_id', user.id)
+    .single()
+  if (!vault) return { success: false, error: 'Yetkisiz' }
+
+  // Aynı slug ise işlem yapma
+  if (vault.slug === newSlug) return { success: true }
+
+  // Benzersiz mi kontrol et
+  const { data: conflict } = await supabase
+    .from('vaults')
+    .select('id')
+    .eq('slug', newSlug)
+    .neq('id', vaultId)
+    .maybeSingle()
+  if (conflict) return { success: false, error: 'Bu adres zaten alınmış' }
+
+  const { error } = await supabase
+    .from('vaults')
+    .update({ slug: newSlug })
+    .eq('id', vaultId)
+  if (error) return { success: false, error: error.message }
+
+  revalidatePath(`/anma-paneli/${vaultId}/link-ayari`)
+  if (vault.slug) revalidatePath(`/memorial/${vault.slug}`)
+  revalidatePath(`/memorial/${newSlug}`)
+  return { success: true }
+}
+
 // ─── Memorial Style Actions ───────────────────────────────────────────────────
 
 export interface MemorialActionInput {
