@@ -144,14 +144,23 @@ export default async function MemorialVideolarPage({ params, searchParams }: Pro
         ) : (
           <div className="grid sm:grid-cols-2 gap-5">
             {videos.map((video) => {
-              const embedUrl = getVideoEmbed(video.original_url)
+              const cfStreamId = (video as Record<string, unknown>).cf_stream_id as string | null
+              const embedUrl = cfStreamId
+                ? `https://iframe.videodelivery.net/${cfStreamId}`
+                : getVideoEmbed(video.original_url)
               const del = deleteMediaAction.bind(null, id, video.id)
               const isEditing = video.id === editId
               return (
                 <div key={video.id} className={`group rounded-2xl border bg-white overflow-hidden transition-all ${isEditing ? 'border-[#c7a76f]' : 'border-[#e5dccb] hover:border-[#174f35]/20 hover:shadow-md'}`}>
                   {embedUrl ? (
                     <div className="aspect-video bg-[#f5efdf]">
-                      <iframe src={embedUrl} className="w-full h-full" allowFullScreen title={video.original_filename ?? 'Video'} />
+                      <iframe
+                        src={embedUrl}
+                        className="w-full h-full"
+                        allowFullScreen
+                        allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture"
+                        title={video.original_filename ?? 'Video'}
+                      />
                     </div>
                   ) : (
                     <div className="aspect-video bg-black">
