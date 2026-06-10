@@ -7,6 +7,7 @@ import FamilyTreeCanvas from '@/components/FamilyTreeCanvas'
 import AudioPlayerSection from './AudioPlayerSection'
 import RealMemorialInteractionsWrapper from './RealMemorialInteractionsWrapper'
 import ProfilePhotoCircle from './ProfilePhotoCircle'
+import HeroPanelEmojiBar from './HeroPanelEmojiBar'
 import TimelineSection from './TimelineSection'
 import { getTurnstileSiteKey } from '@/lib/turnstile'
 import { getTranslation } from '@/i18n/server'
@@ -34,6 +35,8 @@ interface VaultRow {
   status: string
   pub_settings: Record<string, boolean> | null
   theme: string | null
+  hero_left_react_heart: number; hero_left_react_pray: number; hero_left_react_smile: number; hero_left_react_cry: number; hero_left_react_dove: number
+  hero_right_react_heart: number; hero_right_react_pray: number; hero_right_react_smile: number; hero_right_react_cry: number; hero_right_react_dove: number
 }
 
 interface Props {
@@ -208,18 +211,23 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
 
         <div className="relative mx-auto grid w-full max-w-7xl items-center gap-5 px-5 pb-12 pt-6 sm:px-8 lg:grid-cols-[1fr_380px_1fr] lg:gap-10 lg:py-20">
 
-          {/* Left — Son mesaj önizlemesi */}
+          {/* Left — Ailesinden */}
           <div className="order-2 rounded-2xl border border-[#c7a76f]/20 bg-[#091712]/55 p-5 shadow-2xl shadow-black/20 backdrop-blur-sm sm:p-6 lg:order-1">
             <div className="mb-3 flex items-center gap-3 text-[#c7a76f]">
               <span className="h-px w-8 bg-[#c7a76f]" />
-              <span className="text-xs tracking-[0.22em] uppercase">{t.memorial.linesLeftForLovedOnes}</span>
+              <span className="text-xs tracking-[0.22em] uppercase">{t.memorial.fromFamily}</span>
             </div>
             <p className="font-serif text-lg leading-8 text-white sm:text-xl sm:leading-9">
               {vault.tagline ?? 'Saygıyla anıyoruz. Bize bıraktığı sevgi ve hatıralar her zaman kalbimizde yaşayacak.'}
             </p>
+            <HeroPanelEmojiBar
+              vaultId={id}
+              panel="left"
+              initialCounts={{ heart: vault.hero_left_react_heart ?? 0, pray: vault.hero_left_react_pray ?? 0, smile: vault.hero_left_react_smile ?? 0, cry: vault.hero_left_react_cry ?? 0, dove: vault.hero_left_react_dove ?? 0 }}
+            />
             <a
               href="#taziye"
-              className="mt-5 inline-flex items-center gap-2 rounded-lg bg-[#c7a76f] px-4 py-2.5 text-xs font-semibold text-[#0c3327] transition hover:bg-[#d4b87c]"
+              className="mt-4 inline-flex items-center gap-2 rounded-lg bg-[#c7a76f] px-4 py-2.5 text-xs font-semibold text-[#0c3327] transition hover:bg-[#d4b87c]"
             >
               {t.memorial.guestbook} <PenLine className="h-4 w-4" />
             </a>
@@ -283,9 +291,14 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
             <p className="mt-1 font-serif text-lg italic leading-8 text-white sm:text-xl sm:leading-9">
               {vault.last_message ?? t.memorial.noLastMessage}
             </p>
+            <HeroPanelEmojiBar
+              vaultId={id}
+              panel="right"
+              initialCounts={{ heart: vault.hero_right_react_heart ?? 0, pray: vault.hero_right_react_pray ?? 0, smile: vault.hero_right_react_smile ?? 0, cry: vault.hero_right_react_cry ?? 0, dove: vault.hero_right_react_dove ?? 0 }}
+            />
             <a
               href="#son-mesaj"
-              className="mt-5 inline-flex items-center gap-2 rounded-lg border border-[#c7a76f]/40 bg-white/5 px-4 py-2.5 text-xs font-semibold text-white transition hover:bg-white/10"
+              className="mt-4 inline-flex items-center gap-2 rounded-lg border border-[#c7a76f]/40 bg-white/5 px-4 py-2.5 text-xs font-semibold text-white transition hover:bg-white/10"
             >
               {t.memorial.exploreMemories} <ArrowRight className="h-4 w-4" />
             </a>

@@ -37,6 +37,34 @@ export async function reactToEntryAction(
   return { success: true, newCount }
 }
 
+export async function reactToHeroPanelAction(
+  vaultId: string,
+  panel: 'left' | 'right',
+  emoji: EntryEmoji,
+  delta: 1 | -1,
+): Promise<{ success: boolean; newCount: number }> {
+  const allowed: EntryEmoji[] = ['heart', 'pray', 'smile', 'cry', 'dove']
+  if (!allowed.includes(emoji)) return { success: false, newCount: 0 }
+
+  const col = `hero_${panel}_react_${emoji}` as const
+  const service = await createServiceClient()
+
+  const { data } = await service
+    .from('vaults')
+    .select(`id, ${col}`)
+    .eq('id', vaultId)
+    .in('status', ['public_memorial', 'private_memorial'])
+    .single()
+
+  if (!data) return { success: false, newCount: 0 }
+
+  const current = (data as Record<string, number>)[col] ?? 0
+  const newCount = Math.max(0, current + delta)
+
+  await service.from('vaults').update({ [col]: newCount }).eq('id', vaultId)
+  return { success: true, newCount }
+}
+
 export async function addReactionAction(vaultId: string, type: 'candle' | 'flower' | 'prayer'): Promise<void> {
   if (!['candle', 'flower', 'prayer'].includes(type)) return
 
