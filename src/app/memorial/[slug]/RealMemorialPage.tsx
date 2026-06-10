@@ -193,12 +193,12 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
             fill
             priority
             sizes="100vw"
-            className="object-cover object-center opacity-35"
+            className="object-cover object-center opacity-60"
           />
         ) : (
           <div className="absolute inset-0 bg-[url('/images/landing/memorial-cemetery.png')] bg-cover bg-center opacity-20" />
         )}
-        <div className="absolute inset-0 bg-gradient-to-r from-[#0c3327] via-[#0c3327]/85 to-[#0c3327]/20" />
+        <div className="absolute inset-0 bg-gradient-to-r from-[#0c3327]/80 via-[#0c3327]/55 to-[#0c3327]/10" />
 
         <div className="relative mx-auto grid w-full max-w-7xl items-center gap-5 px-5 pb-12 pt-6 sm:px-8 lg:grid-cols-[1fr_380px_1fr] lg:gap-10 lg:py-20">
 
