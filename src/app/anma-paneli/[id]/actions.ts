@@ -164,7 +164,7 @@ export async function updateMemorialFamilyMemberAction(
   redirect(`/anma-paneli/${vaultId}/aile`)
 }
 
-export async function saveMemorialCemeteryAction(vaultId: string, formData: FormData): Promise<void> {
+export async function saveMemorialCemeteryAction(vaultId: string, formData: FormData): Promise<{ success: boolean }> {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
@@ -177,7 +177,7 @@ export async function saveMemorialCemeteryAction(vaultId: string, formData: Form
     .eq('product_type', 'memorial_profile')
     .single()
 
-  if (!vault || vault.status === 'pending_verification') return
+  if (!vault || vault.status === 'pending_verification') return { success: false }
 
   const lat = (formData.get('cemetery_lat') as string)?.trim()
   const lng = (formData.get('cemetery_lng') as string)?.trim()
@@ -198,7 +198,7 @@ export async function saveMemorialCemeteryAction(vaultId: string, formData: Form
 
   revalidatePath(`/anma-paneli/${vaultId}/mezar`)
   revalidatePath(`/anma-paneli/${vaultId}`)
-  redirect(`/anma-paneli/${vaultId}/mezar`)
+  return { success: true }
 }
 
 export async function addMemorialVideoAction(vaultId: string, formData: FormData): Promise<void> {
