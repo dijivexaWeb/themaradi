@@ -10,6 +10,7 @@ import ProfilePhotoCircle from './ProfilePhotoCircle'
 import HeroPanelEmojiBar from './HeroPanelEmojiBar'
 import TimelineSection from './TimelineSection'
 import MemoryBookClient from './MemoryBookClient'
+import MemoriesAccordion from './MemoriesAccordion'
 import { getTurnstileSiteKey } from '@/lib/turnstile'
 import { getTranslation } from '@/i18n/server'
 
@@ -748,50 +749,20 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
             <h2 className="mb-8 font-serif text-4xl text-[#173d31] sm:text-5xl">
               {t.memorial.tracesLeftByLovedOnes}
             </h2>
-            <div className="space-y-3">
-              {regularMemories.map((m) => {
-                const embedUrl = m.media_type === 'video' && m.media_url ? getVideoEmbed(m.media_url) : null
-                return (
-                  <div key={m.id} className="group overflow-hidden rounded-2xl border border-[#e1d5c3] bg-[#fffdf8] shadow-sm shadow-[#4d3d26]/5 transition hover:shadow-md hover:shadow-[#4d3d26]/8">
-                    <div className="flex gap-4 p-4 sm:p-5">
-                      {/* Thumbnail */}
-                      {m.media_type === 'image' && m.media_url && (
-                        <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl border border-[#e1d5c3] bg-[#f4eee3] sm:h-24 sm:w-24">
-                          <Image
-                            src={m.media_url}
-                            alt={m.title ?? 'Anı'}
-                            fill
-                            sizes="96px"
-                            className="object-cover transition duration-300 group-hover:scale-105"
-                            unoptimized
-                          />
-                        </div>
-                      )}
-                      {embedUrl && (
-                        <div className="relative h-20 w-32 shrink-0 overflow-hidden rounded-xl border border-[#e1d5c3] bg-[#f4eee3] sm:h-24 sm:w-40">
-                          <iframe src={embedUrl} className="h-full w-full" allowFullScreen title={m.title ?? ''} />
-                        </div>
-                      )}
-                      {m.media_type === 'video' && m.media_url && !embedUrl && (
-                        <div className="relative h-20 w-32 shrink-0 overflow-hidden rounded-xl border border-[#e1d5c3] bg-black sm:h-24 sm:w-40">
-                          <video controls src={m.media_url} className="h-full w-full object-cover" preload="metadata" />
-                        </div>
-                      )}
-                      {/* Content */}
-                      <div className="min-w-0 flex-1">
-                        {m.memory_date && (
-                          <p className="mb-1 text-xs font-semibold tracking-wide text-[#b08340]">
-                            {new Date(m.memory_date).toLocaleDateString(lang, { year: 'numeric', month: 'long', day: 'numeric' })}
-                          </p>
-                        )}
-                        {m.title && <h3 className="mb-1.5 font-serif text-base text-[#173d31] sm:text-lg">{m.title}</h3>}
-                        <p className="line-clamp-3 text-sm leading-6 text-[#4c463c]">{m.content}</p>
-                      </div>
-                    </div>
-                  </div>
-                )
-              })}
-            </div>
+            <MemoriesAccordion
+              memories={regularMemories.map((m) => ({
+                id: m.id,
+                title: m.title ?? null,
+                content: m.content ?? null,
+                memory_date: m.memory_date ?? null,
+                media_url: m.media_url ?? null,
+                media_type: m.media_type ?? null,
+                formattedDate: m.memory_date
+                  ? new Date(m.memory_date).toLocaleDateString(lang, { year: 'numeric', month: 'long', day: 'numeric' })
+                  : null,
+                embedUrl: m.media_type === 'video' && m.media_url ? getVideoEmbed(m.media_url) : null,
+              }))}
+            />
           </div>
         </section>
       )}
