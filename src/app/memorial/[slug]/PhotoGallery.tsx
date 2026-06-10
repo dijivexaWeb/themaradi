@@ -117,93 +117,44 @@ export default function PhotoGallery({ photos, photoCount, photoArchiveLabel, tr
 
   const currentPhoto = photos[currentIndex]
 
-  // Grid layout sizes: mix 2-col and 3-col
-  const getGridClass = (i: number) => {
-    // every 7th item spans 2 cols on desktop for visual interest
-    if (i % 7 === 0) return 'sm:col-span-2 aspect-[16/9]'
-    if (i % 5 === 0) return 'aspect-[3/4]'
-    if (i % 3 === 0) return 'aspect-[4/3]'
-    return 'aspect-square'
-  }
-
   return (
     <>
-      <section id="fotograflar" className="px-5 py-16 sm:px-8">
-        <div className="mx-auto max-w-7xl">
+      <section id="fotograflar" className="px-4 py-8 sm:px-6">
+        <div className="mx-auto max-w-3xl">
           {/* Section Header */}
-          <div className="mb-10 flex items-end justify-between">
+          <div className="mb-4 flex items-end justify-between">
             <div>
-              <div className="flex items-center gap-3 text-[#b08340]">
-                <span className="h-px w-10 bg-[#c7a76f]" />
+              <div className="flex items-center gap-2 text-[#b08340]">
+                <span className="h-px w-8 bg-[#c7a76f]" />
                 <span className="text-xs tracking-[0.2em] uppercase">{photoArchiveLabel}</span>
               </div>
-              <h2 className="mt-3 font-serif text-4xl text-[#173d31] sm:text-5xl">
+              <h2 className="mt-1.5 font-serif text-2xl text-[#173d31] sm:text-3xl">
                 {tracesLabel}
               </h2>
             </div>
-            <span className="hidden text-sm text-[#8a7a64] sm:block">{photoCount} {photosLabel}</span>
+            <span className="text-xs text-[#8a7a64]">{photoCount} {photosLabel}</span>
           </div>
 
-          {/* Photo Grid */}
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 md:gap-4">
+          {/* Photo Grid — sıkı kolaj, ilk foto 2x2 featured, geri kalanlar küçük kareler */}
+          <div className="grid grid-cols-4 gap-1 sm:grid-cols-5 md:grid-cols-6">
             {photos.map((photo, i) => (
               <button
                 key={photo.id}
                 onClick={() => openLightbox(i)}
-                className={`group relative cursor-pointer overflow-hidden focus:outline-none ${getGridClass(i)}`}
+                className={`group relative cursor-pointer overflow-hidden rounded-sm focus:outline-none aspect-square ${
+                  i === 0 ? 'col-span-2 row-span-2' : ''
+                }`}
                 aria-label={photo.original_filename ?? 'Fotoğraf'}
               >
-                {/* Outer frame */}
-                <div
-                  className="absolute inset-0 rounded-lg border border-[#c7a76f]/60 shadow-[0_0_0_1px_rgba(199,167,111,0.15),0_2px_12px_rgba(64,48,24,0.12)] transition-all duration-300 group-hover:border-[#c7a76f] group-hover:shadow-[0_0_0_1px_rgba(199,167,111,0.4),0_8px_24px_rgba(64,48,24,0.20)] z-10 pointer-events-none"
-                  style={{ borderRadius: '8px' }}
+                <Image
+                  src={photo.thumb_url ?? photo.original_url}
+                  alt={photo.original_filename ?? ''}
+                  fill
+                  sizes="(min-width: 768px) 16vw, (min-width: 640px) 20vw, 25vw"
+                  className="object-cover transition-transform duration-300 group-hover:scale-110"
+                  unoptimized
                 />
-                {/* Inner frame line */}
-                <div
-                  className="absolute inset-[5px] rounded border border-[#c7a76f]/30 z-10 pointer-events-none transition-all duration-300 group-hover:border-[#c7a76f]/60"
-                />
-                {/* Corner ornaments */}
-                {[
-                  'top-1.5 left-1.5',
-                  'top-1.5 right-1.5 rotate-90',
-                  'bottom-1.5 right-1.5 rotate-180',
-                  'bottom-1.5 left-1.5 -rotate-90',
-                ].map((pos, ci) => (
-                  <span
-                    key={ci}
-                    className={`absolute ${pos} z-20 pointer-events-none text-[#c7a76f]/70 text-[10px] leading-none select-none group-hover:text-[#b08340] transition-colors`}
-                  >
-                    ✦
-                  </span>
-                ))}
-
-                {/* Image */}
-                <div className="absolute inset-0 overflow-hidden rounded-lg">
-                  <Image
-                    src={photo.thumb_url ?? photo.original_url}
-                    alt={photo.original_filename ?? ''}
-                    fill
-                    sizes="(min-width: 768px) 33vw, 50vw"
-                    className="object-cover transition-transform duration-500 group-hover:scale-105"
-                    unoptimized
-                  />
-                  {/* Hover overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-                  {/* Caption */}
-                  {(photo.caption || photo.original_filename) && (
-                    <div className="absolute bottom-3 left-3 right-3 translate-y-2 opacity-0 transition-all duration-300 group-hover:translate-y-0 group-hover:opacity-100">
-                      <p className="font-serif text-sm text-white drop-shadow-md">
-                        {photo.caption ?? photo.original_filename}
-                      </p>
-                    </div>
-                  )}
-                  {/* Magnify icon */}
-                  <div className="absolute right-3 top-3 opacity-0 transition-opacity duration-300 group-hover:opacity-100">
-                    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white/20 backdrop-blur-sm text-white text-sm">
-                      ⛶
-                    </span>
-                  </div>
-                </div>
+                <div className="absolute inset-0 bg-black/0 transition-colors duration-300 group-hover:bg-black/20" />
               </button>
             ))}
           </div>
