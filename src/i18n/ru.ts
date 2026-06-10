@@ -1020,6 +1020,7 @@ const ru: LangDict = {
       privateContents: 'Личный контент',
       heirInfo: 'Информация о наследниках',
       documents: 'Документы',
+      memorialStyle: 'Стиль поминовения',
       publishAndQR: 'Публикация и QR',
       adminPanel: 'Панель администратора',
       profilePreview: 'Предпросмотр профиля',

@@ -1018,6 +1018,7 @@ const en = {
       privateContents: 'Private Contents',
       heirInfo: 'Heir Information',
       documents: 'Documents',
+      memorialStyle: 'Memorial Style',
       publishAndQR: 'Publish & QR',
       adminPanel: 'Admin Panel',
       profilePreview: 'Profile Preview',

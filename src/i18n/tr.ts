@@ -1020,6 +1020,7 @@ const tr: LangDict = {
       privateContents: 'Özel İçerikler',
       heirInfo: 'Varis Bilgileri',
       documents: 'Belgeler',
+      memorialStyle: 'Anma Tarzı',
       publishAndQR: 'Yayın & QR',
       adminPanel: 'Admin Paneli',
       profilePreview: 'Profil Önizleme',

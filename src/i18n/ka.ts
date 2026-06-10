@@ -1020,6 +1020,7 @@ const ka: LangDict = {
       privateContents: 'პირადი კონტენტი',
       heirInfo: 'ინფორმაცია მემკვიდრეებზე',
       documents: 'დოკუმენტები',
+      memorialStyle: 'მოხსენების სტილი',
       publishAndQR: 'პუბლიკაცია და QR',
       adminPanel: 'ადმინისტრატორის პანელი',
       profilePreview: 'პროფილის წინასწარი ნახვა',

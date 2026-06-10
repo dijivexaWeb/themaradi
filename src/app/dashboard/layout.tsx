@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import {
   CreditCard, Eye, FileText, Headphones, Home,
-  LockKeyhole, LogOut, QrCode, Scroll, Shield, ShieldCheck,
+  LockKeyhole, LogOut, QrCode, Scroll, Shield, ShieldCheck, Sparkles,
 } from 'lucide-react'
 import { getTranslation } from '@/i18n/server'
 import LangSwitcherDashboard from '@/components/LangSwitcherDashboard'
@@ -36,6 +36,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
     { href: v('gizli-kasa'), label: t.dashboard.sidebar.privateContents, icon: LockKeyhole },
     { href: v('heirs'),      label: t.dashboard.sidebar.heirInfo,  icon: Shield },
     { href: v('belgeler'),   label: t.dashboard.sidebar.documents,         icon: FileText },
+    { href: v('anma-tarzi'), label: t.dashboard.sidebar.memorialStyle,     icon: Sparkles },
     { href: v('settings'),   label: t.dashboard.sidebar.publishAndQR,       icon: QrCode },
   ]
 
