@@ -608,6 +608,43 @@ function witnessEmailHtml(witnessName: string, deceasedName: string, confirmUrl:
 </body></html>`
 }
 
+// ─── Favori Şarkı Yükleme ────────────────────────────────────────────────────
+
+const MAX_SONG_BYTES = 30 * 1024 * 1024 // 30 MB
+const ALLOWED_SONG_MIME = new Set(['audio/mpeg', 'audio/mp3', 'audio/wav', 'audio/ogg', 'audio/x-m4a', 'audio/aac', 'audio/flac'])
+
+export async function uploadSongFileAction(
+  vaultId: string,
+  formData: FormData
+): Promise<{ success: boolean; url?: string; error?: string }> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { success: false, error: 'Oturum bulunamadı' }
+
+  const { data: vault } = await supabase
+    .from('vaults')
+    .select('id')
+    .eq('id', vaultId)
+    .eq('owner_id', user.id)
+    .single()
+  if (!vault) return { success: false, error: 'Yetkisiz' }
+
+  const file = formData.get('song_file')
+  if (!(file instanceof File) || file.size === 0) return { success: false, error: 'Dosya seçilmedi' }
+  if (!ALLOWED_SONG_MIME.has(file.type) || file.size > MAX_SONG_BYTES) {
+    return { success: false, error: 'Geçersiz dosya (MP3/WAV/M4A, max 30 MB)' }
+  }
+
+  const service = await createServiceClient()
+  const fn = cleanFilename(file.name)
+  const path = `songs/${vaultId}/${user.id}/${Date.now()}-${fn}`
+  const { error } = await service.storage.from(MEDIA_BUCKET).upload(path, file, { contentType: file.type, upsert: false })
+  if (error) return { success: false, error: 'Yükleme hatası' }
+
+  const { data } = service.storage.from(MEDIA_BUCKET).getPublicUrl(path)
+  return { success: true, url: data.publicUrl }
+}
+
 // ─── QR / Slug Actions ───────────────────────────────────────────────────────
 
 export async function checkSlugAvailabilityAction(

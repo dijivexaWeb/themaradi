@@ -5,7 +5,8 @@ import { useParams } from 'next/navigation'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { BookOpen, User, Music, Heart, MapPin } from 'lucide-react'
+import { BookOpen, User, Music, Heart, MapPin, Upload, Loader2 } from 'lucide-react'
+import { uploadSongFileAction } from '../actions'
 
 interface VaultData {
   display_name: string
@@ -63,6 +64,8 @@ export default function BiyografiPage() {
   const [favSongUrl, setFavSongUrl] = useState('')
   const [songSaving, setSongSaving] = useState(false)
   const [songSaved, setSongSaved] = useState(false)
+  const [songUploading, setSongUploading] = useState(false)
+  const [songUploadError, setSongUploadError] = useState<string | null>(null)
 
   // Biyografi
   const [bio, setBio] = useState('')
@@ -313,17 +316,60 @@ export default function BiyografiPage() {
             </div>
           </div>
           <form onSubmit={handleSaveSong} className="space-y-4 p-6">
-            <p className="text-xs text-[#788177]">Anma sayfasında çalınan müzik. MP3/WAV URL veya SoundCloud/Spotify bağlantısı.</p>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div>
-                <label className={labelCls}>Şarkı Adı</label>
-                <input type="text" value={favSongTitle} onChange={e => setFavSongTitle(e.target.value)} disabled={isLocked ?? false} placeholder="Ne olurdum sensiz..." className={inputCls} />
-              </div>
-              <div>
-                <label className={labelCls}>Ses URL</label>
-                <input type="url" value={favSongUrl} onChange={e => setFavSongUrl(e.target.value)} disabled={isLocked ?? false} placeholder="https://..." className={inputCls} />
-              </div>
+            <p className="text-xs text-[#788177]">Anma sayfasında çalınan müzik. Dosya yükleyebilir veya URL girebilirsiniz (MP3/WAV/M4A, max 30 MB).</p>
+
+            <div>
+              <label className={labelCls}>Şarkı Adı</label>
+              <input type="text" value={favSongTitle} onChange={e => setFavSongTitle(e.target.value)} disabled={isLocked ?? false} placeholder="Ne olurdum sensiz..." className={inputCls} />
             </div>
+
+            {/* Dosya yükleme */}
+            <div>
+              <label className={labelCls}>Müzik Dosyası Yükle</label>
+              <label className={`flex cursor-pointer items-center gap-3 rounded-xl border-2 border-dashed border-[#e5dccb] bg-[#fdfaf5] px-4 py-4 transition hover:border-[#174f35]/40 hover:bg-[#f5f0e8] ${isLocked ? 'pointer-events-none opacity-40' : ''}`}>
+                {songUploading
+                  ? <Loader2 className="h-5 w-5 animate-spin text-[#174f35]" />
+                  : <Upload className="h-5 w-5 text-[#b08340]" />
+                }
+                <div>
+                  <p className="text-sm font-medium text-[#1f2d27]">
+                    {songUploading ? 'Yükleniyor...' : 'Dosya seç veya buraya sürükle'}
+                  </p>
+                  <p className="text-xs text-[#adb5ab]">MP3, WAV, M4A, AAC — max 30 MB</p>
+                </div>
+                <input
+                  type="file"
+                  accept="audio/*"
+                  className="sr-only"
+                  disabled={isLocked ?? false}
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0]
+                    if (!file) return
+                    setSongUploading(true)
+                    setSongUploadError(null)
+                    const fd = new FormData()
+                    fd.append('song_file', file)
+                    const res = await uploadSongFileAction(id, fd)
+                    setSongUploading(false)
+                    if (res.success && res.url) {
+                      setFavSongUrl(res.url)
+                      if (!favSongTitle) setFavSongTitle(file.name.replace(/\.[^.]+$/, ''))
+                    } else {
+                      setSongUploadError(res.error ?? 'Yükleme hatası')
+                    }
+                    e.target.value = ''
+                  }}
+                />
+              </label>
+              {songUploadError && <p className="mt-1 text-xs text-red-500">{songUploadError}</p>}
+            </div>
+
+            {/* Manuel URL */}
+            <div>
+              <label className={labelCls}>veya Ses URL</label>
+              <input type="url" value={favSongUrl} onChange={e => setFavSongUrl(e.target.value)} disabled={isLocked ?? false} placeholder="https://..." className={inputCls} />
+            </div>
+
             {favSongUrl && (
               <audio controls src={favSongUrl} className="h-9 w-full" />
             )}
