@@ -3,6 +3,35 @@
 > Her oturum sonunda Claude bu dosyayı günceller.
 > Format: tarih → ne yapıldı → nerede kalındı → sıradaki adım.
 
+## 2026-06-11 — Oturum 75: Video Upload HTML Parse Hatası Düzeltme
+
+### Yapılanlar
+- **`src/app/anma-paneli/[id]/videolar/VideoUploadForm.tsx`**:
+  - `uploadUrlRes.ok === false` dalında `.json()` çağrısı try/catch ile sarıldı — Vercel'in HTML hata sayfası döndürmesi durumunda artık `SyntaxError` yerine anlamlı mesaj gösteriliyor
+  - Hata mesajına HTTP status kodu eklendi (`HTTP 404`, `HTTP 500` vb.) — root cause tespiti kolaylaştı
+  - Başarılı yanıt path'inde de `uploadUrlRes.json()` try/catch ile korundu
+- **`src/app/api/stream/upload-url/route.ts`**:
+  - Env var eksikliğinde `console.error` eklendi — Vercel Function logs'da görünür
+  - Cloudflare API çağrısı başladığında `console.log` eklendi (account ID masked)
+
+### Proje Durumu
+- [x] Video upload HTML parse hatası: defensive JSON handling
+- [ ] Cloudflare Stream gerçek entegrasyon testi (deploy sonrası)
+- [ ] Havale akışı email bildirimleri
+
+### Kritik Kararlar / Notlar
+- `src/app/api/stream/upload-url/route.ts` her code path'te JSON döndürüyor — HTML yanıtın kökeni büyük ihtimalle Vercel deployment geçiş süreci veya route derleme hatası
+- Deploy tamamlanınca kullanıcı tekrar denemeli; HTTP status kodu artık hata mesajında görünüyor
+
+### Nerede Kaldık
+`VideoUploadForm.tsx` defensive fix push edildi (commit `7cd1521`). Cloudflare Stream entegrasyonunun gerçekten çalışıp çalışmadığı henüz doğrulanmadı.
+
+### Sıradaki Adım
+1. Vercel deploy bekleniyor → kullanıcı video yüklemeyi tekrar denemeli
+2. Hata devam ederse HTTP status kodu hata mesajından görünerek root cause anlaşılacak
+3. Havale akışı email bildirimleri
+4. Email template DRY: `verificationApprovedEmailHtml` 2 dosyada duplicate, `@/lib/email/templates.ts`'e taşı
+
 ## 2026-06-10 — Oturum 74: Şahit Formu İyileştirme + Onay Bildirimi + R2 Doğrulama
 
 ### Yapılanlar
