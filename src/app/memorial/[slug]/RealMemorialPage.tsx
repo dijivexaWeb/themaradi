@@ -348,7 +348,7 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
         {hasPersonalDetails && (
           <div className="mx-auto grid max-w-7xl border-b border-[#2a5a45] text-[#efe7d8] md:grid-cols-2">
             {vault.profession && (
-              <div className="border-[#2a5a45] px-6 py-6 md:border-r">
+              <div className="border-[#2a5a45] px-6 py-6 md:border-r md:text-right">
                 <div className="text-xs font-semibold uppercase tracking-[0.2em] text-[#c7a76f]">{t.memorial.profession}</div>
                 <div className="mt-2 font-serif text-2xl text-white">{vault.profession}</div>
               </div>
