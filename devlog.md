@@ -3,6 +3,36 @@
 > Her oturum sonunda Claude bu dosyayı günceller.
 > Format: tarih → ne yapıldı → nerede kalındı → sıradaki adım.
 
+## 2026-06-10 — Oturum 65: Publish Hatası Düzeltme + Email Onayı Araştırması
+
+### Yapılanlar
+- `publishMemorialAction` hatası düzeltildi: `createClient()` yerine `createServiceClient()` kullanılarak RLS bypass sağlandı; `vault.slug` seçimine eklendi; `error` kontrolü eklendi
+- `anma-paneli/[id]/layout.tsx` güncellendi: admin link kaldırıldı (ShieldCheck ikonu da temizlendi)
+- `furkandenizk8@gmail.com` kullanıcısı ve tüm ilişkili kayıtları (vaults, profiles, payments, user_consents) Supabase MCP ile silindi
+- Email onayı atlama sorunu araştırıldı: `getOrCreatePurchaseUser()` başında `supabase.auth.getUser()` kontrolü var — kullanıcı zaten giriş yapmışsa `pendingEmailConfirmation` akışına girilmiyor, mevcut session ile devam ediliyor; bu tasarım gereği
+- Email onayı akışı doğrulandı: furkandenizk8 silindikten sonra yeni kayıtta onay maili geldi, onaydan sonra giriş başarılı
+
+### Proje Durumu
+[x] publishMemorialAction RLS hatası düzeltildi
+[x] Admin link sidebar'dan kaldırıldı
+[x] furkandenizk8 kullanıcısı temizlendi
+[x] Email onayı akışı doğrulandı (çalışıyor)
+
+### Kritik Kararlar / Notlar
+- `publishMemorialAction`'da RLS sorunu: `vaults.status` güncelleme politikası kullanıcının kendi kaydında bile `service_role` gerektiriyordu
+- Kullanıcı zaten giriş yapmışken satın alma formuna girerse email onayı atlanıyor — bu bug değil, intentional design
+
+### Nerede Kaldık
+Tüm acil düzeltmeler yapıldı. Email onayı çalışıyor. Sistem stabil.
+
+### Sıradaki Adım
+1. Admin paneline objection listesi sayfası ekle (`admin/objections/page.tsx`)
+2. `anma-paneli/[id]/page.tsx` (dashboard home) — doğrulama durumu widget'ı
+3. TypeScript derleme kontrolü: `tsc --noEmit`
+4. Tarayıcıda test: itiraz formu gönder, DB'de kayıt kontrol et
+
+---
+
 ## 2026-06-10 — Oturum 64: Admin Doğrulama UI + İtiraz Özelliği
 
 ### Yapılanlar
