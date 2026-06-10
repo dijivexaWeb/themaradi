@@ -40,6 +40,14 @@ export default async function AnmaPaneliLayout({
     .eq('id', user.id)
     .single()
 
+  const [
+    { count: pendingGuestbook },
+    { count: pendingMemoryBook },
+  ] = await Promise.all([
+    supabase.from('guestbook_entries').select('id', { count: 'exact', head: true }).eq('vault_id', id).eq('status', 'pending'),
+    supabase.from('memory_book_entries').select('id', { count: 'exact', head: true }).eq('vault_id', id).eq('status', 'pending'),
+  ])
+
   const m = t.memorial_panel
   const initial = (profile?.full_name?.[0] ?? user.email?.[0] ?? '?').toUpperCase()
 
@@ -53,20 +61,20 @@ export default async function AnmaPaneliLayout({
   const status = statusConfig[vault.status ?? 'pending_verification'] ?? statusConfig.pending_verification
 
   const nav = [
-    { href: `/anma-paneli/${id}`,               label: m.sidebar.memorialPage,    icon: Home },
-    { href: `/anma-paneli/${id}/biyografi`,     label: m.sidebar.biography,       icon: BookOpen },
-    { href: `/anma-paneli/${id}/fotolar`,       label: m.sidebar.photos,          icon: Camera },
-    { href: `/anma-paneli/${id}/videolar`,      label: m.sidebar.videos,          icon: Video },
-    { href: `/anma-paneli/${id}/anilar`,        label: m.sidebar.memories,        icon: Heart },
-    { href: `/anma-paneli/${id}/ses-kayitlari`, label: m.sidebar.audioRecordings, icon: Mic },
-    { href: `/anma-paneli/${id}/aile`,          label: m.sidebar.family,          icon: Users },
-    { href: `/anma-paneli/${id}/mezar`,         label: m.sidebar.cemetery,        icon: MapPin },
-    { href: `/anma-paneli/${id}/taziye`,        label: m.sidebar.guestbook,       icon: MessageCircle },
-    { href: `/anma-paneli/${id}/ani-defteri`,  label: 'Anı Defteri',              icon: BookHeart },
-    { href: `/anma-paneli/${id}/gorunum`,       label: m.sidebar.appearance,      icon: Palette },
-    { href: `/anma-paneli/${id}/anma-tarzi`,   label: m.sidebar.memorialStyle,   icon: Sparkles },
-    { href: `/anma-paneli/${id}/link-ayari`,   label: m.sidebar.linkAndQr,       icon: QrCode },
-    { href: `/anma-paneli/${id}/dogrulama`,     label: m.sidebar.verification,    icon: Settings },
+    { href: `/anma-paneli/${id}`,               label: m.sidebar.memorialPage,    icon: Home,            badge: 0 },
+    { href: `/anma-paneli/${id}/biyografi`,     label: m.sidebar.biography,       icon: BookOpen,        badge: 0 },
+    { href: `/anma-paneli/${id}/fotolar`,       label: m.sidebar.photos,          icon: Camera,          badge: 0 },
+    { href: `/anma-paneli/${id}/videolar`,      label: m.sidebar.videos,          icon: Video,           badge: 0 },
+    { href: `/anma-paneli/${id}/anilar`,        label: m.sidebar.memories,        icon: Heart,           badge: 0 },
+    { href: `/anma-paneli/${id}/ses-kayitlari`, label: m.sidebar.audioRecordings, icon: Mic,             badge: 0 },
+    { href: `/anma-paneli/${id}/aile`,          label: m.sidebar.family,          icon: Users,           badge: 0 },
+    { href: `/anma-paneli/${id}/mezar`,         label: m.sidebar.cemetery,        icon: MapPin,          badge: 0 },
+    { href: `/anma-paneli/${id}/taziye`,        label: m.sidebar.guestbook,       icon: MessageCircle,   badge: pendingGuestbook ?? 0 },
+    { href: `/anma-paneli/${id}/ani-defteri`,  label: 'Anı Defteri',              icon: BookHeart,       badge: pendingMemoryBook ?? 0 },
+    { href: `/anma-paneli/${id}/gorunum`,       label: m.sidebar.appearance,      icon: Palette,         badge: 0 },
+    { href: `/anma-paneli/${id}/anma-tarzi`,   label: m.sidebar.memorialStyle,   icon: Sparkles,        badge: 0 },
+    { href: `/anma-paneli/${id}/link-ayari`,   label: m.sidebar.linkAndQr,       icon: QrCode,          badge: 0 },
+    { href: `/anma-paneli/${id}/dogrulama`,     label: m.sidebar.verification,    icon: Settings,        badge: 0 },
   ]
 
   return (
@@ -90,14 +98,26 @@ export default async function AnmaPaneliLayout({
 
         {/* Navigasyon */}
         <nav className="mt-5 space-y-0.5">
-          {nav.map(({ href, label, icon: Icon }) => (
+          {nav.map(({ href, label, icon: Icon, badge }) => (
             <Link
               key={href}
               href={href}
-              className="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-medium text-[#23382f] transition-all hover:bg-[#f5efdf]"
+              className={`flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm font-medium transition-all hover:bg-[#f5efdf] ${badge > 0 ? 'text-[#173d31]' : 'text-[#23382f]'}`}
             >
-              <Icon className="h-4 w-4 text-[#7b837d]" />
-              {label}
+              <span className="relative shrink-0">
+                <Icon className={`h-4 w-4 ${badge > 0 ? 'text-[#174f35]' : 'text-[#7b837d]'}`} />
+                {badge > 0 && (
+                  <span className="absolute -right-1.5 -top-1.5 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-red-500 text-[8px] font-bold leading-none text-white">
+                    {badge > 9 ? '9+' : badge}
+                  </span>
+                )}
+              </span>
+              <span className="flex-1">{label}</span>
+              {badge > 0 && (
+                <span className="ml-auto flex h-5 min-w-[20px] items-center justify-center rounded-full bg-red-100 px-1.5 text-[10px] font-bold text-red-600">
+                  {badge}
+                </span>
+              )}
             </Link>
           ))}
         </nav>
