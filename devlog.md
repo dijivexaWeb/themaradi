@@ -3,6 +3,22 @@
 > Her oturum sonunda Claude bu dosyayı günceller.
 > Format: tarih → ne yapıldı → nerede kalındı → sıradaki adım.
 
+## 2026-06-10 — Oturum 72: Çift Kayıt Sorunu Düzeltme (Tüm Dashboard)
+
+### Yapılanlar
+- **`src/components/SubmitButton.tsx`** (yeni): `useFormStatus` tabanlı paylaşımlı submit butonu — pending sırasında disabled + Loader2 spinner
+- **`anilar/_MemorySubmitButton.tsx`** (yeni): anilar sayfasına özel wrapper
+- **`memories.ts` → `addMemoryAction`**: başarılı kayıt sonrası `?saved=1` ile redirect, başarı banner'ı gösterimi
+- **fotolar, videolar, ses-kayitlari, aile**: ham `<button type="submit">` → `<SubmitButton>` ile değiştirildi
+- **biyografi**: profileSaving/detailSaving/songSaving/extraSaving sırasında buton disabled
+
+### Nerede Kaldık
+Tüm dashboard kaydet butonları artık işlem sırasında disable olup spinner + "Kaydediliyor..." gösteriyor. Çift kayıt mümkün değil.
+
+### Sıradaki Adım
+1. Profil videosu anma sayfasında görüntüleme
+2. Admin itiraz sayfası
+
 ## 2026-06-10 — Oturum 71: Anı Defteri + Emoji Reaksiyon Kalıcılık Fix
 
 ### Yapılanlar
