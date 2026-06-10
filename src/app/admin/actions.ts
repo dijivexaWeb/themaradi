@@ -351,6 +351,13 @@ export async function moderateGuestbook(
 
   const supabase = await createServiceClient()
 
+  // Fetch vault slug before update so we can revalidate the memorial page
+  const { data: entry } = await supabase
+    .from('guestbook_entries')
+    .select('vault_id, vaults(slug)')
+    .eq('id', entryId)
+    .single()
+
   const { error } = await supabase
     .from('guestbook_entries')
     .update({ status })
@@ -368,6 +375,11 @@ export async function moderateGuestbook(
   })
 
   revalidatePath('/admin/guestbook')
+
+  // Revalidate the memorial page so approved entry appears immediately
+  const slug = (entry?.vaults as { slug?: string } | null)?.slug
+  if (slug) revalidatePath(`/memorial/${slug}`)
+
   return { success: true }
 }
 
