@@ -103,14 +103,16 @@ export default async function AnmaPaneliLayout({
 
         {/* Alt alan */}
         <div className="mt-auto space-y-0.5">
-          {vault.status === 'public_memorial' && vault.slug && (
+          {vault.slug && (
             <Link
-              href={`/memorial/${vault.slug}`}
+              href={vault.status === 'public_memorial'
+                ? `/memorial/${vault.slug}`
+                : `/memorial/${vault.slug}?preview=1`}
               target="_blank"
               className="flex items-center gap-3 rounded-xl px-4 py-2.5 text-sm text-[#69766f] transition-colors hover:bg-[#f5efdf]"
             >
               <Eye className="h-4 w-4" />
-              {m.sidebar.preview}
+              {vault.status === 'public_memorial' ? m.sidebar.preview : m.sidebar.previewDraft}
             </Link>
           )}
 

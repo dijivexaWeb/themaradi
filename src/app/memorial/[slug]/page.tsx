@@ -37,8 +37,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 }
 
-export default async function MemorialPage({ params }: Props) {
+interface PropsWithSearch extends Props {
+  searchParams: Promise<{ preview?: string }>
+}
+
+export default async function MemorialPage({ params, searchParams }: PropsWithSearch) {
   const { slug } = await params
+  const { preview } = await searchParams
 
   if (slug === 'demo') {
     return <MemorialPageClient />
@@ -64,8 +69,37 @@ export default async function MemorialPage({ params }: Props) {
     )
   }
 
-  // Not yet published (hidden_vault, pending_verification etc.)
   const isLive = vault.status === 'public_memorial' || vault.status === 'private_memorial'
+
+  // Owner preview — yayınlanmamış sayfalarda sadece sahibi görebilir
+  if (!isLive && preview === '1') {
+    const { data: { user } } = await supabase.auth.getUser()
+    const isOwner = user?.id === vault.owner_id
+    if (!isOwner) {
+      return (
+        <div className="min-h-screen bg-[#0c3327] flex items-center justify-center px-4">
+          <div className="text-center max-w-sm">
+            <div className="text-6xl mb-4">🔒</div>
+            <h1 className="text-2xl font-serif text-[#c7a76f] mb-2">{vault.display_name}</h1>
+            <p className="text-[#cfc3ad] text-sm mt-2">Bu anma sayfası henüz yayınlanmamış.</p>
+          </div>
+        </div>
+      )
+    }
+    return (
+      <>
+        {/* Önizleme bandı */}
+        <div className="sticky top-0 z-50 flex items-center justify-between bg-amber-500 px-4 py-2 text-sm font-semibold text-white">
+          <span>👁 Önizleme Modu — Bu sayfa henüz yayınlanmadı</span>
+          <a href={`/anma-paneli/${vault.id}`} className="rounded bg-white/20 px-3 py-1 text-xs hover:bg-white/30">
+            Panele Dön
+          </a>
+        </div>
+        <RealMemorialPage vault={vault} />
+      </>
+    )
+  }
+
   if (!isLive) {
     return (
       <div className="min-h-screen bg-[#0c3327] flex items-center justify-center px-4">

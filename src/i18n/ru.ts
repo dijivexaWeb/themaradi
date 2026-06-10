@@ -973,6 +973,7 @@ const ru: LangDict = {
       signOut: 'Выйти',
       memberLabel: 'Участник The Eternal Memory',
       preview: 'Открыть страницу памяти',
+      previewDraft: 'Предпросмотр (не опубликовано)',
       profileLabel: 'Мемориальный профиль',
     },
     home: {

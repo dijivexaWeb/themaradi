@@ -971,6 +971,7 @@ const en = {
       signOut: 'Sign Out',
       memberLabel: 'The Eternal Memory Member',
       preview: 'View Memorial Page',
+      previewDraft: 'Preview (Not Published)',
       profileLabel: 'Memorial Profile',
     },
     home: {

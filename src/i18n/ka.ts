@@ -973,6 +973,7 @@ const ka: LangDict = {
       signOut: 'გამოსვლა',
       memberLabel: 'The Eternal Memory-ის წევრი',
       preview: 'მემორიალური გვერდის ნახვა',
+      previewDraft: 'გადახედვა (არ არის გამოქვეყნებული)',
       profileLabel: 'მემორიალური პროფილი',
     },
     home: {

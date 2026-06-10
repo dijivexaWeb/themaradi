@@ -973,6 +973,7 @@ const tr: LangDict = {
       signOut: 'Çıkış Yap',
       memberLabel: 'The Eternal Memory Üyesi',
       preview: 'Anma Sayfasını Gör',
+      previewDraft: 'Önizle (Yayında Değil)',
       profileLabel: 'Anma Profili',
     },
     home: {
