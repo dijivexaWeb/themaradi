@@ -6,6 +6,7 @@ import BrandLogo from '@/components/BrandLogo'
 import FamilyTreeCanvas from '@/components/FamilyTreeCanvas'
 import AudioPlayerSection from './AudioPlayerSection'
 import RealMemorialInteractionsWrapper from './RealMemorialInteractionsWrapper'
+import ProfilePhotoCircle from './ProfilePhotoCircle'
 import TimelineSection from './TimelineSection'
 import { getTurnstileSiteKey } from '@/lib/turnstile'
 import { getTranslation } from '@/i18n/server'
@@ -227,16 +228,11 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
               <span className="h-px w-8 bg-[#c7a76f]" />
             </div>
 
-            {vault.cover_photo_url ? (
-              <div className="relative mx-auto h-[210px] w-[210px] overflow-hidden rounded-full border-[5px] border-[#c7a76f]/35 bg-[#0c3327] shadow-[0_24px_70px_rgba(0,0,0,0.45)] sm:h-[310px] sm:w-[310px] sm:border-[6px]">
-                <Image src={vault.cover_photo_url} alt={vault.display_name} fill priority sizes="310px" className="object-cover object-top" unoptimized />
-                <div className="absolute inset-0 rounded-full ring-1 ring-inset ring-white/15" />
-              </div>
-            ) : (
-              <div className="mx-auto flex h-[210px] w-[210px] items-center justify-center rounded-full border-[5px] border-[#c7a76f]/35 bg-[#091712] shadow-[0_24px_70px_rgba(0,0,0,0.45)] sm:h-[310px] sm:w-[310px]">
-                <span className="text-7xl font-bold text-[#c7a76f]/40">{vaultInitial}</span>
-              </div>
-            )}
+            <ProfilePhotoCircle
+              src={vault.cover_photo_url ?? ''}
+              alt={vault.display_name}
+              initial={vaultInitial}
+            />
 
             <h1 className="mt-5 font-serif text-4xl leading-none text-white sm:mt-7 sm:text-6xl">
               {vault.display_name}

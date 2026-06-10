@@ -40,6 +40,7 @@ export default function BiyografiPage() {
   const [deathDate, setDeathDate] = useState('')
   const [tagline, setTagline] = useState('')
   const [coverPhotoUrl, setCoverPhotoUrl] = useState('')
+  const [photoObjectPos, setPhotoObjectPos] = useState('center 20%')
   const [heroBgUrl, setHeroBgUrl] = useState('')
   const [profileSaving, setProfileSaving] = useState(false)
   const [profileSaved, setProfileSaved] = useState(false)
@@ -118,6 +119,19 @@ export default function BiyografiPage() {
         }
       })
   }, [id, supabase])
+
+  // Yüklenen fotoğrafın boyutuna göre object-position belirle
+  useEffect(() => {
+    if (!coverPhotoUrl) return
+    const img = new window.Image()
+    img.onload = () => {
+      const ratio = img.naturalHeight / img.naturalWidth
+      // Portre (9:16 → ratio ~1.78): yüz genellikle üst %20'de
+      // Kare veya yatay: ortala
+      setPhotoObjectPos(ratio > 1.2 ? 'center 20%' : 'center center')
+    }
+    img.src = coverPhotoUrl
+  }, [coverPhotoUrl])
 
   const isLocked = vault?.status === 'pending_verification'
   const bioDirty = bio !== initialBio
@@ -244,7 +258,7 @@ export default function BiyografiPage() {
                     <Loader2 className="h-7 w-7 animate-spin text-[#174f35]" />
                   ) : coverPhotoUrl ? (
                     <>
-                      <Image src={coverPhotoUrl} alt="Profil" fill className="object-cover object-top" unoptimized />
+                      <Image src={coverPhotoUrl} alt="Profil" fill className="object-cover" style={{ objectPosition: photoObjectPos }} unoptimized />
                       {/* Hover overlay */}
                       <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 rounded-full bg-black/40 opacity-0 transition group-hover:opacity-100">
                         <Upload className="h-5 w-5 text-white" />
