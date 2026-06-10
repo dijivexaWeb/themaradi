@@ -7,8 +7,12 @@ import { createPresignedReadUrl } from '@/lib/r2'
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://theeternalmemory.com'
 
-export default async function VerificationsPage() {
+interface Props { searchParams: Promise<{ tab?: string }> }
+
+export default async function VerificationsPage({ searchParams }: Props) {
   await requireAdmin()
+  const { tab } = await searchParams
+  const activeTab = tab === 'tamamlanan' ? 'tamamlanan' : 'bekleyen'
   const supabase = await createServiceClient()
 
   // Ödeme onayı bekleyenler
@@ -37,6 +41,20 @@ export default async function VerificationsPage() {
     .eq('status', 'pending')
     .order('created_at', { ascending: true })
 
+  // Tamamlanan doğrulamalar (approved)
+  const { data: approvedDocs } = await supabase
+    .from('memorial_verification_docs')
+    .select(`
+      id, file_name, created_at, status,
+      vaults (
+        id, display_name, slug, status,
+        profiles!vaults_owner_id_fkey (full_name, email)
+      )
+    `)
+    .eq('status', 'approved')
+    .order('created_at', { ascending: false })
+    .limit(50)
+
   // Presigned URLs
   const docQueueWithUrls = docQueue
     ? await Promise.all(
@@ -62,6 +80,84 @@ export default async function VerificationsPage() {
         <h1 className="text-2xl font-bold text-slate-900">Doğrulama Kuyruğu</h1>
         <p className="text-slate-500 text-sm mt-1">Ödeme ve belge onay işlemleri</p>
       </div>
+
+      {/* Sekmeler */}
+      <div className="flex gap-1 mb-8 border-b border-slate-200">
+        <a href="/admin/verifications?tab=bekleyen"
+          className={`px-5 py-2.5 text-sm font-semibold rounded-t-lg border-b-2 transition-colors ${activeTab === 'bekleyen' ? 'border-blue-500 text-blue-600 bg-blue-50' : 'border-transparent text-slate-500 hover:text-slate-700'}`}>
+          Bekleyen
+          {((paymentQueue?.length ?? 0) + docQueueWithUrls.length) > 0 && (
+            <span className="ml-2 inline-flex h-5 w-5 items-center justify-center rounded-full bg-amber-500 text-[10px] font-bold text-white">
+              {(paymentQueue?.length ?? 0) + docQueueWithUrls.length}
+            </span>
+          )}
+        </a>
+        <a href="/admin/verifications?tab=tamamlanan"
+          className={`px-5 py-2.5 text-sm font-semibold rounded-t-lg border-b-2 transition-colors ${activeTab === 'tamamlanan' ? 'border-emerald-500 text-emerald-600 bg-emerald-50' : 'border-transparent text-slate-500 hover:text-slate-700'}`}>
+          Tamamlanan
+          {(approvedDocs?.length ?? 0) > 0 && (
+            <span className="ml-2 inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-emerald-500 px-1.5 text-[10px] font-bold text-white">
+              {approvedDocs!.length}
+            </span>
+          )}
+        </a>
+      </div>
+
+      {activeTab === 'tamamlanan' ? (
+        <div>
+          <h2 className="text-lg font-semibold text-slate-800 mb-4">Onaylanan Doğrulamalar</h2>
+          {(!approvedDocs || approvedDocs.length === 0) ? (
+            <div className="bg-white border border-slate-200 rounded-xl p-8 text-center text-slate-400 text-sm">
+              Henüz onaylanmış doğrulama yok.
+            </div>
+          ) : (
+            <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
+              <table className="w-full text-sm">
+                <thead className="bg-slate-50 text-slate-600 text-xs uppercase tracking-wide">
+                  <tr>
+                    <th className="text-left px-4 py-3">Anma Sayfası</th>
+                    <th className="text-left px-4 py-3">Hesap Sahibi</th>
+                    <th className="text-left px-4 py-3">Belge</th>
+                    <th className="text-left px-4 py-3">Onay Tarihi</th>
+                    <th className="text-left px-4 py-3">Durum</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {approvedDocs.map((doc) => {
+                    const v = (Array.isArray(doc.vaults) ? doc.vaults[0] : doc.vaults) as Record<string, unknown> | null
+                    const o = v ? ((Array.isArray(v.profiles) ? (v.profiles as Record<string, unknown>[])[0] : v.profiles) as Record<string, unknown> | null) : null
+                    return (
+                      <tr key={doc.id} className="hover:bg-slate-50">
+                        <td className="px-4 py-3">
+                          <p className="font-medium text-slate-800">{v?.display_name as string ?? '—'}</p>
+                          {(v?.slug as string | null) && (
+                            <a href={`${SITE_URL}/memorial/${v?.slug}`} target="_blank" rel="noopener noreferrer"
+                              className="text-xs text-blue-500 hover:underline">/{v?.slug as string}</a>
+                          )}
+                        </td>
+                        <td className="px-4 py-3">
+                          <p className="text-slate-700">{o?.full_name as string ?? '—'}</p>
+                          <p className="text-xs text-slate-400">{o?.email as string ?? '—'}</p>
+                        </td>
+                        <td className="px-4 py-3 text-slate-500">{doc.file_name}</td>
+                        <td className="px-4 py-3 text-slate-500 text-xs">
+                          {new Date(doc.created_at).toLocaleDateString('tr-TR', { day: 'numeric', month: 'short', year: 'numeric' })}
+                        </td>
+                        <td className="px-4 py-3">
+                          <span className="inline-flex items-center gap-1 rounded-full bg-emerald-100 px-2.5 py-1 text-xs font-semibold text-emerald-700">
+                            ✓ Onaylandı
+                          </span>
+                        </td>
+                      </tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+      ) : (
+      <div>
 
       {/* BÖLÜM 1: Ödeme Onayı */}
       <div className="mb-10">
@@ -206,7 +302,7 @@ export default async function VerificationsPage() {
                         <p className="font-semibold text-slate-800">{owner?.full_name as string ?? '—'}</p>
                         <p className="text-slate-500">{owner?.email as string ?? '—'}</p>
                         {(owner?.phone as string | null) && (
-                          <p className="text-slate-500">📞 {owner.phone as string}</p>
+                          <p className="text-slate-500">📞 {owner?.phone as string}</p>
                         )}
                         {vaultCreatedAt && (
                           <p className="text-xs text-slate-400 pt-1 border-t border-slate-200 mt-2">
@@ -287,6 +383,8 @@ export default async function VerificationsPage() {
           </div>
         )}
       </div>
+      </div>
+      )}
     </div>
   )
 }
