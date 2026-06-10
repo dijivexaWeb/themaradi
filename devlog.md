@@ -3,6 +3,81 @@
 > Her oturum sonunda Claude bu dosyayı günceller.
 > Format: tarih → ne yapıldı → nerede kalındı → sıradaki adım.
 
+## 2026-06-11 — Oturum 78: Admin Önizleme + RLS Düzeltmeleri + Sidebar Badge
+
+### Yapılanlar
+- **Admin "Sayfayı Önizle" düzeltildi (`src/app/memorial/[slug]/page.tsx`):**
+  - `preview=1` geldiğinde vault service client ile çekiliyor (RLS bypass) — yayınlanmamış sayfalar artık 404 vermiyor
+  - Admin kullanıcı (`profiles.role = 'admin'`) preview'da sayfayı görebiliyor
+  - `isPreview` prop geçilmiyordu — medya/anı sorguları da RLS'e takılıyordu, düzeltildi
+  - Admin için önizleme bandı "Admin Paneli" linki gösteriyor
+
+- **Guestbook RLS düzeltildi:**
+  - `user_view_approved_guestbook_entries` sadece `authenticated` içindi — anon ziyaretçi gördüğü onaylı mesajlar yoktu
+  - Yeni migration: `anon_view_approved_guestbook_entries` eklendi
+  - `moderateGuestbook` action'ı artık `/memorial/[slug]` revalidate ediyor
+
+- **Toplu RLS düzeltme migration'ı uygulandı:**
+  - `vault_memories`: sadece owner okuyabiliyordu — `public_memorial` + `private_memorial` için anon+authenticated okuma politikası eklendi
+  - `vault_family_members`: aynı sorun — düzeltildi
+  - `media`: sadece `public_memorial` destekliyordu — `private_memorial` eklendi
+  - `vault_audio_recordings`: aynı sorun — düzeltildi
+
+- **Dashboard sidebar badge eklendi (`src/app/anma-paneli/[id]/layout.tsx`):**
+  - Taziye Defteri: pending guestbook count → kırmızı badge
+  - Anı Defteri: pending memory_book count → kırmızı badge
+  - Hem icon üstünde küçük dot hem sağda sayı pill gösteriliyor
+
+### Proje Durumu
+- [x] Admin önizleme (yayınlanmamış sayfa) — çalışıyor
+- [x] Taziye onaylayınca memorial sayfasında görünüyor
+- [x] Anılar/medya/aile/ses RLS düzeltildi — live vault ziyaretçileri görebiliyor
+- [x] Sidebar badge — pending aksiyon sayısı gösteriliyor
+- [ ] Havale akışı email bildirimleri
+
+### Kritik Kararlar / Notlar
+- `preview=1` geldiğinde tüm sorguları service client'a taşımak gerekiyordu, sadece vault değil
+- RLS politikaları `public_memorial` için yazılmıştı, `private_memorial` unutulmuştu — toplu düzeltme yapıldı
+- Sidebar badge için layout'ta 2 adet `count: 'exact'` sorgusu eklendi — performans etkisi minimal
+
+### Nerede Kaldık
+Tüm RLS sorunları giderildi, sidebar badge aktif, admin önizleme çalışıyor.
+
+### Sıradaki Adım
+1. Havale akışı email bildirimleri
+2. Email template DRY: `verificationApprovedEmailHtml` `@/lib/email/templates.ts`'e taşı
+
+## 2026-06-11 — Oturum 77: Admin Doğrulama Sekmeli Görünüm (Bekleyen/Tamamlanan)
+
+### Yapılanlar
+- **`src/app/admin/verifications/page.tsx`**: Bekleyen/Tamamlanan sekme navigasyonu eklendi
+  - URL param `?tab=bekleyen` / `?tab=tamamlanan` ile aktif sekme belirleniyor (`searchParams` async prop)
+  - Bekleyen sekmesinde ödeme + belge kuyruğu (eski içerik korundu)
+  - Tamamlanan sekmesinde `status='approved'` belgeler tablo halinde: anma sayfası, hesap sahibi, belge adı, tarih, durum
+  - Her sekmede rozet (badge) — bekleyen sayısı amber, tamamlanan sayısı emerald renkli
+  - TypeScript hatası düzeltildi: `owner.phone` → `owner?.phone` (possibly null)
+- Commit `1638258` push edildi
+
+### Proje Durumu
+- [x] Admin doğrulama sekmeli görünüm (Bekleyen/Tamamlanan)
+- [x] Cloudflare Stream video yükleme — çalışıyor
+- [x] R2 vefat belgesi yükleme — çalışıyor
+- [x] Admin doğrulama kuyruğu — belgeler + şahit detayları
+- [ ] Havale akışı email bildirimleri
+- [ ] Email template DRY: `verificationApprovedEmailHtml` 2 dosyada duplicate
+
+### Kritik Kararlar / Notlar
+- Tamamlanan sekme `limit(50)` ile sorgu yapıyor — çok fazla onay birikirse pagination gerekebilir
+- `approvedDocs` querysi sadece temel bilgileri alıyor (şahit detayı yok) — tamamlanan için yeterli
+
+### Nerede Kaldık
+Admin doğrulama sayfası tamamlandı. Bekleyen/tamamlanan sekmeli görünüm çalışıyor, build hatasız.
+
+### Sıradaki Adım
+1. Deploy sonrası admin `/admin/verifications?tab=tamamlanan` test et
+2. Havale akışı email bildirimleri
+3. Email template DRY: `verificationApprovedEmailHtml` `@/lib/email/templates.ts`'e taşı
+
 ## 2026-06-11 — Oturum 76: Cloudflare Stream + R2 Upload Tam Entegrasyon + Admin Doğrulama Detayı
 
 ### Yapılanlar
