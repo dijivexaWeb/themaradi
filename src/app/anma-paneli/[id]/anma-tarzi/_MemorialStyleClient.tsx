@@ -17,7 +17,13 @@ const copy: Record<Lang, {
   title: string
   subtitle: string
   templateSectionTitle: string
+  templateHint: string
   useTemplate: string
+  selected: string
+  deselect: string
+  maxReached: string
+  appendConfirm: string
+  replaceConfirm: string
   editSectionTitle: string
   editSectionDesc: string
   colActive: string
@@ -30,16 +36,21 @@ const copy: Record<Lang, {
   saveBtn: string
   saving: string
   saved: string
-  confirmChange: string
   noActions: string
 }> = {
   tr: {
     title: 'Anma Tarzı',
-    subtitle: 'Ziyaretçilerin bu anma sayfasında nasıl anma yapabileceğini seçin. Hazır bir şablon kullanabilir veya kendi özel butonlarınızı oluşturabilirsiniz.',
+    subtitle: 'Ziyaretçilerin bu anma sayfasında nasıl anma yapabileceğini seçin. En fazla 2 şablon seçebilir veya kendi özel butonlarınızı oluşturabilirsiniz.',
     templateSectionTitle: 'Şablon Seçin',
-    useTemplate: 'Bu şablonu kullan',
+    templateHint: 'En fazla 2 şablon seçilebilir. İkinci şablon seçilince butonları mevcut listeye eklenir.',
+    useTemplate: 'Seç',
+    selected: '✓ Seçili',
+    deselect: 'Kaldır',
+    maxReached: 'En fazla 2 şablon seçilebilir. Birini kaldırın.',
+    appendConfirm: 'Bu şablonun butonları mevcut listeye eklenecek. Devam?',
+    replaceConfirm: 'Mevcut butonlar bu şablonun butonlarıyla değiştirilecek. Devam?',
     editSectionTitle: 'Anma Butonlarını Düzenle',
-    editSectionDesc: 'Aktif butonlar public sayfada görünür. Metni düzenleyebilir, butonu kapatabilir veya silebilirsiniz.',
+    editSectionDesc: 'Aktif butonlar public sayfada görünür. Metni düzenleyebilir, kapatabilir veya silebilirsiniz.',
     colActive: 'Aktif',
     colLabel: 'Buton Metni',
     colIcon: 'İkon',
@@ -50,16 +61,21 @@ const copy: Record<Lang, {
     saveBtn: 'Kaydet',
     saving: 'Kaydediliyor...',
     saved: 'Kaydedildi ✓',
-    confirmChange: 'Mevcut butonlar değiştirilecek. Devam etmek istiyor musunuz?',
     noActions: 'Henüz hiç buton eklenmedi. Bir şablon seçin veya manuel ekleyin.',
   },
   en: {
     title: 'Memorial Style',
-    subtitle: 'Choose how visitors can pay their respects on this memorial page. Use a preset template or create your own custom buttons.',
-    templateSectionTitle: 'Choose a Template',
-    useTemplate: 'Use this template',
+    subtitle: 'Choose how visitors pay their respects. Select up to 2 templates or create custom buttons.',
+    templateSectionTitle: 'Choose Templates',
+    templateHint: 'Up to 2 templates can be selected. The second template\'s buttons are added to the list.',
+    useTemplate: 'Select',
+    selected: '✓ Selected',
+    deselect: 'Remove',
+    maxReached: 'Maximum 2 templates allowed. Remove one first.',
+    appendConfirm: 'This template\'s buttons will be added to the current list. Continue?',
+    replaceConfirm: 'Current buttons will be replaced by this template. Continue?',
     editSectionTitle: 'Edit Memorial Buttons',
-    editSectionDesc: 'Active buttons are shown on the public page. You can edit labels, disable or delete buttons.',
+    editSectionDesc: 'Active buttons appear on the public page.',
     colActive: 'Active',
     colLabel: 'Button Label',
     colIcon: 'Icon',
@@ -70,14 +86,19 @@ const copy: Record<Lang, {
     saveBtn: 'Save',
     saving: 'Saving...',
     saved: 'Saved ✓',
-    confirmChange: 'Existing buttons will be replaced. Continue?',
     noActions: 'No buttons yet. Choose a template or add manually.',
   },
   ka: {
     title: 'მოხსენების სტილი',
-    subtitle: 'აირჩიეთ, როგორ შეძლებენ ვიზიტორები პატივი სცენ ამ გვერდზე. გამოიყენეთ მზა შაბლონი ან შექმენით საკუთარი.',
+    subtitle: 'აირჩიეთ, როგორ შეძლებენ ვიზიტორები პატივი სცენ ამ გვერდზე. შეგიძლიათ 2 შაბლონამდე.',
     templateSectionTitle: 'შაბლონის არჩევა',
-    useTemplate: 'გამოვიყენო ეს შაბლონი',
+    templateHint: 'მაქსიმუმ 2 შაბლონი. მეორე შაბლონი ემატება სიას.',
+    useTemplate: 'არჩევა',
+    selected: '✓ არჩეული',
+    deselect: 'მოხსნა',
+    maxReached: 'მაქსიმუმ 2 შაბლონი. ერთი გადაიტანეთ.',
+    appendConfirm: 'ეს შაბლონი ემატება არსებულ სიას. გაგრძელება?',
+    replaceConfirm: 'არსებული ღილაკები შეიცვლება. გაგრძელება?',
     editSectionTitle: 'ღილაკების რედაქტირება',
     editSectionDesc: 'აქტიური ღილაკები ნაჩვენებია საჯარო გვერდზე.',
     colActive: 'აქტიური',
@@ -90,14 +111,19 @@ const copy: Record<Lang, {
     saveBtn: 'შენახვა',
     saving: 'ინახება...',
     saved: 'შენახულია ✓',
-    confirmChange: 'არსებული ღილაკები შეიცვლება. გაგრძელება?',
-    noActions: 'ჯერ ღილაკები არ არის. შაბლონი აირჩიეთ ან ხელით დაამატეთ.',
+    noActions: 'ჯერ ღილაკები არ არის.',
   },
   ru: {
     title: 'Стиль поминовения',
-    subtitle: 'Выберите, как посетители смогут отдать дань уважения на этой странице. Используйте шаблон или создайте свои кнопки.',
-    templateSectionTitle: 'Выберите шаблон',
-    useTemplate: 'Использовать этот шаблон',
+    subtitle: 'Выберите, как посетители смогут отдать дань уважения. Можно выбрать до 2 шаблонов.',
+    templateSectionTitle: 'Выбор шаблона',
+    templateHint: 'Максимум 2 шаблона. Кнопки второго шаблона добавляются к списку.',
+    useTemplate: 'Выбрать',
+    selected: '✓ Выбран',
+    deselect: 'Убрать',
+    maxReached: 'Максимум 2 шаблона. Сначала уберите один.',
+    appendConfirm: 'Кнопки этого шаблона будут добавлены к текущему списку. Продолжить?',
+    replaceConfirm: 'Существующие кнопки будут заменены. Продолжить?',
     editSectionTitle: 'Редактировать кнопки',
     editSectionDesc: 'Активные кнопки отображаются на публичной странице.',
     colActive: 'Активна',
@@ -110,8 +136,7 @@ const copy: Record<Lang, {
     saveBtn: 'Сохранить',
     saving: 'Сохранение...',
     saved: 'Сохранено ✓',
-    confirmChange: 'Существующие кнопки будут заменены. Продолжить?',
-    noActions: 'Кнопок пока нет. Выберите шаблон или добавьте вручную.',
+    noActions: 'Кнопок пока нет.',
   },
 }
 
@@ -136,16 +161,14 @@ interface Props {
 let _localIdCounter = 0
 function newLocalId() { return `local_${++_localIdCounter}` }
 
-function dbActionsToRows(dbActions: Props['initialActions']): ActionRow[] {
-  return dbActions.map(a => ({
-    _localId: a.id,
-    id: a.id,
-    label: a.label,
-    icon: a.icon,
-    is_active: a.is_active,
-    show_counter: a.show_counter,
-    sort_order: a.sort_order,
-  }))
+function parseKeys(raw: string | null): TemplateKey[] {
+  if (!raw) return []
+  try {
+    const parsed = JSON.parse(raw)
+    if (Array.isArray(parsed)) return parsed as TemplateKey[]
+  } catch { /* not JSON */ }
+  // fallback: single key or comma-separated
+  return raw.split(',').filter(Boolean) as TemplateKey[]
 }
 
 export default function MemorialStyleClient({ vaultId, initialTemplateKey, initialActions }: Props) {
@@ -153,33 +176,61 @@ export default function MemorialStyleClient({ vaultId, initialTemplateKey, initi
   const c = copy[lang as Lang] ?? copy.tr
   const [isPending, startTransition] = useTransition()
   const [savedOk, setSavedOk] = useState(false)
+  const [maxAlert, setMaxAlert] = useState(false)
 
-  const [selectedKey, setSelectedKey] = useState<TemplateKey | null>(
-    (initialTemplateKey as TemplateKey) ?? null
+  const [selectedKeys, setSelectedKeys] = useState<TemplateKey[]>(parseKeys(initialTemplateKey))
+  const [actions, setActions] = useState<ActionRow[]>(
+    initialActions.map(a => ({ _localId: a.id, id: a.id, label: a.label, icon: a.icon, is_active: a.is_active, show_counter: a.show_counter, sort_order: a.sort_order }))
   )
-  const [actions, setActions] = useState<ActionRow[]>(dbActionsToRows(initialActions))
 
-  // New action form state
   const [newLabel, setNewLabel] = useState('')
   const [newIcon, setNewIcon] = useState<ActionIcon>('flower')
   const [newCounter, setNewCounter] = useState(true)
 
-  function applyTemplate(key: TemplateKey) {
-    if (actions.length > 0 && !window.confirm(c.confirmChange)) return
+  function handleTemplateClick(key: TemplateKey) {
+    setMaxAlert(false)
+    const isSelected = selectedKeys.includes(key)
+
+    if (isSelected) {
+      // Deselect — sadece seçimi kaldır, butonlara dokunma
+      setSelectedKeys(prev => prev.filter(k => k !== key))
+      setSavedOk(false)
+      return
+    }
+
+    if (selectedKeys.length >= 2) {
+      setMaxAlert(true)
+      return
+    }
+
     const template = MEMORIAL_STYLE_TEMPLATES.find(t => t.key === key)
     if (!template) return
-    setSelectedKey(key)
-    setActions(
-      template.actions.map((a, i) => ({
-        _localId: newLocalId(),
-        id: null,
-        label: a.label[lang as Lang] ?? a.label.tr,
-        icon: a.icon,
-        is_active: true,
-        show_counter: true,
-        sort_order: i,
-      }))
-    )
+
+    const newRows = template.actions.map((a, i) => ({
+      _localId: newLocalId(),
+      id: null,
+      label: a.label[lang as Lang] ?? a.label.tr,
+      icon: a.icon,
+      is_active: true,
+      show_counter: true,
+      sort_order: actions.length + i,
+    }))
+
+    if (selectedKeys.length === 0) {
+      // İlk şablon — mevcut varsa onayla, sonra değiştir
+      if (actions.length > 0) {
+        if (!window.confirm(c.replaceConfirm)) return
+        setActions(newRows.map((r, i) => ({ ...r, sort_order: i })))
+      } else {
+        setActions(newRows)
+      }
+    } else {
+      // İkinci şablon — listeye ekle
+      if (!window.confirm(c.appendConfirm)) return
+      setActions(prev => [...prev, ...newRows])
+    }
+
+    setSelectedKeys(prev => [...prev, key])
     setSavedOk(false)
   }
 
@@ -197,15 +248,7 @@ export default function MemorialStyleClient({ vaultId, initialTemplateKey, initi
     if (!newLabel.trim()) return
     setActions(prev => [
       ...prev,
-      {
-        _localId: newLocalId(),
-        id: null,
-        label: newLabel.trim(),
-        icon: newIcon,
-        is_active: true,
-        show_counter: newCounter,
-        sort_order: prev.length,
-      },
+      { _localId: newLocalId(), id: null, label: newLabel.trim(), icon: newIcon, is_active: true, show_counter: newCounter, sort_order: prev.length },
     ])
     setNewLabel('')
     setNewIcon('flower')
@@ -217,15 +260,8 @@ export default function MemorialStyleClient({ vaultId, initialTemplateKey, initi
     startTransition(async () => {
       const result = await saveMemorialStyleAction(
         vaultId,
-        selectedKey ?? 'custom',
-        actions.map((a, i) => ({
-          id: a.id,
-          label: a.label,
-          icon: a.icon,
-          is_active: a.is_active,
-          show_counter: a.show_counter,
-          sort_order: i,
-        }))
+        JSON.stringify(selectedKeys.length ? selectedKeys : ['custom']),
+        actions.map((a, i) => ({ id: a.id, label: a.label, icon: a.icon, is_active: a.is_active, show_counter: a.show_counter, sort_order: i }))
       )
       if (result.success) setSavedOk(true)
     })
@@ -243,30 +279,46 @@ export default function MemorialStyleClient({ vaultId, initialTemplateKey, initi
 
         {/* Şablon Seçimi */}
         <section className="mb-10">
-          <h2 className="mb-4 text-xs font-bold uppercase tracking-widest text-[#adb5ab]">
-            {c.templateSectionTitle}
-          </h2>
+          <div className="mb-4 flex items-center justify-between gap-4">
+            <h2 className="text-xs font-bold uppercase tracking-widest text-[#adb5ab]">
+              {c.templateSectionTitle}
+            </h2>
+            <span className={`text-xs font-semibold rounded-full px-3 py-1 ${
+              selectedKeys.length === 2 ? 'bg-[#174f35] text-white' : 'bg-[#f0ebe0] text-[#69766f]'
+            }`}>
+              {selectedKeys.length}/2
+            </span>
+          </div>
+          <p className="mb-4 text-xs text-[#adb5ab]">{c.templateHint}</p>
+
+          {maxAlert && (
+            <div className="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
+              {c.maxReached}
+            </div>
+          )}
+
           <div className="grid gap-3 sm:grid-cols-2">
             {MEMORIAL_STYLE_TEMPLATES.map(tmpl => {
-              const isSelected = selectedKey === tmpl.key
+              const isSelected = selectedKeys.includes(tmpl.key)
+              const isDisabled = !isSelected && selectedKeys.length >= 2
               return (
                 <div
                   key={tmpl.key}
                   className={`rounded-2xl border p-4 transition-all ${
                     isSelected
                       ? 'border-[#174f35] bg-[#edf5f0] shadow-sm'
-                      : 'border-[#e5dccb] bg-white hover:border-[#b5cec0]'
+                      : isDisabled
+                        ? 'border-[#e5dccb] bg-[#f9f7f2] opacity-50'
+                        : 'border-[#e5dccb] bg-white hover:border-[#b5cec0]'
                   }`}
                 >
-                  <div className="flex items-start justify-between gap-3">
+                  <div className="flex items-start gap-3">
+                    <span className="text-xl mt-0.5">{tmpl.emoji}</span>
                     <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-2">
-                        <span className="text-lg">{tmpl.emoji}</span>
-                        <span className="font-semibold text-sm text-[#173d31]">
-                          {tmpl.name[lang as Lang] ?? tmpl.name.tr}
-                        </span>
-                      </div>
-                      <p className="mt-1 text-xs text-[#8a9e96] leading-relaxed">
+                      <span className="font-semibold text-sm text-[#173d31]">
+                        {tmpl.name[lang as Lang] ?? tmpl.name.tr}
+                      </span>
+                      <p className="mt-0.5 text-xs text-[#8a9e96] leading-relaxed">
                         {tmpl.description[lang as Lang] ?? tmpl.description.tr}
                       </p>
                       {tmpl.actions.length > 0 && (
@@ -281,14 +333,15 @@ export default function MemorialStyleClient({ vaultId, initialTemplateKey, initi
                     </div>
                   </div>
                   <button
-                    onClick={() => applyTemplate(tmpl.key)}
-                    className={`mt-3 w-full rounded-xl py-1.5 text-xs font-semibold transition-colors ${
+                    onClick={() => handleTemplateClick(tmpl.key)}
+                    disabled={isDisabled}
+                    className={`mt-3 w-full rounded-xl py-1.5 text-xs font-semibold transition-colors disabled:cursor-not-allowed ${
                       isSelected
-                        ? 'bg-[#174f35] text-white'
+                        ? 'bg-[#174f35] text-white hover:bg-[#cc3b2e]'
                         : 'bg-[#f5efdf] text-[#174f35] hover:bg-[#ead4a5]'
                     }`}
                   >
-                    {isSelected ? '✓ Seçili' : c.useTemplate}
+                    {isSelected ? `${c.selected} — ${c.deselect}` : c.useTemplate}
                   </button>
                 </div>
               )
@@ -307,8 +360,7 @@ export default function MemorialStyleClient({ vaultId, initialTemplateKey, initi
             <p className="py-6 text-center text-sm text-[#adb5ab]">{c.noActions}</p>
           ) : (
             <div className="space-y-2">
-              {/* Header */}
-              <div className="grid grid-cols-[auto_1fr_100px_56px_56px_32px] items-center gap-2 border-b border-[#f0ebe0] pb-2 text-[10px] font-bold uppercase tracking-widest text-[#adb5ab]">
+              <div className="grid grid-cols-[auto_1fr_110px_48px_48px_28px] items-center gap-2 border-b border-[#f0ebe0] pb-2 text-[10px] font-bold uppercase tracking-widest text-[#adb5ab]">
                 <span>{c.colActive}</span>
                 <span>{c.colLabel}</span>
                 <span>{c.colIcon}</span>
@@ -318,8 +370,7 @@ export default function MemorialStyleClient({ vaultId, initialTemplateKey, initi
               </div>
 
               {actions.map(row => (
-                <div key={row._localId} className="grid grid-cols-[auto_1fr_100px_56px_56px_32px] items-center gap-2">
-                  {/* Aktif toggle */}
+                <div key={row._localId} className="grid grid-cols-[auto_1fr_110px_48px_48px_28px] items-center gap-2">
                   <button
                     type="button"
                     onClick={() => updateAction(row._localId, { is_active: !row.is_active })}
@@ -328,14 +379,12 @@ export default function MemorialStyleClient({ vaultId, initialTemplateKey, initi
                     <span className={`block h-4 w-4 rounded-full bg-white shadow-sm transition-transform mx-0.5 ${row.is_active ? 'translate-x-4' : 'translate-x-0'}`} />
                   </button>
 
-                  {/* Label */}
                   <input
                     value={row.label}
                     onChange={e => updateAction(row._localId, { label: e.target.value })}
                     className="rounded-lg border border-[#e5dccb] bg-[#fdfaf5] px-3 py-1.5 text-sm text-[#173d31] focus:border-[#174f35] focus:outline-none"
                   />
 
-                  {/* Icon seçici */}
                   <select
                     value={row.icon}
                     onChange={e => updateAction(row._localId, { icon: e.target.value })}
@@ -346,7 +395,6 @@ export default function MemorialStyleClient({ vaultId, initialTemplateKey, initi
                     ))}
                   </select>
 
-                  {/* Sayaç toggle */}
                   <div className="flex justify-center">
                     <button
                       type="button"
@@ -357,13 +405,11 @@ export default function MemorialStyleClient({ vaultId, initialTemplateKey, initi
                     </button>
                   </div>
 
-                  {/* Sil */}
                   <div />
                   <button
                     type="button"
                     onClick={() => removeAction(row._localId)}
-                    className="text-[#c0a99a] hover:text-red-500 transition-colors text-base leading-none"
-                    title="Sil"
+                    className="text-[#c0a99a] hover:text-red-500 transition-colors text-lg leading-none"
                   >
                     ×
                   </button>
@@ -372,7 +418,6 @@ export default function MemorialStyleClient({ vaultId, initialTemplateKey, initi
             </div>
           )}
 
-          {/* Yeni buton ekle */}
           <div className="mt-6 border-t border-[#f0ebe0] pt-5">
             <p className="mb-3 text-xs font-semibold text-[#69766f]">{c.addTitle}</p>
             <div className="flex flex-wrap items-end gap-2">
@@ -393,12 +438,7 @@ export default function MemorialStyleClient({ vaultId, initialTemplateKey, initi
                 ))}
               </select>
               <label className="flex items-center gap-1.5 text-xs text-[#69766f] select-none cursor-pointer">
-                <input
-                  type="checkbox"
-                  checked={newCounter}
-                  onChange={e => setNewCounter(e.target.checked)}
-                  className="accent-[#174f35]"
-                />
+                <input type="checkbox" checked={newCounter} onChange={e => setNewCounter(e.target.checked)} className="accent-[#174f35]" />
                 Sayaç
               </label>
               <button
@@ -415,9 +455,7 @@ export default function MemorialStyleClient({ vaultId, initialTemplateKey, initi
 
         {/* Kaydet */}
         <div className="flex items-center justify-end gap-4">
-          {savedOk && (
-            <span className="text-sm font-medium text-[#174f35]">{c.saved}</span>
-          )}
+          {savedOk && <span className="text-sm font-medium text-[#174f35]">{c.saved}</span>}
           <button
             type="button"
             onClick={handleSave}

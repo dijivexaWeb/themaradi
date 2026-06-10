@@ -40,6 +40,69 @@ export interface MemorialStyleTemplate {
 
 export const MEMORIAL_STYLE_TEMPLATES: MemorialStyleTemplate[] = [
   {
+    key: 'secular',
+    emoji: '💙',
+    name: { tr: 'Seküler / İnançsız Anma', en: 'Secular Memorial', ka: 'სეკულარული მოხსენება', ru: 'Светское поминовение' },
+    description: {
+      tr: 'Dini ifade kullanmadan sevgi ve hatıra odaklı anma tarzı.',
+      en: 'Love and memory-focused style without religious expressions.',
+      ka: 'სიყვარულსა და მოგონებებზე ორიენტირებული სტილი, რელიგიური გამოხატვის გარეშე.',
+      ru: 'Стиль, ориентированный на любовь и память, без религиозных выражений.',
+    },
+    actions: [
+      { icon: 'star',    label: { tr: 'Anısını yaşattım', en: 'Kept memory alive',  ka: 'ხსოვნა ვაცოცხლე',   ru: 'Сохранил память' } },
+      { icon: 'heart',   label: { tr: 'Kalp bıraktım',   en: 'Left a heart',       ka: 'გული დავტოვე',      ru: 'Оставил сердце' } },
+      { icon: 'message', label: { tr: 'Hatıra yazdım',   en: 'Wrote a memory',     ka: 'მოგონება დავწერე',  ru: 'Написал воспоминание' } },
+      { icon: 'silence', label: { tr: 'Sessizce andım',  en: 'Remembered silently', ka: 'სიჩუმით ვიხსენე',  ru: 'Вспомнил в тишине' } },
+    ],
+  },
+  {
+    key: 'honor_gratitude',
+    emoji: '🏛️',
+    name: { tr: 'Saygı ve Minnet Anması', en: 'Honor & Gratitude Memorial', ka: 'პატივისცემის მოხსენება', ru: 'Поминовение с почестями' },
+    description: {
+      tr: 'Şehit, asker, polis veya toplum için değerli kişiler için uygun tarz.',
+      en: 'Style suited for veterans, public servants and community heroes.',
+      ka: 'სტილი, რომელიც შესაფერისია ვეტერანებისთვის, სახელმწიფო მოხელეებისა და საზოგადოებრივი გმირებისთვის.',
+      ru: 'Стиль, подходящий для ветеранов, государственных служащих и героев.',
+    },
+    actions: [
+      { icon: 'silence', label: { tr: 'Saygıyla andım',       en: 'Honored with respect',  ka: 'პატივისცემით ვიხსენე',  ru: 'Почтил с уважением' } },
+      { icon: 'flag',    label: { tr: 'Bayrak bıraktım',      en: 'Left a flag',           ka: 'დროშა დავტოვე',         ru: 'Оставил флаг' } },
+      { icon: 'message', label: { tr: 'Minnet mesajı yazdım', en: 'Wrote a gratitude note', ka: 'მადლიერების წერილი',    ru: 'Написал слова благодарности' } },
+      { icon: 'prayer',  label: { tr: 'Dua ettim',            en: 'Said a prayer',         ka: 'ვილოცე',                ru: 'Помолился' } },
+    ],
+  },
+  {
+    key: 'child_angel',
+    emoji: '👼',
+    name: { tr: 'Çocuk / Melek Anması', en: 'Child & Angel Memorial', ka: 'ბავშვის / ანგელოზის მოხსენება', ru: 'Поминовение ребёнка / Ангела' },
+    description: {
+      tr: 'Çocuk kayıpları için hassas, sevgi dolu ve yumuşak dil kullanılan tarz.',
+      en: 'Gentle, loving style for the loss of a child.',
+      ka: 'ნაზი, სავსე სიყვარულით სტილი ბავშვის დაკარგვისთვის.',
+      ru: 'Нежный, любящий стиль для потери ребёнка.',
+    },
+    actions: [
+      { icon: 'angel',   label: { tr: 'Melek kalp bıraktım',     en: 'Left an angel heart',    ka: 'ანგელოზის გული დავტოვე', ru: 'Оставил сердце ангела' } },
+      { icon: 'heart',   label: { tr: 'Sevgi gönderdim',         en: 'Sent love',              ka: 'სიყვარული გავუგზავნე',   ru: 'Послал любовь' } },
+      { icon: 'flower',  label: { tr: 'Çiçek bıraktım',          en: 'Left a flower',          ka: 'ყვავილი დავტოვე',        ru: 'Оставил цветок' } },
+      { icon: 'message', label: { tr: 'Aileye destek mesajı yazdım', en: 'Wrote to the family', ka: 'ოჯახს შეტყობინება',      ru: 'Написал семье поддержку' } },
+    ],
+  },
+  {
+    key: 'custom',
+    emoji: '⚙️',
+    name: { tr: 'Özel Anma Tarzı', en: 'Custom Memorial Style', ka: 'მორგებული სტილი', ru: 'Особый стиль поминовения' },
+    description: {
+      tr: 'Kendi anma butonlarınızı tamamen sıfırdan oluşturun.',
+      en: 'Create your own memorial buttons from scratch.',
+      ka: 'შექმენით თქვენი საკუთარი სამგლოვიარო ღილაკები ნულიდან.',
+      ru: 'Создайте собственные кнопки поминовения с нуля.',
+    },
+    actions: [],
+  },
+  {
     key: 'universal',
     emoji: '🌿',
     name: { tr: 'Evrensel Anma', en: 'Universal Memorial', ka: 'უნივერსალური მოხსენება', ru: 'Универсальное поминовение' },
@@ -157,68 +220,5 @@ export const MEMORIAL_STYLE_TEMPLATES: MemorialStyleTemplate[] = [
       { icon: 'star',    label: { tr: 'Huzur diledim',    en: 'Wished peace',        ka: 'სიმშვიდე ვუსურვე',  ru: 'Пожелал мира' } },
       { icon: 'flower',  label: { tr: 'Çiçek bıraktım',  en: 'Left a flower',       ka: 'ყვავილი დავტოვე',   ru: 'Оставил цветок' } },
     ],
-  },
-  {
-    key: 'secular',
-    emoji: '💙',
-    name: { tr: 'Seküler / İnançsız Anma', en: 'Secular Memorial', ka: 'სეკულარული მოხსენება', ru: 'Светское поминовение' },
-    description: {
-      tr: 'Dini ifade kullanmadan sevgi ve hatıra odaklı anma tarzı.',
-      en: 'Love and memory-focused style without religious expressions.',
-      ka: 'სიყვარულსა და მოგონებებზე ორიენტირებული სტილი, რელიგიური გამოხატვის გარეშე.',
-      ru: 'Стиль, ориентированный на любовь и память, без религиозных выражений.',
-    },
-    actions: [
-      { icon: 'star',    label: { tr: 'Anısını yaşattım', en: 'Kept memory alive',  ka: 'ხსოვნა ვაცოცხლე',   ru: 'Сохранил память' } },
-      { icon: 'heart',   label: { tr: 'Kalp bıraktım',   en: 'Left a heart',       ka: 'გული დავტოვე',      ru: 'Оставил сердце' } },
-      { icon: 'message', label: { tr: 'Hatıra yazdım',   en: 'Wrote a memory',     ka: 'მოგონება დავწერე',  ru: 'Написал воспоминание' } },
-      { icon: 'silence', label: { tr: 'Sessizce andım',  en: 'Remembered silently', ka: 'სიჩუმით ვიხსენე',  ru: 'Вспомнил в тишине' } },
-    ],
-  },
-  {
-    key: 'honor_gratitude',
-    emoji: '🏛️',
-    name: { tr: 'Saygı ve Minnet Anması', en: 'Honor & Gratitude Memorial', ka: 'პატივისცემის მოხსენება', ru: 'Поминовение с почестями' },
-    description: {
-      tr: 'Şehit, asker, polis veya toplum için değerli kişiler için uygun tarz.',
-      en: 'Style suited for veterans, public servants and community heroes.',
-      ka: 'სტილი, რომელიც შესაფერისია ვეტერანებისთვის, სახელმწიფო მოხელეებისა და საზოგადოებრივი გმირებისთვის.',
-      ru: 'Стиль, подходящий для ветеранов, государственных служащих и героев.',
-    },
-    actions: [
-      { icon: 'silence', label: { tr: 'Saygıyla andım',       en: 'Honored with respect',  ka: 'პატივისცემით ვიხსენე',  ru: 'Почтил с уважением' } },
-      { icon: 'flag',    label: { tr: 'Bayrak bıraktım',      en: 'Left a flag',           ka: 'დროშა დავტოვე',         ru: 'Оставил флаг' } },
-      { icon: 'message', label: { tr: 'Minnet mesajı yazdım', en: 'Wrote a gratitude note', ka: 'მადლიერების წერილი',    ru: 'Написал слова благодарности' } },
-      { icon: 'prayer',  label: { tr: 'Dua ettim',            en: 'Said a prayer',         ka: 'ვილოცე',                ru: 'Помолился' } },
-    ],
-  },
-  {
-    key: 'child_angel',
-    emoji: '👼',
-    name: { tr: 'Çocuk / Melek Anması', en: 'Child & Angel Memorial', ka: 'ბავშვის / ანგელოზის მოხსენება', ru: 'Поминовение ребёнка / Ангела' },
-    description: {
-      tr: 'Çocuk kayıpları için hassas, sevgi dolu ve yumuşak dil kullanılan tarz.',
-      en: 'Gentle, loving style for the loss of a child.',
-      ka: 'ნაზი, სავსე სიყვარულით სტილი ბავშვის დაკარგვისთვის.',
-      ru: 'Нежный, любящий стиль для потери ребёнка.',
-    },
-    actions: [
-      { icon: 'angel',   label: { tr: 'Melek kalp bıraktım',     en: 'Left an angel heart',    ka: 'ანგელოზის გული დავტოვე', ru: 'Оставил сердце ангела' } },
-      { icon: 'heart',   label: { tr: 'Sevgi gönderdim',         en: 'Sent love',              ka: 'სიყვარული გავუგზავნე',   ru: 'Послал любовь' } },
-      { icon: 'flower',  label: { tr: 'Çiçek bıraktım',          en: 'Left a flower',          ka: 'ყვავილი დავტოვე',        ru: 'Оставил цветок' } },
-      { icon: 'message', label: { tr: 'Aileye destek mesajı yazdım', en: 'Wrote to the family', ka: 'ოჯახს შეტყობინება',      ru: 'Написал семье поддержку' } },
-    ],
-  },
-  {
-    key: 'custom',
-    emoji: '⚙️',
-    name: { tr: 'Özel Anma Tarzı', en: 'Custom Memorial Style', ka: 'მორგებული სტილი', ru: 'Особый стиль поминовения' },
-    description: {
-      tr: 'Kendi anma butonlarınızı tamamen sıfırdan oluşturun.',
-      en: 'Create your own memorial buttons from scratch.',
-      ka: 'შექმენით თქვენი საკუთარი სამგლოვიარო ღილაკები ნულიდან.',
-      ru: 'Создайте собственные кнопки поминовения с нуля.',
-    },
-    actions: [],
   },
 ]
