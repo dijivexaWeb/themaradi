@@ -395,15 +395,13 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
               <div className="mt-1 text-xs text-[#6b9e86]">{t.memorial.archivedMoments}</div>
             </div>
           )}
-          {((v.view_count as number | null) ?? 0) > 0 && (
-            <div className="flex flex-col items-center justify-center gap-1 px-6 py-7 text-center">
-              <div className="font-serif text-5xl text-white">
-                {((v.view_count as number) ?? 0).toLocaleString(lang)}
-              </div>
-              <div className="text-sm font-semibold text-[#c7a76f]">Ziyaretçi</div>
-              <div className="mt-1 text-xs text-[#6b9e86]">Bu sayfayı ziyaret etti</div>
+          <div className="flex flex-col items-center justify-center gap-1 px-6 py-7 text-center">
+            <div className="font-serif text-5xl text-white">
+              {((v.view_count as number) ?? 0).toLocaleString(lang)}
             </div>
-          )}
+            <div className="text-sm font-semibold text-[#c7a76f]">Ziyaretçi</div>
+            <div className="mt-1 text-xs text-[#6b9e86]">Bu sayfayı ziyaret etti</div>
+          </div>
         </div>
       </section>
 
