@@ -3,6 +3,40 @@
 > Her oturum sonunda Claude bu dosyayı günceller.
 > Format: tarih → ne yapıldı → nerede kalındı → sıradaki adım.
 
+## 2026-06-10 — Oturum 70: Guestbook Emoji Reaksiyonları + Metin Güncellemeleri
+
+### Yapılanlar
+- DB migration: `guestbook_entries` tablosuna `react_heart/pray/smile/cry/dove` sütunları eklendi
+- `condolences.ts` → `reactToEntryAction(entryId, emoji, delta)` server action eklendi
+- `MemorialInteractions.tsx`:
+  - `Condolence` tipine `id` ve `reactions` eklendi
+  - Her mesajın altına ❤️🙏😊😢🕊️ emoji barı (toggle, sayaç, localStorage kalıcılığı)
+  - Guestbook ana başlık → "Sevenlerinin sözleriyle."
+- `RealMemorialInteractionsWrapper.tsx`: reaction sütunlarını map'e dahil etti
+- `RealMemorialPage.tsx`:
+  - Hero sol panel: "Ailesinden" → `linesLeftForLovedOnes` ("Hayattayken sevdiklerine bıraktığı satırlar.")
+  - Fotoğraf arşivi alt başlık → `tracesLeftByLovedOnes` ("Sevenlerinin bıraktığı izler.")
+- Profil fotoğrafı ve video yükleme alanlarına tavsiye metinleri entegre edildi (dashboard)
+- Hero görsel upload + vault-media RLS düzeltmesi
+
+### Proje Durumu
+- [x] Email onay + vault-aware redirect
+- [x] Anma Tarzı + aksiyon butonları
+- [x] QR ID sistemi + slug editörü
+- [x] Önizleme modu
+- [x] Guestbook emoji reaksiyonları (❤️🙏😊😢🕊️)
+- [x] Smart profil fotoğrafı kırpma (portre algılama)
+- [ ] Admin itiraz sayfası
+- [ ] Taziye defteri yönetim sayfası (panel)
+
+### Nerede Kaldık
+Guestbook emoji reaksiyon sistemi canlıya alındı. Metin başlıkları duygusal ifadelerle güncellendi.
+
+### Sıradaki Adım
+1. Admin itiraz sayfası (`admin/objections/page.tsx`)
+2. Panel taziye mesajları yönetim sayfası
+3. Anma sayfasına profil videosu entegrasyonu
+
 ## 2026-06-10 — Oturum 69: Storage RLS + Hero Görsel Yükleme
 
 ### Yapılanlar
