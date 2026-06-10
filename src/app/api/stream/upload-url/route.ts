@@ -33,8 +33,11 @@ export async function POST(request: NextRequest) {
     const apiToken = process.env.CLOUDFLARE_API_TOKEN
 
     if (!accountId || !apiToken) {
+      console.error('[stream upload-url] Missing env vars — CLOUDFLARE_ACCOUNT_ID or CLOUDFLARE_API_TOKEN not set')
       return Response.json({ error: 'Cloudflare Stream entegrasyonu sunucu tarafında yapılandırılmamış.' }, { status: 500 })
     }
+
+    console.log('[stream upload-url] Calling Cloudflare Stream API for account:', accountId.slice(0, 6) + '…')
 
     // Expiry: 30 minutes from now
     const expiryDate = new Date(Date.now() + 30 * 60 * 1000).toISOString()

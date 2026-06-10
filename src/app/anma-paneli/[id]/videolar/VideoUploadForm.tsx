@@ -100,11 +100,21 @@ export default function VideoUploadForm({ vaultId, todayMax }: Props) {
         })
 
         if (!uploadUrlRes.ok) {
-          const resJson = await uploadUrlRes.json()
-          throw new Error(resJson.error || 'Video yükleme bağlantısı alınamadı.')
+          let errMsg = `Video yükleme bağlantısı alınamadı. (HTTP ${uploadUrlRes.status})`
+          try {
+            const resJson = await uploadUrlRes.json()
+            if (resJson.error) errMsg = resJson.error
+          } catch { /* HTML veya JSON olmayan yanıt */ }
+          throw new Error(errMsg)
         }
 
-        const { uploadUrl, uid } = await uploadUrlRes.json()
+        let uploadUrlData: { uploadUrl: string; uid: string }
+        try {
+          uploadUrlData = await uploadUrlRes.json()
+        } catch {
+          throw new Error('Sunucudan geçersiz yanıt alındı. Lütfen tekrar deneyin.')
+        }
+        const { uploadUrl, uid } = uploadUrlData
         cfStreamId = uid
         originalFilename = file.name
         fileSize = file.size
