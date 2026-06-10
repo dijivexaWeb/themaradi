@@ -3,6 +3,42 @@
 > Her oturum sonunda Claude bu dosyayı günceller.
 > Format: tarih → ne yapıldı → nerede kalındı → sıradaki adım.
 
+## 2026-06-10 — Oturum 71: Anı Defteri + Emoji Reaksiyon Kalıcılık Fix
+
+### Yapılanlar
+- **DB Migration**: `memory_book_entries` tablosu oluşturuldu (id, vault_id, author_name, relation, memory_text, photo_url, status pending/approved/rejected, author_email, ip_address, created_at) + RLS policies (anon INSERT, public approved SELECT, owner full CRUD)
+- **Server Actions** (`src/lib/actions/memory.ts`): `submitMemoryAction`, `approveMemoryAction`, `rejectMemoryAction`
+- **`MemoryBookClient.tsx`** (yeni, memorial sayfası): anı gösterme grid'i + "Anı Paylaş" formu — client-side fotoğraf upload (vault-media/memories/), IP rate limit (anon: 3/gün), metin 1500 karakter
+- **`RealMemorialPage.tsx`**: `memory_book_entries` parallel fetch eklendi, Anı Defteri section'ı taziye-aile arasına yerleştirildi
+- **`/anma-paneli/[id]/ani-defteri/page.tsx`** (yeni): dashboard yönetim sayfası — bekleyen/yayında kuyrukları, onayla/reddet aksiyonları, fotoğraf önizleme
+- **Dashboard layout**: "Anı Defteri" nav item eklendi (BookHeart ikonu), taziye'nin hemen altında
+- **Emoji reaksiyon fix**: `reactToEntryAction` ve `reactToHeroPanelAction` sonrası `revalidatePath('/memorial/[slug]', 'page')` eklendi — sayfa `revalidate=3600` ile cache'liydi, bu yüzden emoji basınca DB güncelleniyor ama sayfa yenilenince eski sayı görünüyordu
+
+### Proje Durumu
+- [x] Email onay + vault-aware redirect
+- [x] Anma Tarzı + aksiyon butonları
+- [x] QR ID sistemi + slug editörü
+- [x] Önizleme modu
+- [x] Guestbook emoji reaksiyonları (❤️🙏😊😢🕊️)
+- [x] Hero panel emoji reaksiyonları (sol/sağ panel)
+- [x] Smart profil fotoğrafı kırpma (portre algılama)
+- [x] Emoji reaksiyon kalıcılık düzeltmesi (revalidatePath)
+- [x] Anı Defteri (memorial + dashboard)
+- [ ] Admin itiraz sayfası
+- [ ] Profil videosu anma sayfasında görüntüleme
+
+### Kritik Kararlar / Notlar
+- Emoji sayısı kaybolma sebebi: page.tsx `revalidate = 3600`, DB güncelleniyor ama RSC cache stale kalıyordu. revalidatePath çözüm.
+- Anı formu: photo upload önce client-side Supabase storage'a, sonra URL server action'a geçilir (Vercel body limit bypass)
+- IP rate limit sadece anon kullanıcıya uygulanır; auth'd kullanıcı (dashboard sahibi) sınırsız ekleyebilir
+
+### Nerede Kaldık
+Anı Defteri tam fonksiyonel: memorial sayfasından ziyaretçi/sahibi anı ekleyebilir, dashboard'dan pending/approved yönetimi yapılır, emoji sayıları artık yenileme sonrası da korunur.
+
+### Sıradaki Adım
+1. Profil videosu anma sayfasında görüntüleme (biyografi'de profile_video_url DB'ye kaydedildi ama memorial'da gösterilmiyor)
+2. Admin itiraz sayfası (`/admin/objections/page.tsx`)
+
 ## 2026-06-10 — Oturum 70: Guestbook Emoji Reaksiyonları + Metin Güncellemeleri
 
 ### Yapılanlar
