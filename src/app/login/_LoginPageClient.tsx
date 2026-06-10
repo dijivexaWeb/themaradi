@@ -7,7 +7,7 @@ import Link from 'next/link'
 import { Loader2 } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import TurnstileWidget from '@/components/TurnstileWidget'
-import { checkTurnstileAction } from './actions'
+import { userLogin } from './actions'
 
 const authCopy: Record<Lang, {
   login: string
@@ -110,44 +110,25 @@ export default function LoginPageClient({ siteKey }: { siteKey: string }) {
     setLoading(true)
     setMsg(null)
 
-    // Verify Turnstile if configured
-    const token = (e.currentTarget.querySelector<HTMLInputElement>('[name="cf-turnstile-response"]'))?.value
-    if (token) {
-      const { ok } = await checkTurnstileAction(token)
-      if (!ok) {
-        setMsg({ ok: false, text: c.errorCaptcha })
-        setLoading(false)
-        return
-      }
-    }
-
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
-    if (error) {
-      const isUnconfirmed = error.message.toLowerCase().includes('not confirmed') || error.code === 'email_not_confirmed'
-      setMsg({ ok: false, text: isUnconfirmed ? c.errorUnconfirmed : c.error })
-      setLoading(false)
-    } else {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (user) {
-        const { data: vault } = await supabase
-          .from('vaults')
-          .select('id, product_type')
-          .eq('owner_id', user.id)
-          .order('created_at', { ascending: false })
-          .limit(1)
-          .single()
-
-        if (vault?.product_type === 'memorial_profile') {
-          window.location.href = `/anma-paneli/${vault.id}`
-        } else if (vault?.product_type === 'life_vault') {
-          window.location.href = `/dashboard/vault/${vault.id}`
+    const formData = new FormData(e.currentTarget)
+    try {
+      const res = await userLogin(null, formData)
+      if (!res.success) {
+        if (res.errorType === 'captcha') {
+          setMsg({ ok: false, text: c.errorCaptcha })
+        } else if (res.errorType === 'unconfirmed') {
+          setMsg({ ok: false, text: c.errorUnconfirmed })
         } else {
-          window.location.href = '/dashboard'
+          setMsg({ ok: false, text: res.error || c.error })
         }
-      } else {
-        window.location.href = '/dashboard'
+        setLoading(false)
+      } else if (res.redirectUrl) {
+        window.location.href = res.redirectUrl
       }
-      // intentionally no setLoading(false) — button stays disabled while navigating
+    } catch (err) {
+      console.error('Login error:', err)
+      setMsg({ ok: false, text: c.error })
+      setLoading(false)
     }
   }
 
