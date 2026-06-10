@@ -57,23 +57,6 @@ export const MEMORIAL_STYLE_TEMPLATES: MemorialStyleTemplate[] = [
     ],
   },
   {
-    key: 'islamic',
-    emoji: '🤲',
-    name: { tr: 'İslami Anma', en: 'Islamic Memorial', ka: 'ისლამური მოხსენება', ru: 'Исламское поминовение' },
-    description: {
-      tr: 'Dua, rahmet ve Fatiha odaklı anma tarzı.',
-      en: 'Prayer and mercy-focused memorial style.',
-      ka: 'ლოცვა- და მოწყალებაზე ორიენტირებული სამგლოვიარო სტილი.',
-      ru: 'Стиль поминовения, ориентированный на молитву и милосердие.',
-    },
-    actions: [
-      { icon: 'prayer',  label: { tr: 'Fatiha okudum',   en: 'Recited Al-Fatiha', ka: 'ფათიჰა წავიკითხე',  ru: 'Прочитал Аль-Фатиху' } },
-      { icon: 'silence', label: { tr: 'Dua ettim',       en: 'Said a prayer',     ka: 'ვილოცე',           ru: 'Помолился' } },
-      { icon: 'heart',   label: { tr: 'Rahmet diledim',  en: 'Prayed for mercy',  ka: 'მოწყალება ვითხოვე', ru: 'Помолился о милости' } },
-      { icon: 'message', label: { tr: 'Taziye mesajı yaz', en: 'Write condolences', ka: 'თანაგრძნობა დაწერე', ru: 'Написать соболезнование' } },
-    ],
-  },
-  {
     key: 'christian',
     emoji: '✝️',
     name: { tr: 'Hristiyan Anma', en: 'Christian Memorial', ka: 'ქრისტიანული მოხსენება', ru: 'Христианское поминовение' },
@@ -122,6 +105,23 @@ export const MEMORIAL_STYLE_TEMPLATES: MemorialStyleTemplate[] = [
       { icon: 'silence', label: { tr: 'Dua gönderdim',   en: 'Sent a prayer',     ka: 'ლოცვა გავუგზავნე', ru: 'Помолился' } },
       { icon: 'flower',  label: { tr: 'Çiçek bıraktım',  en: 'Left a flower',     ka: 'ყვავილი დავტოვე',   ru: 'Оставил цветок' } },
       { icon: 'heart',   label: { tr: 'Sevgiyle andım',  en: 'Remembered with love', ka: 'სიყვარულით ვიხსენე', ru: 'Вспомнил с любовью' } },
+    ],
+  },
+  {
+    key: 'islamic',
+    emoji: '🤲',
+    name: { tr: 'İslami Anma', en: 'Islamic Memorial', ka: 'ისლამური მოხსენება', ru: 'Исламское поминовение' },
+    description: {
+      tr: 'Dua, rahmet ve Fatiha odaklı anma tarzı.',
+      en: 'Prayer and mercy-focused memorial style.',
+      ka: 'ლოცვა- და მოწყალებაზე ორიენტირებული სამგლოვიარო სტილი.',
+      ru: 'Стиль поминовения, ориентированный на молитву и милосердие.',
+    },
+    actions: [
+      { icon: 'prayer',  label: { tr: 'Fatiha okudum',   en: 'Recited Al-Fatiha', ka: 'ფათიჰა წავიკითხე',  ru: 'Прочитал Аль-Фатиху' } },
+      { icon: 'silence', label: { tr: 'Dua ettim',       en: 'Said a prayer',     ka: 'ვილოცე',           ru: 'Помолился' } },
+      { icon: 'heart',   label: { tr: 'Rahmet diledim',  en: 'Prayed for mercy',  ka: 'მოწყალება ვითხოვე', ru: 'Помолился о милости' } },
+      { icon: 'message', label: { tr: 'Taziye mesajı yaz', en: 'Write condolences', ka: 'თანაგრძნობა დაწერე', ru: 'Написать соболезнование' } },
     ],
   },
   {
