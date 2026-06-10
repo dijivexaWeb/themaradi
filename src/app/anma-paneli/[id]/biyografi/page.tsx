@@ -238,30 +238,25 @@ export default function BiyografiPage() {
               {/* Fotoğraf yükleme */}
               <div className="shrink-0">
                 <label className={labelCls}>Profil Fotoğrafı</label>
-                <label className={`block cursor-pointer overflow-hidden rounded-xl border-2 border-dashed border-[#e5dccb] bg-[#fdfaf5] transition hover:border-[#174f35]/40 hover:bg-[#f5f0e8] ${isLocked ? 'pointer-events-none opacity-40' : ''}`}>
-                  {/* Yükleme satırı */}
-                  <div className="flex items-center gap-3 px-4 py-3">
-                    {photoUploading ? (
-                      <Loader2 className="h-5 w-5 shrink-0 animate-spin text-[#174f35]" />
-                    ) : coverPhotoUrl ? (
-                      <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full border border-[#dfbd72]">
-                        <Image src={coverPhotoUrl} alt="Profil" fill className="object-cover" unoptimized />
+                {/* Büyük daire önizleme + tıklanınca yükle */}
+                <label className={`group relative mx-auto flex h-28 w-28 cursor-pointer items-center justify-center overflow-hidden rounded-full border-[3px] border-dashed border-[#e5dccb] bg-[#fdfaf5] transition hover:border-[#174f35]/50 ${isLocked ? 'pointer-events-none opacity-40' : ''}`}>
+                  {photoUploading ? (
+                    <Loader2 className="h-7 w-7 animate-spin text-[#174f35]" />
+                  ) : coverPhotoUrl ? (
+                    <>
+                      <Image src={coverPhotoUrl} alt="Profil" fill className="object-cover object-top" unoptimized />
+                      {/* Hover overlay */}
+                      <div className="absolute inset-0 flex flex-col items-center justify-center gap-1 rounded-full bg-black/40 opacity-0 transition group-hover:opacity-100">
+                        <Upload className="h-5 w-5 text-white" />
+                        <span className="text-[10px] font-semibold text-white">Değiştir</span>
                       </div>
-                    ) : (
-                      <Upload className="h-5 w-5 shrink-0 text-[#b08340]" />
-                    )}
-                    <div>
-                      <p className="text-sm font-medium text-[#1f2d27]">
-                        {photoUploading ? 'Yükleniyor...' : coverPhotoUrl ? 'Fotoğrafı değiştir' : 'Fotoğraf seç veya buraya sürükle'}
-                      </p>
-                      <p className="text-xs text-[#adb5ab]">JPG, PNG, WEBP — max 10 MB</p>
+                    </>
+                  ) : (
+                    <div className="flex flex-col items-center gap-1.5">
+                      <Upload className="h-6 w-6 text-[#b08340]" />
+                      <span className="text-center text-[10px] leading-tight text-[#adb5ab]">Fotoğraf<br />Yükle</span>
                     </div>
-                  </div>
-                  {/* Tavsiye notu */}
-                  <div className="border-t border-dashed border-[#e5dccb] bg-[#faf6ee] px-4 py-2.5 text-xs text-[#4a5e55]">
-                    📸 <span className="font-semibold">Fotoğraf Seçimi İçin Tavsiyeler</span><br />
-                    <span className="text-[#788177]">Ziyaretçilerin ekranda net görebilmesi için aydınlık ve yüzün belirgin olduğu yüksek kaliteli fotoğrafları tercih edin.</span>
-                  </div>
+                  )}
                   <input
                     type="file"
                     accept="image/*"
@@ -292,7 +287,12 @@ export default function BiyografiPage() {
                     }}
                   />
                 </label>
-                {photoUploadError && <p className="mt-1 text-xs text-red-500">{photoUploadError}</p>}
+                {photoUploadError && <p className="mt-1 max-w-[112px] text-center text-[10px] text-red-500">{photoUploadError}</p>}
+                {/* Tavsiye notu */}
+                <div className="mt-2 max-w-[112px] rounded-lg border border-[#e5dccb] bg-[#faf6ee] px-2.5 py-2 text-[10px] leading-relaxed text-[#788177]">
+                  📸 <span className="font-semibold text-[#4a5e55]">Tavsiye:</span><br />
+                  Aydınlık, yüzün net göründüğü fotoğraf seçin.
+                </div>
               </div>
 
               {/* Ad Soyad + Tarihler */}
