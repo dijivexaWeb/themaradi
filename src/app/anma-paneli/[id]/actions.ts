@@ -375,9 +375,10 @@ export async function publishMemorialAction(vaultId: string): Promise<void> {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
+  // Kullanıcı sahipliği kontrolü
   const { data: vault } = await supabase
     .from('vaults')
-    .select('id, status')
+    .select('id, status, slug')
     .eq('id', vaultId)
     .eq('owner_id', user.id)
     .eq('product_type', 'memorial_profile')
@@ -385,14 +386,24 @@ export async function publishMemorialAction(vaultId: string): Promise<void> {
 
   if (!vault || vault.status !== 'private_memorial') return
 
-  // Tüm doğrulama koşullarını kontrol et
+  // Doğrulama koşullarını kontrol et
   const ready = await isVerificationComplete(vaultId)
   if (!ready) return
 
-  await supabase.from('vaults').update({ status: 'public_memorial' }).eq('id', vaultId)
+  // Status güncellemesi için service client kullan (kullanıcı RLS'i bypass)
+  const service = await createServiceClient()
+  const { error } = await service.from('vaults')
+    .update({ status: 'public_memorial' })
+    .eq('id', vaultId)
+
+  if (error) {
+    console.error('[publishMemorialAction] update error:', error)
+    return
+  }
 
   revalidatePath(`/anma-paneli/${vaultId}`)
   revalidatePath(`/anma-paneli/${vaultId}/dogrulama`)
+  if (vault.slug) revalidatePath(`/memorial/${vault.slug}`)
   redirect(`/anma-paneli/${vaultId}/dogrulama`)
 }
 
