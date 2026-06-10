@@ -64,8 +64,14 @@ export async function POST(request: NextRequest) {
 
     if (!cfResponse.ok) {
       const errorText = await cfResponse.text()
-      console.error('[Cloudflare Stream direct_upload error]:', errorText)
-      return Response.json({ error: 'Cloudflare Stream yükleme adresi alınamadı' }, { status: 502 })
+      console.error('[Cloudflare Stream direct_upload error] status:', cfResponse.status, 'body:', errorText)
+      let cfMsg = ''
+      try {
+        const cfJson = JSON.parse(errorText)
+        cfMsg = cfJson?.errors?.[0]?.message ?? cfJson?.message ?? ''
+      } catch { /* not JSON */ }
+      const displayMsg = cfMsg ? `Cloudflare: ${cfMsg}` : `Cloudflare hata kodu ${cfResponse.status}`
+      return Response.json({ error: displayMsg }, { status: 502 })
     }
 
     const data = await cfResponse.json()
