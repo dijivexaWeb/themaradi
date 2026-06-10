@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
+import { Loader2 } from 'lucide-react'
 import { useMemo, useState } from 'react'
 
 export default function UpdatePasswordPage() {
@@ -86,8 +87,9 @@ export default function UpdatePasswordPage() {
           <button
             type="submit"
             disabled={loading || !password || !confirm}
-            className="w-full rounded-xl bg-amber-500 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-amber-500/20 transition-colors hover:bg-amber-400 disabled:opacity-50"
+            className="w-full rounded-xl bg-amber-500 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-amber-500/20 transition-colors hover:bg-amber-400 disabled:opacity-50 flex items-center justify-center gap-2"
           >
+            {loading && <Loader2 className="h-4 w-4 animate-spin" />}
             {loading ? 'Kaydediliyor...' : 'Şifreyi Kaydet'}
           </button>
         </form>

@@ -16,7 +16,7 @@ export default async function InboxPage({ searchParams }: Props) {
   // Tüm aktif emailleri çek (thread gruplamak için hepsine ihtiyaç var)
   const { data: allEmails } = await supabase
     .from('inbound_emails')
-    .select('id, inbox, from_email, from_name, subject, body_text, body_html, received_at, status, replied_at, reply_subject, reply_body_html, is_flagged, is_following_up, follow_up_note, thread_id')
+    .select('id, inbox, from_email, from_name, subject, body_text, body_html, attachments, received_at, status, replied_at, reply_subject, reply_body_html, is_flagged, is_following_up, follow_up_note, thread_id')
     .order('received_at', { ascending: false })
     .limit(300)
 

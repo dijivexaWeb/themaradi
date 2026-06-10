@@ -1,9 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceClient } from '@/lib/supabase/server'
 import PostalMime from 'postal-mime'
+import { uploadR2Object, sanitizeFileName } from '@/lib/r2'
 import crypto from 'crypto'
 
 type JsonRecord = Record<string, unknown>
+
+interface AttachmentMeta {
+  filename: string
+  mimeType: string
+  size: number
+  url: string
+}
 
 function getString(obj: unknown, ...keys: string[]): string | null {
   if (!obj || typeof obj !== 'object') return null
@@ -61,7 +69,6 @@ function stripRePrefix(subject: string): string {
 export async function POST(req: NextRequest) {
   const supabase = await createServiceClient()
 
-  // Token doğrulama
   const { data: tokenRow } = await supabase
     .from('platform_settings')
     .select('value')
@@ -88,30 +95,64 @@ export async function POST(req: NextRequest) {
   const fromRaw = data.from ?? ''
   const toRaw = data.to ?? []
   const toArr = Array.isArray(toRaw)
-    ? toRaw.map((item) => typeof item === 'string' ? item : '')
-        .filter(Boolean)
-    : typeof toRaw === 'string'
-      ? [toRaw]
-      : []
-
-  const subject = getString(data, 'subject') ?? '(Konu yok)'
+    ? toRaw.map((item) => typeof item === 'string' ? item : '').filter(Boolean)
+    : typeof toRaw === 'string' ? [toRaw] : []
 
   let bodyText: string | null = null
   let bodyHtml: string | null = null
+  let subject = getString(data, 'subject') ?? '(Konu yok)'
+  const attachments: AttachmentMeta[] = []
 
-  // Cloudflare Worker'dan gelen raw MIME email
   const rawMime = getString(data, 'raw')
   if (rawMime) {
     try {
       const parsed = await PostalMime.parse(rawMime)
       bodyText = parsed.text ?? null
       bodyHtml = parsed.html ?? null
+      if (parsed.subject) subject = parsed.subject
+
+      // Attachments — R2 private bucket'a yükle
+      const bucket = process.env.R2_PRIVATE_BUCKET || 'tem-private-documents'
+      const msgId = crypto.randomUUID()
+
+      for (const att of parsed.attachments ?? []) {
+        if (!att.content) continue
+
+        // content: string | ArrayBuffer | Uint8Array — normalize to Uint8Array
+        let content: Uint8Array
+        if (att.content instanceof Uint8Array) {
+          content = att.content
+        } else if (att.content instanceof ArrayBuffer) {
+          content = new Uint8Array(att.content)
+        } else {
+          content = new TextEncoder().encode(att.content as string)
+        }
+
+        if (content.length === 0) continue
+        const MAX_SIZE = 20 * 1024 * 1024
+        if (content.length > MAX_SIZE) continue
+
+        const filename = sanitizeFileName(att.filename || `attachment-${Date.now()}`)
+        const key = `email-attachments/${msgId}/${filename}`
+        const mimeType = att.mimeType || 'application/octet-stream'
+
+        try {
+          await uploadR2Object(bucket, key, content, mimeType)
+          attachments.push({
+            filename: att.filename || filename,
+            mimeType,
+            size: content.length,
+            url: key,
+          })
+        } catch (err) {
+          console.error('[inbound webhook] attachment upload error:', err)
+        }
+      }
     } catch (err) {
       console.error('[inbound webhook] MIME parse error:', err)
     }
   }
 
-  // Fallback: payload içinde direkt html/text alanları varsa
   if (!bodyText && !bodyHtml) {
     bodyText = getString(data, 'text') ?? getString(data, 'body_text') ?? null
     bodyHtml = getString(data, 'html') ?? getString(data, 'body_html') ?? null
@@ -120,12 +161,10 @@ export async function POST(req: NextRequest) {
   const { email: fromEmail, name: fromName } = parseFrom(fromRaw)
   const inbox = detectInbox(toArr)
 
-  // Kendi domain'imizden gelen mailler (outbound loop) — yoksay
   if (fromEmail.toLowerCase().endsWith('@theeternalmemory.com')) {
     return NextResponse.json({ ok: true, skipped: 'own_domain' })
   }
 
-  // Thread algılama: aynı from_email + benzer konu → aynı thread
   let threadId: string | null = null
   const cleanedSubject = stripRePrefix(subject)
 
@@ -144,10 +183,7 @@ export async function POST(req: NextRequest) {
         threadId = existing.thread_id
       } else {
         threadId = crypto.randomUUID()
-        await supabase
-          .from('inbound_emails')
-          .update({ thread_id: threadId })
-          .eq('id', existing.id)
+        await supabase.from('inbound_emails').update({ thread_id: threadId }).eq('id', existing.id)
       }
     }
   }
@@ -159,6 +195,7 @@ export async function POST(req: NextRequest) {
     subject,
     body_text: bodyText,
     body_html: bodyHtml,
+    attachments: attachments.length > 0 ? attachments : [],
     received_at: (payload.created_at as string) ?? new Date().toISOString(),
     thread_id: threadId,
     raw_payload: payload,

@@ -3,6 +3,13 @@
 import { useState, useTransition, useOptimistic } from 'react'
 import { markEmailStatusAction, sendInboxReplyAction, toggleFlagAction, setFollowUpAction } from './actions'
 
+export type AttachmentMeta = {
+  filename: string
+  mimeType: string
+  size: number
+  url: string
+}
+
 export type InboxEmail = {
   id: string
   inbox: string
@@ -11,6 +18,7 @@ export type InboxEmail = {
   subject: string | null
   body_text: string | null
   body_html: string | null
+  attachments: AttachmentMeta[] | null
   received_at: string
   status: string
   replied_at: string | null
@@ -411,6 +419,27 @@ function EmailCard({ email }: { email: InboxEmail }) {
           <pre className="text-sm text-slate-700 whitespace-pre-wrap bg-slate-50 rounded-xl p-4 border border-slate-100 font-sans">{email.body_text}</pre>
         ) : (
           <p className="text-sm text-slate-400 italic">İçerik yok.</p>
+        )}
+
+        {email.attachments && email.attachments.length > 0 && (
+          <div className="mt-3 space-y-1.5">
+            <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Ekler ({email.attachments.length})</p>
+            {email.attachments.map((att, i) => (
+              <a
+                key={i}
+                href={`/api/email/attachment?key=${encodeURIComponent(att.url)}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2.5 rounded-lg border border-slate-200 bg-white px-3 py-2 text-xs text-slate-700 hover:bg-slate-50 transition-colors"
+              >
+                <svg className="h-4 w-4 shrink-0 text-slate-400" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                </svg>
+                <span className="flex-1 truncate">{att.filename}</span>
+                <span className="shrink-0 text-slate-400">{(att.size / 1024).toFixed(0)} KB</span>
+              </a>
+            ))}
+          </div>
         )}
 
         {email.replied_at && (
