@@ -5,7 +5,16 @@ import { ArrowRight, Feather, Flame, Heart, X } from 'lucide-react'
 import { type Lang } from '@/i18n'
 import { useLang } from '@/i18n/context'
 import { submitCondolenceAction, addReactionAction } from '@/lib/actions/condolences'
+import { incrementMemorialActionAction } from '@/lib/actions/memorial-public-actions'
 import TurnstileWidget from '@/components/TurnstileWidget'
+
+export interface CustomAction {
+  id: string
+  label: string
+  icon: string
+  show_counter: boolean
+  count: number
+}
 
 interface Condolence {
   name: string
@@ -80,7 +89,7 @@ const interactionCopy: Record<Lang, InteractionCopy> = {
 }
 interface InitialCounts { candle: number; flower: number; prayer: number }
 
-export default function MemorialInteractions({ condolences, vaultId, initialCounts, siteKey = '' }: { condolences: Condolence[]; vaultId?: string; initialCounts?: InitialCounts; siteKey?: string }) {
+export default function MemorialInteractions({ condolences, vaultId, initialCounts, siteKey = '', customActions = [] }: { condolences: Condolence[]; vaultId?: string; initialCounts?: InitialCounts; siteKey?: string; customActions?: CustomAction[] }) {
   const { lang } = useLang()
   const copy = interactionCopy[lang]
   const [candlesLit, setCandlesLit] = useState(initialCounts?.candle ?? 0)
@@ -90,6 +99,24 @@ export default function MemorialInteractions({ condolences, vaultId, initialCoun
   const [userLeftFlower, setUserLeftFlower] = useState(false)
   const [userPrayed, setUserPrayed] = useState(false)
   const [pendingAction, setPendingAction] = useState<ActionType>(null)
+
+  // Custom action buton state'leri
+  const [customCounts, setCustomCounts] = useState<Record<string, number>>(
+    Object.fromEntries(customActions.map(a => [a.id, a.count]))
+  )
+  const [clickedActions, setClickedActions] = useState<Set<string>>(new Set())
+  const [, startCustomTransition] = useTransition()
+
+  function handleCustomAction(actionId: string) {
+    if (clickedActions.has(actionId) || !vaultId) return
+    setClickedActions(prev => new Set(prev).add(actionId))
+    setCustomCounts(prev => ({ ...prev, [actionId]: (prev[actionId] ?? 0) + 1 }))
+    startCustomTransition(async () => {
+      await incrementMemorialActionAction(actionId, vaultId)
+    })
+  }
+
+  const hasCustomActions = customActions.length > 0
   const [showCondolenceForm, setShowCondolenceForm] = useState(false)
   const [formOpenTime, setFormOpenTime] = useState('')
   const [submitDone, setSubmitDone] = useState(false)
@@ -145,7 +172,44 @@ export default function MemorialInteractions({ condolences, vaultId, initialCoun
             </h2>
           </div>
 
-          {/* Ä°nteraksiyon butonlarÄ± */}
+          {/* Anma aksiyonları — özel butonlar veya varsayılan 3 */}
+          {hasCustomActions ? (
+            <div className={`mb-7 grid gap-2 sm:gap-3 ${
+              customActions.length <= 2 ? 'grid-cols-2' :
+              customActions.length === 3 ? 'grid-cols-3' :
+              customActions.length === 4 ? 'grid-cols-2 sm:grid-cols-4' :
+              'grid-cols-3 sm:grid-cols-5'
+            }`}>
+              {customActions.map((action) => {
+                const clicked = clickedActions.has(action.id)
+                const count = customCounts[action.id] ?? action.count
+                return (
+                  <button
+                    key={action.id}
+                    onClick={() => handleCustomAction(action.id)}
+                    disabled={clicked}
+                    className={`group flex flex-col items-center gap-2 rounded-2xl border px-3 py-5 text-center transition-all duration-200 ${
+                      clicked
+                        ? 'border-[#c7a76f] bg-[#c7a76f]/10 cursor-default'
+                        : 'border-white/10 bg-[#0d1412] hover:border-[#c7a76f]/40 hover:bg-white/[0.05] active:scale-95'
+                    }`}
+                  >
+                    <span className={`text-3xl transition-transform duration-300 sm:text-4xl ${clicked ? 'scale-110' : 'group-hover:scale-105'}`}>
+                      {action.icon}
+                    </span>
+                    <span className={`text-xs font-semibold sm:text-sm ${clicked ? 'text-[#c7a76f]' : 'text-[#cfc3ad]'}`}>
+                      {clicked ? '✓ ' : ''}{action.label}
+                    </span>
+                    {action.show_counter && (
+                      <span className="text-[11px] tabular-nums text-[#8f9f96]">
+                        {count.toLocaleString()}
+                      </span>
+                    )}
+                  </button>
+                )
+              })}
+            </div>
+          ) : (
           <div className="mb-7 grid grid-cols-3 gap-2 sm:gap-3">
             <InteractionButton
               onClick={() => requestAction('candle')}
@@ -187,6 +251,7 @@ export default function MemorialInteractions({ condolences, vaultId, initialCoun
               }
             />
           </div>
+          )}
 
           <div className="grid gap-5 lg:grid-cols-[1fr_340px]">
             <div className="overflow-hidden rounded-2xl border border-white/10 bg-[#0d1412] shadow-2xl shadow-black/25">
@@ -232,6 +297,18 @@ export default function MemorialInteractions({ condolences, vaultId, initialCoun
                   <p className="mt-2 text-sm leading-6 text-[#b8aa93]">
                     {copy.ctaText}
                   </p>
+                  {hasCustomActions ? (
+                    <div className="mt-4 flex flex-wrap justify-center gap-3 text-xs text-[#8f9f96] lg:justify-start">
+                      {customActions.filter(a => a.show_counter).map((a, i) => (
+                        <>
+                          {i > 0 && <span key={`sep-${a.id}`}>·</span>}
+                          <span key={a.id} className="flex items-center gap-1.5">
+                            <span>{a.icon}</span>{customCounts[a.id] ?? a.count} {a.label.toLowerCase()}
+                          </span>
+                        </>
+                      ))}
+                    </div>
+                  ) : (
                   <div className="mt-4 flex flex-wrap justify-center gap-3 text-xs text-[#8f9f96] lg:justify-start">
                     <span className="flex items-center gap-1.5"><Flame className="h-3.5 w-3.5 text-[#b08340]" />{candlesLit} {copy.candleUnit}</span>
                     <span>·</span>
@@ -239,6 +316,7 @@ export default function MemorialInteractions({ condolences, vaultId, initialCoun
                     <span>·</span>
                     <span className="flex items-center gap-1.5"><Heart className="h-3.5 w-3.5 text-[#b08340]" />{prayersSent} {copy.prayerUnit}</span>
                   </div>
+                  )}
                 </div>
                 <button
                   onClick={() => { setShowCondolenceForm(true); setFormOpenTime(Date.now().toString()) }}

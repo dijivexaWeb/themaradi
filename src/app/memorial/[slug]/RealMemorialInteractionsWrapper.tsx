@@ -1,7 +1,7 @@
 'use client'
 
 import { LangProvider } from '@/i18n/context'
-import MemorialInteractions from './MemorialInteractions'
+import MemorialInteractions, { type CustomAction } from './MemorialInteractions'
 
 interface GuestbookEntry {
   id: string
@@ -16,9 +16,10 @@ interface Props {
   vaultId: string
   initialCounts: { candle: number; flower: number; prayer: number }
   siteKey: string
+  customActions?: CustomAction[]
 }
 
-export default function RealMemorialInteractionsWrapper({ entries, vaultId, initialCounts, siteKey }: Props) {
+export default function RealMemorialInteractionsWrapper({ entries, vaultId, initialCounts, siteKey, customActions = [] }: Props) {
   const condolences = entries.map((e) => ({
     name: e.author_name,
     date: new Date(e.created_at).toLocaleDateString('tr-TR', {
@@ -32,7 +33,7 @@ export default function RealMemorialInteractionsWrapper({ entries, vaultId, init
 
   return (
     <LangProvider>
-      <MemorialInteractions condolences={condolences} vaultId={vaultId} initialCounts={initialCounts} siteKey={siteKey} />
+      <MemorialInteractions condolences={condolences} vaultId={vaultId} initialCounts={initialCounts} siteKey={siteKey} customActions={customActions} />
     </LangProvider>
   )
 }

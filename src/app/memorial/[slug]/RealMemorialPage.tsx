@@ -79,6 +79,7 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
     { data: audioRecordings },
     guestbookResult,
     reactionsResult,
+    { data: memorialActionsRaw },
   ] = await Promise.all([
     supabase.from('media').select('*').eq('vault_id', id).eq('media_type', 'image').eq('is_public', true).order('sort_order', { ascending: true }).limit(24),
     supabase.from('media').select('*').eq('vault_id', id).eq('media_type', 'video').eq('is_public', true).order('sort_order', { ascending: true }).limit(6),
@@ -87,7 +88,16 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
     supabase.from('vault_audio_recordings').select('*').eq('vault_id', id).eq('is_public', true).order('sort_order'),
     supabase.from('guestbook_entries').select('*').eq('vault_id', id).eq('status', 'approved').order('created_at', { ascending: false }).limit(20),
     supabase.from('memorial_reactions').select('reaction_type').eq('vault_id', id),
+    supabase.from('memorial_actions').select('id, label, icon, show_counter, count, sort_order').eq('memorial_id', id).eq('is_active', true).order('sort_order', { ascending: true }),
   ])
+
+  const customActions = (memorialActionsRaw ?? []).map(a => ({
+    id: a.id as string,
+    label: a.label as string,
+    icon: a.icon as string,
+    show_counter: a.show_counter as boolean,
+    count: (a.count as number) ?? 0,
+  }))
 
   const guestbookEntries = (guestbookResult.data ?? []) as {
     id: string
@@ -771,7 +781,7 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
 
       {/* ── TAZİYE DEFTERİ ── */}
       <div id="taziye">
-        <RealMemorialInteractionsWrapper entries={guestbookEntries} vaultId={id} initialCounts={initialCounts} siteKey={turnstileSiteKey} />
+        <RealMemorialInteractionsWrapper entries={guestbookEntries} vaultId={id} initialCounts={initialCounts} siteKey={turnstileSiteKey} customActions={customActions} />
       </div>
 
       {/* ── AİLE BAĞLARI ── */}
