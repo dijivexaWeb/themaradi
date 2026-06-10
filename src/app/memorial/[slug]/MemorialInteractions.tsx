@@ -6,6 +6,7 @@ import { type Lang } from '@/i18n'
 import { useLang } from '@/i18n/context'
 import { submitCondolenceAction, addReactionAction } from '@/lib/actions/condolences'
 import { incrementMemorialActionAction } from '@/lib/actions/memorial-public-actions'
+import { ACTION_ICON_MAP, type ActionIcon } from '@/lib/memorial-style-templates'
 import TurnstileWidget from '@/components/TurnstileWidget'
 
 export interface CustomAction {
@@ -183,6 +184,7 @@ export default function MemorialInteractions({ condolences, vaultId, initialCoun
               {customActions.map((action) => {
                 const clicked = clickedActions.has(action.id)
                 const count = customCounts[action.id] ?? action.count
+                const emoji = ACTION_ICON_MAP[action.icon as ActionIcon] ?? action.icon
                 return (
                   <button
                     key={action.id}
@@ -195,7 +197,7 @@ export default function MemorialInteractions({ condolences, vaultId, initialCoun
                     }`}
                   >
                     <span className={`text-3xl transition-transform duration-300 sm:text-4xl ${clicked ? 'scale-110' : 'group-hover:scale-105'}`}>
-                      {action.icon}
+                      {emoji}
                     </span>
                     <span className={`text-xs font-semibold sm:text-sm ${clicked ? 'text-[#c7a76f]' : 'text-[#cfc3ad]'}`}>
                       {clicked ? '✓ ' : ''}{action.label}
@@ -303,7 +305,7 @@ export default function MemorialInteractions({ condolences, vaultId, initialCoun
                         <>
                           {i > 0 && <span key={`sep-${a.id}`}>·</span>}
                           <span key={a.id} className="flex items-center gap-1.5">
-                            <span>{a.icon}</span>{customCounts[a.id] ?? a.count} {a.label.toLowerCase()}
+                            <span>{ACTION_ICON_MAP[a.icon as ActionIcon] ?? a.icon}</span>{customCounts[a.id] ?? a.count} {a.label.toLowerCase()}
                           </span>
                         </>
                       ))}
