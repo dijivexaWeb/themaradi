@@ -25,6 +25,7 @@ interface VaultData {
   donation_preference: string | null
   donation_url: string | null
   hero_bg_url: string | null
+  profile_video_url: string | null
 }
 
 export default function BiyografiPage() {
@@ -58,6 +59,19 @@ export default function BiyografiPage() {
   const [extraSaving, setExtraSaving] = useState(false)
   const [extraSaved, setExtraSaved] = useState(false)
 
+  // Profil fotoğrafı yükleme
+  const [photoUploading, setPhotoUploading] = useState(false)
+  const [photoUploadError, setPhotoUploadError] = useState<string | null>(null)
+
+  // Profil videosu
+  const [profileVideoUrl, setProfileVideoUrl] = useState('')
+  const [videoUploading, setVideoUploading] = useState(false)
+  const [videoUploadError, setVideoUploadError] = useState<string | null>(null)
+
+  // Hero arka plan yükleme
+  const [heroBgUploading, setHeroBgUploading] = useState(false)
+  const [heroBgUploadError, setHeroBgUploadError] = useState<string | null>(null)
+
   // Sevilen şarkı
   const [favSongTitle, setFavSongTitle] = useState('')
   const [favSongUrl, setFavSongUrl] = useState('')
@@ -76,7 +90,7 @@ export default function BiyografiPage() {
   useEffect(() => {
     supabase
       .from('vaults')
-      .select('display_name, biography, status, cover_photo_url, birth_date, death_date, tagline, profession, hobbies, birth_place, death_place, favorite_song_title, favorite_song_url, last_message, donation_preference, donation_url, hero_bg_url')
+      .select('display_name, biography, status, cover_photo_url, birth_date, death_date, tagline, profession, hobbies, birth_place, death_place, favorite_song_title, favorite_song_url, last_message, donation_preference, donation_url, hero_bg_url, profile_video_url')
       .eq('id', id)
       .single()
       .then(({ data }) => {
@@ -98,6 +112,7 @@ export default function BiyografiPage() {
           setDonationUrl(v.donation_url ?? '')
           setFavSongTitle(v.favorite_song_title ?? '')
           setFavSongUrl(v.favorite_song_url ?? '')
+          setProfileVideoUrl(v.profile_video_url ?? '')
           setBio(v.biography ?? '')
           setInitialBio(v.biography ?? '')
         }
@@ -136,8 +151,9 @@ export default function BiyografiPage() {
       tagline: tagline.trim() || null,
       cover_photo_url: coverPhotoUrl.trim() || null,
       hero_bg_url: heroBgUrl.trim() || null,
+      profile_video_url: profileVideoUrl.trim() || null,
     }).eq('id', id)
-    setVault(prev => prev ? { ...prev, display_name: displayName, birth_date: birthDate || null, death_date: deathDate || null, tagline: tagline || null, cover_photo_url: coverPhotoUrl || null, hero_bg_url: heroBgUrl || null } : prev)
+    setVault(prev => prev ? { ...prev, display_name: displayName, birth_date: birthDate || null, death_date: deathDate || null, tagline: tagline || null, cover_photo_url: coverPhotoUrl || null, hero_bg_url: heroBgUrl || null, profile_video_url: profileVideoUrl || null } : prev)
     setProfileSaving(false)
     setProfileSaved(true)
     setTimeout(() => setProfileSaved(false), 2500)
@@ -216,48 +232,204 @@ export default function BiyografiPage() {
               <h2 className="font-semibold text-[#1f2d27]">Profil Bilgileri</h2>
             </div>
           </div>
-          <form onSubmit={handleSaveProfile} className="space-y-4 p-6">
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div>
-                <label className={labelCls}>Ad Soyad *</label>
-                <input type="text" value={displayName} onChange={e => setDisplayName(e.target.value)} disabled={isLocked ?? false} placeholder="Adnan Kahya" className={inputCls} />
+          <form onSubmit={handleSaveProfile} className="space-y-5 p-6">
+            {/* Ad Soyad + Profil Fotoğrafı yan yana önizleme */}
+            <div className="flex flex-col gap-5 sm:flex-row sm:items-start">
+              {/* Fotoğraf yükleme */}
+              <div className="shrink-0">
+                <label className={labelCls}>Profil Fotoğrafı</label>
+                <label className={`relative flex h-24 w-24 cursor-pointer items-center justify-center overflow-hidden rounded-full border-2 border-dashed border-[#e5dccb] bg-[#fdfaf5] transition hover:border-[#174f35]/40 hover:bg-[#f5f0e8] ${isLocked ? 'pointer-events-none opacity-40' : ''}`}>
+                  {photoUploading ? (
+                    <Loader2 className="h-6 w-6 animate-spin text-[#174f35]" />
+                  ) : coverPhotoUrl ? (
+                    <Image src={coverPhotoUrl} alt="Profil" fill className="object-cover" unoptimized />
+                  ) : (
+                    <div className="flex flex-col items-center gap-1">
+                      <Upload className="h-5 w-5 text-[#b08340]" />
+                      <span className="text-center text-[10px] leading-tight text-[#adb5ab]">Fotoğraf Yükle</span>
+                    </div>
+                  )}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="sr-only"
+                    disabled={isLocked ?? false}
+                    onChange={async (e) => {
+                      const file = e.target.files?.[0]
+                      if (!file) return
+                      if (!file.type.startsWith('image/')) { setPhotoUploadError('Sadece görsel yükleyebilirsiniz'); e.target.value = ''; return }
+                      if (file.size > 10 * 1024 * 1024) { setPhotoUploadError('Dosya çok büyük (max 10 MB)'); e.target.value = ''; return }
+                      setPhotoUploading(true)
+                      setPhotoUploadError(null)
+                      try {
+                        const { data: { user } } = await supabase.auth.getUser()
+                        if (!user) { setPhotoUploadError('Oturum bulunamadı'); return }
+                        const ext = file.name.split('.').pop()?.toLowerCase() ?? 'jpg'
+                        const path = `photos/${id}/${user.id}/${Date.now()}.${ext}`
+                        const { error } = await supabase.storage.from('vault-media').upload(path, file, { contentType: file.type, upsert: false })
+                        if (error) { setPhotoUploadError(`Yükleme hatası: ${error.message}`); return }
+                        const { data: urlData } = supabase.storage.from('vault-media').getPublicUrl(path)
+                        setCoverPhotoUrl(urlData.publicUrl)
+                      } catch (err) {
+                        setPhotoUploadError('Beklenmeyen hata: ' + String(err))
+                      } finally {
+                        setPhotoUploading(false)
+                        e.target.value = ''
+                      }
+                    }}
+                  />
+                </label>
+                {photoUploadError && <p className="mt-1 max-w-[96px] text-[10px] text-red-500">{photoUploadError}</p>}
+                <p className="mt-1 max-w-[96px] text-center text-[10px] text-[#adb5ab]">JPG, PNG, WEBP</p>
               </div>
-              <div>
-                <label className={labelCls}>Profil Fotoğrafı URL</label>
-                <input type="url" value={coverPhotoUrl} onChange={e => setCoverPhotoUrl(e.target.value)} disabled={isLocked ?? false} placeholder="https://..." className={inputCls} />
+
+              {/* Ad Soyad + Tarihler */}
+              <div className="flex-1 space-y-4">
+                <div>
+                  <label className={labelCls}>Ad Soyad *</label>
+                  <input type="text" value={displayName} onChange={e => setDisplayName(e.target.value)} disabled={isLocked ?? false} placeholder="Adnan Kahya" className={inputCls} />
+                </div>
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div>
+                    <label className={labelCls}>Doğum Tarihi</label>
+                    <input type="date" value={birthDate} onChange={e => setBirthDate(e.target.value)} disabled={isLocked ?? false} className={inputCls} />
+                  </div>
+                  <div>
+                    <label className={labelCls}>Vefat Tarihi</label>
+                    <input type="date" value={deathDate} onChange={e => setDeathDate(e.target.value)} disabled={isLocked ?? false} className={inputCls} />
+                  </div>
+                </div>
               </div>
             </div>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div>
-                <label className={labelCls}>Doğum Tarihi</label>
-                <input type="date" value={birthDate} onChange={e => setBirthDate(e.target.value)} disabled={isLocked ?? false} className={inputCls} />
-              </div>
-              <div>
-                <label className={labelCls}>Vefat Tarihi</label>
-                <input type="date" value={deathDate} onChange={e => setDeathDate(e.target.value)} disabled={isLocked ?? false} className={inputCls} />
-              </div>
+
+            {/* Fotoğraf tavsiye notu */}
+            <div className="rounded-xl border border-[#e5dccb] bg-[#fdfaf5] px-4 py-3 text-xs text-[#4a5e55]">
+              📸 <span className="font-semibold">Fotoğraf Seçimi İçin Tavsiyeler</span><br />
+              Ziyaretçilerin ekranda net görebilmesi için aydınlık ve yüzün belirgin olduğu yüksek kaliteli fotoğrafları tercih edin.
             </div>
+
             <div>
               <label className={labelCls}>Kısa Anı Sözü</label>
               <input type="text" value={tagline} onChange={e => setTagline(e.target.value)} disabled={isLocked ?? false} placeholder="Kalbimizde yaşıyor... veya en sevdiği söz" maxLength={200} className={inputCls} />
             </div>
             <div>
-              <label className={labelCls}>Arka Plan Görseli URL (Hero)</label>
-              <input type="url" value={heroBgUrl} onChange={e => setHeroBgUrl(e.target.value)} disabled={isLocked ?? false} placeholder="https://... (anma sayfasının hero bölümünde görünür)" className={inputCls} />
-              <p className="mt-1 text-xs text-[#adb5ab]">Boş bırakılırsa profil fotoğrafı arka plan olarak kullanılır</p>
+              <label className={labelCls}>Arka Plan Görseli (Hero)</label>
+              <p className="mb-2 text-xs text-[#788177]">Anma sayfasının üst bölümünde görünür. Boş bırakılırsa profil fotoğrafı kullanılır.</p>
+              <label className={`flex cursor-pointer items-center gap-3 rounded-xl border-2 border-dashed border-[#e5dccb] bg-[#fdfaf5] px-4 py-4 transition hover:border-[#174f35]/40 hover:bg-[#f5f0e8] ${isLocked ? 'pointer-events-none opacity-40' : ''}`}>
+                {heroBgUploading
+                  ? <Loader2 className="h-5 w-5 animate-spin text-[#174f35]" />
+                  : <Upload className="h-5 w-5 text-[#b08340]" />
+                }
+                <div>
+                  <p className="text-sm font-medium text-[#1f2d27]">
+                    {heroBgUploading ? 'Yükleniyor...' : 'Görsel seç veya buraya sürükle'}
+                  </p>
+                  <p className="text-xs text-[#adb5ab]">JPG, PNG, WEBP — max 10 MB</p>
+                </div>
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="sr-only"
+                  disabled={isLocked ?? false}
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0]
+                    if (!file) return
+                    if (!file.type.startsWith('image/')) {
+                      setHeroBgUploadError('Sadece görsel dosyası yükleyebilirsiniz')
+                      e.target.value = ''
+                      return
+                    }
+                    if (file.size > 10 * 1024 * 1024) {
+                      setHeroBgUploadError('Dosya çok büyük (max 10 MB)')
+                      e.target.value = ''
+                      return
+                    }
+                    setHeroBgUploading(true)
+                    setHeroBgUploadError(null)
+                    try {
+                      const { data: { user } } = await supabase.auth.getUser()
+                      if (!user) { setHeroBgUploadError('Oturum bulunamadı'); return }
+                      const ext = file.name.split('.').pop()?.toLowerCase() ?? 'jpg'
+                      const path = `heroes/${id}/${user.id}/${Date.now()}.${ext}`
+                      const { error } = await supabase.storage
+                        .from('vault-media')
+                        .upload(path, file, { contentType: file.type, upsert: false })
+                      if (error) { setHeroBgUploadError(`Yükleme hatası: ${error.message}`); return }
+                      const { data: urlData } = supabase.storage.from('vault-media').getPublicUrl(path)
+                      setHeroBgUrl(urlData.publicUrl)
+                    } catch (err) {
+                      setHeroBgUploadError('Beklenmeyen hata: ' + String(err))
+                    } finally {
+                      setHeroBgUploading(false)
+                      e.target.value = ''
+                    }
+                  }}
+                />
+              </label>
+              {heroBgUploadError && <p className="mt-1 text-xs text-red-500">{heroBgUploadError}</p>}
+              {heroBgUrl && (
+                <div className="mt-2 overflow-hidden rounded-xl border border-[#e5dccb]">
+                  <Image src={heroBgUrl} alt="Hero önizleme" width={600} height={120} className="h-24 w-full object-cover" unoptimized />
+                </div>
+              )}
             </div>
 
-            {coverPhotoUrl && (
-              <div className="flex items-center gap-3 rounded-xl border border-[#e5dccb] bg-[#f9f5ec] p-3">
-                <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full border border-[#dfbd72]">
-                  <Image src={coverPhotoUrl} alt="Önizleme" fill className="object-cover" unoptimized />
+            {/* Video yükleme */}
+            <div>
+              <label className={labelCls}>Profil Videosu</label>
+              <label className={`flex cursor-pointer items-center gap-3 rounded-xl border-2 border-dashed border-[#e5dccb] bg-[#fdfaf5] px-4 py-4 transition hover:border-[#174f35]/40 hover:bg-[#f5f0e8] ${isLocked ? 'pointer-events-none opacity-40' : ''}`}>
+                {videoUploading
+                  ? <Loader2 className="h-5 w-5 animate-spin text-[#174f35]" />
+                  : <Upload className="h-5 w-5 text-[#b08340]" />
+                }
+                <div>
+                  <p className="text-sm font-medium text-[#1f2d27]">
+                    {videoUploading ? 'Video yükleniyor...' : 'Video seç veya buraya sürükle'}
+                  </p>
+                  <p className="text-xs text-[#adb5ab]">MP4, MOV, WEBM — max 100 MB, 10 dakika</p>
                 </div>
-                <div className="min-w-0">
-                  <p className="truncate font-serif text-sm text-[#1f2d27]">{displayName}</p>
-                  {tagline && <p className="mt-0.5 truncate text-xs italic text-[#7a7467]">&quot;{tagline}&quot;</p>}
-                </div>
+                <input
+                  type="file"
+                  accept="video/*"
+                  className="sr-only"
+                  disabled={isLocked ?? false}
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0]
+                    if (!file) return
+                    if (!file.type.startsWith('video/')) { setVideoUploadError('Sadece video dosyası yükleyebilirsiniz'); e.target.value = ''; return }
+                    if (file.size > 100 * 1024 * 1024) { setVideoUploadError('Video çok büyük (max 100 MB)'); e.target.value = ''; return }
+                    setVideoUploading(true)
+                    setVideoUploadError(null)
+                    try {
+                      const { data: { user } } = await supabase.auth.getUser()
+                      if (!user) { setVideoUploadError('Oturum bulunamadı'); return }
+                      const ext = file.name.split('.').pop()?.toLowerCase() ?? 'mp4'
+                      const path = `videos/${id}/${user.id}/${Date.now()}.${ext}`
+                      const { error } = await supabase.storage.from('vault-media').upload(path, file, { contentType: file.type, upsert: false })
+                      if (error) { setVideoUploadError(`Yükleme hatası: ${error.message}`); return }
+                      const { data: urlData } = supabase.storage.from('vault-media').getPublicUrl(path)
+                      setProfileVideoUrl(urlData.publicUrl)
+                    } catch (err) {
+                      setVideoUploadError('Beklenmeyen hata: ' + String(err))
+                    } finally {
+                      setVideoUploading(false)
+                      e.target.value = ''
+                    }
+                  }}
+                />
+              </label>
+              {videoUploadError && <p className="mt-1 text-xs text-red-500">{videoUploadError}</p>}
+              {profileVideoUrl && (
+                <video controls src={profileVideoUrl} className="mt-2 w-full rounded-xl border border-[#e5dccb]" style={{ maxHeight: 220 }} />
+              )}
+
+              {/* Video tavsiye notu */}
+              <div className="mt-3 rounded-xl border border-[#e5dccb] bg-[#fdfaf5] px-4 py-3 text-xs text-[#4a5e55]">
+                🎥 <span className="font-semibold">Video Seçimi İçin Tavsiyeler</span><br />
+                Mezarlık gibi açık alanlarda internet bağlantısı zayıf olabilir. Videoların ziyaretçilerde donmadan, anında açılabilmesi için süreyi <span className="font-semibold">2–3 dakika</span> aralığında tutmanızı öneririz.<br />
+                <span className="mt-1 block text-[#788177]">(Sistemimiz kalite standartları gereği en fazla 100 MB boyutunda ve 10 dakikalık videolara izin vermektedir.)</span>
               </div>
-            )}
+            </div>
 
             <div className="flex items-center gap-3">
               <button type="submit" disabled={isLocked ?? false} className={saveBtnCls}>

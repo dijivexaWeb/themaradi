@@ -3,6 +3,35 @@
 > Her oturum sonunda Claude bu dosyayı günceller.
 > Format: tarih → ne yapıldı → nerede kalındı → sıradaki adım.
 
+## 2026-06-10 — Oturum 69: Storage RLS + Hero Görsel Yükleme
+
+### Yapılanlar
+- `supabase/migrations/storage_vault_media_rls.sql` uygulandı: `vault-media` bucket'ı için INSERT/SELECT/DELETE RLS policy'leri eklendi (önceki policy sadece `media` bucket'ını kapsıyordu, bu nedenle şarkı yükleme "RLS violation" hatası veriyordu)
+- `src/app/anma-paneli/[id]/biyografi/page.tsx` güncellendi: "Arka Plan Görseli URL (Hero)" alanı URL input'tan dosya yükleme alanına çevrildi — JPG/PNG/WEBP, max 10 MB, `vault-media/heroes/[id]/...` path'ine direkt client-side upload, önizleme gösterimi
+
+### Proje Durumu
+- [x] Email onay + vault-aware redirect
+- [x] Anma Tarzı özelliği (11 şablon, action butonları)
+- [x] QR ID sistemi + slug editörü + indirme
+- [x] Önizleme modu (`?preview=1` owner için)
+- [x] Memorial sayfasında aktif anma aksiyon butonları
+- [x] Şarkı ve hero görsel yükleme (vault-media bucket, client-side)
+- [ ] Admin itiraz sayfası (`admin/objections/page.tsx`)
+- [ ] Profil fotoğrafı da yükleme ile olacak
+
+### Kritik Kararlar / Notlar
+- vault-media RLS: INSERT policy `with_check` kısmında `bucket_id = 'media'` vardı, `vault-media` için ayrı policy eksikti
+- Hero ve şarkı yüklemeleri direkt client → Supabase storage (Vercel function body limitini bypass eder)
+- DELETE policy path'i: `(string_to_array(name, '/'))[2]` = user.id (path: `heroes/vaultId/userId/filename`)
+
+### Nerede Kaldık
+Biyografi sayfasında hero arka plan görseli dosya yükleme ile tamamlandı. Şarkı yükleme RLS sorunu da çözüldü.
+
+### Sıradaki Adım
+1. Profil fotoğrafı URL input'unu da yükleme alanına çevir
+2. Admin itiraz sayfası (`admin/objections/page.tsx`)
+3. Taziye defteri / guestbook sayfası
+
 ## 2026-06-10 — Oturum 68: QR ID Sistemi + Link & QR Sayfası
 
 ### Yapılanlar
