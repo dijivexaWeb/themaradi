@@ -3,6 +3,33 @@
 > Her oturum sonunda Claude bu dosyayı günceller.
 > Format: tarih → ne yapıldı → nerede kalındı → sıradaki adım.
 
+## 2026-06-10 — Oturum 66: Vault-Aware Giriş Yönlendirmesi
+
+### Yapılanlar
+- `auth/callback/route.ts` yeniden yazıldı: email onayı sonrası kullanıcının en son vault'una bakıp product_type'a göre yönlendirir (`memorial_profile` → `/anma-paneli/${id}`, `life_vault` → `/dashboard/vault/${id}`)
+- `login/_LoginPageClient.tsx` güncellendi: `signInWithPassword` başarısında vault sorgusu yapılır, product_type'a göre doğru sayfaya yönlendirilir — `window.location.href = '/dashboard'` hardcode kaldırıldı
+- `satin-al/actions.ts` temizlendi: denenen `redirect_to` URL modifikasyon yaklaşımı (Supabase allowed redirect URL kısıtı nedeniyle riskli) kaldırıldı; yönlendirme sorumluluğu tamamen callback/login'e taşındı
+
+### Proje Durumu
+[x] Email onayı sonrası vault-aware yönlendirme (callback)
+[x] Normal login sonrası vault-aware yönlendirme
+[x] Memorial profile → /anma-paneli, Life vault → /dashboard/vault
+
+### Kritik Kararlar / Notlar
+- Yönlendirme mantığı cookie veya URL parametresine bağlı değil — DB'den vault sorgusu ile belirleniyor; manipülasyon imkânsız
+- Kullanıcının birden fazla vault'u varsa `created_at DESC` ile en son oluşturulan vault'a yönlendirilir
+- Supabase `redirect_to` URL modifikasyonu: Supabase allowed redirect URL listesi query parametreli URL'leri kabul etmeyebileceğinden bu yaklaşım terk edildi
+
+### Nerede Kaldık
+Vault-aware yönlendirme tamamlandı. Giriş ve email onayı her iki yolda da doğru sayfaya gönderiliyor.
+
+### Sıradaki Adım
+1. Admin objection listesi sayfası (`admin/objections/page.tsx`)
+2. TypeScript derleme kontrolü: `tsc --noEmit`
+3. Test: anma profili satın al → email onayla → `/anma-paneli` sayfasına geldiğini doğrula
+
+---
+
 ## 2026-06-10 — Oturum 65: Publish Hatası Düzeltme + Email Onayı Araştırması
 
 ### Yapılanlar

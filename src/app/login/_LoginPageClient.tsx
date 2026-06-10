@@ -125,7 +125,26 @@ export default function LoginPageClient({ siteKey }: { siteKey: string }) {
       const isUnconfirmed = error.message.toLowerCase().includes('not confirmed') || error.code === 'email_not_confirmed'
       setMsg({ ok: false, text: isUnconfirmed ? c.errorUnconfirmed : c.error })
     } else {
-      window.location.href = '/dashboard'
+      const { data: { user } } = await supabase.auth.getUser()
+      if (user) {
+        const { data: vault } = await supabase
+          .from('vaults')
+          .select('id, product_type')
+          .eq('owner_id', user.id)
+          .order('created_at', { ascending: false })
+          .limit(1)
+          .single()
+
+        if (vault?.product_type === 'memorial_profile') {
+          window.location.href = `/anma-paneli/${vault.id}`
+        } else if (vault?.product_type === 'life_vault') {
+          window.location.href = `/dashboard/vault/${vault.id}`
+        } else {
+          window.location.href = '/dashboard'
+        }
+      } else {
+        window.location.href = '/dashboard'
+      }
     }
     setLoading(false)
   }
