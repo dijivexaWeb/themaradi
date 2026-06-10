@@ -44,8 +44,12 @@
 Tüm RLS sorunları giderildi, sidebar badge aktif, admin önizleme çalışıyor.
 
 ### Sıradaki Adım
-1. Havale akışı email bildirimleri
-2. Email template DRY: `verificationApprovedEmailHtml` `@/lib/email/templates.ts`'e taşı
+1. **Admin Taziye sayfasına "Anma Tarzı" aksiyonları ekle:**
+   - DB'de `memorial_actions`, `memorial_action_clicks`, `memorial_reactions` tabloları mevcut
+   - Her anma sayfası için tıklama istatistiklerini (mum, çiçek, dua vb.) admin guestbook sayfasında göster
+   - Vault bazında toplam tıklama sayısı + aksiyon bazında breakdown
+2. Havale akışı email bildirimleri
+3. Email template DRY: `verificationApprovedEmailHtml` `@/lib/email/templates.ts`'e taşı
 
 ## 2026-06-11 — Oturum 77: Admin Doğrulama Sekmeli Görünüm (Bekleyen/Tamamlanan)
 
