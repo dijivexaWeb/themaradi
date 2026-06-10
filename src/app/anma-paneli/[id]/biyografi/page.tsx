@@ -238,17 +238,30 @@ export default function BiyografiPage() {
               {/* Fotoğraf yükleme */}
               <div className="shrink-0">
                 <label className={labelCls}>Profil Fotoğrafı</label>
-                <label className={`relative flex h-24 w-24 cursor-pointer items-center justify-center overflow-hidden rounded-full border-2 border-dashed border-[#e5dccb] bg-[#fdfaf5] transition hover:border-[#174f35]/40 hover:bg-[#f5f0e8] ${isLocked ? 'pointer-events-none opacity-40' : ''}`}>
-                  {photoUploading ? (
-                    <Loader2 className="h-6 w-6 animate-spin text-[#174f35]" />
-                  ) : coverPhotoUrl ? (
-                    <Image src={coverPhotoUrl} alt="Profil" fill className="object-cover" unoptimized />
-                  ) : (
-                    <div className="flex flex-col items-center gap-1">
-                      <Upload className="h-5 w-5 text-[#b08340]" />
-                      <span className="text-center text-[10px] leading-tight text-[#adb5ab]">Fotoğraf Yükle</span>
+                <label className={`block cursor-pointer overflow-hidden rounded-xl border-2 border-dashed border-[#e5dccb] bg-[#fdfaf5] transition hover:border-[#174f35]/40 hover:bg-[#f5f0e8] ${isLocked ? 'pointer-events-none opacity-40' : ''}`}>
+                  {/* Yükleme satırı */}
+                  <div className="flex items-center gap-3 px-4 py-3">
+                    {photoUploading ? (
+                      <Loader2 className="h-5 w-5 shrink-0 animate-spin text-[#174f35]" />
+                    ) : coverPhotoUrl ? (
+                      <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full border border-[#dfbd72]">
+                        <Image src={coverPhotoUrl} alt="Profil" fill className="object-cover" unoptimized />
+                      </div>
+                    ) : (
+                      <Upload className="h-5 w-5 shrink-0 text-[#b08340]" />
+                    )}
+                    <div>
+                      <p className="text-sm font-medium text-[#1f2d27]">
+                        {photoUploading ? 'Yükleniyor...' : coverPhotoUrl ? 'Fotoğrafı değiştir' : 'Fotoğraf seç veya buraya sürükle'}
+                      </p>
+                      <p className="text-xs text-[#adb5ab]">JPG, PNG, WEBP — max 10 MB</p>
                     </div>
-                  )}
+                  </div>
+                  {/* Tavsiye notu */}
+                  <div className="border-t border-dashed border-[#e5dccb] bg-[#faf6ee] px-4 py-2.5 text-xs text-[#4a5e55]">
+                    📸 <span className="font-semibold">Fotoğraf Seçimi İçin Tavsiyeler</span><br />
+                    <span className="text-[#788177]">Ziyaretçilerin ekranda net görebilmesi için aydınlık ve yüzün belirgin olduğu yüksek kaliteli fotoğrafları tercih edin.</span>
+                  </div>
                   <input
                     type="file"
                     accept="image/*"
@@ -279,8 +292,7 @@ export default function BiyografiPage() {
                     }}
                   />
                 </label>
-                {photoUploadError && <p className="mt-1 max-w-[96px] text-[10px] text-red-500">{photoUploadError}</p>}
-                <p className="mt-1 max-w-[96px] text-center text-[10px] text-[#adb5ab]">JPG, PNG, WEBP</p>
+                {photoUploadError && <p className="mt-1 text-xs text-red-500">{photoUploadError}</p>}
               </div>
 
               {/* Ad Soyad + Tarihler */}
@@ -300,12 +312,6 @@ export default function BiyografiPage() {
                   </div>
                 </div>
               </div>
-            </div>
-
-            {/* Fotoğraf tavsiye notu */}
-            <div className="rounded-xl border border-[#e5dccb] bg-[#fdfaf5] px-4 py-3 text-xs text-[#4a5e55]">
-              📸 <span className="font-semibold">Fotoğraf Seçimi İçin Tavsiyeler</span><br />
-              Ziyaretçilerin ekranda net görebilmesi için aydınlık ve yüzün belirgin olduğu yüksek kaliteli fotoğrafları tercih edin.
             </div>
 
             <div>
@@ -377,16 +383,25 @@ export default function BiyografiPage() {
             {/* Video yükleme */}
             <div>
               <label className={labelCls}>Profil Videosu</label>
-              <label className={`flex cursor-pointer items-center gap-3 rounded-xl border-2 border-dashed border-[#e5dccb] bg-[#fdfaf5] px-4 py-4 transition hover:border-[#174f35]/40 hover:bg-[#f5f0e8] ${isLocked ? 'pointer-events-none opacity-40' : ''}`}>
-                {videoUploading
-                  ? <Loader2 className="h-5 w-5 animate-spin text-[#174f35]" />
-                  : <Upload className="h-5 w-5 text-[#b08340]" />
-                }
-                <div>
-                  <p className="text-sm font-medium text-[#1f2d27]">
-                    {videoUploading ? 'Video yükleniyor...' : 'Video seç veya buraya sürükle'}
-                  </p>
-                  <p className="text-xs text-[#adb5ab]">MP4, MOV, WEBM — max 100 MB, 10 dakika</p>
+              <label className={`block cursor-pointer overflow-hidden rounded-xl border-2 border-dashed border-[#e5dccb] bg-[#fdfaf5] transition hover:border-[#174f35]/40 hover:bg-[#f5f0e8] ${isLocked ? 'pointer-events-none opacity-40' : ''}`}>
+                {/* Yükleme satırı */}
+                <div className="flex items-center gap-3 px-4 py-4">
+                  {videoUploading
+                    ? <Loader2 className="h-5 w-5 shrink-0 animate-spin text-[#174f35]" />
+                    : <Upload className="h-5 w-5 shrink-0 text-[#b08340]" />
+                  }
+                  <div>
+                    <p className="text-sm font-medium text-[#1f2d27]">
+                      {videoUploading ? 'Video yükleniyor...' : 'Video seç veya buraya sürükle'}
+                    </p>
+                    <p className="text-xs text-[#adb5ab]">MP4, MOV, WEBM — max 100 MB, 10 dakika</p>
+                  </div>
+                </div>
+                {/* Tavsiye notu */}
+                <div className="border-t border-dashed border-[#e5dccb] bg-[#faf6ee] px-4 py-3 text-xs text-[#4a5e55]">
+                  🎥 <span className="font-semibold">Video Seçimi İçin Tavsiyeler</span><br />
+                  <span className="text-[#788177]">Mezarlık gibi açık alanlarda internet bağlantısı zayıf olabilir. Videoların ziyaretçilerde donmadan, anında açılabilmesi için süreyi <span className="font-semibold text-[#4a5e55]">2–3 dakika</span> aralığında tutmanızı öneririz.</span><br />
+                  <span className="mt-1 block text-[#adb5ab]">(Sistemimiz kalite standartları gereği en fazla 100 MB boyutunda ve 10 dakikalık videolara izin vermektedir.)</span>
                 </div>
                 <input
                   type="file"
@@ -422,13 +437,6 @@ export default function BiyografiPage() {
               {profileVideoUrl && (
                 <video controls src={profileVideoUrl} className="mt-2 w-full rounded-xl border border-[#e5dccb]" style={{ maxHeight: 220 }} />
               )}
-
-              {/* Video tavsiye notu */}
-              <div className="mt-3 rounded-xl border border-[#e5dccb] bg-[#fdfaf5] px-4 py-3 text-xs text-[#4a5e55]">
-                🎥 <span className="font-semibold">Video Seçimi İçin Tavsiyeler</span><br />
-                Mezarlık gibi açık alanlarda internet bağlantısı zayıf olabilir. Videoların ziyaretçilerde donmadan, anında açılabilmesi için süreyi <span className="font-semibold">2–3 dakika</span> aralığında tutmanızı öneririz.<br />
-                <span className="mt-1 block text-[#788177]">(Sistemimiz kalite standartları gereği en fazla 100 MB boyutunda ve 10 dakikalık videolara izin vermektedir.)</span>
-              </div>
             </div>
 
             <div className="flex items-center gap-3">
