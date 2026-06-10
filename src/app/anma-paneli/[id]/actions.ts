@@ -512,7 +512,13 @@ export async function addWitnessAction(vaultId: string, formData: FormData): Pro
 
   const fullName = (formData.get('full_name') as string)?.trim()
   const email = (formData.get('email') as string)?.trim().toLowerCase()
-  if (!fullName || !email) return
+  const phone = (formData.get('phone') as string)?.trim() || null
+  const consentProcessing = formData.get('consent_processing') === 'on'
+  const consentPhone = formData.get('consent_phone') === 'on'
+  const consentEmail = formData.get('consent_email') === 'on'
+
+  if (!fullName || !email || !phone) return
+  if (!consentProcessing || !consentPhone || !consentEmail) return
 
   // Mevcut şahit sayısını kontrol et (max 5)
   const { count } = await supabase.from('memorial_witnesses')
@@ -520,7 +526,10 @@ export async function addWitnessAction(vaultId: string, formData: FormData): Pro
   if ((count ?? 0) >= 5) return
 
   const { data: witness, error } = await supabase.from('memorial_witnesses').insert({
-    vault_id: vaultId, full_name: fullName, email,
+    vault_id: vaultId, full_name: fullName, email, phone,
+    consent_processing: consentProcessing,
+    consent_phone: consentPhone,
+    consent_email: consentEmail,
   }).select('id, token').single()
 
   if (error || !witness) return

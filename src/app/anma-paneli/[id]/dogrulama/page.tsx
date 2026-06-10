@@ -188,9 +188,13 @@ export default async function MemorialDogrulamaPage({ params }: Props) {
               </div>
 
               <div className="p-6">
-                {activeDoc?.status === 'rejected' && activeDoc.admin_note && (
-                  <div className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-                    <strong>Red sebebi:</strong> {activeDoc.admin_note}
+                {activeDoc?.status === 'rejected' && (
+                  <div className="mb-4 rounded-xl border border-red-300 bg-red-50 px-4 py-3.5">
+                    <p className="text-sm font-semibold text-red-700 mb-1">Belgeniz reddedildi</p>
+                    {activeDoc.admin_note && (
+                      <p className="text-sm text-red-600 mb-2">{activeDoc.admin_note}</p>
+                    )}
+                    <p className="text-xs text-red-500">Lütfen belgenizi düzelterek yeniden yükleyin.</p>
                   </div>
                 )}
 
@@ -265,22 +269,26 @@ export default async function MemorialDogrulamaPage({ params }: Props) {
                           </p>
                         )}
                       </div>
-                      <div className="flex items-center gap-1.5 shrink-0">
+                      <div className="flex flex-col items-end gap-1.5 shrink-0">
                         {w.status === 'confirmed' ? (
                           <span className="rounded-full bg-[#e9f5ec] px-2.5 py-0.5 text-[11px] font-semibold text-[#176b3f]">Onaylandı</span>
                         ) : (
                           <>
                             <span className="rounded-full bg-[#fff4dc] px-2.5 py-0.5 text-[11px] font-semibold text-[#93620f]">Bekliyor</span>
-                            <form action={resend}>
-                              <button type="submit" title="Email'i yeniden gönder" className="rounded-lg border border-[#e5dccb] p-1.5 text-[#788177] hover:bg-[#f5efdf] hover:text-[#174f35]">
-                                <RefreshCw className="h-3.5 w-3.5" />
-                              </button>
-                            </form>
-                            <form action={remove}>
-                              <button type="submit" title="Şahiti kaldır" className="rounded-lg border border-red-200 bg-red-50 p-1.5 text-red-400 hover:text-red-600">
-                                <Trash2 className="h-3.5 w-3.5" />
-                              </button>
-                            </form>
+                            <div className="flex items-center gap-1.5">
+                              <form action={resend}>
+                                <button type="submit" title="Email'i yeniden gönder" className="flex items-center gap-1 rounded-lg border border-[#e5dccb] px-2 py-1 text-[11px] text-[#788177] hover:bg-[#f5efdf] hover:text-[#174f35]">
+                                  <RefreshCw className="h-3 w-3" />
+                                  Tekrar Gönder
+                                </button>
+                              </form>
+                              <form action={remove}>
+                                <button type="submit" title="Kişiyi değiştir" className="flex items-center gap-1 rounded-lg border border-red-200 bg-red-50 px-2 py-1 text-[11px] text-red-500 hover:text-red-700">
+                                  <Trash2 className="h-3 w-3" />
+                                  Kişiyi Değiştir
+                                </button>
+                              </form>
+                            </div>
                           </>
                         )}
                       </div>
@@ -297,14 +305,41 @@ export default async function MemorialDogrulamaPage({ params }: Props) {
                     </div>
                     <div className="grid sm:grid-cols-2 gap-3">
                       <div>
-                        <label className={labelCls}>Ad Soyad</label>
+                        <label className={labelCls}>Ad Soyad *</label>
                         <input type="text" name="full_name" required placeholder="Ahmet Yılmaz" className={inputCls} />
                       </div>
                       <div>
-                        <label className={labelCls}>E-posta</label>
+                        <label className={labelCls}>E-posta *</label>
                         <input type="email" name="email" required placeholder="ahmet@example.com" className={inputCls} />
                       </div>
+                      <div className="sm:col-span-2">
+                        <label className={labelCls}>Telefon Numarası *</label>
+                        <input type="tel" name="phone" required placeholder="+90 5xx xxx xx xx" className={inputCls} />
+                      </div>
                     </div>
+
+                    {/* Zorunlu izinler */}
+                    <div className="space-y-2 rounded-xl border border-[#e5dccb] bg-[#fffdf8] p-3">
+                      <p className="text-[11px] font-semibold text-[#4a5e55] mb-2">Zorunlu İzinler</p>
+                      {[
+                        { name: 'consent_processing', label: 'Kişisel verilerimin işlenmesine ve vefat doğrulaması sürecinde kullanılmasına onay veriyorum.' },
+                        { name: 'consent_phone', label: 'Gerektiğinde telefonla aranmamı kabul ediyorum.' },
+                        { name: 'consent_email', label: 'Süreçle ilgili e-posta ile haberleşme yapılmasını kabul ediyorum.' },
+                      ].map(item => (
+                        <label key={item.name} className="flex items-start gap-2.5 cursor-pointer group">
+                          <input
+                            type="checkbox"
+                            name={item.name}
+                            required
+                            className="mt-0.5 h-4 w-4 shrink-0 rounded border-[#c8bfb0] accent-[#174f35]"
+                          />
+                          <span className="text-[11px] leading-relaxed text-[#4a5e55] group-hover:text-[#1f2d27]">
+                            {item.label}
+                          </span>
+                        </label>
+                      ))}
+                    </div>
+
                     <button type="submit"
                       className="flex items-center gap-2 rounded-xl bg-[#174f35] px-5 py-2.5 text-xs font-semibold text-white shadow-[0_4px_14px_rgba(23,79,53,0.18)] hover:bg-[#123f2b] transition-colors">
                       <Mail className="h-3.5 w-3.5" />
@@ -320,6 +355,21 @@ export default async function MemorialDogrulamaPage({ params }: Props) {
 
             {/* ADIM 3 — Özet / Yayına Al */}
             {status === 'private_memorial' && (
+              <>
+                {/* Doğrulama tamamlandı tebrik mesajı */}
+                <div className="rounded-3xl border border-[#c7a76f]/40 bg-gradient-to-br from-[#fffdf8] to-[#f5efdf] p-6 shadow-[0_4px_24px_rgba(64,48,24,0.06)]">
+                  <div className="flex items-start gap-4">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-[#174f35] text-white text-xl">✓</div>
+                    <div>
+                      <h3 className="font-serif text-lg text-[#1f2d27] mb-1">Doğrulamanız Tamamlandı</h3>
+                      <p className="text-sm leading-7 text-[#4a5e55]">
+                        {vault.display_name} için hazırlanan anma sayfası incelendi ve doğrulandı. Bu zorlu süreçte gösterdiğiniz sabır ve anlayış için teşekkür ederiz. Sevdiklerinizin anısını yaşatma çabanıza saygıyla eşlik ediyoruz.
+                      </p>
+                      <p className="mt-2 text-xs text-[#8a7a64] italic">— The Eternal Memory ekibi</p>
+                    </div>
+                  </div>
+                </div>
+
               <div className={`rounded-3xl border p-6 ${allVerified ? 'border-[#cfe7d3] bg-[#e9f5ec]' : 'border-[#e5dccb] bg-[#fffdf8]'}`}>
                 <h3 className="mb-3 flex items-center gap-2 font-semibold text-[#0d3a22]">
                   <Globe className="h-5 w-5 text-[#174f35]" />
@@ -358,6 +408,7 @@ export default async function MemorialDogrulamaPage({ params }: Props) {
                   </>
                 )}
               </div>
+              </>
             )}
           </div>
         )}

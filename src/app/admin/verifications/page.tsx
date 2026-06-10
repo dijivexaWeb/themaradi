@@ -26,7 +26,7 @@ export default async function VerificationsPage() {
     .select(`
       id, file_name, file_url, mime_type, file_size_bytes, created_at, status, file_key, storage_bucket,
       vaults (id, display_name, slug, status, profiles!vaults_owner_id_fkey (full_name, email)),
-      memorial_witnesses (id, full_name, email, status, confirmed_at)
+      memorial_witnesses (id, full_name, email, phone, status, confirmed_at, consent_processing, consent_phone, consent_email)
     `)
     .eq('status', 'pending')
     .order('created_at', { ascending: true })
@@ -150,7 +150,7 @@ export default async function VerificationsPage() {
             {docQueueWithUrls.map((doc) => {
               const vault = Array.isArray(doc.vaults) ? doc.vaults[0] : doc.vaults as Record<string, unknown> | null
               const owner = vault ? (Array.isArray((vault as Record<string, unknown>).profiles) ? ((vault as Record<string, unknown>).profiles as Record<string, unknown>[])[0] : (vault as Record<string, unknown>).profiles) as Record<string, unknown> | null : null
-              const witnesses = (Array.isArray(doc.memorial_witnesses) ? doc.memorial_witnesses : []) as Array<{ id: string; full_name: string; email: string; status: string; confirmed_at: string | null }>
+              const witnesses = (Array.isArray(doc.memorial_witnesses) ? doc.memorial_witnesses : []) as Array<{ id: string; full_name: string; email: string; phone: string | null; status: string; confirmed_at: string | null; consent_processing: boolean; consent_phone: boolean; consent_email: boolean }>
               const confirmedCount = witnesses.filter(w => w.status === 'confirmed').length
 
               return (
@@ -197,20 +197,29 @@ export default async function VerificationsPage() {
                       ) : (
                         <div className="space-y-2">
                           {witnesses.map(w => (
-                            <div key={w.id} className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-xs ${w.status === 'confirmed' ? 'border-emerald-200 bg-emerald-50' : 'border-slate-200 bg-white'}`}>
-                              <span className={`font-semibold ${w.status === 'confirmed' ? 'text-emerald-700' : 'text-amber-600'}`}>
-                                {w.status === 'confirmed' ? '✓' : '○'}
-                              </span>
-                              <span className="font-medium text-slate-700">{w.full_name}</span>
-                              <span className="text-slate-400 truncate">{w.email}</span>
-                              {w.status === 'confirmed' && w.confirmed_at && (
-                                <span className="ml-auto shrink-0 text-slate-400">
-                                  {new Date(w.confirmed_at).toLocaleDateString('tr-TR')}
+                            <div key={w.id} className={`rounded-lg border px-3 py-2.5 text-xs ${w.status === 'confirmed' ? 'border-emerald-200 bg-emerald-50' : 'border-slate-200 bg-white'}`}>
+                              <div className="flex items-center gap-2">
+                                <span className={`font-semibold ${w.status === 'confirmed' ? 'text-emerald-700' : 'text-amber-600'}`}>
+                                  {w.status === 'confirmed' ? '✓' : '○'}
                                 </span>
-                              )}
-                              {w.status !== 'confirmed' && (
-                                <span className="ml-auto shrink-0 font-semibold text-amber-600">Bekliyor</span>
-                              )}
+                                <span className="font-medium text-slate-700">{w.full_name}</span>
+                                {w.status === 'confirmed' && w.confirmed_at ? (
+                                  <span className="ml-auto shrink-0 text-slate-400">
+                                    {new Date(w.confirmed_at).toLocaleDateString('tr-TR')}
+                                  </span>
+                                ) : (
+                                  <span className="ml-auto shrink-0 font-semibold text-amber-600">Bekliyor</span>
+                                )}
+                              </div>
+                              <div className="mt-1 space-y-0.5 pl-4">
+                                <p className="text-slate-500">{w.email}</p>
+                                {w.phone && <p className="text-slate-500">📞 {w.phone}</p>}
+                                <div className="flex gap-2 mt-1">
+                                  <span className={`rounded px-1.5 py-0.5 font-medium ${w.consent_processing ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-600'}`}>İşleme {w.consent_processing ? '✓' : '✗'}</span>
+                                  <span className={`rounded px-1.5 py-0.5 font-medium ${w.consent_phone ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-600'}`}>Telefon {w.consent_phone ? '✓' : '✗'}</span>
+                                  <span className={`rounded px-1.5 py-0.5 font-medium ${w.consent_email ? 'bg-emerald-100 text-emerald-700' : 'bg-red-100 text-red-600'}`}>E-posta {w.consent_email ? '✓' : '✗'}</span>
+                                </div>
+                              </div>
                             </div>
                           ))}
                         </div>
