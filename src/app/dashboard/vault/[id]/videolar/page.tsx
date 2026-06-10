@@ -3,6 +3,7 @@ import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
 import { addVideoAction, updateMediaAction, deleteMediaAction } from '@/lib/actions/media'
 import PersonHeader from '../_PersonHeader'
+import VideoUploadForm from './VideoUploadForm'
 
 interface Props { params: Promise<{ id: string }>; searchParams: Promise<{ edit?: string }> }
 
@@ -128,54 +129,7 @@ export default async function VideolarPage({ params, searchParams }: Props) {
 
         {/* Add form */}
         {!isLocked && !atLimit && !editingVideo && (
-          <div className="rounded-3xl border border-[#e5dccb] bg-[#fffdf8] p-6 shadow-[0_4px_24px_rgba(64,48,24,0.05)] mb-10">
-            <div className="flex items-center gap-2 mb-1">
-              <span className="text-lg">📤</span>
-              <h2 className="font-semibold text-[#1f2d27]">Video Ekle</h2>
-            </div>
-            <p className="text-xs text-[#788177] mb-4 ml-7">YouTube / Vimeo linki, video URL&apos;si veya dosya yükleme</p>
-            <form action={addVideo} className="space-y-4">
-              <div className="grid sm:grid-cols-2 gap-4">
-                <div>
-                  <label className={labelCls}>Video URL</label>
-                  <input type="url" name="url" placeholder="https://youtube.com/watch?v=..." className={inputCls} />
-                </div>
-                <div>
-                  <label className={labelCls}>Dosya Yükle</label>
-                  <input type="file" name="file" accept="video/*"
-                    className="w-full cursor-pointer rounded-xl border border-[#e5dccb] bg-white px-3 py-2.5 text-sm text-[#1f2d27] file:mr-3 file:rounded-lg file:border-0 file:bg-[#174f35]/10 file:px-3 file:py-1.5 file:text-[#174f35] file:font-medium outline-none" />
-                </div>
-              </div>
-              <div className="grid sm:grid-cols-3 gap-4">
-                <div>
-                  <label className={labelCls}>Başlık</label>
-                  <input type="text" name="title" placeholder="Doğum günü videosu" className={inputCls} />
-                </div>
-                <div>
-                  <label className={labelCls}>Tarih</label>
-                  <input type="datetime-local" name="taken_at" max={todayMax} className={inputCls} />
-                </div>
-                <div>
-                  <label className={labelCls}>Görünürlük</label>
-                  <select name="visibility" defaultValue="private"
-                    className="w-full rounded-xl border border-[#e5dccb] bg-white px-4 py-3 text-sm text-[#1f2d27] outline-none focus:border-[#174f35]">
-                    <option value="private">Gizli</option>
-                    <option value="public">Herkese açık</option>
-                  </select>
-                </div>
-              </div>
-              <div>
-                <label className={labelCls}>Anlatım</label>
-                <textarea name="caption" rows={2}
-                  placeholder="Bu videoda kimler var, hangi an anlatılıyor?"
-                  className={inputCls + ' resize-none'} />
-              </div>
-              <button type="submit"
-                className="rounded-xl bg-[#174f35] px-6 py-3 text-sm font-semibold text-white shadow-[0_14px_35px_rgba(23,79,53,0.18)] hover:bg-[#123f2b] transition-colors">
-                Videoyu Kaydet
-              </button>
-            </form>
-          </div>
+          <VideoUploadForm vaultId={id} todayMax={todayMax} />
         )}
 
         {!videos?.length ? (
@@ -192,7 +146,17 @@ export default async function VideolarPage({ params, searchParams }: Props) {
               const isEditing = video.id === editId
               return (
                 <div key={video.id} className={`group rounded-2xl border bg-white overflow-hidden transition-all ${isEditing ? 'border-[#c7a76f]' : 'border-[#e5dccb] hover:border-[#174f35]/20 hover:shadow-md'}`}>
-                  {embedUrl ? (
+                  {video.cf_stream_id ? (
+                    <div className="aspect-video bg-black">
+                      <iframe
+                        src={`https://iframe.videodelivery.net/${video.cf_stream_id}`}
+                        className="w-full h-full border-0"
+                        allowFullScreen
+                        allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
+                        title={video.original_filename ?? 'Video'}
+                      />
+                    </div>
+                  ) : embedUrl ? (
                     <div className="aspect-video bg-[#f5efdf]">
                       <iframe src={embedUrl} className="w-full h-full" allowFullScreen title={video.original_filename ?? 'Video'} />
                     </div>

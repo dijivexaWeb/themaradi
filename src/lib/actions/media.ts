@@ -127,8 +127,19 @@ export async function addPhotoAction(vaultId: string, formData: FormData): Promi
     return
   }
 
+  const { data: vault } = await owned.supabase
+    .from('vaults')
+    .select('slug')
+    .eq('id', vaultId)
+    .single()
+
   revalidatePath(`/dashboard/vault/${vaultId}/fotolar`)
   revalidatePath(`/dashboard/vault/${vaultId}`)
+  revalidatePath(`/dashboard/vault/${vaultId}/onizleme`)
+  revalidatePath(`/preview/${vaultId}`)
+  if (vault?.slug) {
+    revalidatePath(`/memorial/${vault.slug}`)
+  }
   redirect(`/dashboard/vault/${vaultId}/fotolar`)
 }
 
@@ -177,8 +188,19 @@ export async function addVideoAction(vaultId: string, formData: FormData): Promi
     return
   }
 
+  const { data: vault } = await owned.supabase
+    .from('vaults')
+    .select('slug')
+    .eq('id', vaultId)
+    .single()
+
   revalidatePath(`/dashboard/vault/${vaultId}/videolar`)
   revalidatePath(`/dashboard/vault/${vaultId}`)
+  revalidatePath(`/dashboard/vault/${vaultId}/onizleme`)
+  revalidatePath(`/preview/${vaultId}`)
+  if (vault?.slug) {
+    revalidatePath(`/memorial/${vault.slug}`)
+  }
   redirect(`/dashboard/vault/${vaultId}/videolar`)
 }
 
@@ -187,7 +209,7 @@ export async function updateMediaAction(mediaId: string, vaultId: string, redire
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
-  const { data: vault } = await supabase.from('vaults').select('id').eq('id', vaultId).eq('owner_id', user.id).single()
+  const { data: vault } = await supabase.from('vaults').select('id, slug').eq('id', vaultId).eq('owner_id', user.id).single()
   if (!vault) return
 
   const title = (formData.get('title') as string | null)?.trim() || null
@@ -207,6 +229,11 @@ export async function updateMediaAction(mediaId: string, vaultId: string, redire
   revalidatePath(`/dashboard/vault/${vaultId}/fotolar`)
   revalidatePath(`/dashboard/vault/${vaultId}/videolar`)
   revalidatePath(`/dashboard/vault/${vaultId}`)
+  revalidatePath(`/dashboard/vault/${vaultId}/onizleme`)
+  revalidatePath(`/preview/${vaultId}`)
+  if (vault?.slug) {
+    revalidatePath(`/memorial/${vault.slug}`)
+  }
   redirect(redirectTo)
 }
 
@@ -217,7 +244,7 @@ export async function deleteMediaAction(vaultId: string, mediaId: string): Promi
 
   const { data: vault } = await supabase
     .from('vaults')
-    .select('id')
+    .select('id, slug')
     .eq('id', vaultId)
     .eq('owner_id', user.id)
     .single()
@@ -251,4 +278,8 @@ export async function deleteMediaAction(vaultId: string, mediaId: string): Promi
   revalidatePath(`/dashboard/vault/${vaultId}/${route}`)
   revalidatePath(`/dashboard/vault/${vaultId}`)
   revalidatePath(`/dashboard/vault/${vaultId}/onizleme`)
+  revalidatePath(`/preview/${vaultId}`)
+  if (vault?.slug) {
+    revalidatePath(`/memorial/${vault.slug}`)
+  }
 }

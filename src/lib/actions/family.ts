@@ -1,8 +1,9 @@
 'use server'
 
-import { createClient, createServiceClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
+import { generateFileKey, getPublicUrl, uploadR2Object } from '@/lib/r2'
 
 function cleanFilename(name: string) {
   const cleaned = name
@@ -24,16 +25,15 @@ async function uploadFamilyPhoto(vaultId: string, userId: string, formData: Form
   const urlInput = (formData.get('photo_url') as string)?.trim() || null
 
   if (file instanceof File && file.size > 0 && file.type.startsWith('image/')) {
-    const service = await createServiceClient()
-    const filename = cleanFilename(file.name)
-    const path = `family/${vaultId}/${userId}/${Date.now()}-${filename}`
-    const { error } = await service.storage.from('vault-media').upload(path, file, {
-      contentType: file.type,
-      upsert: false,
-    })
-    if (!error) {
-      const { data } = service.storage.from('vault-media').getPublicUrl(path)
-      return data.publicUrl
+    try {
+      const bucket = process.env.R2_PUBLIC_BUCKET || 'tem-public-media'
+      const key = generateFileKey('family_member', vaultId, file.name)
+      const buffer = Buffer.from(await file.arrayBuffer())
+      await uploadR2Object(bucket, key, buffer, file.type)
+      return getPublicUrl(key)
+    } catch (e) {
+      console.error('[uploadFamilyPhoto] R2 upload error:', e)
+      return null
     }
   }
 

@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { addMemorialVideoAction } from '../actions'
+import { addVideoAction } from '@/lib/actions/media'
 
 interface Props {
   vaultId: string
@@ -45,15 +45,16 @@ export default function VideoUploadForm({ vaultId, todayMax }: Props) {
 
     // Size limit check: 100 MB
     if (selected.size > 100 * 1024 * 1024) {
-      setError('Video boyutu en fazla 100 MB olabilir.')
+      setError('Video boyutu en fazla 100 MB olabilir. Ziyaretçilerin videoya hızlı ulaşabilmesi için lütfen videonuzu sıkıştırarak tekrar yükleyin.')
       setFile(null)
       return
     }
 
+    // Format check
     const validExtensions = ['.mp4', '.mov', '.webm']
     const hasValidExt = validExtensions.some(ext => selected.name.toLowerCase().endsWith(ext))
     if (!hasValidExt) {
-      setError('Lütfen MP4, MOV veya WEBM formatında bir video yükleyin.')
+      setError('Bu video formatı desteklenmiyor. Lütfen MP4, MOV veya WEBM formatında bir video yükleyin.');
       setFile(null)
       return
     }
@@ -74,6 +75,7 @@ export default function VideoUploadForm({ vaultId, todayMax }: Props) {
       let fileSize = 0
 
       if (file) {
+        // 1. Check video duration on the client side
         let duration = 0
         try {
           const meta = await checkVideoMetadata(file)
@@ -84,10 +86,10 @@ export default function VideoUploadForm({ vaultId, todayMax }: Props) {
 
         // Duration limit check: 10 minutes (600 seconds)
         if (duration > 600) {
-          throw new Error('Video süresi en fazla 10 dakika olabilir.')
+          throw new Error('Video süresi en fazla 10 dakika olabilir. En iyi deneyim için 2–3 dakikalık kısa videolar önerilir.')
         }
 
-        // 1. Request Direct Creator Upload URL
+        // 2. Request Direct Creator Upload URL from backend
         const uploadUrlRes = await fetch('/api/stream/upload-url', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -109,7 +111,7 @@ export default function VideoUploadForm({ vaultId, todayMax }: Props) {
         originalFilename = file.name
         fileSize = file.size
 
-        // 2. Upload to Cloudflare Stream
+        // 3. Upload to Cloudflare Stream via POST
         await new Promise<void>((resolve, reject) => {
           const xhr = new XMLHttpRequest()
           xhr.open('POST', uploadUrl, true)
@@ -125,7 +127,7 @@ export default function VideoUploadForm({ vaultId, todayMax }: Props) {
             if (xhr.status === 200 || xhr.status === 201 || xhr.status === 204) {
               resolve()
             } else {
-              reject(new Error(`Yükleme başarısız. Durum kodu: ${xhr.status}`))
+              reject(new Error(`Videonuz yüklenemedi. Sunucu durum kodu: ${xhr.status}`))
             }
           }
 
@@ -137,7 +139,7 @@ export default function VideoUploadForm({ vaultId, todayMax }: Props) {
         })
       }
 
-      // 3. Submit metadata to server action
+      // 4. Save metadata to Supabase DB via Server Action
       const formData = new FormData()
       formData.set('title', title)
       formData.set('taken_at', takenAt)
@@ -151,37 +153,34 @@ export default function VideoUploadForm({ vaultId, todayMax }: Props) {
       } else if (url) {
         formData.set('url', url)
       } else {
-        throw new Error('Lütfen bir video dosyası seçin veya geçerli bir URL girin.')
+        throw new Error('Lütfen bir video dosyası yükleyin veya harici bir link belirtin.')
       }
 
-      await addMemorialVideoAction(vaultId, formData)
-
-      // Reset
-      setFile(null)
-      setUrl('')
-      setTitle('')
-      setTakenAt('')
-      setCaption('')
-      const formEl = e.target as HTMLFormElement
-      formEl.reset()
+      await addVideoAction(vaultId, formData)
     } catch (err: any) {
       console.error(err)
-      setError(err.message || 'Video kaydedilirken hata oluştu.')
-    } finally {
+      setError(err.message || 'Bir hata oluştu.')
       setLoading(false)
     }
   }
 
-  const inputCls = 'w-full rounded-xl border border-[#e5dccb] bg-white px-4 py-3 text-sm text-[#1f2d27] placeholder-[#adb5ab] outline-none focus:border-[#174f35] focus:ring-2 focus:ring-[#174f35]/10 disabled:opacity-50'
-  const labelCls = 'mb-1.5 block text-xs font-semibold text-[#4a5e55]'
+  const inputCls = `w-full rounded-xl border border-[#e5dccb] bg-white px-4 py-3 text-sm text-[#1f2d27] placeholder-[#adb5ab] outline-none focus:border-[#174f35] focus:ring-2 focus:ring-[#174f35]/10 disabled:opacity-50`
+  const labelCls = `mb-1.5 block text-xs font-semibold text-[#4a5e55]`
 
   return (
     <div className="rounded-3xl border border-[#e5dccb] bg-[#fffdf8] p-6 shadow-[0_4px_24px_rgba(64,48,24,0.05)] mb-10">
       <div className="flex items-center gap-2 mb-1">
-        <span className="text-lg">📤</span>
+        <span className="text-lg">🎬</span>
         <h2 className="font-semibold text-[#1f2d27]">Video Ekle</h2>
       </div>
       <p className="text-xs text-[#788177] mb-4 ml-7">YouTube / Vimeo linki veya video dosyası yükleme</p>
+
+      <div className="mb-5 rounded-2xl border border-amber-500/10 bg-amber-500/[0.04] p-4 text-xs leading-relaxed text-[#7a6440]">
+        <h3 className="font-bold mb-1">🎥 Video Seçimi İçin Tavsiyeler</h3>
+        <p className="mb-2">Mezarlık gibi açık alanlarda internet bağlantısı her zaman güçlü olmayabilir. Videoların ziyaretçilerde donmadan ve hızlı açılabilmesi için 2–3 dakikalık kısa ve anlamlı videolar yüklemenizi öneririz.</p>
+        <p className="mb-2 text-[#967d53]">Sistemimiz kalite standartları gereği en fazla 100 MB boyutunda ve 10 dakika uzunluğundaki videolara izin vermektedir.</p>
+        <span className="font-semibold text-[#8c6d3b]">Videonuz yüklendikten sonra ziyaretçiler için daha hızlı açılacak şekilde 720p kaliteye otomatik optimize edilir.</span>
+      </div>
 
       <form onSubmit={handleSubmit} className="space-y-4">
         <div className="grid sm:grid-cols-2 gap-4">
@@ -266,7 +265,7 @@ export default function VideoUploadForm({ vaultId, todayMax }: Props) {
         {loading && (
           <div className="space-y-2">
             <div className="flex justify-between text-xs text-[#788177]">
-              <span>Videonuz yükleniyor. Lütfen bu ekranı kapatmayın...</span>
+              <span>Videnuz yükleniyor. Lütfen bu ekranı kapatmayın...</span>
               <span>%{progress}</span>
             </div>
             <div className="h-2 w-full bg-[#e5dccb] rounded-full overflow-hidden">

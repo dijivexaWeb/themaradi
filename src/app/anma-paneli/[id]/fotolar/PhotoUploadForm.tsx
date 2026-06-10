@@ -13,7 +13,7 @@ export default function PhotoUploadForm({ vaultId, todayMax }: Props) {
   const [url, setUrl] = useState('')
   const [title, setTitle] = useState('')
   const [takenAt, setTakenAt] = useState('')
-  const [visibility, setVisibility] = useState('private')
+  const [visibility, setVisibility] = useState('public')
   const [caption, setCaption] = useState('')
 
   const [loading, setLoading] = useState(false)

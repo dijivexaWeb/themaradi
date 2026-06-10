@@ -1,6 +1,7 @@
 'use server'
 
-import { createClient, createServiceClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/supabase/server'
+import { generateFileKey, getPublicUrl, uploadR2Object } from '@/lib/r2'
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 
@@ -26,6 +27,33 @@ async function assertOwner(supabase: Awaited<ReturnType<typeof createClient>>, v
   return data
 }
 
+async function uploadToCloudflareStream(file: File): Promise<string> {
+  const accountId = process.env.CLOUDFLARE_ACCOUNT_ID
+  const apiToken = process.env.CLOUDFLARE_API_TOKEN
+  if (!accountId || !apiToken) {
+    throw new Error('Cloudflare Stream credentials are not configured')
+  }
+
+  const formData = new FormData()
+  formData.append('file', file)
+
+  const res = await fetch(`https://api.cloudflare.com/client/v4/accounts/${accountId}/stream`, {
+    method: 'POST',
+    headers: {
+      'Authorization': `Bearer ${apiToken}`,
+    },
+    body: formData,
+  })
+
+  if (!res.ok) {
+    const errorJson = await res.json().catch(() => ({}))
+    throw new Error(errorJson.errors?.[0]?.message || `Cloudflare Stream upload failed: ${res.statusText}`)
+  }
+
+  const data = await res.json()
+  return `https://iframe.videodelivery.net/${data.result.uid}`
+}
+
 async function resolveMemoryMedia(
   vaultId: string,
   userId: string,
@@ -40,17 +68,22 @@ async function resolveMemoryMedia(
     if (!isImage && !isVideo) return { ok: false, error: 'Sadece fotoğraf veya video dosyası yükleyebilirsiniz.' }
     if (file.size > MAX_MEMORY_MEDIA_BYTES) return { ok: false, error: 'Dosya boyutu 50 MB sınırını aşıyor.' }
 
-    const service = await createServiceClient()
-    const filename = cleanFilename(file.name)
-    const path = `memories/${vaultId}/${userId}/${Date.now()}-${filename}`
-    const { error } = await service.storage.from(MEDIA_BUCKET).upload(path, file, {
-      contentType: file.type,
-      upsert: false,
-    })
-    if (error) return { ok: false, error: `Dosya yüklenemedi: ${error.message}` }
-
-    const { data } = service.storage.from(MEDIA_BUCKET).getPublicUrl(path)
-    return { ok: true, mediaUrl: data.publicUrl, mediaType: isImage ? 'image' : 'video' }
+    try {
+      if (isImage) {
+        const bucket = process.env.R2_PUBLIC_BUCKET || 'tem-public-media'
+        const key = generateFileKey('gallery_image', vaultId, file.name)
+        const buffer = Buffer.from(await file.arrayBuffer())
+        await uploadR2Object(bucket, key, buffer, file.type)
+        const mediaUrl = getPublicUrl(key)
+        return { ok: true, mediaUrl, mediaType: 'image' }
+      } else {
+        const mediaUrl = await uploadToCloudflareStream(file)
+        return { ok: true, mediaUrl, mediaType: 'video' }
+      }
+    } catch (err: any) {
+      console.error('[resolveMemoryMedia] R2/Stream upload error:', err)
+      return { ok: false, error: `Dosya yüklenemedi: ${err.message}` }
+    }
   }
 
   if (urlInput) {

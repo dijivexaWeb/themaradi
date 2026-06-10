@@ -3,6 +3,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
+import { generateFileKey, getPublicUrl, uploadR2Object } from '@/lib/r2'
 
 function redirectToProfileWithMessage(vaultId: string, params: URLSearchParams): never {
   redirect(`/dashboard/vault/${vaultId}/profil?${params.toString()}`)
@@ -126,9 +127,50 @@ export async function saveVaultProfileAction(vaultId: string, formData: FormData
   if (!vault) redirectToProfileError(vaultId, 'Anı alanı bulunamadı.')
   if (vault.status === 'pending_verification') redirectToProfileError(vaultId, 'Ödeme doğrulanmadan kayıt yapılamaz.')
 
-  const coverPhotoUrl = (formData.get('cover_photo_url') as string)?.trim() || vault.cover_photo_url || null
-  const heroBgUrl = (formData.get('hero_bg_url') as string)?.trim() || vault.hero_bg_url || null
-  const favoriteSongUrl = (formData.get('favorite_song_url') as string)?.trim() || vault.favorite_song_url || null
+  const bucket = process.env.R2_PUBLIC_BUCKET || 'tem-public-media'
+
+  let coverPhotoUrl = (formData.get('cover_photo_url') as string)?.trim() || vault.cover_photo_url || null
+  const coverPhotoFile = formData.get('cover_photo_file')
+  if (coverPhotoFile instanceof File && coverPhotoFile.size > 0) {
+    try {
+      const key = generateFileKey('profile_photo', vaultId, coverPhotoFile.name)
+      const buffer = Buffer.from(await coverPhotoFile.arrayBuffer())
+      await uploadR2Object(bucket, key, buffer, coverPhotoFile.type)
+      coverPhotoUrl = getPublicUrl(key)
+    } catch (e: any) {
+      console.error('[saveVaultProfileAction] cover upload error:', e)
+      redirectToProfileError(vaultId, `Profil fotoğrafı yüklenemedi: ${e.message}`)
+    }
+  }
+
+  let heroBgUrl = (formData.get('hero_bg_url') as string)?.trim() || vault.hero_bg_url || null
+  const heroBgFile = formData.get('hero_bg_file')
+  if (heroBgFile instanceof File && heroBgFile.size > 0) {
+    try {
+      const key = generateFileKey('hero_bg', vaultId, heroBgFile.name)
+      const buffer = Buffer.from(await heroBgFile.arrayBuffer())
+      await uploadR2Object(bucket, key, buffer, heroBgFile.type)
+      heroBgUrl = getPublicUrl(key)
+    } catch (e: any) {
+      console.error('[saveVaultProfileAction] hero_bg upload error:', e)
+      redirectToProfileError(vaultId, `Arka plan fotoğrafı yüklenemedi: ${e.message}`)
+    }
+  }
+
+  let favoriteSongUrl = (formData.get('favorite_song_url') as string)?.trim() || vault.favorite_song_url || null
+  const songFile = formData.get('favorite_song_file')
+  if (songFile instanceof File && songFile.size > 0) {
+    try {
+      const key = generateFileKey('audio_recording', vaultId, songFile.name)
+      const buffer = Buffer.from(await songFile.arrayBuffer())
+      const contentType = songFile.name.toLowerCase().endsWith('.m4a') ? 'audio/mp4' : songFile.type
+      await uploadR2Object(bucket, key, buffer, contentType)
+      favoriteSongUrl = getPublicUrl(key)
+    } catch (e: any) {
+      console.error('[saveVaultProfileAction] song upload error:', e)
+      redirectToProfileError(vaultId, `Şarkı dosyası yüklenemedi: ${e.message}`)
+    }
+  }
 
   const { error } = await supabase
     .from('vaults')

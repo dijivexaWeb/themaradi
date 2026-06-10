@@ -3,6 +3,8 @@ import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
 import { uploadDocumentsAction, deleteDocumentAction } from '@/lib/actions/documents'
 import PersonHeader from '../_PersonHeader'
+import DocumentUploadForm from './DocumentUploadForm'
+import { createPresignedReadUrl } from '@/lib/r2'
 
 interface Props { params: Promise<{ id: string }> }
 
@@ -44,11 +46,28 @@ export default async function BelgelerPage({ params }: Props) {
     .eq('id', id).eq('owner_id', user.id).single()
   if (!vault) notFound()
 
-  const { data: documents } = await supabase
+  const { data: rawDocuments } = await supabase
     .from('vault_documents').select('*')
     .eq('vault_id', id).order('created_at', { ascending: false })
 
+  const documents = rawDocuments
+    ? await Promise.all(
+        rawDocuments.map(async (doc) => {
+          let fileUrl = doc.file_url
+          if (doc.file_key && doc.storage_bucket) {
+            try {
+              fileUrl = await createPresignedReadUrl(doc.storage_bucket, doc.file_key, 3600)
+            } catch (err) {
+              console.error('Error generating doc url:', err)
+            }
+          }
+          return { ...doc, file_url: fileUrl }
+        })
+      )
+    : []
+
   const isLocked = vault.status === 'pending_verification'
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const uploadAction = uploadDocumentsAction.bind(null, id)
 
   const grouped = (documents ?? []).reduce<Record<string, typeof documents>>((acc, doc) => {
@@ -88,40 +107,7 @@ export default async function BelgelerPage({ params }: Props) {
         </div>
 
         {!isLocked && (
-          <div className="rounded-3xl border border-[#e5dccb] bg-[#fffdf8] p-6 shadow-[0_4px_24px_rgba(64,48,24,0.05)] mb-10">
-            <div className="flex items-center gap-2 mb-4">
-              <span className="text-lg">📤</span>
-              <h2 className="font-semibold text-[#1f2d27]">Belge Yükle</h2>
-            </div>
-            <form action={uploadAction} className="space-y-4">
-              <div>
-                <label className={labelCls}>Dosya Seç <span className="text-[#dfbd72]">*</span></label>
-                <input type="file" name="files" multiple required
-                  accept=".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.jpg,.jpeg,.png,.webp,.heic"
-                  className="w-full cursor-pointer rounded-xl border border-[#e5dccb] bg-white px-3 py-3 text-sm text-[#1f2d27] file:mr-3 file:rounded-lg file:border-0 file:bg-[#174f35]/10 file:px-3 file:py-1.5 file:text-[#174f35] file:font-medium outline-none" />
-                <p className="mt-1.5 text-xs text-[#adb5ab]">PDF, Word, Excel, PowerPoint, metin, resim — max 25 MB/dosya. Birden fazla dosya seçilebilir.</p>
-              </div>
-              <div className="grid sm:grid-cols-2 gap-4">
-                <div>
-                  <label className={labelCls}>Kategori</label>
-                  <select name="category" defaultValue="other"
-                    className="w-full rounded-xl border border-[#e5dccb] bg-white px-4 py-3 text-sm text-[#1f2d27] outline-none focus:border-[#174f35]">
-                    {Object.entries(CATEGORIES).map(([val, { label, icon }]) => (
-                      <option key={val} value={val}>{icon} {label}</option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className={labelCls}>Açıklama (opsiyonel)</label>
-                  <input type="text" name="description" placeholder="Kısa bir not..." className={inputCls} />
-                </div>
-              </div>
-              <button type="submit"
-                className="rounded-xl bg-[#174f35] px-6 py-3 text-sm font-semibold text-white shadow-[0_14px_35px_rgba(23,79,53,0.18)] hover:bg-[#123f2b] transition-colors">
-                Belgeleri Yükle
-              </button>
-            </form>
-          </div>
+          <DocumentUploadForm vaultId={id} categories={CATEGORIES} />
         )}
 
         {(documents?.length ?? 0) === 0 ? (

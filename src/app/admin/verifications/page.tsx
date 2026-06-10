@@ -3,6 +3,7 @@ import { createServiceClient } from '@/lib/supabase/server'
 import RejectModal from '../_components/RejectModal'
 import ApproveButton from './_ApproveButton'
 import DocApproveButton from './_DocApproveButton'
+import { createPresignedReadUrl } from '@/lib/r2'
 
 export default async function VerificationsPage() {
   await requireAdmin()
@@ -23,12 +24,30 @@ export default async function VerificationsPage() {
   const { data: docQueue } = await supabase
     .from('memorial_verification_docs')
     .select(`
-      id, file_name, file_url, mime_type, file_size_bytes, created_at, status,
+      id, file_name, file_url, mime_type, file_size_bytes, created_at, status, file_key, storage_bucket,
       vaults (id, display_name, slug, status, profiles!vaults_owner_id_fkey (full_name, email)),
       memorial_witnesses (id, full_name, email, status, confirmed_at)
     `)
     .eq('status', 'pending')
     .order('created_at', { ascending: true })
+
+  // Generate dynamic signed URLs for R2 documents
+  const docQueueWithUrls = docQueue
+    ? await Promise.all(
+        docQueue.map(async (doc) => {
+          let viewUrl = doc.file_url
+          if (doc.file_key && doc.storage_bucket) {
+            try {
+              viewUrl = await createPresignedReadUrl(doc.storage_bucket, doc.file_key, 3600) // 1 hour expiry
+            } catch (err) {
+              console.error('Error generating signed URL:', err)
+            }
+          }
+          return { ...doc, viewUrl }
+        })
+      )
+    : []
+
 
   // eslint-disable-next-line react-hooks/purity
   const now = Date.now()
@@ -122,13 +141,13 @@ export default async function VerificationsPage() {
           )}
         </div>
 
-        {(!docQueue || docQueue.length === 0) ? (
+        {(docQueueWithUrls.length === 0) ? (
           <div className="bg-white border border-slate-200 rounded-xl p-8 text-center text-slate-400 text-sm">
             İncelenecek belge yok.
           </div>
         ) : (
           <div className="space-y-4">
-            {docQueue.map((doc) => {
+            {docQueueWithUrls.map((doc) => {
               const vault = Array.isArray(doc.vaults) ? doc.vaults[0] : doc.vaults as Record<string, unknown> | null
               const owner = vault ? (Array.isArray((vault as Record<string, unknown>).profiles) ? ((vault as Record<string, unknown>).profiles as Record<string, unknown>[])[0] : (vault as Record<string, unknown>).profiles) as Record<string, unknown> | null : null
               const witnesses = (Array.isArray(doc.memorial_witnesses) ? doc.memorial_witnesses : []) as Array<{ id: string; full_name: string; email: string; status: string; confirmed_at: string | null }>
@@ -160,7 +179,7 @@ export default async function VerificationsPage() {
                             <p className="text-xs text-slate-400">{(doc.file_size_bytes / 1024).toFixed(0)} KB</p>
                           )}
                         </div>
-                        <a href={doc.file_url} target="_blank" rel="noopener noreferrer"
+                        <a href={doc.viewUrl} target="_blank" rel="noopener noreferrer"
                           className="shrink-0 rounded-lg bg-slate-700 px-3 py-1.5 text-xs font-semibold text-white hover:bg-slate-800">
                           Görüntüle →
                         </a>

@@ -3,6 +3,7 @@ import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
 import { addAudioRecordingAction, updateAudioRecordingAction, deleteAudioRecordingAction } from '@/lib/actions/audio'
 import PersonHeader from '../_PersonHeader'
+import AudioUploadForm from './AudioUploadForm'
 
 interface Props {
   params: Promise<{ id: string }>
@@ -141,39 +142,7 @@ export default async function SesKayitlariPage({ params, searchParams }: Props) 
 
         {/* Yeni kayıt ekle */}
         {!editingRec && (
-          <div className="rounded-3xl border border-[#e5dccb] bg-[#fffdf8] p-6 shadow-[0_4px_24px_rgba(64,48,24,0.05)]">
-            <h2 className="mb-4 flex items-center gap-2 font-semibold text-[#1f2d27]">
-              <span>➕</span> Yeni Ses Kaydı Ekle
-            </h2>
-            <form action={addAction} className="space-y-4">
-              <div>
-                <label className={labelCls}>Başlık <span className="text-[#dfbd72]">*</span></label>
-                <input type="text" name="title" required placeholder="Sabah duası, Vasiyetim, ..." disabled={isLocked} className={inputCls} />
-              </div>
-              <div>
-                <label className={labelCls}>Seslendiren</label>
-                <input type="text" name="author" placeholder="Kendi sesinden, Kızı Zeynep anlatıyor..." disabled={isLocked} className={inputCls} />
-              </div>
-              <div className="rounded-2xl border border-[#e5dccb] bg-white p-4 space-y-3">
-                <div>
-                  <label className={labelCls}>Ses dosyası yükle</label>
-                  <input type="file" name="audio_file" accept="audio/*" disabled={isLocked}
-                    className="w-full cursor-pointer rounded-xl border border-[#e5dccb] bg-white px-3 py-2.5 text-sm text-[#1f2d27] file:mr-3 file:rounded-lg file:border-0 file:bg-[#174f35]/10 file:px-3 file:py-1.5 file:text-[#174f35] file:font-medium outline-none disabled:opacity-40" />
-                </div>
-                <p className="text-[11px] text-[#adb5ab]">veya</p>
-                <div>
-                  <label className={labelCls}>Ses URL</label>
-                  <input type="url" name="audio_url" placeholder="https://... (mp3, wav, ogg)" disabled={isLocked} className={inputCls} />
-                </div>
-              </div>
-              {!isLocked && (
-                <button type="submit"
-                  className="w-full rounded-xl bg-[#174f35] py-3.5 text-sm font-semibold text-white shadow-[0_14px_35px_rgba(23,79,53,0.18)] hover:bg-[#123f2b] transition-colors">
-                  Kaydet
-                </button>
-              )}
-            </form>
-          </div>
+          <AudioUploadForm vaultId={id} isLocked={isLocked} />
         )}
       </div>
     </div>

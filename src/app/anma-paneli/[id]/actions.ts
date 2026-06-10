@@ -4,7 +4,7 @@ import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 import { sendEmail } from '@/lib/email'
-import { deleteR2Object, getPublicUrl } from '@/lib/r2'
+import { deleteR2Object, getPublicUrl, generateFileKey, uploadR2Object } from '@/lib/r2'
 
 const MEDIA_BUCKET = 'vault-media'
 const PHOTO_LIMIT_MEMORIAL = 50
@@ -28,7 +28,7 @@ export async function addMemorialPhotoAction(vaultId: string, formData: FormData
 
   const { data: vault } = await supabase
     .from('vaults')
-    .select('id, status, product_type')
+    .select('id, status, product_type, slug')
     .eq('id', vaultId)
     .eq('owner_id', user.id)
     .eq('product_type', 'memorial_profile')
@@ -63,7 +63,7 @@ export async function addMemorialPhotoAction(vaultId: string, formData: FormData
     storageBucket = bucket
     storagePath = fileKey
     fileSize = fileSizeRaw ? parseInt(fileSizeRaw as string, 10) : null
-    filename = fileNameInput
+    filename = fileNameInput || null
   } else if (urlInput) {
     originalUrl = urlInput
   } else {
@@ -101,6 +101,11 @@ export async function addMemorialPhotoAction(vaultId: string, formData: FormData
 
   revalidatePath(`/anma-paneli/${vaultId}/fotolar`)
   revalidatePath(`/anma-paneli/${vaultId}`)
+  revalidatePath(`/dashboard/vault/${vaultId}/onizleme`)
+  revalidatePath(`/preview/${vaultId}`)
+  if (vault?.slug) {
+    revalidatePath(`/memorial/${vault.slug}`)
+  }
   redirect(`/anma-paneli/${vaultId}/fotolar`)
 }
 
@@ -198,7 +203,7 @@ export async function addMemorialVideoAction(vaultId: string, formData: FormData
 
   const { data: vault } = await supabase
     .from('vaults')
-    .select('id, status, product_type')
+    .select('id, status, product_type, slug')
     .eq('id', vaultId)
     .eq('owner_id', user.id)
     .eq('product_type', 'memorial_profile')
@@ -228,7 +233,7 @@ export async function addMemorialVideoAction(vaultId: string, formData: FormData
     thumbUrl = `https://videodelivery.net/${cfStreamId}/thumbnails/thumbnail.jpg`
     sourceType = 'bucket'
     fileSize = fileSizeRaw ? parseInt(fileSizeRaw as string, 10) : null
-    filename = originalFilename
+    filename = originalFilename || null
   } else if (urlInput) {
     originalUrl = urlInput
   } else {
@@ -261,6 +266,11 @@ export async function addMemorialVideoAction(vaultId: string, formData: FormData
 
   revalidatePath(`/anma-paneli/${vaultId}/videolar`)
   revalidatePath(`/anma-paneli/${vaultId}`)
+  revalidatePath(`/dashboard/vault/${vaultId}/onizleme`)
+  revalidatePath(`/preview/${vaultId}`)
+  if (vault?.slug) {
+    revalidatePath(`/memorial/${vault.slug}`)
+  }
   redirect(`/anma-paneli/${vaultId}/videolar`)
 }
 
@@ -630,16 +640,12 @@ export async function uploadSongFileAction(
     // Bucket audio/mp4 kabul ediyor, m4a için content type'ı normalize et
     const contentType = file.name.toLowerCase().endsWith('.m4a') ? 'audio/mp4' : file.type
 
-    const service = await createServiceClient()
-    const fn = cleanFilename(file.name)
-    const path = `songs/${vaultId}/${user.id}/${Date.now()}-${fn}`
-    const { error } = await service.storage
-      .from(MEDIA_BUCKET)
-      .upload(path, file, { contentType, upsert: false })
-    if (error) return { success: false, error: `Yükleme hatası: ${error.message}` }
-
-    const { data } = service.storage.from(MEDIA_BUCKET).getPublicUrl(path)
-    return { success: true, url: data.publicUrl }
+    const bucket = process.env.R2_PUBLIC_BUCKET || 'tem-public-media'
+    const key = generateFileKey('audio_recording', vaultId, file.name)
+    const buffer = Buffer.from(await file.arrayBuffer())
+    await uploadR2Object(bucket, key, buffer, contentType)
+    const publicUrl = getPublicUrl(key)
+    return { success: true, url: publicUrl }
   } catch (err) {
     console.error('[uploadSongFileAction]', err)
     return { success: false, error: 'Sunucu hatası' }

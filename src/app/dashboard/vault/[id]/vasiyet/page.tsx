@@ -2,8 +2,10 @@ import { createClient } from '@/lib/supabase/server'
 import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
 import { addMemoryAction, updateMemoryAction, deleteMemoryAction } from '@/lib/actions/memories'
-import { uploadDocumentsAction, deleteDocumentAction } from '@/lib/actions/documents'
+import { deleteDocumentAction } from '@/lib/actions/documents'
 import PersonHeader from '../_PersonHeader'
+import DocumentUploadForm from '../belgeler/DocumentUploadForm'
+import { createPresignedReadUrl } from '@/lib/r2'
 
 interface Props {
   params: Promise<{ id: string }>
@@ -24,7 +26,7 @@ export default async function VasiyetPage({ params, searchParams }: Props) {
 
   if (vault.product_type === 'memorial_profile') redirect(`/dashboard/vault/${id}`)
 
-  const [{ data: notes }, { data: docs }] = await Promise.all([
+  const [{ data: notes }, { data: rawDocs }] = await Promise.all([
     supabase.from('vault_memories').select('*')
       .eq('vault_id', id).eq('is_secret', true).eq('section', 'vasiyet')
       .order('created_at', { ascending: false }),
@@ -33,8 +35,23 @@ export default async function VasiyetPage({ params, searchParams }: Props) {
       .order('created_at', { ascending: false }),
   ])
 
+  const docs = rawDocs
+    ? await Promise.all(
+        rawDocs.map(async (doc) => {
+          let fileUrl = doc.file_url
+          if (doc.file_key && doc.storage_bucket) {
+            try {
+              fileUrl = await createPresignedReadUrl(doc.storage_bucket, doc.file_key, 3600)
+            } catch (err) {
+              console.error('Error generating will doc URL:', err)
+            }
+          }
+          return { ...doc, file_url: fileUrl }
+        })
+      )
+    : []
+
   const isLocked = vault.status === 'pending_verification'
-  const uploadDocs = uploadDocumentsAction.bind(null, id)
   const pageUrl = `/dashboard/vault/${id}/vasiyet`
   const addNote = addMemoryAction.bind(null, id, pageUrl)
 
@@ -194,26 +211,11 @@ export default async function VasiyetPage({ params, searchParams }: Props) {
           </div>
 
           {!isLocked && (
-            <div className="rounded-3xl border border-[#e5dccb] bg-[#fffdf8] p-6 shadow-[0_4px_24px_rgba(64,48,24,0.05)] mb-5">
-              <form action={uploadDocs} className="space-y-4">
-                <input type="hidden" name="category" value="will" />
-                <div>
-                  <label className={labelCls}>Belge Seç <span className="text-[#dfbd72]">*</span></label>
-                  <input type="file" name="files" multiple required
-                    accept=".pdf,.doc,.docx,.jpg,.jpeg,.png"
-                    className="w-full cursor-pointer rounded-xl border border-[#e5dccb] bg-white px-3 py-3 text-sm text-[#1f2d27] file:mr-3 file:rounded-lg file:border-0 file:bg-[#174f35]/10 file:px-3 file:py-1.5 file:text-[#174f35] file:font-medium outline-none" />
-                  <p className="mt-1.5 text-xs text-[#adb5ab]">PDF, Word veya görüntü — max 25 MB/dosya</p>
-                </div>
-                <div>
-                  <label className={labelCls}>Açıklama (opsiyonel)</label>
-                  <input type="text" name="description" placeholder="Notarizeli vasiyet, el yazılı not..." className={inputCls} />
-                </div>
-                <button type="submit"
-                  className="rounded-xl bg-[#174f35] px-6 py-3 text-sm font-semibold text-white shadow-[0_14px_35px_rgba(23,79,53,0.18)] hover:bg-[#123f2b] transition-colors">
-                  Belgeleri Yükle
-                </button>
-              </form>
-            </div>
+            <DocumentUploadForm
+              vaultId={id}
+              categories={{ will: { label: 'Vasiyet', icon: '📜' } }}
+              defaultCategory="will"
+            />
           )}
 
           {!docs?.length ? (

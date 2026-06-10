@@ -11,6 +11,7 @@ import HeroPanelEmojiBar from './HeroPanelEmojiBar'
 import TimelineSection from './TimelineSection'
 import MemoryBookClient from './MemoryBookClient'
 import MemoriesAccordion from './MemoriesAccordion'
+import PhotoGallery from './PhotoGallery'
 import { getTurnstileSiteKey } from '@/lib/turnstile'
 import { getTranslation } from '@/i18n/server'
 
@@ -619,52 +620,20 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
         </section>
       )}
 
-      {/* ── FOTOĞRAFLAR ── */}
       {hasPhotos && (
-        <section id="fotograflar" className="px-5 py-16 sm:px-8">
-          <div className="mx-auto max-w-7xl">
-            <div className="mb-10 flex items-end justify-between">
-              <div>
-                <div className="flex items-center gap-3 text-[#b08340]">
-                  <span className="h-px w-10 bg-[#c7a76f]" />
-                  <span className="text-xs tracking-[0.2em] uppercase">{t.memorial.photoArchive}</span>
-                </div>
-                <h2 className="mt-3 font-serif text-5xl text-[#173d31]">
-                  {t.memorial.tracesLeftByLovedOnes}
-                </h2>
-              </div>
-              <span className="hidden text-sm text-[#8a7a64] sm:block">{photos!.length} {t.memorial.photos}</span>
-            </div>
-
-            <div className="columns-2 gap-4 md:columns-3">
-              {photos!.map((p, i) => (
-                <div
-                  key={p.id}
-                  className={`group mb-4 break-inside-avoid overflow-hidden rounded-xl border border-[#e1d5c3] bg-[#fffdf8] ${
-                    i % 3 === 0 ? 'aspect-[3/4]' : i % 3 === 1 ? 'aspect-square' : 'aspect-[4/3]'
-                  }`}
-                >
-                  <div className="relative h-full w-full overflow-hidden">
-                    <Image
-                      src={p.thumb_url ?? p.original_url}
-                      alt={p.original_filename ?? ''}
-                      fill
-                      sizes="(min-width: 768px) 33vw, 50vw"
-                      className="object-cover transition duration-500 group-hover:scale-105"
-                      unoptimized
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 transition duration-300 group-hover:opacity-100" />
-                    {(p.caption || p.original_filename) && (
-                      <div className="absolute bottom-3 left-3 right-3 translate-y-2 opacity-0 transition duration-300 group-hover:translate-y-0 group-hover:opacity-100">
-                        <p className="font-serif text-sm text-white">{p.caption ?? p.original_filename}</p>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
-        </section>
+        <PhotoGallery
+          photos={photos!.map(p => ({
+            id: p.id,
+            original_url: p.original_url,
+            thumb_url: p.thumb_url ?? null,
+            original_filename: (p.original_filename as string | null) ?? null,
+            caption: (p as Record<string, unknown>).caption as string | null ?? null,
+          }))}
+          photoCount={photos!.length}
+          photoArchiveLabel={t.memorial.photoArchive}
+          tracesLabel={t.memorial.tracesLeftByLovedOnes}
+          photosLabel={t.memorial.photos}
+        />
       )}
 
       {/* ── SON MESAJ ── */}

@@ -139,3 +139,22 @@ export function getPublicUrl(key: string): string {
   const bucket = process.env.R2_PUBLIC_BUCKET || 'tem-public-media'
   return `https://${bucket}.${accountId}.r2.cloudflarestorage.com/${key}`
 }
+
+/**
+ * Uploads an object directly to R2 from the server.
+ */
+export async function uploadR2Object(
+  bucket: string,
+  key: string,
+  body: Buffer | Uint8Array | Blob | string,
+  mimeType: string
+): Promise<void> {
+  const command = new PutObjectCommand({
+    Bucket: bucket,
+    Key: key,
+    Body: body,
+    ContentType: mimeType,
+  })
+  await r2Client.send(command)
+}
+
