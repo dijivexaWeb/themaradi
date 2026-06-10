@@ -3,6 +3,48 @@
 > Her oturum sonunda Claude bu dosyayı günceller.
 > Format: tarih → ne yapıldı → nerede kalındı → sıradaki adım.
 
+## 2026-06-11 — Oturum 76: Cloudflare Stream + R2 Upload Tam Entegrasyon + Admin Doğrulama Detayı
+
+### Yapılanlar
+- **Cloudflare Stream entegrasyonu tamamlandı:**
+  - Yeni API token (`cfut_...`) oluşturuldu — Stream:Read + Stream:Edit izniyle
+  - Stream aboneliği aktif edildi (0 dakika kotası vardı, plan alındı)
+  - `src/app/api/stream/upload-url/route.ts`: Cloudflare hata mesajı kullanıcıya iletiliyor
+  - `src/app/anma-paneli/[id]/videolar/VideoUploadForm.tsx`: `NEXT_REDIRECT` hatası giderildi — `redirect()` yerine `router.refresh()`
+  - `src/app/anma-paneli/[id]/videolar/page.tsx`: `cf_stream_id` varsa `<video>` yerine `<iframe>` embed
+- **R2 belge yükleme tamamen düzeltildi:**
+  - `R2_ENDPOINT`, `R2_ACCESS_KEY_ID`, `R2_SECRET_ACCESS_KEY` Vercel'e eklendi
+  - `src/lib/r2.ts`: AWS SDK v3 checksum devre dışı (`WHEN_REQUIRED`) — R2 desteklemiyor
+  - `tem-private-documents` ve `tem-public-media` bucket'larına CORS politikası eklendi (`AllowedHeaders: ["*"]`)
+  - `src/app/anma-paneli/[id]/dogrulama/VerificationDocUpload.tsx`: debug logları eklendi (sorun tespiti)
+- **Admin doğrulama kuyruğu join hatası giderildi:**
+  - `memorial_witnesses` FK'sı `memorial_verification_docs`'a değil `vaults`'a bağlı — query `vaults` üzerinden yapıldı
+- **Admin doğrulama kartı zenginleştirildi:**
+  - Hesap sahibi: ad, email, telefon, hesap açılış tarihi
+  - Vefat eden: doğum/ölüm yılı, tagline
+  - Sayfa önizleme linki (preview=1)
+  - 3 kolonlu layout: hesap sahibi / belge / şahitler
+
+### Proje Durumu
+- [x] Cloudflare Stream video yükleme — çalışıyor
+- [x] R2 vefat belgesi yükleme — çalışıyor
+- [x] Admin doğrulama kuyruğu — belgeler görünüyor, şahit detayları mevcut
+- [x] Admin kart detayı — hesap sahibi, önizleme, yıllar
+- [ ] Havale akışı email bildirimleri
+
+### Kritik Kararlar / Notlar
+- R2 presign URL'de `X-Amz-Credential` başında access key ID eksikti → env var eksikti
+- AWS SDK v3 default olarak CRC32 checksum ekliyor, R2 bunu 400 ile reddediyor → `requestChecksumCalculation: 'WHEN_REQUIRED'`
+- Cloudflare Stream `cfat_` prefix'li token R2'ye özgü, Stream için `cfut_` prefix'li ayrı token gerekiyor
+
+### Nerede Kaldık
+Tüm upload akışları (fotoğraf, video, belge) çalışıyor. Admin doğrulama kuyruğu tam detaylı. Belge approve/reject + şahit bilgileri admin ekranında görünüyor.
+
+### Sıradaki Adım
+1. Deploy sonrası admin `/admin/verifications` test et — belge + şahit kart görünümü
+2. Havale akışı email bildirimleri
+3. Email template DRY: `verificationApprovedEmailHtml` 2 dosyada duplicate
+
 ## 2026-06-11 — Oturum 75: Video Upload HTML Parse Hatası Düzeltme
 
 ### Yapılanlar
