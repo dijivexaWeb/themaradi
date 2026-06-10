@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { addMemorialVideoAction } from '../actions'
 
 interface Props {
@@ -9,6 +10,7 @@ interface Props {
 }
 
 export default function VideoUploadForm({ vaultId, todayMax }: Props) {
+  const router = useRouter()
   const [file, setFile] = useState<File | null>(null)
   const [url, setUrl] = useState('')
   const [title, setTitle] = useState('')
@@ -174,6 +176,7 @@ export default function VideoUploadForm({ vaultId, todayMax }: Props) {
       setCaption('')
       const formEl = e.target as HTMLFormElement
       formEl.reset()
+      router.refresh()
     } catch (err: any) {
       console.error(err)
       setError(err.message || 'Video kaydedilirken hata oluştu.')

@@ -271,7 +271,6 @@ export async function addMemorialVideoAction(vaultId: string, formData: FormData
   if (vault?.slug) {
     revalidatePath(`/memorial/${vault.slug}`)
   }
-  redirect(`/anma-paneli/${vaultId}/videolar`)
 }
 
 export async function addMemorialAudioAction(vaultId: string, formData: FormData): Promise<void> {
