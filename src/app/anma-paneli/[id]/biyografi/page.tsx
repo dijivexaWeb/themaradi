@@ -6,7 +6,6 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { BookOpen, User, Music, Heart, MapPin, Upload, Loader2 } from 'lucide-react'
-import { uploadSongFileAction } from '../actions'
 
 interface VaultData {
   display_name: string
@@ -345,20 +344,42 @@ export default function BiyografiPage() {
                   onChange={async (e) => {
                     const file = e.target.files?.[0]
                     if (!file) return
+                    if (!file.type.startsWith('audio/')) {
+                      setSongUploadError('Sadece ses dosyası yükleyebilirsiniz')
+                      e.target.value = ''
+                      return
+                    }
+                    if (file.size > 50 * 1024 * 1024) {
+                      setSongUploadError('Dosya çok büyük (max 50 MB)')
+                      e.target.value = ''
+                      return
+                    }
                     setSongUploading(true)
                     setSongUploadError(null)
                     try {
-                      const fd = new FormData()
-                      fd.append('song_file', file)
-                      const res = await uploadSongFileAction(id, fd)
-                      if (res.success && res.url) {
-                        setFavSongUrl(res.url)
-                        if (!favSongTitle) setFavSongTitle(file.name.replace(/\.[^.]+$/, ''))
-                      } else {
-                        setSongUploadError(res.error ?? 'Yükleme hatası')
+                      // Direkt client → Supabase storage (Next.js function limiti yok)
+                      const { data: { user } } = await supabase.auth.getUser()
+                      if (!user) { setSongUploadError('Oturum bulunamadı'); return }
+
+                      const ext = file.name.split('.').pop()?.toLowerCase() ?? 'mp3'
+                      const safeName = `${Date.now()}.${ext}`
+                      const path = `songs/${id}/${user.id}/${safeName}`
+                      const contentType = ext === 'm4a' ? 'audio/mp4' : file.type
+
+                      const { error } = await supabase.storage
+                        .from('vault-media')
+                        .upload(path, file, { contentType, upsert: false })
+
+                      if (error) {
+                        setSongUploadError(`Yükleme hatası: ${error.message}`)
+                        return
                       }
-                    } catch {
-                      setSongUploadError('Bağlantı hatası, tekrar dene')
+
+                      const { data: urlData } = supabase.storage.from('vault-media').getPublicUrl(path)
+                      setFavSongUrl(urlData.publicUrl)
+                      if (!favSongTitle) setFavSongTitle(file.name.replace(/\.[^.]+$/, ''))
+                    } catch (err) {
+                      setSongUploadError('Beklenmeyen hata: ' + String(err))
                     } finally {
                       setSongUploading(false)
                       e.target.value = ''
