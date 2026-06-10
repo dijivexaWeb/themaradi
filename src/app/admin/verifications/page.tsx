@@ -25,8 +25,11 @@ export default async function VerificationsPage() {
     .from('memorial_verification_docs')
     .select(`
       id, file_name, file_url, mime_type, file_size_bytes, created_at, status, file_key, storage_bucket,
-      vaults (id, display_name, slug, status, profiles!vaults_owner_id_fkey (full_name, email)),
-      memorial_witnesses (id, full_name, email, phone, status, confirmed_at, consent_processing, consent_phone, consent_email)
+      vaults (
+        id, display_name, slug, status,
+        profiles!vaults_owner_id_fkey (full_name, email),
+        memorial_witnesses (id, full_name, email, phone, status, confirmed_at, consent_processing, consent_phone, consent_email)
+      )
     `)
     .eq('status', 'pending')
     .order('created_at', { ascending: true })
@@ -150,7 +153,8 @@ export default async function VerificationsPage() {
             {docQueueWithUrls.map((doc) => {
               const vault = Array.isArray(doc.vaults) ? doc.vaults[0] : doc.vaults as Record<string, unknown> | null
               const owner = vault ? (Array.isArray((vault as Record<string, unknown>).profiles) ? ((vault as Record<string, unknown>).profiles as Record<string, unknown>[])[0] : (vault as Record<string, unknown>).profiles) as Record<string, unknown> | null : null
-              const witnesses = (Array.isArray(doc.memorial_witnesses) ? doc.memorial_witnesses : []) as Array<{ id: string; full_name: string; email: string; phone: string | null; status: string; confirmed_at: string | null; consent_processing: boolean; consent_phone: boolean; consent_email: boolean }>
+              const witnessesRaw = vault ? (vault as Record<string, unknown>).memorial_witnesses : []
+              const witnesses = (Array.isArray(witnessesRaw) ? witnessesRaw : []) as Array<{ id: string; full_name: string; email: string; phone: string | null; status: string; confirmed_at: string | null; consent_processing: boolean; consent_phone: boolean; consent_email: boolean }>
               const confirmedCount = witnesses.filter(w => w.status === 'confirmed').length
 
               return (
