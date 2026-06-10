@@ -3,6 +3,7 @@ import { createClient, createServiceClient } from '@/lib/supabase/server'
 import MemorialPageClient from './MemorialPageClient'
 import RealMemorialPage from './RealMemorialPage'
 import ObjectionSection from './ObjectionSection'
+import ViewTracker from './ViewTracker'
 
 export const revalidate = 0
 
@@ -126,6 +127,7 @@ export default async function MemorialPage({ params, searchParams }: PropsWithSe
 
   return (
     <>
+      <ViewTracker vaultId={vault.id} />
       <RealMemorialPage vault={vault} />
       {vault.status === 'public_memorial' && <ObjectionSection vaultId={vault.id} />}
     </>

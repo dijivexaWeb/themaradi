@@ -28,7 +28,7 @@ export default async function MemorialTaziyePage({ params }: Props) {
   const [
     { data: pending },
     { data: approved },
-    { data: reactions },
+    { data: actions },
   ] = await Promise.all([
     supabase
       .from('guestbook_entries')
@@ -42,15 +42,13 @@ export default async function MemorialTaziyePage({ params }: Props) {
       .eq('vault_id', id)
       .eq('status', 'approved')
       .order('created_at', { ascending: false }),
-    supabase.from('memorial_reactions').select('reaction_type').eq('vault_id', id),
+    supabase
+      .from('memorial_actions')
+      .select('id, label, icon, count')
+      .eq('memorial_id', id)
+      .eq('is_active', true)
+      .order('sort_order', { ascending: true }),
   ])
-
-  const reactionData = (reactions ?? []) as { reaction_type: string }[]
-  const counts = {
-    candle: reactionData.filter(r => r.reaction_type === 'candle').length,
-    flower: reactionData.filter(r => r.reaction_type === 'flower').length,
-    prayer: reactionData.filter(r => r.reaction_type === 'prayer').length,
-  }
 
   const rowCls =
     'flex items-start gap-3 rounded-xl border border-[#e5dccb] bg-white p-4'
@@ -78,25 +76,23 @@ export default async function MemorialTaziyePage({ params }: Props) {
           </p>
         </div>
 
-        {/* Tepki sayaçları */}
-        <div className="mb-8 grid grid-cols-3 gap-4">
-          {[
-            { emoji: '🕯️', label: 'Mum yakıldı', count: counts.candle },
-            { emoji: '🌹', label: 'Çiçek bırakıldı', count: counts.flower },
-            { emoji: '🤲', label: 'Dua edildi', count: counts.prayer },
-          ].map(stat => (
-            <div
-              key={stat.label}
-              className="rounded-2xl border border-[#e5dccb] bg-white p-5 text-center shadow-sm"
-            >
-              <div className="mb-1 text-3xl">{stat.emoji}</div>
-              <div className="font-serif text-2xl text-[#1f2d27]">
-                {stat.count.toLocaleString('tr-TR')}
+        {/* Anma aksiyonları */}
+        {(actions?.length ?? 0) > 0 && (
+          <div className={`mb-8 grid gap-4 ${(actions!.length <= 3) ? `grid-cols-${actions!.length}` : 'grid-cols-2 sm:grid-cols-4'}`}>
+            {actions!.map(action => (
+              <div
+                key={action.id}
+                className="rounded-2xl border border-[#e5dccb] bg-white p-5 text-center shadow-sm"
+              >
+                <div className="mb-1 text-3xl">{action.icon}</div>
+                <div className="font-serif text-2xl text-[#1f2d27]">
+                  {(action.count ?? 0).toLocaleString('tr-TR')}
+                </div>
+                <div className="mt-0.5 text-xs text-[#788177]">{action.label}</div>
               </div>
-              <div className="mt-0.5 text-xs text-[#788177]">{stat.label}</div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
 
         {/* Bekleyen mesajlar */}
         <div className="mb-8">

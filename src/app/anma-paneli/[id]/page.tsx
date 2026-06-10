@@ -5,7 +5,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import {
   BookOpen, Camera, Users, MapPin, MessageCircle,
-  Settings, ArrowRight, CheckCircle2, Clock,
+  Settings, ArrowRight, CheckCircle2, Clock, Eye,
 } from 'lucide-react'
 
 interface Props {
@@ -36,6 +36,7 @@ export default async function AnmaPaneliPage({ params, searchParams }: Props) {
     { count: photoCount },
     { count: familyCount },
     { count: pendingGuestbookCount },
+    { data: memorialActions },
   ] = await Promise.all([
     supabase.from('media').select('id', { count: 'exact', head: true })
       .eq('vault_id', id).eq('media_type', 'image'),
@@ -43,7 +44,12 @@ export default async function AnmaPaneliPage({ params, searchParams }: Props) {
       .eq('vault_id', id),
     supabase.from('guestbook_entries').select('id', { count: 'exact', head: true })
       .eq('vault_id', id).eq('status', 'pending'),
+    supabase.from('memorial_actions').select('id, label, icon, count')
+      .eq('memorial_id', id).eq('is_active', true).order('sort_order', { ascending: true }),
   ])
+
+  const viewCount = (vault as Record<string, unknown>).view_count as number ?? 0
+  const totalActionClicks = (memorialActions ?? []).reduce((sum, a) => sum + (a.count ?? 0), 0)
 
   const m = t.memorial_panel
   const s = m.home.sections
@@ -183,6 +189,48 @@ export default async function AnmaPaneliPage({ params, searchParams }: Props) {
             </div>
           )}
         </div>
+
+        {/* İstatistik kartları — sadece yayınlanmış sayfalarda */}
+        {isVerified && (
+          <div className={`mb-4 grid gap-3 ${(memorialActions?.length ?? 0) > 0 ? 'grid-cols-2 sm:grid-cols-3' : 'grid-cols-1 sm:grid-cols-2'}`}>
+            {/* Ziyaretçi sayısı */}
+            <div className={`${blockCls} flex items-center gap-4 p-5`}>
+              <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-[#c7a76f]/30 bg-[#f9f5ec]">
+                <Eye className="h-5 w-5 text-[#b08340]" />
+              </div>
+              <div>
+                <div className="font-serif text-2xl text-[#1f2d27]">{viewCount.toLocaleString('tr-TR')}</div>
+                <div className="text-xs text-[#788177]">Sayfa ziyareti</div>
+              </div>
+            </div>
+
+            {/* Toplam aksiyon */}
+            {(memorialActions?.length ?? 0) > 0 && (
+              <div className={`${blockCls} flex items-center gap-4 p-5`}>
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-[#c7a76f]/30 bg-[#f9f5ec] text-xl">
+                  {memorialActions![0].icon}
+                </div>
+                <div>
+                  <div className="font-serif text-2xl text-[#1f2d27]">{totalActionClicks.toLocaleString('tr-TR')}</div>
+                  <div className="text-xs text-[#788177]">Toplam anma aksiyonu</div>
+                </div>
+              </div>
+            )}
+
+            {/* Her aksiyon ayrı */}
+            {(memorialActions ?? []).map(action => (
+              <div key={action.id} className={`${blockCls} flex items-center gap-4 p-5`}>
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-[#c7a76f]/30 bg-[#f9f5ec] text-xl">
+                  {action.icon}
+                </div>
+                <div>
+                  <div className="font-serif text-2xl text-[#1f2d27]">{(action.count ?? 0).toLocaleString('tr-TR')}</div>
+                  <div className="text-xs text-[#788177]">{action.label}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* Bölüm kartları */}
         <div className="grid gap-3 sm:grid-cols-2">
