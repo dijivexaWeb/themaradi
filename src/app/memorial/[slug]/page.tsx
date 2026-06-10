@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createServiceClient } from '@/lib/supabase/server'
 import MemorialPageClient from './MemorialPageClient'
 import RealMemorialPage from './RealMemorialPage'
 import ObjectionSection from './ObjectionSection'
@@ -50,7 +50,9 @@ export default async function MemorialPage({ params, searchParams }: PropsWithSe
   }
 
   const supabase = await createClient()
-  const { data: vault } = await supabase
+  // preview=1: use service client to bypass RLS (unpublished vaults are hidden from non-owners)
+  const vaultClient = preview === '1' ? await createServiceClient() : supabase
+  const { data: vault } = await vaultClient
     .from('vaults')
     .select('*')
     .eq('slug', slug)
