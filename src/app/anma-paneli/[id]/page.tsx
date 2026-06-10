@@ -7,6 +7,7 @@ import {
   BookOpen, Camera, Users, MapPin, MessageCircle,
   Settings, ArrowRight, CheckCircle2, Clock, Eye,
 } from 'lucide-react'
+import { ACTION_ICON_MAP } from '@/lib/memorial-style-templates'
 
 interface Props {
   params: Promise<{ id: string }>
@@ -208,7 +209,7 @@ export default async function AnmaPaneliPage({ params, searchParams }: Props) {
             {(memorialActions?.length ?? 0) > 0 && (
               <div className={`${blockCls} flex items-center gap-4 p-5`}>
                 <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-[#c7a76f]/30 bg-[#f9f5ec] text-xl">
-                  {memorialActions![0].icon}
+                  {ACTION_ICON_MAP[memorialActions![0].icon as keyof typeof ACTION_ICON_MAP] ?? memorialActions![0].icon}
                 </div>
                 <div>
                   <div className="font-serif text-2xl text-[#1f2d27]">{totalActionClicks.toLocaleString('tr-TR')}</div>
@@ -221,7 +222,7 @@ export default async function AnmaPaneliPage({ params, searchParams }: Props) {
             {(memorialActions ?? []).map(action => (
               <div key={action.id} className={`${blockCls} flex items-center gap-4 p-5`}>
                 <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-[#c7a76f]/30 bg-[#f9f5ec] text-xl">
-                  {action.icon}
+                  {ACTION_ICON_MAP[action.icon as keyof typeof ACTION_ICON_MAP] ?? action.icon}
                 </div>
                 <div>
                   <div className="font-serif text-2xl text-[#1f2d27]">{(action.count ?? 0).toLocaleString('tr-TR')}</div>

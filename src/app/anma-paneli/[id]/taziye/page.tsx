@@ -5,6 +5,7 @@ import {
   approveGuestbookEntryAction,
   rejectGuestbookEntryAction,
 } from '@/lib/actions/condolences'
+import { ACTION_ICON_MAP } from '@/lib/memorial-style-templates'
 
 interface Props {
   params: Promise<{ id: string }>
@@ -84,7 +85,7 @@ export default async function MemorialTaziyePage({ params }: Props) {
                 key={action.id}
                 className="rounded-2xl border border-[#e5dccb] bg-white p-5 text-center shadow-sm"
               >
-                <div className="mb-1 text-3xl">{action.icon}</div>
+                <div className="mb-1 text-3xl">{ACTION_ICON_MAP[action.icon as keyof typeof ACTION_ICON_MAP] ?? action.icon}</div>
                 <div className="font-serif text-2xl text-[#1f2d27]">
                   {(action.count ?? 0).toLocaleString('tr-TR')}
                 </div>
