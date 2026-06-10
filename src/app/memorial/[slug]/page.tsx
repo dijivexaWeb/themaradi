@@ -104,7 +104,7 @@ export default async function MemorialPage({ params, searchParams }: PropsWithSe
             {backLabel}
           </a>
         </div>
-        <RealMemorialPage vault={vault} />
+        <RealMemorialPage vault={vault} isPreview />
       </>
     )
   }
