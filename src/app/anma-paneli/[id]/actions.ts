@@ -610,39 +610,47 @@ function witnessEmailHtml(witnessName: string, deceasedName: string, confirmUrl:
 
 // ─── Favori Şarkı Yükleme ────────────────────────────────────────────────────
 
-const MAX_SONG_BYTES = 30 * 1024 * 1024 // 30 MB
-const ALLOWED_SONG_MIME = new Set(['audio/mpeg', 'audio/mp3', 'audio/wav', 'audio/ogg', 'audio/x-m4a', 'audio/aac', 'audio/flac'])
+const MAX_SONG_BYTES = 50 * 1024 * 1024 // 50 MB (bucket limiti)
 
 export async function uploadSongFileAction(
   vaultId: string,
   formData: FormData
 ): Promise<{ success: boolean; url?: string; error?: string }> {
-  const supabase = await createClient()
-  const { data: { user } } = await supabase.auth.getUser()
-  if (!user) return { success: false, error: 'Oturum bulunamadı' }
+  try {
+    const supabase = await createClient()
+    const { data: { user } } = await supabase.auth.getUser()
+    if (!user) return { success: false, error: 'Oturum bulunamadı' }
 
-  const { data: vault } = await supabase
-    .from('vaults')
-    .select('id')
-    .eq('id', vaultId)
-    .eq('owner_id', user.id)
-    .single()
-  if (!vault) return { success: false, error: 'Yetkisiz' }
+    const { data: vault } = await supabase
+      .from('vaults')
+      .select('id')
+      .eq('id', vaultId)
+      .eq('owner_id', user.id)
+      .single()
+    if (!vault) return { success: false, error: 'Yetkisiz' }
 
-  const file = formData.get('song_file')
-  if (!(file instanceof File) || file.size === 0) return { success: false, error: 'Dosya seçilmedi' }
-  if (!ALLOWED_SONG_MIME.has(file.type) || file.size > MAX_SONG_BYTES) {
-    return { success: false, error: 'Geçersiz dosya (MP3/WAV/M4A, max 30 MB)' }
+    const file = formData.get('song_file')
+    if (!(file instanceof File) || file.size === 0) return { success: false, error: 'Dosya seçilmedi' }
+    if (file.size > MAX_SONG_BYTES) return { success: false, error: 'Dosya çok büyük (max 50 MB)' }
+    if (!file.type.startsWith('audio/')) return { success: false, error: 'Sadece ses dosyası yükleyebilirsiniz' }
+
+    // Bucket audio/mp4 kabul ediyor, m4a için content type'ı normalize et
+    const contentType = file.name.toLowerCase().endsWith('.m4a') ? 'audio/mp4' : file.type
+
+    const service = await createServiceClient()
+    const fn = cleanFilename(file.name)
+    const path = `songs/${vaultId}/${user.id}/${Date.now()}-${fn}`
+    const { error } = await service.storage
+      .from(MEDIA_BUCKET)
+      .upload(path, file, { contentType, upsert: false })
+    if (error) return { success: false, error: `Yükleme hatası: ${error.message}` }
+
+    const { data } = service.storage.from(MEDIA_BUCKET).getPublicUrl(path)
+    return { success: true, url: data.publicUrl }
+  } catch (err) {
+    console.error('[uploadSongFileAction]', err)
+    return { success: false, error: 'Sunucu hatası' }
   }
-
-  const service = await createServiceClient()
-  const fn = cleanFilename(file.name)
-  const path = `songs/${vaultId}/${user.id}/${Date.now()}-${fn}`
-  const { error } = await service.storage.from(MEDIA_BUCKET).upload(path, file, { contentType: file.type, upsert: false })
-  if (error) return { success: false, error: 'Yükleme hatası' }
-
-  const { data } = service.storage.from(MEDIA_BUCKET).getPublicUrl(path)
-  return { success: true, url: data.publicUrl }
 }
 
 // ─── QR / Slug Actions ───────────────────────────────────────────────────────

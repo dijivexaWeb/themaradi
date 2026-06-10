@@ -347,17 +347,22 @@ export default function BiyografiPage() {
                     if (!file) return
                     setSongUploading(true)
                     setSongUploadError(null)
-                    const fd = new FormData()
-                    fd.append('song_file', file)
-                    const res = await uploadSongFileAction(id, fd)
-                    setSongUploading(false)
-                    if (res.success && res.url) {
-                      setFavSongUrl(res.url)
-                      if (!favSongTitle) setFavSongTitle(file.name.replace(/\.[^.]+$/, ''))
-                    } else {
-                      setSongUploadError(res.error ?? 'Yükleme hatası')
+                    try {
+                      const fd = new FormData()
+                      fd.append('song_file', file)
+                      const res = await uploadSongFileAction(id, fd)
+                      if (res.success && res.url) {
+                        setFavSongUrl(res.url)
+                        if (!favSongTitle) setFavSongTitle(file.name.replace(/\.[^.]+$/, ''))
+                      } else {
+                        setSongUploadError(res.error ?? 'Yükleme hatası')
+                      }
+                    } catch {
+                      setSongUploadError('Bağlantı hatası, tekrar dene')
+                    } finally {
+                      setSongUploading(false)
+                      e.target.value = ''
                     }
-                    e.target.value = ''
                   }}
                 />
               </label>
