@@ -106,6 +106,11 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
     relation: string | null
     message: string
     created_at: string
+    react_heart: number
+    react_pray: number
+    react_smile: number
+    react_cry: number
+    react_dove: number
   }[]
 
   const reactionData = (reactionsResult.data ?? []) as { reaction_type: string }[]
@@ -203,11 +208,11 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
 
         <div className="relative mx-auto grid w-full max-w-7xl items-center gap-5 px-5 pb-12 pt-6 sm:px-8 lg:grid-cols-[1fr_380px_1fr] lg:gap-10 lg:py-20">
 
-          {/* Left — Ailesinden */}
+          {/* Left — Son mesaj önizlemesi */}
           <div className="order-2 rounded-2xl border border-[#c7a76f]/20 bg-[#091712]/55 p-5 shadow-2xl shadow-black/20 backdrop-blur-sm sm:p-6 lg:order-1">
             <div className="mb-3 flex items-center gap-3 text-[#c7a76f]">
               <span className="h-px w-8 bg-[#c7a76f]" />
-              <span className="text-xs tracking-[0.22em] uppercase">{t.memorial.fromFamily}</span>
+              <span className="text-xs tracking-[0.22em] uppercase">{t.memorial.linesLeftForLovedOnes}</span>
             </div>
             <p className="font-serif text-lg leading-8 text-white sm:text-xl sm:leading-9">
               {vault.tagline ?? 'Saygıyla anıyoruz. Bize bıraktığı sevgi ve hatıralar her zaman kalbimizde yaşayacak.'}
@@ -586,7 +591,7 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
                   <span className="text-xs tracking-[0.2em] uppercase">{t.memorial.photoArchive}</span>
                 </div>
                 <h2 className="mt-3 font-serif text-5xl text-[#173d31]">
-                  {t.memorial.frozenMoments}
+                  {t.memorial.tracesLeftByLovedOnes}
                 </h2>
               </div>
               <span className="hidden text-sm text-[#8a7a64] sm:block">{photos!.length} {t.memorial.photos}</span>

@@ -8,6 +8,35 @@ import { sendEmail, isNotificationEnabled } from '@/lib/email'
 import { newGuestbookEntryEmail, messageApprovedEmail, condolenceReceivedEmail } from '@/lib/email/templates'
 import { verifyTurnstile } from '@/lib/turnstile'
 
+type EntryEmoji = 'heart' | 'pray' | 'smile' | 'cry' | 'dove'
+
+export async function reactToEntryAction(
+  entryId: string,
+  emoji: EntryEmoji,
+  delta: 1 | -1,
+): Promise<{ success: boolean; newCount: number }> {
+  const allowed: EntryEmoji[] = ['heart', 'pray', 'smile', 'cry', 'dove']
+  if (!allowed.includes(emoji)) return { success: false, newCount: 0 }
+
+  const col = `react_${emoji}` as const
+  const service = await createServiceClient()
+
+  const { data } = await service
+    .from('guestbook_entries')
+    .select(`id, ${col}`)
+    .eq('id', entryId)
+    .eq('status', 'approved')
+    .single()
+
+  if (!data) return { success: false, newCount: 0 }
+
+  const current = (data as Record<string, number>)[col] ?? 0
+  const newCount = Math.max(0, current + delta)
+
+  await service.from('guestbook_entries').update({ [col]: newCount }).eq('id', entryId)
+  return { success: true, newCount }
+}
+
 export async function addReactionAction(vaultId: string, type: 'candle' | 'flower' | 'prayer'): Promise<void> {
   if (!['candle', 'flower', 'prayer'].includes(type)) return
 

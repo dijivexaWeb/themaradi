@@ -9,6 +9,11 @@ interface GuestbookEntry {
   relation: string | null
   message: string
   created_at: string
+  react_heart: number
+  react_pray: number
+  react_smile: number
+  react_cry: number
+  react_dove: number
 }
 
 interface Props {
@@ -21,6 +26,7 @@ interface Props {
 
 export default function RealMemorialInteractionsWrapper({ entries, vaultId, initialCounts, siteKey, customActions = [] }: Props) {
   const condolences = entries.map((e) => ({
+    id: e.id,
     name: e.author_name,
     date: new Date(e.created_at).toLocaleDateString('tr-TR', {
       day: 'numeric',
@@ -29,6 +35,13 @@ export default function RealMemorialInteractionsWrapper({ entries, vaultId, init
     }),
     relation: e.relation ?? '',
     text: e.message,
+    reactions: {
+      heart: e.react_heart ?? 0,
+      pray:  e.react_pray  ?? 0,
+      smile: e.react_smile ?? 0,
+      cry:   e.react_cry   ?? 0,
+      dove:  e.react_dove  ?? 0,
+    },
   }))
 
   return (

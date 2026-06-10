@@ -4,7 +4,7 @@ import { useState, useTransition } from 'react'
 import { ArrowRight, Feather, Flame, Heart, X } from 'lucide-react'
 import { type Lang } from '@/i18n'
 import { useLang } from '@/i18n/context'
-import { submitCondolenceAction, addReactionAction } from '@/lib/actions/condolences'
+import { submitCondolenceAction, addReactionAction, reactToEntryAction } from '@/lib/actions/condolences'
 import { incrementMemorialActionAction } from '@/lib/actions/memorial-public-actions'
 import { ACTION_ICON_MAP, type ActionIcon } from '@/lib/memorial-style-templates'
 import TurnstileWidget from '@/components/TurnstileWidget'
@@ -17,11 +17,23 @@ export interface CustomAction {
   count: number
 }
 
+type EntryEmoji = 'heart' | 'pray' | 'smile' | 'cry' | 'dove'
+
+const ENTRY_EMOJIS: { key: EntryEmoji; emoji: string }[] = [
+  { key: 'heart', emoji: '❤️' },
+  { key: 'pray',  emoji: '🙏' },
+  { key: 'smile', emoji: '😊' },
+  { key: 'cry',   emoji: '😢' },
+  { key: 'dove',  emoji: '🕊️' },
+]
+
 interface Condolence {
+  id: string
   name: string
   date: string
   relation: string
   text: string
+  reactions: Record<EntryEmoji, number>
 }
 
 type ActionType = 'candle' | 'flower' | 'prayer' | null
@@ -101,6 +113,46 @@ export default function MemorialInteractions({ condolences, vaultId, initialCoun
   const [userPrayed, setUserPrayed] = useState(false)
   const [pendingAction, setPendingAction] = useState<ActionType>(null)
 
+  // Entry emoji reaksiyonları
+  const [entryReactions, setEntryReactions] = useState<Record<string, Record<EntryEmoji, number>>>(
+    Object.fromEntries(condolences.map(c => [c.id, { ...c.reactions }]))
+  )
+  const [userEntryReactions, setUserEntryReactions] = useState<Set<string>>(() => {
+    if (typeof window === 'undefined') return new Set<string>()
+    try {
+      const parsed = JSON.parse(localStorage.getItem('gr') ?? '{}') as Record<string, boolean>
+      return new Set<string>(Object.keys(parsed).filter(k => parsed[k]))
+    } catch (_) {
+      return new Set<string>()
+    }
+  })
+  const [, startEntryTransition] = useTransition()
+
+  function handleEntryReaction(entryId: string, emoji: EntryEmoji) {
+    const key = `${entryId}_${emoji}`
+    const alreadyReacted = userEntryReactions.has(key)
+    const delta: 1 | -1 = alreadyReacted ? -1 : 1
+
+    setEntryReactions(prev => ({
+      ...prev,
+      [entryId]: { ...prev[entryId], [emoji]: Math.max(0, (prev[entryId]?.[emoji] ?? 0) + delta) },
+    }))
+
+    const next = new Set(userEntryReactions)
+    if (alreadyReacted) { next.delete(key) } else { next.add(key) }
+    setUserEntryReactions(next)
+
+    try {
+      const stored: Record<string, boolean> = {}
+      next.forEach(k => { stored[k] = true })
+      localStorage.setItem('gr', JSON.stringify(stored))
+    } catch (_) { /* ignore */ }
+
+    startEntryTransition(async () => {
+      await reactToEntryAction(entryId, emoji, delta)
+    })
+  }
+
   // Custom action buton state'leri
   const [customCounts, setCustomCounts] = useState<Record<string, number>>(
     Object.fromEntries(customActions.map(a => [a.id, a.count]))
@@ -168,8 +220,8 @@ export default function MemorialInteractions({ condolences, vaultId, initialCoun
               <span className="h-px w-10 bg-[#c7a76f]" />
             </div>
             <h2 className="mt-3 font-serif text-4xl text-white sm:text-5xl">
-              {copy.title}<br />
-              <span className="text-[#c7a76f]">{copy.titleAccent}</span>
+              {lang === 'tr' ? 'Sevenlerinin' : lang === 'ka' ? 'საყვარელი ადამიანების' : lang === 'ru' ? 'Словами' : 'With words of'}<br />
+              <span className="text-[#c7a76f]">{lang === 'tr' ? 'sözleriyle.' : lang === 'ka' ? 'სიტყვებით.' : lang === 'ru' ? 'любящих.' : 'loved ones.'}</span>
             </h2>
           </div>
 
@@ -258,29 +310,58 @@ export default function MemorialInteractions({ condolences, vaultId, initialCoun
           <div className="grid gap-5 lg:grid-cols-[1fr_340px]">
             <div className="overflow-hidden rounded-2xl border border-white/10 bg-[#0d1412] shadow-2xl shadow-black/25">
               <div className="border-b border-white/10 bg-white/[0.03] px-4 py-3 text-xs font-semibold text-[#cfc3ad]">
-                {lang === 'tr' ? 'Taziye Mesajları' : lang === 'ka' ? 'სამძიმრის შეტყობინებები' : lang === 'ru' ? 'Сообщения с соболезнованиями' : 'Condolence Messages'}
+                {lang === 'tr' ? 'Sevenlerinin sözleriyle.' : lang === 'ka' ? 'საყვარელი ადამიანების სიტყვებით.' : lang === 'ru' ? 'Словами любящих.' : 'With words of loved ones.'}
               </div>
 
               <div className="divide-y divide-white/8">
-                {condolences.map((item) => (
-                  <div key={item.name} className="p-4 transition hover:bg-white/[0.035] sm:p-5">
-                    <div className="flex items-start gap-3">
-                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#c7a76f]/35 bg-[#f4eee3] text-xs font-semibold text-[#173d31]">
-                        {item.name[0]}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="flex flex-wrap items-baseline justify-between gap-2">
-                          <div>
-                            <div className="font-serif text-base text-white">{item.name}</div>
-                            <div className="text-[11px] text-[#8f9f96]">{item.relation} · {item.date}</div>
-                          </div>
-                          <span className="text-xs text-[#c7a76f]">♥ {item.name.length + 7}</span>
+                {condolences.map((item) => {
+                  const rxns = entryReactions[item.id] ?? item.reactions
+                  const totalReactions = Object.values(rxns).reduce((a, b) => a + b, 0)
+                  return (
+                    <div key={item.id} className="p-4 sm:p-5">
+                      <div className="flex items-start gap-3">
+                        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border border-[#c7a76f]/35 bg-[#f4eee3] text-xs font-semibold text-[#173d31]">
+                          {item.name[0]}
                         </div>
-                        <p className="mt-3 text-sm leading-7 text-[#d8ccba]">{item.text}</p>
+                        <div className="min-w-0 flex-1">
+                          <div className="flex flex-wrap items-baseline justify-between gap-2">
+                            <div>
+                              <div className="font-serif text-base text-white">{item.name}</div>
+                              <div className="text-[11px] text-[#8f9f96]">{item.relation}{item.relation ? ' · ' : ''}{item.date}</div>
+                            </div>
+                            {totalReactions > 0 && (
+                              <span className="text-xs text-[#c7a76f]/70">{totalReactions} tepki</span>
+                            )}
+                          </div>
+                          <p className="mt-3 text-sm leading-7 text-[#d8ccba]">{item.text}</p>
+
+                          {/* Emoji reaksiyon barı */}
+                          <div className="mt-3 flex flex-wrap gap-1.5">
+                            {ENTRY_EMOJIS.map(({ key, emoji }) => {
+                              const count = rxns[key] ?? 0
+                              const active = userEntryReactions.has(`${item.id}_${key}`)
+                              return (
+                                <button
+                                  key={key}
+                                  type="button"
+                                  onClick={() => handleEntryReaction(item.id, key)}
+                                  className={`flex items-center gap-1 rounded-full border px-2.5 py-1 text-sm transition-all duration-150 active:scale-90 ${
+                                    active
+                                      ? 'border-[#c7a76f]/60 bg-[#c7a76f]/15 text-[#c7a76f]'
+                                      : 'border-white/10 bg-white/[0.04] text-[#8f9f96] hover:border-white/25 hover:bg-white/[0.08]'
+                                  }`}
+                                >
+                                  <span>{emoji}</span>
+                                  {count > 0 && <span className="text-[11px] font-medium">{count}</span>}
+                                </button>
+                              )
+                            })}
+                          </div>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             </div>
 

@@ -1017,7 +1017,7 @@ export default function MemorialPage() {
       </section>
 
       {/* â”€â”€ TAZÄ°YE + Ä°NTERAKSÄ°YON (client) â”€â”€ */}
-      <MemorialInteractions condolences={condolences} />
+      <MemorialInteractions condolences={condolences.map((c, i) => ({ ...c, id: `demo-${i}`, reactions: { heart: 0, pray: 0, smile: 0, cry: 0, dove: 0 } }))} />
 
       <section id="aile-baglari" className="bg-[#091712] px-5 py-12 text-[#efe7d8] sm:px-8">
         <div className="mx-auto max-w-5xl">
