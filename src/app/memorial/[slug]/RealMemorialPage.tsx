@@ -9,6 +9,7 @@ import RealMemorialInteractionsWrapper from './RealMemorialInteractionsWrapper'
 import ProfilePhotoCircle from './ProfilePhotoCircle'
 import HeroPanelEmojiBar from './HeroPanelEmojiBar'
 import TimelineSection from './TimelineSection'
+import MemoryBookClient from './MemoryBookClient'
 import { getTurnstileSiteKey } from '@/lib/turnstile'
 import { getTranslation } from '@/i18n/server'
 
@@ -84,6 +85,7 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
     guestbookResult,
     reactionsResult,
     { data: memorialActionsRaw },
+    { data: approvedMemories },
   ] = await Promise.all([
     supabase.from('media').select('*').eq('vault_id', id).eq('media_type', 'image').eq('is_public', true).order('sort_order', { ascending: true }).limit(24),
     supabase.from('media').select('*').eq('vault_id', id).eq('media_type', 'video').eq('is_public', true).order('sort_order', { ascending: true }).limit(6),
@@ -93,6 +95,7 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
     supabase.from('guestbook_entries').select('*').eq('vault_id', id).eq('status', 'approved').order('created_at', { ascending: false }).limit(20),
     supabase.from('memorial_reactions').select('reaction_type').eq('vault_id', id),
     supabase.from('memorial_actions').select('id, label, icon, show_counter, count, sort_order').eq('memorial_id', id).eq('is_active', true).order('sort_order', { ascending: true }),
+    supabase.from('memory_book_entries').select('id, author_name, relation, memory_text, photo_url, created_at').eq('vault_id', id).eq('status', 'approved').order('created_at', { ascending: false }).limit(30),
   ])
 
   const customActions = (memorialActionsRaw ?? []).map(a => ({
@@ -797,6 +800,19 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
       <div id="taziye">
         <RealMemorialInteractionsWrapper entries={guestbookEntries} vaultId={id} initialCounts={initialCounts} siteKey={turnstileSiteKey} customActions={customActions} />
       </div>
+
+      {/* ── ANI DEFTERİ ── */}
+      <MemoryBookClient
+        vaultId={id}
+        initialMemories={(approvedMemories ?? []) as {
+          id: string
+          author_name: string
+          relation: string | null
+          memory_text: string
+          photo_url: string | null
+          created_at: string
+        }[]}
+      />
 
       {/* ── AİLE BAĞLARI ── */}
       {hasFamilyMembers && (
