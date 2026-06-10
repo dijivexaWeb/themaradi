@@ -3,6 +3,35 @@
 > Her oturum sonunda Claude bu dosyayı günceller.
 > Format: tarih → ne yapıldı → nerede kalındı → sıradaki adım.
 
+## 2026-06-10 — Oturum 68: QR ID Sistemi + Link & QR Sayfası
+
+### Yapılanlar
+- `supabase/migrations/012_vaults_qr_id.sql` oluşturuldu ve uygulandı: `qr_id` kolonu vaults tablosuna eklendi, tüm mevcut vault'lara `mem-XXXXXXXX` formatında UUID tabanlı kalıcı ID atandı, yeni vault'lar için BEFORE INSERT trigger eklendi
+- `src/app/q/[qr_id]/route.ts` oluşturuldu: kalıcı 301 redirect — qr_id → vault slug'a yönlendirir, slug değişse bile QR bozulmaz
+- `src/app/anma-paneli/[id]/link-ayari/page.tsx` oluşturuldu: server component, QR PNG'yi `qrcode` paketi ile server-side üretiyor (400px, koyu yeşil)
+- `src/app/anma-paneli/[id]/link-ayari/_QrLinkClient.tsx` oluşturuldu: slug editörü (gerçek zamanlı uygunluk kontrolü), QR görsel + PNG indirme butonu, link kopyalama
+- `src/app/anma-paneli/[id]/actions.ts` güncellendi: `checkSlugAvailabilityAction` + `updateMemorialSlugAction` eklendi
+- Anma paneli layout'una "Link & QR Kod" sidebar linki eklendi (`QrCode` ikonu)
+- 4 dil dosyasına `linkAndQr` anahtarı eklendi (TR/EN/KA/RU)
+
+### Proje Durumu
+- [x] Email onay + vault-aware redirect
+- [x] Anma Tarzı özelliği (11 şablon, action butonları)
+- [x] QR ID sistemi + slug editörü + indirme
+
+### Kritik Kararlar / Notlar
+- Option A seçildi: kalıcı `/q/[qr_id]` URL'i, slug değişse bile QR çalışır
+- QR server-side PNG olarak üretiliyor (data URL), client'ta `<a download>` ile indiriliyor
+- Yeni vault'lara trigger ile otomatik qr_id atanıyor
+
+### Nerede Kaldık
+`/anma-paneli/[id]/link-ayari` sayfası tamamlandı ve push edildi. Anma sayfasının önizlemesi henüz yapılmadı (`/memorial/[slug]` owner preview modu).
+
+### Sıradaki Adım
+1. `/memorial/[slug]` sayfasında owner preview desteği (`?preview=1` query ile)
+2. Memorial sayfasında aktif anma aksiyon butonlarını göster (tıklama sayacı ile)
+3. Admin itiraz sayfası (`admin/objections/page.tsx`)
+
 ## 2026-06-10 — Oturum 67: Anma Tarzı Özelliği — Dashboard
 
 ### Yapılanlar
