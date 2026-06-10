@@ -47,6 +47,7 @@ export default function VerificationDocUpload({ vaultId }: Props) {
       }
 
       const { uploadUrl, fileKey, bucket } = await presignRes.json()
+      console.log('[DocUpload] uploadUrl host:', new URL(uploadUrl).hostname)
 
       // 2. Upload directly to Cloudflare R2
       await new Promise<void>((resolve, reject) => {
@@ -62,6 +63,7 @@ export default function VerificationDocUpload({ vaultId }: Props) {
         }
 
         xhr.onload = () => {
+          console.log('[DocUpload] xhr.status:', xhr.status)
           if (xhr.status === 200) {
             resolve()
           } else {
@@ -69,7 +71,10 @@ export default function VerificationDocUpload({ vaultId }: Props) {
           }
         }
 
-        xhr.onerror = () => reject(new Error('Ağ hatası oluştu.'))
+        xhr.onerror = () => {
+          console.error('[DocUpload] xhr.onerror — status:', xhr.status, 'readyState:', xhr.readyState)
+          reject(new Error('Ağ hatası oluştu.'))
+        }
         xhr.send(file)
       })
 
