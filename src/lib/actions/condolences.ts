@@ -54,7 +54,6 @@ export async function reactToHeroPanelAction(
     .from('vaults')
     .select(`id, ${col}`)
     .eq('id', vaultId)
-    .in('status', ['public_memorial', 'private_memorial'])
     .single()
 
   if (!data) return { success: false, newCount: 0 }

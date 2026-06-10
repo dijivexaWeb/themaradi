@@ -4,7 +4,7 @@ import MemorialPageClient from './MemorialPageClient'
 import RealMemorialPage from './RealMemorialPage'
 import ObjectionSection from './ObjectionSection'
 
-export const revalidate = 3600
+export const revalidate = 0
 
 interface Props { params: Promise<{ slug: string }> }
 
