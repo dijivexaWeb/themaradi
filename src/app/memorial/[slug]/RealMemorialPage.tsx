@@ -366,7 +366,7 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
             )}
           </div>
         )}
-        <div className="mx-auto grid max-w-7xl grid-cols-2 divide-x divide-y divide-[#2a5a45] sm:grid-cols-4 sm:divide-y-0">
+        <div className="mx-auto grid max-w-7xl grid-cols-2 divide-x divide-y divide-[#2a5a45] sm:grid-cols-5 sm:divide-y-0">
           {yearsLived !== null && (
             <div className="flex flex-col items-center justify-center gap-1 px-6 py-7 text-center">
               <div className="font-serif text-5xl text-white">{yearsLived}</div>
