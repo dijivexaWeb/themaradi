@@ -1,17 +1,9 @@
 'use server'
 
-import { createClient, createServiceClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
-
-const MEDIA_BUCKET = 'vault-media'
-
-function cleanFilename(name: string) {
-  return (name.toLowerCase()
-    .replace(/ş/g, 's').replace(/ğ/g, 'g').replace(/ü/g, 'u')
-    .replace(/ö/g, 'o').replace(/ı/g, 'i').replace(/ç/g, 'c')
-    .replace(/[^a-z0-9._-]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '')) || 'audio'
-}
+import { deleteR2Object, getPublicUrl } from '@/lib/r2'
 
 export async function addAudioRecordingAction(vaultId: string, formData: FormData): Promise<void> {
   const supabase = await createClient()
@@ -25,32 +17,42 @@ export async function addAudioRecordingAction(vaultId: string, formData: FormDat
   const author = (formData.get('author') as string)?.trim() || null
   if (!title) return
 
-  const file = formData.get('audio_file')
-  let audioUrl: string | null = (formData.get('audio_url') as string)?.trim() || null
+  // R2 file upload details submitted from frontend
+  const fileKey = (formData.get('file_key') as string | null)?.trim()
+  const bucket = (formData.get('bucket') as string | null)?.trim()
+  const originalUrl = (formData.get('audio_url') as string | null)?.trim()
 
-  if (file instanceof File && file.size > 0 && file.type.startsWith('audio/')) {
-    const service = await createServiceClient()
-    const filename = cleanFilename(file.name)
-    const path = `audio/${vaultId}/${user.id}/${Date.now()}-${filename}`
-    const { error } = await service.storage.from(MEDIA_BUCKET).upload(path, file, {
-      contentType: file.type,
-      upsert: false,
-    })
-    if (!error) {
-      const { data } = service.storage.from(MEDIA_BUCKET).getPublicUrl(path)
-      audioUrl = data.publicUrl
-    }
+  let audioUrl = ''
+  let storageBucket: string | null = null
+  let storagePath: string | null = null
+  let r2FileKey: string | null = null
+
+  if (fileKey && bucket) {
+    audioUrl = getPublicUrl(fileKey)
+    storageBucket = bucket
+    storagePath = fileKey
+    r2FileKey = fileKey
+  } else if (originalUrl) {
+    audioUrl = originalUrl
+  } else {
+    console.error('[addAudioRecordingAction] No audio file source provided')
+    return
   }
 
-  if (!audioUrl) return
-
-  await supabase.from('vault_audio_recordings').insert({
+  const { error } = await supabase.from('vault_audio_recordings').insert({
     vault_id: vaultId,
     title,
     author,
     audio_url: audioUrl,
     is_public: true,
+    storage_bucket: storageBucket,
+    storage_path: storagePath,
+    r2_file_key: r2FileKey
   })
+
+  if (error) {
+    console.error('[addAudioRecordingAction] Insert error:', error.message)
+  }
 
   revalidatePath(`/dashboard/vault/${vaultId}/ses-kayitlari`)
 }
@@ -84,7 +86,27 @@ export async function deleteAudioRecordingAction(recordingId: string, vaultId: s
   const { data: vault } = await supabase.from('vaults').select('id').eq('id', vaultId).eq('owner_id', user.id).single()
   if (!vault) return
 
+  const { data: recording } = await supabase
+    .from('vault_audio_recordings')
+    .select('id, storage_bucket, storage_path, r2_file_key')
+    .eq('id', recordingId)
+    .eq('vault_id', vaultId)
+    .single()
+
+  if (!recording) return
+
+  // Delete DB record first
   await supabase.from('vault_audio_recordings').delete().eq('id', recordingId).eq('vault_id', vaultId)
+
+  // Clean up R2 object if exists
+  const keyToDelete = recording.r2_file_key || recording.storage_path
+  if (keyToDelete && recording.storage_bucket) {
+    try {
+      await deleteR2Object(recording.storage_bucket, keyToDelete)
+    } catch (err) {
+      console.error('[deleteAudioRecordingAction] R2 delete failed:', err)
+    }
+  }
 
   revalidatePath(`/dashboard/vault/${vaultId}/ses-kayitlari`)
 }

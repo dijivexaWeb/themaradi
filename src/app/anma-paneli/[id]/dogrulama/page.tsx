@@ -3,7 +3,6 @@ import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
 import {
   publishMemorialAction,
-  uploadVerificationDocAction,
   deleteVerificationDocAction,
   addWitnessAction,
   resendWitnessEmailAction,
@@ -13,6 +12,8 @@ import {
   CheckCircle2, Clock, Globe, Lock, AlertTriangle, Eye, ArrowRight,
   FileText, Users, Mail, Trash2, RefreshCw, Upload,
 } from 'lucide-react'
+import VerificationDocUpload from './VerificationDocUpload'
+import { createPresignedReadUrl } from '@/lib/r2'
 
 interface Props {
   params: Promise<{ id: string }>
@@ -22,6 +23,8 @@ type Doc = {
   id: string
   file_name: string
   file_url: string
+  file_key?: string | null
+  storage_bucket?: string | null
   status: string
   admin_note: string | null
   created_at: string
@@ -91,6 +94,15 @@ export default async function MemorialDogrulamaPage({ params }: Props) {
   const isActive = !isLocked
 
   const activeDoc = (docs ?? []).find(d => d.status !== 'rejected') as Doc | undefined
+  let activeDocViewUrl = activeDoc?.file_url || ''
+  if (activeDoc && activeDoc.file_key && activeDoc.storage_bucket) {
+    try {
+      activeDocViewUrl = await createPresignedReadUrl(activeDoc.storage_bucket, activeDoc.file_key, 3600)
+    } catch (err) {
+      console.error('Error generating verification doc URL:', err)
+    }
+  }
+
   const typedWitnesses = (witnesses ?? []) as Witness[]
   const confirmedWitnesses = typedWitnesses.filter(w => w.status === 'confirmed')
 
@@ -99,7 +111,6 @@ export default async function MemorialDogrulamaPage({ params }: Props) {
   const witnessesOk = confirmedWitnesses.length >= 2
   const allVerified = docOk && witnessesOk
 
-  const uploadDocAction = uploadVerificationDocAction.bind(null, id)
   const deleteDocAction = deleteVerificationDocAction.bind(null, id)
   const addWitness = addWitnessAction.bind(null, id)
   const publishAction = publishMemorialAction.bind(null, id)
@@ -192,7 +203,7 @@ export default async function MemorialDogrulamaPage({ params }: Props) {
                         {new Date(activeDoc.created_at).toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' })}
                       </p>
                     </div>
-                    <a href={activeDoc.file_url} target="_blank" rel="noopener noreferrer"
+                    <a href={activeDocViewUrl} target="_blank" rel="noopener noreferrer"
                       className="shrink-0 rounded-lg border border-[#e5dccb] px-3 py-1.5 text-xs font-medium text-[#174f35] hover:bg-[#f0faf4]">
                       Görüntüle
                     </a>
@@ -209,14 +220,7 @@ export default async function MemorialDogrulamaPage({ params }: Props) {
                     <p className="mb-3 text-xs text-[#788177]">
                       Vefat belgesi, nüfus cüzdanı veya resmi bir doğrulama belgesi yükleyin. (PDF, JPEG, PNG — maks. 20 MB)
                     </p>
-                    <form action={uploadDocAction}>
-                      <label className="flex cursor-pointer flex-col items-center gap-2 rounded-2xl border-2 border-dashed border-[#e5dccb] bg-white px-5 py-8 text-center hover:border-[#174f35]/40 hover:bg-[#f9f5ec] transition-all">
-                        <Upload className="h-6 w-6 text-[#c7a76f]" />
-                        <span className="text-sm font-medium text-[#1f2d27]">Belge seçin veya sürükleyin</span>
-                        <span className="text-xs text-[#adb5ab]">PDF, JPG, PNG — maks. 20 MB</span>
-                        <input type="file" name="doc_file" accept=".pdf,.jpg,.jpeg,.png,.webp" className="sr-only" onChange={e => e.target.form?.requestSubmit()} />
-                      </label>
-                    </form>
+                    <VerificationDocUpload vaultId={id} />
                   </div>
                 )}
               </div>

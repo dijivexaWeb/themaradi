@@ -4,8 +4,8 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { addMemorialPhotoAction } from '../actions'
 import { updateMediaAction, deleteMediaAction } from '@/lib/actions/media'
-import { ImageUploadInput } from '@/components/ImageUploadInput'
 import SubmitButton from '@/components/SubmitButton'
+import PhotoUploadForm from './PhotoUploadForm'
 
 interface Props {
   params: Promise<{ id: string }>
@@ -170,67 +170,7 @@ export default async function MemorialFotolarPage({ params, searchParams }: Prop
 
         {/* Yükleme formu */}
         {!isLocked && !atLimit && !editingPhoto && (
-          <div className="mb-10 rounded-3xl border border-[#e5dccb] bg-[#fffdf8] p-6 shadow-[0_4px_24px_rgba(64,48,24,0.05)]">
-            <h2 className="mb-4 flex items-center gap-2 font-semibold text-[#1f2d27]">
-              <span>📤</span> Fotoğraf Ekle
-            </h2>
-            <form action={addPhoto} className="space-y-4">
-              <div className="grid gap-4 sm:grid-cols-2">
-                <div>
-                  <label className={labelCls}>Dosya Yükle</label>
-                  <ImageUploadInput
-                    name="file"
-                    className="w-full cursor-pointer rounded-xl border border-[#e5dccb] bg-white px-3 py-2.5 text-sm text-[#1f2d27] file:mr-3 file:rounded-lg file:border-0 file:bg-[#174f35]/10 file:px-3 file:py-1.5 file:font-medium file:text-[#174f35] outline-none"
-                  />
-                </div>
-                <div>
-                  <label className={labelCls}>veya URL</label>
-                  <input type="url" name="url" placeholder="https://..." className={inputCls} />
-                </div>
-              </div>
-              <div className="grid gap-4 sm:grid-cols-3">
-                <div>
-                  <label className={labelCls}>Fotoğraf Adı</label>
-                  <input
-                    type="text"
-                    name="title"
-                    placeholder="Piknik, 1985"
-                    className={inputCls}
-                  />
-                </div>
-                <div>
-                  <label className={labelCls}>Çekildiği Tarih</label>
-                  <input
-                    type="datetime-local"
-                    name="taken_at"
-                    max={todayMax}
-                    className={inputCls}
-                  />
-                </div>
-                <div>
-                  <label className={labelCls}>Görünürlük</label>
-                  <select
-                    name="visibility"
-                    defaultValue="private"
-                    className="w-full rounded-xl border border-[#e5dccb] bg-white px-4 py-3 text-sm text-[#1f2d27] outline-none focus:border-[#174f35]"
-                  >
-                    <option value="private">Gizli</option>
-                    <option value="public">Herkese açık</option>
-                  </select>
-                </div>
-              </div>
-              <div>
-                <label className={labelCls}>Not</label>
-                <textarea
-                  name="caption"
-                  rows={2}
-                  placeholder="Bu fotoğraf hakkında birkaç kelime..."
-                  className={`${inputCls} resize-none`}
-                />
-              </div>
-              <SubmitButton pendingLabel="Kaydediliyor...">Fotoğrafı Kaydet</SubmitButton>
-            </form>
-          </div>
+          <PhotoUploadForm vaultId={id} todayMax={todayMax} />
         )}
 
         {atLimit && !isLocked && (

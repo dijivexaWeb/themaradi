@@ -4,6 +4,7 @@ import { createClient } from '@/lib/supabase/client'
 import { langs, type Lang } from '@/i18n'
 import { useLang } from '@/i18n/context'
 import Link from 'next/link'
+import { Loader2 } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import TurnstileWidget from '@/components/TurnstileWidget'
 import { checkTurnstileAction } from './actions'
@@ -124,6 +125,7 @@ export default function LoginPageClient({ siteKey }: { siteKey: string }) {
     if (error) {
       const isUnconfirmed = error.message.toLowerCase().includes('not confirmed') || error.code === 'email_not_confirmed'
       setMsg({ ok: false, text: isUnconfirmed ? c.errorUnconfirmed : c.error })
+      setLoading(false)
     } else {
       const { data: { user } } = await supabase.auth.getUser()
       if (user) {
@@ -145,8 +147,8 @@ export default function LoginPageClient({ siteKey }: { siteKey: string }) {
       } else {
         window.location.href = '/dashboard'
       }
+      // intentionally no setLoading(false) — button stays disabled while navigating
     }
-    setLoading(false)
   }
 
   async function handlePasswordReset() {
@@ -244,11 +246,10 @@ export default function LoginPageClient({ siteKey }: { siteKey: string }) {
             <button
               type="submit"
               disabled={loading || !email || !password}
-              className="w-full bg-amber-500 hover:bg-amber-400 text-white font-semibold rounded-xl px-4 py-2.5 text-sm transition-colors disabled:opacity-50 shadow-lg shadow-amber-500/20"
+              className="w-full bg-amber-500 hover:bg-amber-400 text-white font-semibold rounded-xl px-4 py-2.5 text-sm transition-colors disabled:opacity-50 shadow-lg shadow-amber-500/20 flex items-center justify-center gap-2"
             >
-              {loading
-                ? c.loading
-                : c.submitLogin}
+              {loading && <Loader2 className="h-4 w-4 animate-spin" />}
+              {loading ? c.loading : c.submitLogin}
             </button>
           </form>
 

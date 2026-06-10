@@ -280,20 +280,38 @@ export default function BiyografiPage() {
                       const file = e.target.files?.[0]
                       if (!file) return
                       if (!file.type.startsWith('image/')) { setPhotoUploadError('Sadece görsel yükleyebilirsiniz'); e.target.value = ''; return }
-                      if (file.size > 10 * 1024 * 1024) { setPhotoUploadError('Dosya çok büyük (max 10 MB)'); e.target.value = ''; return }
+                      if (file.size > 8 * 1024 * 1024) { setPhotoUploadError('Dosya çok büyük (max 8 MB)'); e.target.value = ''; return }
                       setPhotoUploading(true)
                       setPhotoUploadError(null)
                       try {
-                        const { data: { user } } = await supabase.auth.getUser()
-                        if (!user) { setPhotoUploadError('Oturum bulunamadı'); return }
-                        const ext = file.name.split('.').pop()?.toLowerCase() ?? 'jpg'
-                        const path = `photos/${id}/${user.id}/${Date.now()}.${ext}`
-                        const { error } = await supabase.storage.from('vault-media').upload(path, file, { contentType: file.type, upsert: false })
-                        if (error) { setPhotoUploadError(`Yükleme hatası: ${error.message}`); return }
-                        const { data: urlData } = supabase.storage.from('vault-media').getPublicUrl(path)
-                        setCoverPhotoUrl(urlData.publicUrl)
-                      } catch (err) {
-                        setPhotoUploadError('Beklenmeyen hata: ' + String(err))
+                        const presignRes = await fetch('/api/r2/presign', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({
+                            fileName: file.name,
+                            fileSize: file.size,
+                            category: 'profile_photo',
+                            profileId: id,
+                            mimeType: file.type || 'image/jpeg',
+                          }),
+                        })
+                        if (!presignRes.ok) {
+                          const resJson = await presignRes.json()
+                          throw new Error(resJson.error || 'Yükleme izni alınamadı.')
+                        }
+                        const { uploadUrl, publicUrl } = await presignRes.json()
+
+                        const uploadRes = await fetch(uploadUrl, {
+                          method: 'PUT',
+                          headers: { 'Content-Type': file.type || 'image/jpeg' },
+                          body: file,
+                        })
+                        if (!uploadRes.ok) {
+                          throw new Error('Dosya R2 ye yüklenemedi.')
+                        }
+                        setCoverPhotoUrl(publicUrl)
+                      } catch (err: any) {
+                        setPhotoUploadError(err.message || 'Yükleme sırasında hata oluştu.')
                       } finally {
                         setPhotoUploading(false)
                         e.target.value = ''
@@ -359,26 +377,42 @@ export default function BiyografiPage() {
                       e.target.value = ''
                       return
                     }
-                    if (file.size > 10 * 1024 * 1024) {
-                      setHeroBgUploadError('Dosya çok büyük (max 10 MB)')
+                    if (file.size > 8 * 1024 * 1024) {
+                      setHeroBgUploadError('Dosya çok büyük (max 8 MB)')
                       e.target.value = ''
                       return
                     }
                     setHeroBgUploading(true)
                     setHeroBgUploadError(null)
                     try {
-                      const { data: { user } } = await supabase.auth.getUser()
-                      if (!user) { setHeroBgUploadError('Oturum bulunamadı'); return }
-                      const ext = file.name.split('.').pop()?.toLowerCase() ?? 'jpg'
-                      const path = `heroes/${id}/${user.id}/${Date.now()}.${ext}`
-                      const { error } = await supabase.storage
-                        .from('vault-media')
-                        .upload(path, file, { contentType: file.type, upsert: false })
-                      if (error) { setHeroBgUploadError(`Yükleme hatası: ${error.message}`); return }
-                      const { data: urlData } = supabase.storage.from('vault-media').getPublicUrl(path)
-                      setHeroBgUrl(urlData.publicUrl)
-                    } catch (err) {
-                      setHeroBgUploadError('Beklenmeyen hata: ' + String(err))
+                      const presignRes = await fetch('/api/r2/presign', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                          fileName: file.name,
+                          fileSize: file.size,
+                          category: 'hero_bg',
+                          profileId: id,
+                          mimeType: file.type || 'image/jpeg',
+                        }),
+                      })
+                      if (!presignRes.ok) {
+                        const resJson = await presignRes.json()
+                        throw new Error(resJson.error || 'Yükleme izni alınamadı.')
+                      }
+                      const { uploadUrl, publicUrl } = await presignRes.json()
+
+                      const uploadRes = await fetch(uploadUrl, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': file.type || 'image/jpeg' },
+                        body: file,
+                      })
+                      if (!uploadRes.ok) {
+                        throw new Error('Dosya R2 ye yüklenemedi.')
+                      }
+                      setHeroBgUrl(publicUrl)
+                    } catch (err: any) {
+                      setHeroBgUploadError(err.message || 'Yükleme sırasında hata oldu.')
                     } finally {
                       setHeroBgUploading(false)
                       e.target.value = ''
@@ -427,19 +461,69 @@ export default function BiyografiPage() {
                     if (!file) return
                     if (!file.type.startsWith('video/')) { setVideoUploadError('Sadece video dosyası yükleyebilirsiniz'); e.target.value = ''; return }
                     if (file.size > 100 * 1024 * 1024) { setVideoUploadError('Video çok büyük (max 100 MB)'); e.target.value = ''; return }
+                    
                     setVideoUploading(true)
                     setVideoUploadError(null)
+                    
                     try {
-                      const { data: { user } } = await supabase.auth.getUser()
-                      if (!user) { setVideoUploadError('Oturum bulunamadı'); return }
-                      const ext = file.name.split('.').pop()?.toLowerCase() ?? 'mp4'
-                      const path = `videos/${id}/${user.id}/${Date.now()}.${ext}`
-                      const { error } = await supabase.storage.from('vault-media').upload(path, file, { contentType: file.type, upsert: false })
-                      if (error) { setVideoUploadError(`Yükleme hatası: ${error.message}`); return }
-                      const { data: urlData } = supabase.storage.from('vault-media').getPublicUrl(path)
-                      setProfileVideoUrl(urlData.publicUrl)
-                    } catch (err) {
-                      setVideoUploadError('Beklenmeyen hata: ' + String(err))
+                      // Check duration
+                      const duration = await new Promise<number>((resolve, reject) => {
+                        const video = document.createElement('video')
+                        video.preload = 'metadata'
+                        video.onloadedmetadata = () => {
+                          URL.revokeObjectURL(video.src)
+                          resolve(video.duration)
+                        }
+                        video.onerror = () => {
+                          URL.revokeObjectURL(video.src)
+                          reject(new Error('Video dosyası okunamadı.'))
+                        }
+                        video.src = URL.createObjectURL(file)
+                      })
+
+                      if (duration > 600) {
+                        throw new Error('Video süresi en fazla 10 dakika olabilir.')
+                      }
+
+                      // Request Direct Creator Upload URL
+                      const uploadUrlRes = await fetch('/api/stream/upload-url', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                          fileName: file.name,
+                          fileSize: file.size,
+                          profileId: id,
+                          duration,
+                        }),
+                      })
+
+                      if (!uploadUrlRes.ok) {
+                        const resJson = await uploadUrlRes.json()
+                        throw new Error(resJson.error || 'Video yükleme bağlantısı alınamadı.')
+                      }
+
+                      const { uploadUrl, uid } = await uploadUrlRes.json()
+
+                      // Upload to Cloudflare Stream
+                      await new Promise<void>((resolve, reject) => {
+                        const xhr = new XMLHttpRequest()
+                        xhr.open('POST', uploadUrl, true)
+                        xhr.onload = () => {
+                          if (xhr.status === 200 || xhr.status === 201 || xhr.status === 204) {
+                            resolve()
+                          } else {
+                            reject(new Error(`Videonuz yüklenemedi. Sunucu durum kodu: ${xhr.status}`))
+                          }
+                        }
+                        xhr.onerror = () => reject(new Error('Yükleme sırasında ağ hatası oluştu.'))
+                        const uploadForm = new FormData()
+                        uploadForm.append('file', file)
+                        xhr.send(uploadForm)
+                      })
+
+                      setProfileVideoUrl(`https://iframe.videodelivery.net/${uid}`)
+                    } catch (err: any) {
+                      setVideoUploadError(err.message || 'Yükleme sırasında hata oluştu.')
                     } finally {
                       setVideoUploading(false)
                       e.target.value = ''
@@ -449,7 +533,13 @@ export default function BiyografiPage() {
               </label>
               {videoUploadError && <p className="mt-1 text-xs text-red-500">{videoUploadError}</p>}
               {profileVideoUrl && (
-                <video controls src={profileVideoUrl} className="mt-2 w-full rounded-xl border border-[#e5dccb]" style={{ maxHeight: 220 }} />
+                profileVideoUrl.includes('iframe.videodelivery.net') ? (
+                  <div className="mt-2 aspect-video overflow-hidden rounded-xl border border-[#e5dccb]">
+                    <iframe src={profileVideoUrl} className="h-full w-full border-0" allowFullScreen />
+                  </div>
+                ) : (
+                  <video controls src={profileVideoUrl} className="mt-2 w-full rounded-xl border border-[#e5dccb]" style={{ maxHeight: 220 }} />
+                )
               )}
             </div>
 
@@ -543,37 +633,44 @@ export default function BiyografiPage() {
                       e.target.value = ''
                       return
                     }
-                    if (file.size > 50 * 1024 * 1024) {
-                      setSongUploadError('Dosya çok büyük (max 50 MB)')
+                    if (file.size > 30 * 1024 * 1024) {
+                      setSongUploadError('Dosya çok büyük (max 30 MB)')
                       e.target.value = ''
                       return
                     }
                     setSongUploading(true)
                     setSongUploadError(null)
                     try {
-                      // Direkt client → Supabase storage (Next.js function limiti yok)
-                      const { data: { user } } = await supabase.auth.getUser()
-                      if (!user) { setSongUploadError('Oturum bulunamadı'); return }
+                      const presignRes = await fetch('/api/r2/presign', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                          fileName: file.name,
+                          fileSize: file.size,
+                          category: 'audio_recording',
+                          profileId: id,
+                          mimeType: file.type || 'audio/mpeg',
+                        }),
+                      })
+                      if (!presignRes.ok) {
+                        const resJson = await presignRes.json()
+                        throw new Error(resJson.error || 'Yükleme izni alınamadı.')
+                      }
+                      const { uploadUrl, publicUrl } = await presignRes.json()
 
-                      const ext = file.name.split('.').pop()?.toLowerCase() ?? 'mp3'
-                      const safeName = `${Date.now()}.${ext}`
-                      const path = `songs/${id}/${user.id}/${safeName}`
-                      const contentType = ext === 'm4a' ? 'audio/mp4' : file.type
-
-                      const { error } = await supabase.storage
-                        .from('vault-media')
-                        .upload(path, file, { contentType, upsert: false })
-
-                      if (error) {
-                        setSongUploadError(`Yükleme hatası: ${error.message}`)
-                        return
+                      const uploadRes = await fetch(uploadUrl, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': file.type || 'audio/mpeg' },
+                        body: file,
+                      })
+                      if (!uploadRes.ok) {
+                        throw new Error('Dosya R2 ye yüklenemedi.')
                       }
 
-                      const { data: urlData } = supabase.storage.from('vault-media').getPublicUrl(path)
-                      setFavSongUrl(urlData.publicUrl)
+                      setFavSongUrl(publicUrl)
                       if (!favSongTitle) setFavSongTitle(file.name.replace(/\.[^.]+$/, ''))
-                    } catch (err) {
-                      setSongUploadError('Beklenmeyen hata: ' + String(err))
+                    } catch (err: any) {
+                      setSongUploadError(err.message || 'Yükleme sırasında hata oldu.')
                     } finally {
                       setSongUploading(false)
                       e.target.value = ''

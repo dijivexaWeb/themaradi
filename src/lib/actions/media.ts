@@ -3,27 +3,12 @@
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
+import { deleteR2Object, getPublicUrl } from '@/lib/r2'
 
-const MEDIA_BUCKET = 'vault-media'
 const PHOTO_LIMIT_MEMORIAL = 50
 const VIDEO_LIMIT_MEMORIAL = 10
-const MAX_PHOTO_BYTES = 15 * 1024 * 1024
-const MAX_VIDEO_BYTES = 100 * 1024 * 1024
 
 type MediaKind = 'image' | 'video'
-
-function cleanFilename(name: string) {
-  const fallback = 'media'
-  const cleaned = name
-    .toLowerCase()
-    .replace(/ş/g, 's').replace(/ğ/g, 'g').replace(/ü/g, 'u')
-    .replace(/ö/g, 'o').replace(/ı/g, 'i').replace(/ç/g, 'c')
-    .replace(/[^a-z0-9._-]/g, '-')
-    .replace(/-+/g, '-')
-    .replace(/^-|-$/g, '')
-
-  return cleaned || fallback
-}
 
 function normalizeVisibility(formData: FormData) {
   return formData.get('visibility') === 'public' ? 'public' : 'private'
@@ -65,49 +50,27 @@ async function getOwnedVault(vaultId: string, kind: MediaKind) {
   return { supabase, user }
 }
 
-async function resolveMediaLocation(vaultId: string, userId: string, formData: FormData, kind: MediaKind) {
-  const url = (formData.get('url') as string | null)?.trim()
-  const file = formData.get('file')
+async function deleteCloudflareStreamVideo(streamId: string) {
+  const accountId = process.env.CLOUDFLARE_ACCOUNT_ID
+  const apiToken = process.env.CLOUDFLARE_API_TOKEN
+  if (!accountId || !apiToken || !streamId) return
 
-  if (file instanceof File && file.size > 0) {
-    const maxBytes = kind === 'video' ? MAX_VIDEO_BYTES : MAX_PHOTO_BYTES
-    const validType = kind === 'video' ? file.type.startsWith('video/') : file.type.startsWith('image/')
-    if (!validType) { console.error('[resolveMediaLocation] invalid file type:', file.type, 'for kind:', kind); return null }
-    if (file.size > maxBytes) { console.error('[resolveMediaLocation] file too large:', file.size); return null }
-
-    const service = await createServiceClient()
-    const filename = cleanFilename(file.name)
-    const path = `${kind}s/${vaultId}/${userId}/${Date.now()}-${filename}`
-    const { error } = await service.storage.from(MEDIA_BUCKET).upload(path, file, {
-      contentType: file.type,
-      upsert: false,
-    })
-    if (error) { console.error('[resolveMediaLocation] storage upload error:', error); return null }
-
-    const { data } = service.storage.from(MEDIA_BUCKET).getPublicUrl(path)
-    return {
-      originalUrl: data.publicUrl,
-      sourceType: 'bucket',
-      storageBucket: MEDIA_BUCKET,
-      storagePath: path,
-      fileSize: file.size,
-      filename,
+  try {
+    const res = await fetch(
+      `https://api.cloudflare.com/client/v4/accounts/${accountId}/stream/${streamId}`,
+      {
+        method: 'DELETE',
+        headers: {
+          Authorization: `Bearer ${apiToken}`,
+        },
+      }
+    )
+    if (!res.ok) {
+      console.error('[deleteCloudflareStreamVideo] Cloudflare Stream returned error:', await res.text())
     }
+  } catch (err) {
+    console.error('[deleteCloudflareStreamVideo] Exception during delete:', err)
   }
-
-  if (url) {
-    return {
-      originalUrl: url,
-      sourceType: 'url',
-      storageBucket: null,
-      storagePath: null,
-      fileSize: null,
-      filename: null,
-    }
-  }
-
-  console.error('[resolveMediaLocation] no file and no url provided for kind:', kind)
-  return null
 }
 
 export async function addPhotoAction(vaultId: string, formData: FormData): Promise<void> {
@@ -117,30 +80,52 @@ export async function addPhotoAction(vaultId: string, formData: FormData): Promi
   const caption = (formData.get('caption') as string | null)?.trim() || null
   const takenAt = normalizeTakenAt(formData.get('taken_at'))
   const visibility = normalizeVisibility(formData)
-
-  const location = await resolveMediaLocation(vaultId, owned.user.id, formData, 'image')
-  if (!location) return
-
   const title = (formData.get('title') as string | null)?.trim()
+
+  // R2 upload metadata sent from client
+  const fileKey = (formData.get('file_key') as string | null)?.trim()
+  const bucket = (formData.get('bucket') as string | null)?.trim()
+  const fileSizeRaw = formData.get('file_size')
+  const originalFilename = (formData.get('original_filename') as string | null)?.trim()
+  const url = (formData.get('url') as string | null)?.trim()
+
+  let finalUrl = ''
+  let sourceType = 'url'
+
+  if (fileKey && bucket) {
+    finalUrl = getPublicUrl(fileKey)
+    sourceType = 'bucket'
+  } else if (url) {
+    finalUrl = url
+    sourceType = 'url'
+  } else {
+    console.error('[addPhotoAction] No photo source provided')
+    return
+  }
 
   const { error } = await owned.supabase.from('media').insert({
     vault_id: vaultId,
     uploader_id: owned.user.id,
-    original_url: location.originalUrl,
-    thumb_url: location.originalUrl,
+    original_url: finalUrl,
+    thumb_url: finalUrl,
     media_type: 'image',
     is_public: visibility === 'public',
     visibility,
-    source_type: location.sourceType,
-    storage_bucket: location.storageBucket,
-    storage_path: location.storagePath,
-    file_size_bytes: location.fileSize,
+    source_type: sourceType,
+    storage_bucket: bucket || null,
+    storage_path: fileKey || null,
+    r2_file_key: fileKey || null,
+    file_size_bytes: fileSizeRaw ? parseInt(fileSizeRaw.toString(), 10) : null,
     taken_at: takenAt,
     caption,
-    original_filename: title || location.filename || 'Fotoğraf',
+    original_filename: title || originalFilename || 'Fotoğraf',
+    status: 'ready'
   })
 
-  if (error) { console.error('[addPhotoAction] insert error:', error); return }
+  if (error) {
+    console.error('[addPhotoAction] insert error:', error)
+    return
+  }
 
   revalidatePath(`/dashboard/vault/${vaultId}/fotolar`)
   revalidatePath(`/dashboard/vault/${vaultId}`)
@@ -154,29 +139,43 @@ export async function addVideoAction(vaultId: string, formData: FormData): Promi
   const visibility = normalizeVisibility(formData)
   const caption = (formData.get('caption') as string | null)?.trim() || null
   const takenAt = normalizeTakenAt(formData.get('taken_at'))
-
-  const location = await resolveMediaLocation(vaultId, owned.user.id, formData, 'video')
-  if (!location) return
-
   const title = (formData.get('title') as string | null)?.trim()
+
+  // Cloudflare Stream video UID sent from client after direct upload
+  const cfStreamId = (formData.get('cf_stream_id') as string | null)?.trim()
+  const originalFilename = (formData.get('original_filename') as string | null)?.trim()
+  const fileSizeRaw = formData.get('file_size')
+
+  if (!cfStreamId) {
+    console.error('[addVideoAction] cf_stream_id is required')
+    return
+  }
+
+  // Cloudflare Stream universal playback & thumbnail formats
+  const finalUrl = `https://iframe.videodelivery.net/${cfStreamId}`
+  const thumbUrl = `https://videodelivery.net/${cfStreamId}/thumbnails/thumbnail.jpg`
 
   const { error } = await owned.supabase.from('media').insert({
     vault_id: vaultId,
     uploader_id: owned.user.id,
-    original_url: location.originalUrl,
+    original_url: finalUrl,
+    thumb_url: thumbUrl,
     media_type: 'video',
     is_public: visibility === 'public',
     visibility,
-    source_type: location.sourceType,
-    storage_bucket: location.storageBucket,
-    storage_path: location.storagePath,
-    file_size_bytes: location.fileSize,
+    source_type: 'bucket',
+    cf_stream_id: cfStreamId,
+    file_size_bytes: fileSizeRaw ? parseInt(fileSizeRaw.toString(), 10) : null,
     taken_at: takenAt,
     caption,
-    original_filename: title || location.filename || 'Video',
+    original_filename: title || originalFilename || 'Video',
+    status: 'ready'
   })
 
-  if (error) { console.error('[addVideoAction] insert error:', error); return }
+  if (error) {
+    console.error('[addVideoAction] insert error:', error)
+    return
+  }
 
   revalidatePath(`/dashboard/vault/${vaultId}/videolar`)
   revalidatePath(`/dashboard/vault/${vaultId}`)
@@ -226,15 +225,24 @@ export async function deleteMediaAction(vaultId: string, mediaId: string): Promi
 
   const { data: media } = await supabase
     .from('media')
-    .select('id, media_type, storage_bucket, storage_path')
+    .select('id, media_type, storage_bucket, storage_path, r2_file_key, cf_stream_id')
     .eq('id', mediaId)
     .eq('vault_id', vaultId)
     .single()
   if (!media) return
 
+  // Delete DB record first
   await supabase.from('media').delete().eq('id', mediaId).eq('vault_id', vaultId)
 
-  if (media.storage_bucket && media.storage_path) {
+  // Delete physical files
+  if (media.media_type === 'video' && media.cf_stream_id) {
+    // Delete from Cloudflare Stream
+    await deleteCloudflareStreamVideo(media.cf_stream_id)
+  } else if (media.r2_file_key && media.storage_bucket) {
+    // Delete from Cloudflare R2
+    await deleteR2Object(media.storage_bucket, media.r2_file_key)
+  } else if (media.storage_bucket && media.storage_path) {
+    // Fallback delete for legacy Supabase Storage files
     const service = await createServiceClient()
     await service.storage.from(media.storage_bucket).remove([media.storage_path])
   }

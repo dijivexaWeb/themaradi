@@ -3,6 +3,34 @@
 > Her oturum sonunda Claude bu dosyayı günceller.
 > Format: tarih → ne yapıldı → nerede kalındı → sıradaki adım.
 
+## 2026-06-10 — Oturum 73: Login Butonu Loading State + Spinner
+
+### Yapılanlar
+- **`src/app/login/_LoginPageClient.tsx`**:
+  - `Loader2` import eklendi (lucide-react)
+  - Submit butona `flex items-center justify-center gap-2` eklendi
+  - `loading` durumunda `<Loader2 className="h-4 w-4 animate-spin" />` spinner gösterimi
+  - Başarılı girişte `setLoading(false)` kaldırıldı — yönlendirme tamamlanana kadar buton disabled/spinner halde kalır
+  - Hata durumunda `setLoading(false)` korundu
+
+### Proje Durumu
+- [x] Anı Defteri (memory book) tam sistem
+- [x] Emoji reaksiyon kalıcılık fix
+- [x] Dashboard kaydet butonları double-submit fix
+- [x] Login butonu loading state + spinner
+- [ ] Profil videosu anma sayfasında görüntüleme
+- [ ] Admin itiraz sayfası
+
+### Kritik Kararlar / Notlar
+- Başarılı giriş sonrası `setLoading(false)` çağırılmaması kasıtlı: `window.location.href` yönlendirmesi bitene kadar buton pasif kalmalı
+
+### Nerede Kaldık
+`_LoginPageClient.tsx` güncellendi. Login butonuna basılınca Loader2 spinner gösterip disabled kalıyor; hata çıkınca tekrar aktif oluyor.
+
+### Sıradaki Adım
+1. Profil videosu anma sayfasında görüntüleme
+2. Admin itiraz sayfası
+
 ## 2026-06-10 — Oturum 72: Çift Kayıt Sorunu Düzeltme (Tüm Dashboard)
 
 ### Yapılanlar

@@ -67,21 +67,45 @@ export default function MemoryBookClient({ vaultId, initialMemories }: Props) {
     setSubmitting(true)
     let photo_url: string | undefined
 
+    let fileKey = ''
+    let bucket = ''
+
     if (photoFile) {
       setUploadProgress(true)
       try {
-        const supabase = createClient()
-        const ext = photoFile.name.split('.').pop() ?? 'jpg'
-        const path = `memories/${vaultId}/${Date.now()}.${ext}`
-        const { error: upErr } = await supabase.storage
-          .from('vault-media')
-          .upload(path, photoFile, { upsert: false })
-        if (upErr) throw upErr
-        const { data: { publicUrl } } = supabase.storage
-          .from('vault-media')
-          .getPublicUrl(path)
-        photo_url = publicUrl
-      } catch (_) {
+        const presignRes = await fetch('/api/r2/presign', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            fileName: photoFile.name,
+            fileSize: photoFile.size,
+            category: 'gallery_image',
+            profileId: vaultId,
+            mimeType: photoFile.type || 'image/jpeg',
+          }),
+        })
+
+        if (!presignRes.ok) {
+          const resJson = await presignRes.json()
+          throw new Error(resJson.error || 'Yükleme izni alınamadı.')
+        }
+
+        const presignData = await presignRes.json()
+        fileKey = presignData.fileKey
+        bucket = presignData.bucket
+        photo_url = presignData.publicUrl
+
+        const uploadRes = await fetch(presignData.uploadUrl, {
+          method: 'PUT',
+          headers: { 'Content-Type': photoFile.type || 'image/jpeg' },
+          body: photoFile,
+        })
+
+        if (!uploadRes.ok) {
+          throw new Error('Dosya R2\'ye yüklenemedi.')
+        }
+      } catch (err: any) {
+        console.error(err)
         setError('Fotoğraf yüklenemedi. Tekrar deneyin.')
         setSubmitting(false)
         setUploadProgress(false)
@@ -95,6 +119,8 @@ export default function MemoryBookClient({ vaultId, initialMemories }: Props) {
       relation: form.relation || undefined,
       memory_text: form.memory_text,
       photo_url,
+      file_key: fileKey || undefined,
+      bucket: bucket || undefined,
       author_email: form.author_email || undefined,
     })
 

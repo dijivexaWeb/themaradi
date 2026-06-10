@@ -4,6 +4,7 @@ import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 import { sendEmail } from '@/lib/email'
+import { deleteR2Object, getPublicUrl } from '@/lib/r2'
 
 const MEDIA_BUCKET = 'vault-media'
 const PHOTO_LIMIT_MEMORIAL = 50
@@ -50,25 +51,19 @@ export async function addMemorialPhotoAction(vaultId: string, formData: FormData
   let fileSize: number | null = null
   let filename: string | null = null
 
-  const file = formData.get('file')
+  const fileKey = (formData.get('file_key') as string | null)?.trim()
+  const bucket = (formData.get('bucket') as string | null)?.trim()
+  const fileNameInput = (formData.get('file_name') as string | null)?.trim()
+  const fileSizeRaw = formData.get('file_size')
   const urlInput = (formData.get('url') as string | null)?.trim()
 
-  if (file instanceof File && file.size > 0) {
-    if (!file.type.startsWith('image/') || file.size > MAX_PHOTO_BYTES) return
-    const service = await createServiceClient()
-    const fn = cleanFilename(file.name)
-    const path = `images/${vaultId}/${user.id}/${Date.now()}-${fn}`
-    const { error } = await service.storage
-      .from(MEDIA_BUCKET)
-      .upload(path, file, { contentType: file.type, upsert: false })
-    if (error) { console.error('[addMemorialPhotoAction] upload error:', error); return }
-    const { data } = service.storage.from(MEDIA_BUCKET).getPublicUrl(path)
-    originalUrl = data.publicUrl
+  if (fileKey && bucket) {
+    originalUrl = getPublicUrl(fileKey)
     sourceType = 'bucket'
-    storageBucket = MEDIA_BUCKET
-    storagePath = path
-    fileSize = file.size
-    filename = fn
+    storageBucket = bucket
+    storagePath = fileKey
+    fileSize = fileSizeRaw ? parseInt(fileSizeRaw as string, 10) : null
+    filename = fileNameInput
   } else if (urlInput) {
     originalUrl = urlInput
   } else {
@@ -94,10 +89,12 @@ export async function addMemorialPhotoAction(vaultId: string, formData: FormData
     source_type: sourceType,
     storage_bucket: storageBucket,
     storage_path: storagePath,
+    r2_file_key: fileKey || null,
     file_size_bytes: fileSize,
     taken_at: takenAt,
     caption,
     original_filename: title || filename || 'Fotoğraf',
+    status: 'ready'
   })
 
   if (error) { console.error('[addMemorialPhotoAction] insert error:', error); return }
@@ -127,18 +124,11 @@ export async function updateMemorialFamilyMemberAction(
 
   let photoUrl = (formData.get('photo_url') as string)?.trim() || null
 
-  const photoFile = formData.get('photo_file')
-  if (photoFile instanceof File && photoFile.size > 0 && photoFile.type.startsWith('image/')) {
-    const service = await createServiceClient()
-    const fn = cleanFilename(photoFile.name)
-    const path = `family/${vaultId}/${user.id}/${Date.now()}-${fn}`
-    const { error } = await service.storage
-      .from(MEDIA_BUCKET)
-      .upload(path, photoFile, { contentType: photoFile.type, upsert: false })
-    if (!error) {
-      const { data } = service.storage.from(MEDIA_BUCKET).getPublicUrl(path)
-      photoUrl = data.publicUrl
-    }
+  const fileKey = (formData.get('file_key') as string | null)?.trim()
+  const bucket = (formData.get('bucket') as string | null)?.trim()
+
+  if (fileKey && bucket) {
+    photoUrl = getPublicUrl(fileKey)
   }
 
   const fullName = (formData.get('full_name') as string)?.trim()
@@ -222,32 +212,23 @@ export async function addMemorialVideoAction(vaultId: string, formData: FormData
     .eq('media_type', 'video')
   if ((count ?? 0) >= VIDEO_LIMIT_MEMORIAL) return
 
+  const cfStreamId = (formData.get('cf_stream_id') as string | null)?.trim()
+  const originalFilename = (formData.get('original_filename') as string | null)?.trim()
+  const fileSizeRaw = formData.get('file_size')
   const urlInput = (formData.get('url') as string | null)?.trim()
-  const file = formData.get('file')
 
   let originalUrl: string | null = null
+  let thumbUrl: string | null = null
   let sourceType = 'url'
-  let storageBucket: string | null = null
-  let storagePath: string | null = null
   let fileSize: number | null = null
   let filename: string | null = null
 
-  if (file instanceof File && file.size > 0) {
-    if (!file.type.startsWith('video/') || file.size > MAX_VIDEO_BYTES) return
-    const service = await createServiceClient()
-    const fn = cleanFilename(file.name)
-    const path = `videos/${vaultId}/${user.id}/${Date.now()}-${fn}`
-    const { error } = await service.storage
-      .from(MEDIA_BUCKET)
-      .upload(path, file, { contentType: file.type, upsert: false })
-    if (error) { console.error('[addMemorialVideoAction] upload error:', error); return }
-    const { data } = service.storage.from(MEDIA_BUCKET).getPublicUrl(path)
-    originalUrl = data.publicUrl
+  if (cfStreamId) {
+    originalUrl = `https://iframe.videodelivery.net/${cfStreamId}`
+    thumbUrl = `https://videodelivery.net/${cfStreamId}/thumbnails/thumbnail.jpg`
     sourceType = 'bucket'
-    storageBucket = MEDIA_BUCKET
-    storagePath = path
-    fileSize = file.size
-    filename = fn
+    fileSize = fileSizeRaw ? parseInt(fileSizeRaw as string, 10) : null
+    filename = originalFilename
   } else if (urlInput) {
     originalUrl = urlInput
   } else {
@@ -264,16 +245,17 @@ export async function addMemorialVideoAction(vaultId: string, formData: FormData
     vault_id: vaultId,
     uploader_id: user.id,
     original_url: originalUrl,
+    thumb_url: thumbUrl || undefined,
     media_type: 'video',
     is_public: visibility === 'public',
     visibility,
     source_type: sourceType,
-    storage_bucket: storageBucket,
-    storage_path: storagePath,
+    cf_stream_id: cfStreamId || null,
     file_size_bytes: fileSize,
     taken_at: takenAt,
     caption,
     original_filename: title || filename || 'Video',
+    status: 'ready'
   })
   if (error) { console.error('[addMemorialVideoAction] insert error:', error); return }
 
@@ -300,23 +282,25 @@ export async function addMemorialAudioAction(vaultId: string, formData: FormData
   const author = (formData.get('author') as string)?.trim() || null
   if (!title) return
 
-  const file = formData.get('audio_file')
+  const fileKey = (formData.get('file_key') as string | null)?.trim()
+  const bucket = (formData.get('bucket') as string | null)?.trim()
   let audioUrl: string | null = (formData.get('audio_url') as string)?.trim() || null
 
-  if (file instanceof File && file.size > 0 && file.type.startsWith('audio/')) {
-    const service = await createServiceClient()
-    const fn = cleanFilename(file.name)
-    const path = `audio/${vaultId}/${user.id}/${Date.now()}-${fn}`
-    const { error } = await service.storage.from(MEDIA_BUCKET).upload(path, file, { contentType: file.type, upsert: false })
-    if (!error) {
-      const { data } = service.storage.from(MEDIA_BUCKET).getPublicUrl(path)
-      audioUrl = data.publicUrl
-    }
+  if (fileKey && bucket) {
+    audioUrl = getPublicUrl(fileKey)
   }
 
   if (!audioUrl) return
 
-  await supabase.from('vault_audio_recordings').insert({ vault_id: vaultId, title, author, audio_url: audioUrl, is_public: true })
+  await supabase.from('vault_audio_recordings').insert({
+    vault_id: vaultId,
+    title,
+    author,
+    audio_url: audioUrl,
+    is_public: true,
+    file_key: fileKey || null,
+    storage_bucket: bucket || null
+  })
 
   revalidatePath(`/anma-paneli/${vaultId}/ses-kayitlari`)
   revalidatePath(`/anma-paneli/${vaultId}`)
@@ -442,17 +426,18 @@ export async function uploadVerificationDocAction(vaultId: string, formData: For
     .eq('id', vaultId).eq('owner_id', user.id).eq('product_type', 'memorial_profile').single()
   if (!vault || vault.status === 'pending_verification') return
 
-  const file = formData.get('doc_file')
-  if (!(file instanceof File) || file.size === 0) return
-  if (!ALLOWED_DOC_MIME.has(file.type) || file.size > MAX_DOC_BYTES) return
+  const fileKey = (formData.get('file_key') as string | null)?.trim()
+  const bucket = (formData.get('bucket') as string | null)?.trim()
+  const fileName = (formData.get('file_name') as string | null)?.trim()
+  const fileSizeRaw = formData.get('file_size')
+  const mimeType = (formData.get('mime_type') as string | null)?.trim()
 
-  const service = await createServiceClient()
-  const fn = cleanFilename(file.name)
-  const path = `verification/${vaultId}/${user.id}/${Date.now()}-${fn}`
-  const { error } = await service.storage.from(MEDIA_BUCKET).upload(path, file, { contentType: file.type, upsert: false })
-  if (error) { console.error('[uploadVerificationDocAction]', error); return }
+  if (!fileKey || !bucket || !fileName || !fileSizeRaw || !mimeType) {
+    console.error('[uploadVerificationDocAction] Missing R2 metadata')
+    return
+  }
 
-  const { data } = service.storage.from(MEDIA_BUCKET).getPublicUrl(path)
+  const fileSize = parseInt(fileSizeRaw as string, 10)
 
   // Önceki pending/rejected belgeler varsa sil (her vault için 1 aktif belge)
   await supabase.from('memorial_verification_docs')
@@ -461,12 +446,13 @@ export async function uploadVerificationDocAction(vaultId: string, formData: For
   await supabase.from('memorial_verification_docs').insert({
     vault_id: vaultId,
     uploader_id: user.id,
-    file_name: file.name,
-    file_url: data.publicUrl,
-    storage_bucket: MEDIA_BUCKET,
-    storage_path: path,
-    file_size_bytes: file.size,
-    mime_type: file.type,
+    file_name: fileName,
+    file_url: '', // Özel belgelere direkt link verilmez
+    file_key: fileKey,
+    storage_bucket: bucket,
+    storage_path: fileKey,
+    file_size_bytes: fileSize,
+    mime_type: mimeType,
     status: 'pending',
   })
 
@@ -481,15 +467,22 @@ export async function deleteVerificationDocAction(vaultId: string): Promise<void
   if (!user) redirect('/login')
 
   const { data: doc } = await supabase.from('memorial_verification_docs')
-    .select('id, storage_path, status')
+    .select('id, storage_bucket, storage_path, file_key, status')
     .eq('vault_id', vaultId)
     .neq('status', 'approved')
     .single()
   if (!doc) return
 
   await supabase.from('memorial_verification_docs').delete().eq('id', doc.id)
-  const service = await createServiceClient()
-  await service.storage.from(MEDIA_BUCKET).remove([doc.storage_path])
+
+  const keyToDelete = doc.file_key || doc.storage_path
+  if (keyToDelete && doc.storage_bucket) {
+    try {
+      await deleteR2Object(doc.storage_bucket, keyToDelete)
+    } catch (err) {
+      console.error('[deleteVerificationDocAction] R2 delete failed:', err)
+    }
+  }
 
   revalidatePath(`/anma-paneli/${vaultId}/dogrulama`)
   redirect(`/anma-paneli/${vaultId}/dogrulama`)

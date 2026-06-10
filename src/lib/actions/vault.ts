@@ -1,52 +1,16 @@
 'use server'
 
-import { createClient, createServiceClient } from '@/lib/supabase/server'
+import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 
-const MEDIA_BUCKET = 'vault-media'
-const MAX_PROFILE_PHOTO_BYTES = 15 * 1024 * 1024
-const MAX_FAVORITE_SONG_BYTES = 25 * 1024 * 1024
-
-function cleanFilename(name: string) {
-  const cleaned = name
-    .toLowerCase()
-    .replace(/ş/g, 's').replace(/ğ/g, 'g').replace(/ü/g, 'u')
-    .replace(/ö/g, 'o').replace(/ı/g, 'i').replace(/ç/g, 'c')
-    .replace(/[^a-z0-9._-]/g, '-')
-    .replace(/-+/g, '-')
-    .replace(/^-|-$/g, '')
-
-  return cleaned || 'profil-fotografi'
+function redirectToProfileWithMessage(vaultId: string, params: URLSearchParams): never {
+  redirect(`/dashboard/vault/${vaultId}/profil?${params.toString()}`)
 }
 
-async function uploadProfilePhoto(vaultId: string, userId: string, formData: FormData) {
-  const file = formData.get('cover_photo_file')
-  if (!(file instanceof File) || file.size === 0) return null
-  if (!file.type.startsWith('image/') || file.size > MAX_PROFILE_PHOTO_BYTES) return null
-
-  const service = await createServiceClient()
-  const path = `${vaultId}/${userId}/profile-${Date.now()}-${cleanFilename(file.name)}`
-  let { error } = await service.storage.from(MEDIA_BUCKET).upload(path, file, {
-    contentType: file.type,
-    upsert: false,
-  })
-  if (error && error.message.toLowerCase().includes('bucket')) {
-    await service.storage.createBucket(MEDIA_BUCKET, {
-      public: true,
-      fileSizeLimit: MAX_PROFILE_PHOTO_BYTES,
-      allowedMimeTypes: ['image/jpeg', 'image/png', 'image/webp', 'image/gif'],
-    })
-    const retry = await service.storage.from(MEDIA_BUCKET).upload(path, file, {
-      contentType: file.type,
-      upsert: false,
-    })
-    error = retry.error
-  }
-  if (error) return null
-
-  const { data } = service.storage.from(MEDIA_BUCKET).getPublicUrl(path)
-  return data.publicUrl
+function redirectToProfileError(vaultId: string, message: string): never {
+  const params = new URLSearchParams({ error: message })
+  redirectToProfileWithMessage(vaultId, params)
 }
 
 export async function createVaultAction(formData: FormData): Promise<void> {
@@ -147,48 +111,6 @@ export async function linkQRToVaultAction(vaultId: string, qrHash: string) {
   return { success: true }
 }
 
-async function uploadBgPhoto(vaultId: string, userId: string, formData: FormData) {
-  const file = formData.get('hero_bg_file')
-  if (!(file instanceof File) || file.size === 0) return null
-  if (!file.type.startsWith('image/') || file.size > MAX_PROFILE_PHOTO_BYTES) return null
-
-  const service = await createServiceClient()
-  const path = `${vaultId}/${userId}/hero-bg-${Date.now()}-${cleanFilename(file.name)}`
-  const { error } = await service.storage.from(MEDIA_BUCKET).upload(path, file, {
-    contentType: file.type,
-    upsert: false,
-  })
-  if (error) return null
-  const { data } = service.storage.from(MEDIA_BUCKET).getPublicUrl(path)
-  return data.publicUrl
-}
-
-async function uploadFavoriteSong(vaultId: string, userId: string, formData: FormData) {
-  const file = formData.get('favorite_song_file')
-  if (!(file instanceof File) || file.size === 0) return null
-  if (!file.type.startsWith('audio/') || file.size > MAX_FAVORITE_SONG_BYTES) return null
-
-  const service = await createServiceClient()
-  const path = `${vaultId}/${userId}/favorite-song-${Date.now()}-${cleanFilename(file.name)}`
-  const { error } = await service.storage.from(MEDIA_BUCKET).upload(path, file, {
-    contentType: file.type,
-    upsert: false,
-  })
-  if (error) return null
-
-  const { data } = service.storage.from(MEDIA_BUCKET).getPublicUrl(path)
-  return data.publicUrl
-}
-
-function redirectToProfileWithMessage(vaultId: string, params: URLSearchParams): never {
-  redirect(`/dashboard/vault/${vaultId}/profil?${params.toString()}`)
-}
-
-function redirectToProfileError(vaultId: string, message: string): never {
-  const params = new URLSearchParams({ error: message })
-  redirectToProfileWithMessage(vaultId, params)
-}
-
 export async function saveVaultProfileAction(vaultId: string, formData: FormData): Promise<void> {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -204,23 +126,9 @@ export async function saveVaultProfileAction(vaultId: string, formData: FormData
   if (!vault) redirectToProfileError(vaultId, 'Anı alanı bulunamadı.')
   if (vault.status === 'pending_verification') redirectToProfileError(vaultId, 'Ödeme doğrulanmadan kayıt yapılamaz.')
 
-  const uploadedCoverUrl = await uploadProfilePhoto(vaultId, user.id, formData)
-  const coverPhotoUrl = uploadedCoverUrl
-    ?? (formData.get('cover_photo_url') as string)?.trim()
-    ?? vault.cover_photo_url
-    ?? null
-
-  const uploadedBgUrl = await uploadBgPhoto(vaultId, user.id, formData)
-  const heroBgUrl = uploadedBgUrl
-    ?? (formData.get('hero_bg_url') as string)?.trim()
-    ?? (vault as Record<string, unknown>).hero_bg_url as string | null
-    ?? null
-
-  const uploadedSongUrl = await uploadFavoriteSong(vaultId, user.id, formData)
-  const favoriteSongUrl = uploadedSongUrl
-    ?? (formData.get('favorite_song_url') as string)?.trim()
-    ?? (vault as Record<string, unknown>).favorite_song_url as string | null
-    ?? null
+  const coverPhotoUrl = (formData.get('cover_photo_url') as string)?.trim() || vault.cover_photo_url || null
+  const heroBgUrl = (formData.get('hero_bg_url') as string)?.trim() || vault.hero_bg_url || null
+  const favoriteSongUrl = (formData.get('favorite_song_url') as string)?.trim() || vault.favorite_song_url || null
 
   const { error } = await supabase
     .from('vaults')

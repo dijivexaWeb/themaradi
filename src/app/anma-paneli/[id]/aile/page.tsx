@@ -5,7 +5,7 @@ import Image from 'next/image'
 import { addFamilyMemberAction, deleteFamilyMemberAction } from '@/lib/actions/family'
 import { updateMemorialFamilyMemberAction } from '../actions'
 import FamilyTreeCanvas from '@/components/FamilyTreeCanvas'
-import { ImageUploadInput } from '@/components/ImageUploadInput'
+import R2ImageUpload from '@/components/R2ImageUpload'
 import SubmitButton from '@/components/SubmitButton'
 
 interface Props {
@@ -237,9 +237,11 @@ export default async function MemorialAilePage({ params, searchParams }: Props) 
                               (boş bırakırsan mevcut kalır)
                             </span>
                           </label>
-                          <ImageUploadInput
+                          <R2ImageUpload
                             name="photo_file"
-                            className="w-full cursor-pointer rounded-xl border border-white/15 bg-white/5 px-3 py-3 text-sm text-[#efe7d8] file:mr-3 file:rounded-lg file:border-0 file:bg-[#c7a76f]/20 file:px-3 file:py-1.5 file:font-medium file:text-[#c7a76f] outline-none"
+                            category="profile_photo"
+                            profileId={id}
+                            defaultUrl={editMember.photo_url}
                           />
                           <input
                             type="url"
@@ -340,9 +342,10 @@ export default async function MemorialAilePage({ params, searchParams }: Props) 
                             Fotoğraf{' '}
                             <span className="font-normal text-white/30">(opsiyonel)</span>
                           </label>
-                          <ImageUploadInput
+                          <R2ImageUpload
                             name="photo_file"
-                            className="w-full cursor-pointer rounded-xl border border-white/15 bg-white/5 px-3 py-3 text-sm text-[#efe7d8] file:mr-3 file:rounded-lg file:border-0 file:bg-[#c7a76f]/20 file:px-3 file:py-1.5 file:font-medium file:text-[#c7a76f] outline-none"
+                            category="profile_photo"
+                            profileId={id}
                           />
                           <input
                             type="url"

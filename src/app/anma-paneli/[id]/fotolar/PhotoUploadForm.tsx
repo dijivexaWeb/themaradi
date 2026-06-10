@@ -1,0 +1,257 @@
+'use client'
+
+import { useState } from 'react'
+import { addMemorialPhotoAction } from '../actions'
+
+interface Props {
+  vaultId: string
+  todayMax: string
+}
+
+export default function PhotoUploadForm({ vaultId, todayMax }: Props) {
+  const [file, setFile] = useState<File | null>(null)
+  const [url, setUrl] = useState('')
+  const [title, setTitle] = useState('')
+  const [takenAt, setTakenAt] = useState('')
+  const [visibility, setVisibility] = useState('private')
+  const [caption, setCaption] = useState('')
+
+  const [loading, setLoading] = useState(false)
+  const [progress, setProgress] = useState(0)
+  const [error, setError] = useState<string | null>(null)
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selected = e.target.files?.[0] || null
+    if (!selected) {
+      setFile(null)
+      return
+    }
+
+    // Size limit check: 8 MB
+    if (selected.size > 8 * 1024 * 1024) {
+      setError('Fotoğraf boyutu en fazla 8 MB olmalıdır.')
+      setFile(null)
+      return
+    }
+
+    if (!selected.type.startsWith('image/')) {
+      setError('Sadece görsel dosyaları (.jpg, .png, .webp vb.) yükleyebilirsiniz.')
+      setFile(null)
+      return
+    }
+
+    setError(null)
+    setFile(selected)
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setLoading(true)
+    setError(null)
+    setProgress(0)
+
+    try {
+      let fileKey = ''
+      let bucket = ''
+      let originalFilename = ''
+      let fileSize = 0
+      let mimeType = ''
+
+      if (file) {
+        // 1. Get presigned upload URL
+        const presignRes = await fetch('/api/r2/presign', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            fileName: file.name,
+            fileSize: file.size,
+            category: 'gallery_image',
+            profileId: vaultId,
+            mimeType: file.type || 'image/jpeg',
+          }),
+        })
+
+        if (!presignRes.ok) {
+          const resJson = await presignRes.json()
+          throw new Error(resJson.error || 'Fotoğraf yükleme yetkisi alınamadı.')
+        }
+
+        const presignData = await presignRes.json()
+        fileKey = presignData.fileKey
+        bucket = presignData.bucket
+        originalFilename = file.name
+        fileSize = file.size
+        mimeType = file.type || 'image/jpeg'
+
+        // 2. Upload file directly to R2 public bucket
+        await new Promise<void>((resolve, reject) => {
+          const xhr = new XMLHttpRequest()
+          xhr.open('PUT', presignData.uploadUrl, true)
+          xhr.setRequestHeader('Content-Type', file.type || 'image/jpeg')
+
+          xhr.upload.onprogress = (event) => {
+            if (event.lengthComputable) {
+              const pct = Math.round((event.loaded / event.total) * 100)
+              setProgress(pct)
+            }
+          }
+
+          xhr.onload = () => {
+            if (xhr.status === 200) {
+              resolve()
+            } else {
+              reject(new Error(`Yükleme başarısız oldu (Status: ${xhr.status})`))
+            }
+          }
+
+          xhr.onerror = () => reject(new Error('Yüklenirken ağ hatası oluştu.'))
+          xhr.send(file)
+        })
+      }
+
+      // 3. Submit metadata to Server Action
+      const formData = new FormData()
+      formData.set('title', title)
+      formData.set('taken_at', takenAt)
+      formData.set('visibility', visibility)
+      formData.set('caption', caption)
+
+      if (fileKey && bucket) {
+        formData.set('file_key', fileKey)
+        formData.set('bucket', bucket)
+        formData.set('file_name', originalFilename)
+        formData.set('file_size', fileSize.toString())
+        formData.set('mime_type', mimeType)
+      } else if (url) {
+        formData.set('url', url)
+      } else {
+        throw new Error('Lütfen bir fotoğraf dosyası seçin veya geçerli bir URL girin.')
+      }
+
+      await addMemorialPhotoAction(vaultId, formData)
+
+      // Reset
+      setFile(null)
+      setUrl('')
+      setTitle('')
+      setTakenAt('')
+      setCaption('')
+      const formEl = e.target as HTMLFormElement
+      formEl.reset()
+    } catch (err: any) {
+      console.error(err)
+      setError(err.message || 'Fotoğraf kaydedilirken hata oluştu.')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const inputCls = 'w-full rounded-xl border border-[#e5dccb] bg-white px-4 py-3 text-sm text-[#1f2d27] placeholder-[#adb5ab] outline-none focus:border-[#174f35] focus:ring-2 focus:ring-[#174f35]/10 disabled:opacity-50'
+  const labelCls = 'mb-1.5 block text-xs font-semibold text-[#4a5e55]'
+
+  return (
+    <div className="mb-10 rounded-3xl border border-[#e5dccb] bg-[#fffdf8] p-6 shadow-[0_4px_24px_rgba(64,48,24,0.05)]">
+      <h2 className="mb-4 flex items-center gap-2 font-semibold text-[#1f2d27]">
+        <span>📤</span> Fotoğraf Ekle
+      </h2>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div className="grid gap-4 sm:grid-cols-2">
+          <div>
+            <label className={labelCls}>Fotoğraf Seç</label>
+            <input
+              type="file"
+              accept="image/*"
+              disabled={loading}
+              onChange={handleFileChange}
+              className="w-full cursor-pointer rounded-xl border border-[#e5dccb] bg-white px-3 py-2.5 text-sm text-[#1f2d27] file:mr-3 file:rounded-lg file:border-0 file:bg-[#174f35]/10 file:px-3 file:py-1.5 file:font-medium file:text-[#174f35] outline-none disabled:opacity-50"
+            />
+          </div>
+          <div>
+            <label className={labelCls}>veya URL</label>
+            <input
+              type="url"
+              value={url}
+              onChange={(e) => setUrl(e.target.value)}
+              disabled={loading || !!file}
+              placeholder="https://..."
+              className={inputCls}
+            />
+          </div>
+        </div>
+        <div className="grid gap-4 sm:grid-cols-3">
+          <div>
+            <label className={labelCls}>Fotoğraf Adı</label>
+            <input
+              type="text"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              disabled={loading}
+              placeholder="Piknik, 1985"
+              className={inputCls}
+            />
+          </div>
+          <div>
+            <label className={labelCls}>Çekildiği Tarih</label>
+            <input
+              type="datetime-local"
+              value={takenAt}
+              onChange={(e) => setTakenAt(e.target.value)}
+              disabled={loading}
+              max={todayMax}
+              className={inputCls}
+            />
+          </div>
+          <div>
+            <label className={labelCls}>Görünürlük</label>
+            <select
+              value={visibility}
+              onChange={(e) => setVisibility(e.target.value)}
+              disabled={loading}
+              className="w-full rounded-xl border border-[#e5dccb] bg-white px-4 py-3 text-sm text-[#1f2d27] outline-none focus:border-[#174f35] disabled:opacity-50"
+            >
+              <option value="private">Gizli</option>
+              <option value="public">Herkese açık</option>
+            </select>
+          </div>
+        </div>
+        <div>
+          <label className={labelCls}>Not</label>
+          <textarea
+            value={caption}
+            onChange={(e) => setCaption(e.target.value)}
+            disabled={loading}
+            rows={2}
+            placeholder="Bu fotoğraf hakkında birkaç kelime..."
+            className={`${inputCls} resize-none`}
+          />
+        </div>
+
+        {error && (
+          <div className="text-sm text-red-600 bg-red-50 border border-red-200 rounded-xl px-4 py-2.5">
+            ⚠️ {error}
+          </div>
+        )}
+
+        {loading && (
+          <div className="space-y-2">
+            <div className="flex justify-between text-xs text-[#788177]">
+              <span>Fotoğraf R2'ye yükleniyor. Lütfen bu ekranı kapatmayın...</span>
+              <span>%{progress}</span>
+            </div>
+            <div className="h-2 w-full bg-[#e5dccb] rounded-full overflow-hidden">
+              <div className="h-full bg-[#174f35] transition-all duration-300" style={{ width: `${progress}%` }} />
+            </div>
+          </div>
+        )}
+
+        <button
+          type="submit"
+          disabled={loading || (!file && !url)}
+          className="rounded-xl bg-[#174f35] px-6 py-3 text-sm font-semibold text-white shadow-[0_14px_35px_rgba(23,79,53,0.18)] hover:bg-[#123f2b] transition-colors disabled:opacity-50"
+        >
+          {loading ? 'Kaydediliyor...' : 'Fotoğrafı Kaydet'}
+        </button>
+      </form>
+    </div>
+  )
+}

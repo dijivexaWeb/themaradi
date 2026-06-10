@@ -4,6 +4,7 @@ import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { headers } from 'next/headers'
+import { getPublicUrl } from '@/lib/r2'
 
 export async function submitMemoryAction(
   vaultId: string,
@@ -12,10 +13,12 @@ export async function submitMemoryAction(
     relation?: string
     memory_text: string
     photo_url?: string
+    file_key?: string
+    bucket?: string
     author_email?: string
   },
 ): Promise<{ error?: string }> {
-  const { author_name, relation, memory_text, photo_url, author_email } = data
+  const { author_name, relation, memory_text, photo_url, file_key, bucket, author_email } = data
 
   if (!author_name?.trim() || !memory_text?.trim())
     return { error: 'Ad ve anı metni zorunludur.' }
@@ -57,12 +60,17 @@ export async function submitMemoryAction(
 
   if (!vault) return { error: 'Bu sayfa için anı paylaşılamaz.' }
 
+  let finalPhotoUrl = photo_url || null
+  if (file_key && bucket) {
+    finalPhotoUrl = getPublicUrl(file_key)
+  }
+
   await service.from('memory_book_entries').insert({
     vault_id: vaultId,
     author_name: author_name.trim(),
     relation: relation?.trim() || null,
     memory_text: memory_text.trim(),
-    photo_url: photo_url || null,
+    photo_url: finalPhotoUrl,
     author_email: author_email?.trim() || null,
     ip_address: ip,
     status: 'pending',

@@ -552,13 +552,23 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
               {/* Featured video */}
               {(() => {
                 const vid0 = videos![0]
-                const embed = getVideoEmbed(vid0.original_url)
-                const thumb = getVideoThumb(vid0.original_url, vid0.thumb_url)
+                const embed = vid0.cf_stream_id 
+                  ? `https://iframe.videodelivery.net/${vid0.cf_stream_id}`
+                  : getVideoEmbed(vid0.original_url)
+                const thumb = vid0.cf_stream_id
+                  ? `https://videodelivery.net/${vid0.cf_stream_id}/thumbnails/thumbnail.jpg`
+                  : getVideoThumb(vid0.original_url, vid0.thumb_url)
                 return (
                   <div className="overflow-hidden rounded-2xl border border-white/10 bg-[#173d31] shadow-xl shadow-black/20">
-                    {embed ? (
+                    {vid0.cf_stream_id || embed ? (
                       <div className="aspect-video">
-                        <iframe src={embed} className="h-full w-full" allowFullScreen title={vid0.original_filename ?? 'Video'} />
+                        <iframe 
+                          src={embed || ''} 
+                          className="h-full w-full border-0" 
+                          allowFullScreen 
+                          allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
+                          title={vid0.original_filename ?? 'Video'} 
+                        />
                       </div>
                     ) : (
                       <div className="aspect-video bg-black">
@@ -576,12 +586,24 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
               {videos!.length > 1 && (
                 <div className="flex flex-col gap-4">
                   {videos!.slice(1).map((vid) => {
-                    const embed = getVideoEmbed(vid.original_url)
-                    const thumb = getVideoThumb(vid.original_url, vid.thumb_url)
+                    const embed = vid.cf_stream_id
+                      ? `https://iframe.videodelivery.net/${vid.cf_stream_id}`
+                      : getVideoEmbed(vid.original_url)
+                    const thumb = vid.cf_stream_id
+                      ? `https://videodelivery.net/${vid.cf_stream_id}/thumbnails/thumbnail.jpg`
+                      : getVideoThumb(vid.original_url, vid.thumb_url)
                     return (
                       <div key={vid.id} className="group flex-1 overflow-hidden rounded-xl bg-black">
-                        {embed ? (
-                          <div className="aspect-video"><iframe src={embed} className="h-full w-full" allowFullScreen title={vid.original_filename ?? ''} /></div>
+                        {vid.cf_stream_id || embed ? (
+                          <div className="aspect-video">
+                            <iframe 
+                              src={embed || ''} 
+                              className="h-full w-full border-0" 
+                              allowFullScreen 
+                              allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;"
+                              title={vid.original_filename ?? ''} 
+                            />
+                          </div>
                         ) : (
                           <div className="aspect-video">
                             <video controls src={vid.original_url} poster={thumb ?? undefined} className="h-full w-full" preload="metadata" />
