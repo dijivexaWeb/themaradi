@@ -454,7 +454,7 @@ export default function BiyografiPage() {
             </div>
 
             <div className="flex items-center gap-3">
-              <button type="submit" disabled={isLocked ?? false} className={saveBtnCls}>
+              <button type="submit" disabled={(isLocked ?? false) || profileSaving} className={saveBtnCls}>
                 {profileSaving ? 'Kaydediliyor...' : 'Profili Kaydet'}
               </button>
               {profileSaved && <span className="flex items-center gap-1.5 text-xs font-medium text-[#174f35]">✓ Kaydedildi</span>}
@@ -492,7 +492,7 @@ export default function BiyografiPage() {
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <button type="submit" disabled={isLocked ?? false} className={saveBtnCls}>
+              <button type="submit" disabled={(isLocked ?? false) || detailSaving} className={saveBtnCls}>
                 {detailSaving ? 'Kaydediliyor...' : 'Detayları Kaydet'}
               </button>
               {detailSaved && <span className="flex items-center gap-1.5 text-xs font-medium text-[#174f35]">✓ Kaydedildi</span>}
@@ -594,7 +594,7 @@ export default function BiyografiPage() {
               <audio controls src={favSongUrl} className="h-9 w-full" />
             )}
             <div className="flex items-center gap-3">
-              <button type="submit" disabled={isLocked ?? false} className={saveBtnCls}>
+              <button type="submit" disabled={(isLocked ?? false) || songSaving} className={saveBtnCls}>
                 {songSaving ? 'Kaydediliyor...' : 'Şarkıyı Kaydet'}
               </button>
               {songSaved && <span className="flex items-center gap-1.5 text-xs font-medium text-[#174f35]">✓ Kaydedildi</span>}
@@ -625,7 +625,7 @@ export default function BiyografiPage() {
               <input type="url" value={donationUrl} onChange={e => setDonationUrl(e.target.value)} disabled={isLocked ?? false} placeholder="https://... (bağış sayfası)" className={inputCls} />
             </div>
             <div className="flex items-center gap-3">
-              <button type="submit" disabled={isLocked ?? false} className={saveBtnCls}>
+              <button type="submit" disabled={(isLocked ?? false) || extraSaving} className={saveBtnCls}>
                 {extraSaving ? 'Kaydediliyor...' : 'Kaydet'}
               </button>
               {extraSaved && <span className="flex items-center gap-1.5 text-xs font-medium text-[#174f35]">✓ Kaydedildi</span>}

@@ -102,6 +102,11 @@ export async function addMemoryAction(vaultId: string, redirectTo: string | null
   revalidatePath(`/dashboard/vault/${vaultId}/gizli-kasa`)
   revalidatePath(`/dashboard/vault/${vaultId}/vasiyet`)
   revalidatePath(`/dashboard/vault/${vaultId}`)
+
+  if (redirectTo) {
+    const sep = redirectTo.includes('?') ? '&' : '?'
+    redirect(`${redirectTo}${sep}saved=1`)
+  }
 }
 
 export async function updateMemoryAction(memoryId: string, vaultId: string, redirectTo: string, formData: FormData): Promise<void> {

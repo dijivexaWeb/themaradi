@@ -3,6 +3,7 @@ import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
 import { addMemorialAudioAction, updateMemorialAudioAction } from '../actions'
 import { deleteAudioRecordingAction } from '@/lib/actions/audio'
+import SubmitButton from '@/components/SubmitButton'
 
 interface Props {
   params: Promise<{ id: string }>
@@ -89,10 +90,7 @@ export default async function MemorialSesKayitlariPage({ params, searchParams }:
                   <option value="true">Herkese açık</option>
                 </select>
               </div>
-              <button type="submit"
-                className="rounded-xl bg-[#174f35] px-6 py-3 text-sm font-semibold text-white shadow-[0_14px_35px_rgba(23,79,53,0.18)] hover:bg-[#123f2b] transition-colors">
-                Kaydet
-              </button>
+              <SubmitButton pendingLabel="Kaydediliyor...">Kaydet</SubmitButton>
             </form>
           </div>
         )}
@@ -171,10 +169,12 @@ export default async function MemorialSesKayitlariPage({ params, searchParams }:
                 </div>
               </div>
               {!isLocked && (
-                <button type="submit"
-                  className="w-full rounded-xl bg-[#174f35] py-3.5 text-sm font-semibold text-white shadow-[0_14px_35px_rgba(23,79,53,0.18)] hover:bg-[#123f2b] transition-colors">
+                <SubmitButton
+                  className="w-full rounded-xl bg-[#174f35] py-3.5 text-sm font-semibold text-white shadow-[0_14px_35px_rgba(23,79,53,0.18)] hover:bg-[#123f2b] transition-colors disabled:cursor-not-allowed disabled:opacity-60"
+                  pendingLabel="Yükleniyor..."
+                >
                   Kaydet
-                </button>
+                </SubmitButton>
               )}
             </form>
           </div>

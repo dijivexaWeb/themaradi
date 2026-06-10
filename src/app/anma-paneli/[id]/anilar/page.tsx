@@ -4,10 +4,11 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { addMemoryAction, updateMemoryAction, deleteMemoryAction } from '@/lib/actions/memories'
 import { ImageUploadInput } from '@/components/ImageUploadInput'
+import MemorySubmitButton from './_MemorySubmitButton'
 
 interface Props {
   params: Promise<{ id: string }>
-  searchParams: Promise<{ edit?: string; section?: string; error?: string }>
+  searchParams: Promise<{ edit?: string; section?: string; error?: string; saved?: string }>
 }
 
 function getVideoEmbed(url: string): string | null {
@@ -26,7 +27,7 @@ const SECTION_LABELS: Record<string, { label: string; badge: string; badgeCls: s
 
 export default async function MemorialAnilarPage({ params, searchParams }: Props) {
   const { id } = await params
-  const { edit: editId, section: filterSection, error } = await searchParams
+  const { edit: editId, section: filterSection, error, saved } = await searchParams
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
@@ -68,6 +69,11 @@ export default async function MemorialAnilarPage({ params, searchParams }: Props
         {isLocked && (
           <div className="mb-5 rounded-2xl border border-[#dfbd72]/50 bg-[#fff7e6] px-5 py-4 text-sm text-[#725212]">
             Ödeme doğrulandıktan sonra anı ekleyebilirsiniz.
+          </div>
+        )}
+        {saved === '1' && (
+          <div className="mb-5 flex items-center gap-2 rounded-2xl border border-[#c7e4c7] bg-[#e9f5ec] px-5 py-4 text-sm font-medium text-[#174f35]">
+            <span>✓</span> Anı başarıyla kaydedildi.
           </div>
         )}
         {error && (
@@ -162,10 +168,7 @@ export default async function MemorialAnilarPage({ params, searchParams }: Props
                   </div>
                 </div>
               </div>
-              <button type="submit"
-                className="rounded-xl bg-[#174f35] px-6 py-3 text-sm font-semibold text-white shadow-[0_14px_35px_rgba(23,79,53,0.18)] hover:bg-[#123f2b] transition-colors">
-                Anıyı Kaydet
-              </button>
+              <MemorySubmitButton />
             </form>
           </div>
         )}
@@ -222,9 +225,7 @@ export default async function MemorialAnilarPage({ params, searchParams }: Props
                             <textarea name="content" required rows={4} defaultValue={m.content ?? ''} className={inputCls + ' resize-none'} />
                           </div>
                           <div className="flex items-center gap-3 pt-1">
-                            <button type="submit" className="rounded-xl bg-[#174f35] px-5 py-2.5 text-sm font-semibold text-white hover:bg-[#123f2b] transition-colors">
-                              Kaydet
-                            </button>
+                            <MemorySubmitButton label="Kaydet" pendingLabel="Kaydediliyor..." />
                             <Link href={pageUrl} className="rounded-xl border border-[#e5dccb] px-5 py-2.5 text-sm font-medium text-[#788177] hover:bg-[#f5efdf] transition-colors">
                               İptal
                             </Link>

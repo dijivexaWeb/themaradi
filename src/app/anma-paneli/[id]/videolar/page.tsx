@@ -3,6 +3,7 @@ import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
 import { addMemorialVideoAction } from '../actions'
 import { updateMediaAction, deleteMediaAction } from '@/lib/actions/media'
+import SubmitButton from '@/components/SubmitButton'
 
 interface Props {
   params: Promise<{ id: string }>
@@ -117,10 +118,7 @@ export default async function MemorialVideolarPage({ params, searchParams }: Pro
                   <input type="text" name="caption" defaultValue={(editingVideo as Record<string, unknown>).caption as string ?? ''} placeholder="Bu videoda kimler var?" className={inputCls} />
                 </div>
               </div>
-              <button type="submit"
-                className="rounded-xl bg-[#174f35] px-6 py-3 text-sm font-semibold text-white shadow-[0_14px_35px_rgba(23,79,53,0.18)] hover:bg-[#123f2b] transition-colors">
-                Kaydet
-              </button>
+              <SubmitButton pendingLabel="Kaydediliyor...">Kaydet</SubmitButton>
             </form>
           </div>
         )}
@@ -167,10 +165,7 @@ export default async function MemorialVideolarPage({ params, searchParams }: Pro
                 <label className={labelCls}>Anlatım</label>
                 <textarea name="caption" rows={2} placeholder="Bu videoda kimler var, hangi an anlatılıyor?" className={inputCls + ' resize-none'} />
               </div>
-              <button type="submit"
-                className="rounded-xl bg-[#174f35] px-6 py-3 text-sm font-semibold text-white shadow-[0_14px_35px_rgba(23,79,53,0.18)] hover:bg-[#123f2b] transition-colors">
-                Videoyu Kaydet
-              </button>
+              <SubmitButton pendingLabel="Yükleniyor...">Videoyu Kaydet</SubmitButton>
             </form>
           </div>
         )}

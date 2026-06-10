@@ -6,6 +6,7 @@ import { addFamilyMemberAction, deleteFamilyMemberAction } from '@/lib/actions/f
 import { updateMemorialFamilyMemberAction } from '../actions'
 import FamilyTreeCanvas from '@/components/FamilyTreeCanvas'
 import { ImageUploadInput } from '@/components/ImageUploadInput'
+import SubmitButton from '@/components/SubmitButton'
 
 interface Props {
   params: Promise<{ id: string }>
@@ -258,12 +259,7 @@ export default async function MemorialAilePage({ params, searchParams }: Props) 
                             className={dInputCls}
                           />
                         </div>
-                        <button
-                          type="submit"
-                          className="rounded-xl bg-[#c7a76f] px-6 py-3 text-sm font-semibold text-[#091712] shadow-lg shadow-black/20 transition-colors hover:bg-[#d4b87c]"
-                        >
-                          Kaydet
-                        </button>
+                        <SubmitButton className="rounded-xl bg-[#c7a76f] px-6 py-3 text-sm font-semibold text-[#091712] shadow-lg shadow-black/20 transition-colors hover:bg-[#d4b87c] disabled:cursor-not-allowed disabled:opacity-60" pendingLabel="Kaydediliyor...">Kaydet</SubmitButton>
                       </form>
                     </>
                   ) : (
@@ -367,12 +363,7 @@ export default async function MemorialAilePage({ params, searchParams }: Props) 
                             className={dInputCls}
                           />
                         </div>
-                        <button
-                          type="submit"
-                          className="rounded-xl bg-[#c7a76f] px-6 py-3 text-sm font-semibold text-[#091712] shadow-lg shadow-black/20 transition-colors hover:bg-[#d4b87c]"
-                        >
-                          Ekle
-                        </button>
+                        <SubmitButton className="rounded-xl bg-[#c7a76f] px-6 py-3 text-sm font-semibold text-[#091712] shadow-lg shadow-black/20 transition-colors hover:bg-[#d4b87c] disabled:cursor-not-allowed disabled:opacity-60" pendingLabel="Ekleniyor...">Ekle</SubmitButton>
                       </form>
                     </>
                   )}

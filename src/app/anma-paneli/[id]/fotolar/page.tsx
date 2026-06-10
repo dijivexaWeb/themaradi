@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { addMemorialPhotoAction } from '../actions'
 import { updateMediaAction, deleteMediaAction } from '@/lib/actions/media'
 import { ImageUploadInput } from '@/components/ImageUploadInput'
+import SubmitButton from '@/components/SubmitButton'
 
 interface Props {
   params: Promise<{ id: string }>
@@ -162,12 +163,7 @@ export default async function MemorialFotolarPage({ params, searchParams }: Prop
                   />
                 </div>
               </div>
-              <button
-                type="submit"
-                className="rounded-xl bg-[#174f35] px-6 py-3 text-sm font-semibold text-white shadow-[0_14px_35px_rgba(23,79,53,0.18)] transition-colors hover:bg-[#123f2b]"
-              >
-                Kaydet
-              </button>
+              <SubmitButton pendingLabel="Yükleniyor...">Kaydet</SubmitButton>
             </form>
           </div>
         )}
@@ -232,12 +228,7 @@ export default async function MemorialFotolarPage({ params, searchParams }: Prop
                   className={`${inputCls} resize-none`}
                 />
               </div>
-              <button
-                type="submit"
-                className="rounded-xl bg-[#174f35] px-6 py-3 text-sm font-semibold text-white shadow-[0_14px_35px_rgba(23,79,53,0.18)] transition-colors hover:bg-[#123f2b]"
-              >
-                Fotoğrafı Kaydet
-              </button>
+              <SubmitButton pendingLabel="Kaydediliyor...">Fotoğrafı Kaydet</SubmitButton>
             </form>
           </div>
         )}
