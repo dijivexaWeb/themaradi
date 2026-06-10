@@ -3,6 +3,50 @@
 > Her oturum sonunda Claude bu dosyayı günceller.
 > Format: tarih → ne yapıldı → nerede kalındı → sıradaki adım.
 
+## 2026-06-10 — Oturum 74: Şahit Formu İyileştirme + Onay Bildirimi + R2 Doğrulama
+
+### Yapılanlar
+- **DB Migration**: `memorial_witnesses` tablosuna `phone`, `consent_processing`, `consent_phone`, `consent_email` eklendi
+- **`src/app/anma-paneli/[id]/dogrulama/page.tsx`**:
+  - Şahit formuna telefon alanı (zorunlu) + 3 zorunlu izin checkbox'ı eklendi
+  - Belge reddedildiğinde net kırmızı banner + "Lütfen yeniden yükleyin" mesajı
+  - Şahit bekliyor durumunda "Tekrar Gönder" + "Kişiyi Değiştir" etiketli butonlar
+  - `private_memorial` statusunda kurumsal taziye/tebrik banner'ı eklendi
+- **`src/app/anma-paneli/[id]/actions.ts`**:
+  - `addWitnessAction` telefon + 3 consent alanını DB'ye kaydediyor
+  - Eksik veya onaysız form gönderimi engelleniyor
+- **`src/app/admin/verifications/actions.ts`**:
+  - `approveDocumentAction` onay emaili HTML template'i + vault sahibine email gönderme
+- **`src/app/admin/verifications/page.tsx`**:
+  - Şahit listesinde telefon ve 3 izin badge'i gösteriliyor
+- **`src/app/verify/witness/page.tsx`**:
+  - Şahit onaylandığında 2+ şahit + belge onaylıysa vault `private_memorial` yapılıyor
+  - Vault sahibine kurumsal onay emaili gönderiliyor (bug fix: daha önce witness confirm'de status güncellemiyordu)
+- **R2 Upload Doğrulama**: Tüm upload yolları kontrol edildi — `supabase.storage` hiç kullanılmıyor, hepsi R2 presign API'sinden geçiyor ✓
+
+### Proje Durumu
+- [x] Şahit formu: telefon + izin checkbox'ları
+- [x] Admin şahit görünümü: telefon + izin badge'leri
+- [x] Belge reddi: net kırmızı banner + admin notu
+- [x] Şahit pending: "Kişiyi Değiştir" butonu
+- [x] Onay tamamlandı: tebrik/taziye banner (ekran)
+- [x] Onay tamamlandı: kurumsal email vault sahibine
+- [x] R2 upload doğrulaması: tüm yüklemeler R2'ye gidiyor
+- [ ] Havale akışı email bildirimleri (admin notify + user notify)
+
+### Kritik Kararlar / Notlar
+- Witness confirm page'de vault status güncellemesi eksikti; artık 2+ şahit + approved doc varsa `private_memorial` yapılıyor
+- Email template (verificationApprovedEmailHtml) hem `actions.ts` hem `verify/witness/page.tsx`'de duplicate — ileride `@/lib/email-templates` altına taşınabilir
+- R2 bucket: public `tem-public-media`, private `tem-private-documents`
+
+### Nerede Kaldık
+Şahit form güncellemesi, admin görünümü ve onay email bildirimi tamamlandı. Belge reddi UX iyileştirildi. R2 upload zinciri doğrulandı.
+
+### Sıradaki Adım
+1. Havale akışı email bildirimleri: admin → user ödeme onaylandı, user → admin havale gönderildi
+2. Email template'lerini `@/lib/email-templates.ts`'de birleştir (DRY)
+3. Onay/red durumunda vault sahibine anlık bildirim (push veya in-app)
+
 ## 2026-06-10 — Oturum 73: Login Butonu Loading State + Spinner
 
 ### Yapılanlar
