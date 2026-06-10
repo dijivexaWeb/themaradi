@@ -965,6 +965,7 @@ const tr: LangDict = {
       cemetery: 'Mezar Bilgileri',
       guestbook: 'Taziye Defteri',
       appearance: 'Görünüm & Tema',
+      memorialStyle: 'Anma Tarzı',
       verification: 'Doğrulama & Yayın',
       adminPanel: 'Admin Paneli',
       helpAndSupport: 'Yardım & Destek',

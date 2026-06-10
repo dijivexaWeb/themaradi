@@ -607,3 +607,93 @@ function witnessEmailHtml(witnessName: string, deceasedName: string, confirmUrl:
   </div>
 </body></html>`
 }
+
+// ─── Memorial Style Actions ───────────────────────────────────────────────────
+
+export interface MemorialActionInput {
+  id?: string | null
+  label: string
+  icon: string
+  is_active: boolean
+  show_counter: boolean
+  sort_order: number
+}
+
+export async function saveMemorialStyleAction(
+  vaultId: string,
+  templateKey: string,
+  actions: MemorialActionInput[]
+): Promise<{ success: boolean; error?: string }> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { success: false, error: 'Oturum bulunamadı' }
+
+  const { data: vault } = await supabase
+    .from('vaults')
+    .select('id')
+    .eq('id', vaultId)
+    .eq('owner_id', user.id)
+    .single()
+
+  if (!vault) return { success: false, error: 'Yetkisiz' }
+
+  const service = await createServiceClient()
+
+  const { error: styleErr } = await service
+    .from('memorial_styles')
+    .upsert(
+      { memorial_id: vaultId, selected_template_key: templateKey, updated_at: new Date().toISOString() },
+      { onConflict: 'memorial_id' }
+    )
+
+  if (styleErr) return { success: false, error: styleErr.message }
+
+  // Mevcut action ID'lerini al
+  const { data: existingRows } = await service
+    .from('memorial_actions')
+    .select('id')
+    .eq('memorial_id', vaultId)
+
+  const existingIds = new Set((existingRows ?? []).map((r: { id: string }) => r.id))
+  const incomingIds = new Set(actions.filter(a => a.id).map(a => a.id!))
+
+  // Silinenleri temizle
+  const toDelete = [...existingIds].filter(id => !incomingIds.has(id))
+  if (toDelete.length > 0) {
+    await service.from('memorial_actions').delete().in('id', toDelete)
+  }
+
+  // Mevcutları güncelle
+  for (const action of actions.filter(a => a.id)) {
+    await service.from('memorial_actions')
+      .update({
+        label: action.label,
+        icon: action.icon,
+        is_active: action.is_active,
+        show_counter: action.show_counter,
+        sort_order: action.sort_order,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', action.id!)
+      .eq('memorial_id', vaultId)
+  }
+
+  // Yenileri ekle
+  const newActions = actions.filter(a => !a.id)
+  if (newActions.length > 0) {
+    await service.from('memorial_actions').insert(
+      newActions.map(a => ({
+        memorial_id: vaultId,
+        label: a.label,
+        icon: a.icon,
+        is_active: a.is_active,
+        show_counter: a.show_counter,
+        sort_order: a.sort_order,
+        count: 0,
+      }))
+    )
+  }
+
+  revalidatePath(`/anma-paneli/${vaultId}/anma-tarzi`)
+  return { success: true }
+}

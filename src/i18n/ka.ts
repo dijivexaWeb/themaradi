@@ -965,6 +965,7 @@ const ka: LangDict = {
       cemetery: 'სასაფლაოს ინფო',
       guestbook: 'გამოხმაურების წიგნი',
       appearance: 'გამოჩენა და თემა',
+      memorialStyle: 'მოხსენების სტილი',
       verification: 'დადასტურება და გამოქვეყნება',
       adminPanel: 'ადმინ პანელი',
       helpAndSupport: 'დახმარება',

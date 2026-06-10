@@ -3,6 +3,39 @@
 > Her oturum sonunda Claude bu dosyayı günceller.
 > Format: tarih → ne yapıldı → nerede kalındı → sıradaki adım.
 
+## 2026-06-10 — Oturum 67: Anma Tarzı Özelliği — Dashboard
+
+### Yapılanlar
+- `supabase/migrations/011_memorial_styles.sql` oluşturuldu + Supabase MCP ile uygulandı: `memorial_styles`, `memorial_actions`, `memorial_action_clicks` tabloları, RLS, indexler
+- `src/lib/memorial-style-templates.ts` oluşturuldu: 11 şablon (universal → custom), TR/EN/KA/RU çevirileri, 11 ikon tanımı
+- `anma-paneli/[id]/anma-tarzi/page.tsx` oluşturuldu: server component, style + actions DB'den çekiliyor
+- `anma-paneli/[id]/anma-tarzi/_MemorialStyleClient.tsx` oluşturuldu: şablon kartları grid, buton düzenleyici (toggle/label/icon/sayaç/sil), yeni buton form, kaydet butonu — 4 dil desteği
+- `anma-paneli/[id]/actions.ts` genişletildi: `saveMemorialStyleAction` (upsert style, delta update actions — count korunur)
+- `anma-paneli/[id]/layout.tsx` güncellendi: sidebar'a "Anma Tarzı" (Sparkles icon) eklendi
+- i18n TR/EN/KA/RU güncellendi: `memorial_panel.sidebar.memorialStyle` eklendi
+
+### Proje Durumu
+[x] memorial_styles / memorial_actions / memorial_action_clicks tabloları
+[x] 11 şablon + 4 dil templates constant
+[x] Dashboard: şablon seçme + buton düzenleme + kayıt
+[ ] Public memorial sayfası: aktif butonları göster + sayaç artır
+[ ] Admin objection listesi sayfası
+
+### Kritik Kararlar / Notlar
+- "Din" kelimesi hiçbir yerde geçmiyor — şablonlar "Anma Tarzı" olarak etiketleniyor
+- `saveMemorialStyleAction` delta mantığı: mevcut ID'ler güncellenir, silinmeyenler korunur (count kaybı yok), yeniler insert edilir
+- Public sayfa implementasyonu sonraki oturum
+
+### Nerede Kaldık
+Dashboard tamamen çalışır durumda. Test edilebilir: `/anma-paneli/{id}/anma-tarzi`
+
+### Sıradaki Adım
+1. Public memorial sayfasında `PublicMemorialActions` component'i (aktif butonlar + sayaç + spam engeli)
+2. `recordMemorialActionClick` server action (count artışı + click log)
+3. Admin objection listesi: `admin/objections/page.tsx`
+
+---
+
 ## 2026-06-10 — Oturum 66: Vault-Aware Giriş Yönlendirmesi
 
 ### Yapılanlar

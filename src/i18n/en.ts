@@ -963,6 +963,7 @@ const en = {
       cemetery: 'Cemetery Info',
       guestbook: 'Condolence Book',
       appearance: 'Appearance & Theme',
+      memorialStyle: 'Memorial Style',
       verification: 'Verification & Publish',
       adminPanel: 'Admin Panel',
       helpAndSupport: 'Help & Support',
