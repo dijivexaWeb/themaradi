@@ -104,9 +104,13 @@ export async function POST(req: NextRequest) {
   const attachments: AttachmentMeta[] = []
 
   const rawMime = getString(data, 'raw')
+  const rawEncoding = getString(data, 'raw_encoding')
   if (rawMime) {
     try {
-      const parsed = await PostalMime.parse(rawMime)
+      const input = rawEncoding === 'base64'
+        ? Buffer.from(rawMime, 'base64')
+        : rawMime
+      const parsed = await PostalMime.parse(input)
       bodyText = parsed.text ?? null
       bodyHtml = parsed.html ?? null
       if (parsed.subject) subject = parsed.subject
