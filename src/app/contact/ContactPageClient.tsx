@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { Clock, Mail, MapPin, Phone } from 'lucide-react'
 import ContactForm from './ContactForm'
 import { useLang } from '@/i18n/context'
-import BrandLogo from '@/components/BrandLogo'
+import LandingNav from '@/components/landing/Nav'
 
 export default function ContactPageClient({ siteKey }: { siteKey: string }) {
   const { t } = useLang()
@@ -15,14 +15,14 @@ export default function ContactPageClient({ siteKey }: { siteKey: string }) {
       icon: Phone,
       label: c.info.phone,
       lines: [
-        { text: '+995 555 511 884', href: 'tel:+995555511884', tag: c.info.phoneTag },
+        { text: '+995 555 51 18 84', href: 'tel:+995555511884', tag: c.info.phoneTag },
+        { text: '+90 537 882 67 47', href: 'tel:+905378826747', tag: c.info.phoneTagTurkey },
       ],
     },
     {
       icon: Mail,
       label: c.info.email,
       lines: [
-        { text: 'info@theeternalmemory.com', href: 'mailto:info@theeternalmemory.com', tag: c.info.emailTagGeneral },
         { text: 'support@theeternalmemory.com', href: 'mailto:support@theeternalmemory.com', tag: c.info.emailTagSupport },
       ],
     },
@@ -32,6 +32,7 @@ export default function ContactPageClient({ siteKey }: { siteKey: string }) {
       lines: [
         { text: c.info.addressLine1, href: null, tag: null },
         { text: c.info.addressLine2, href: null, tag: null },
+        { text: c.info.addressLine3, href: null, tag: null },
       ],
     },
     {
@@ -65,23 +66,7 @@ export default function ContactPageClient({ siteKey }: { siteKey: string }) {
   return (
     <div className="min-h-screen bg-[#fbf8f1] text-[#173d31]">
 
-      {/* NAV */}
-      <nav className="fixed inset-x-0 top-0 z-50 border-b border-[#e6dccb] bg-[#fbf8f1]/92 shadow-sm backdrop-blur">
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5 sm:px-8">
-          <BrandLogo />
-          <div className="hidden items-center gap-7 text-sm text-[#4c463c] lg:flex">
-            <Link href="/" className="hover:text-[#9a7132]">{c.nav.home}</Link>
-            <Link href="/pricing" className="hover:text-[#9a7132]">{c.nav.pricing}</Link>
-            <Link href="/memorial/demo" className="hover:text-[#9a7132]">{c.nav.demoProfile}</Link>
-          </div>
-          <Link
-            href="/pricing"
-            className="inline-flex items-center gap-2 rounded-md bg-[#103b2c] px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-[#103b2c]/15 transition hover:bg-[#0b2b20]"
-          >
-            {c.nav.start}
-          </Link>
-        </div>
-      </nav>
+      <LandingNav />
 
       <main className="pt-16">
 

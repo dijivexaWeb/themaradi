@@ -276,7 +276,7 @@ const tr: LangDict = {
         { label: 'SSS', href: '#sss' },
       ],
       corporateLinks: [
-        { label: 'Hakkımızda', href: '/contact' },
+        { label: 'Hakkımızda', href: '/about' },
         { label: 'İletişim', href: '/contact' },
       ],
       docLinks: [
@@ -478,13 +478,15 @@ const tr: LangDict = {
       address: 'Adres',
       hours: 'Çalışma saatleri',
       phoneTag: 'Gürcistan',
+      phoneTagTurkey: 'Türkiye',
       emailTagGeneral: 'Genel',
       emailTagSupport: 'Destek',
       hoursWeekday: 'Pzt–Cum  09:00 – 18:00',
       hoursWeekdayTag: 'GE saati',
       hoursSaturday: 'Cmt  10:00 – 14:00',
       addressLine1: 'Petre Bagrationi Str. 220',
-      addressLine2: 'Batumi / Gürcistan',
+      addressLine2: 'Gürcistan',
+      addressLine3: 'Türkiye',
     },
     form: {
       heading: 'Mesaj gönderin',
@@ -702,6 +704,7 @@ const tr: LangDict = {
         { id: 'sureklilk', label: '11. Hizmet Sürekliliği Taahhüdü' },
         { id: 'hukuk', label: '12. Uygulanacak Hukuk' },
         { id: 'degisiklik', label: '13. Değişiklikler' },
+        { id: 'iletisim', label: '14. İletişim' },
       ],
       content: {
         parties: {
@@ -772,6 +775,12 @@ const tr: LangDict = {
         changes: {
           h: '13. Değişiklikler',
           p: 'Önemli değişiklikler yürürlüğe girmeden en az 14 gün önce iletilecektir. Platforma devam etmek kabul anlamına gelir.',
+        },
+        contactSection: {
+          h: '14. İletişim',
+          email: 'support@theeternalmemory.com',
+          tel: '+995 555 511 884',
+          address: 'Petre Bagrationi Str. 220, Batumi, Gürcistan',
         },
       },
     },
@@ -1251,6 +1260,56 @@ const tr: LangDict = {
         statusPanelAfterPayment: 'Ödeme onayından sonra panel açılacak',
         spamNote: 'E-posta gelmediyse spam klasörünü kontrol edin.',
       },
+    },
+  },
+  about: {
+    pageTitle: 'Hakkımızda — The Eternal Memory',
+    hero: {
+      eyebrow: 'Hakkımızda',
+      heading: 'Bir kaybın ardından doğan bir fikir.',
+      body: 'The Eternal Memory, sevdiklerinin hatırasını yalnızca taşa değil; hikâyelere, fotoğraflara, seslere ve sevgiye emanet etmek isteyen bir ailenin hayalinden doğdu.',
+    },
+    story: {
+      heading: 'Her şey nasıl başladı?',
+      p1: 'Her şey 2023 yılında Türkiye\'de bir kaybın ardından başladı. Ailemizden birini yitirdiğimizde, geride kalan tek şeyin soğuk bir mezar taşındaki isim olduğunu fark ettik. Fotoğraflar telefonlarda kayboluyordu. Hikâyeler hafızalarda soluklaşıyordu. Torunlar, dedelerinin sesini hiç duymadan büyüyordu.',
+      p2: 'O günden bu yana tek bir soruya cevap aradık: Bir insanın hayatı, gerçekten hak ettiği şekilde nasıl korunabilir? The Eternal Memory bu sorunun cevabı olarak doğdu.',
+      p3: 'Bugün hem Türkiye hem Gürcistan\'da ailelere hizmet eden bir platform olarak, her kaybın ardında bırakılan mirasın yıllarca değil nesiller boyu yaşaması için çalışıyoruz.',
+      pullQuote: '"Taştaki bir isim yetmez. Tam olarak hatırlanmayı hak ediyoruz."',
+    },
+    vision: {
+      label: 'Vizyonumuz',
+      text: 'Her insanın yalnızca bir isim olarak değil; hikâyesiyle, sesiyle, fotoğraflarıyla ve geride bıraktığı sevgiyle hatırlanabildiği bir dünya.',
+    },
+    mission: {
+      label: 'Misyonumuz',
+      text: 'Ailelere, sevdiklerinin anılarını onurlu, güzel ve kalıcı bir dijital alanda saklama ve gelecek nesillere aktarma imkânı sunmak.',
+    },
+    values: {
+      heading: 'Değerlerimiz',
+      items: [
+        {
+          title: 'Saygı',
+          text: 'Her anma profili, o kişinin hayatına duyulan saygının bir ifadesidir. Tasarımdan güvenliğe kadar her karar bu tek değer etrafında şekillenir.',
+        },
+        {
+          title: 'Kalıcılık',
+          text: 'Bir anı bir kez kaydedildiğinde, sonsuza dek korunmalıdır. Teknik altyapımızı ve iş modelimizin tamamını bu taahhüt üzerine inşa ettik.',
+        },
+        {
+          title: 'Güven',
+          text: 'Aile fotoğrafları, hikâyeleri ve anıları en kişisel varlıklardır. Bu verileri en yüksek güvenlik standartlarıyla korur; üçüncü taraflarla asla paylaşmayız.',
+        },
+      ],
+    },
+    cta: {
+      heading: 'Bugün kaydedilen bir anı, yarın bir neslin mirası olabilir.',
+      body: 'Sevdiğiniz kişi için bir anma profili oluşturmaya bugün başlayın. Hikâyesini, fotoğraflarını ve anılarını gelecek nesiller için koruyun.',
+      btn: 'Anma Profili Oluştur',
+    },
+    contact: {
+      heading: 'Bize ulaşın',
+      body: 'Anma Profili, Yaşam Kasası veya QR plaka hakkında sorularınız için ekibimiz burada.',
+      btn: 'İletişime Geç',
     },
   },
 }

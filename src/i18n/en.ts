@@ -274,7 +274,7 @@ const en = {
         { label: 'FAQ', href: '#sss' },
       ],
       corporateLinks: [
-        { label: 'About Us', href: '/contact' },
+        { label: 'About Us', href: '/about' },
         { label: 'Contact', href: '/contact' },
       ],
       docLinks: [
@@ -476,13 +476,15 @@ const en = {
       address: 'Address',
       hours: 'Working hours',
       phoneTag: 'Georgia',
+      phoneTagTurkey: 'Turkey',
       emailTagGeneral: 'General',
       emailTagSupport: 'Support',
       hoursWeekday: 'Mon–Fri  09:00 – 18:00',
       hoursWeekdayTag: 'GE time',
       hoursSaturday: 'Sat  10:00 – 14:00',
       addressLine1: 'Petre Bagrationi Str. 220',
-      addressLine2: 'Batumi / Georgia',
+      addressLine2: 'Georgia',
+      addressLine3: 'Turkey',
     },
     form: {
       heading: 'Send a message',
@@ -700,6 +702,7 @@ const en = {
         { id: 'sureklilk', label: '11. Service Continuity Commitment' },
         { id: 'hukuk', label: '12. Applicable Law' },
         { id: 'degisiklik', label: '13. Changes' },
+        { id: 'iletisim', label: '14. Contact' },
       ],
       content: {
         parties: {
@@ -770,6 +773,12 @@ const en = {
         changes: {
           h: '13. Changes',
           p: 'Material changes will be communicated at least 14 days before they take effect. Continued use constitutes acceptance.',
+        },
+        contactSection: {
+          h: '14. Contact',
+          email: 'support@theeternalmemory.com',
+          tel: '+995 555 511 884',
+          address: 'Petre Bagrationi Str. 220, Batumi, Georgia',
         },
       },
     },
@@ -1249,6 +1258,56 @@ const en = {
         statusPanelAfterPayment: 'Panel opens after payment confirmation',
         spamNote: 'If you don\'t see the email, check your spam folder.',
       },
+    },
+  },
+  about: {
+    pageTitle: 'About Us — The Eternal Memory',
+    hero: {
+      eyebrow: 'About Us',
+      heading: 'An idea born from loss.',
+      body: 'The Eternal Memory was born from a family\'s wish to entrust the memory of their loved one not to stone alone — but to stories, photographs, voices and love.',
+    },
+    story: {
+      heading: 'How it all began',
+      p1: 'It started in 2023, in Turkey, after a loss. When we lost a family member, we realised that all that remained was a name on a cold gravestone. Photos were disappearing on phones. Stories were fading from memory. Grandchildren were growing up never having heard their grandfather\'s voice.',
+      p2: 'From that day we searched for the answer to one question: how can a person\'s life be preserved in the way it truly deserves? The Eternal Memory was born as the answer.',
+      p3: 'Today, serving families across Turkey and Georgia, we work every day so that the legacy left behind after every loss continues to live — not just for years, but for generations.',
+      pullQuote: '"A name on stone is not enough. We deserve to be remembered in full."',
+    },
+    vision: {
+      label: 'Our Vision',
+      text: 'A world where every person is remembered not only as a name, but as a full life — with their story, their voice, their photographs and the love they left behind.',
+    },
+    mission: {
+      label: 'Our Mission',
+      text: 'To give families the means to preserve the memories of their loved ones in a dignified, beautiful and permanent digital space — and to pass them on to the generations that follow.',
+    },
+    values: {
+      heading: 'Our Values',
+      items: [
+        {
+          title: 'Respect',
+          text: 'Every memorial profile is an expression of respect for that person\'s life. Every decision — from design to security — is shaped around this single value.',
+        },
+        {
+          title: 'Permanence',
+          text: 'Once a memory is recorded, it should be preserved for ever. We built our technical infrastructure and our entire business model on this commitment.',
+        },
+        {
+          title: 'Trust',
+          text: 'Family photographs, stories and memories are the most personal things there are. We protect this data with the highest security standards — and never share it with third parties.',
+        },
+      ],
+    },
+    cta: {
+      heading: 'A memory saved today may be a generation\'s legacy tomorrow.',
+      body: 'Start building a memorial profile for your loved one. Preserve their story, photographs and memories — for all the generations that come after.',
+      btn: 'Create a Memorial Profile',
+    },
+    contact: {
+      heading: 'Get in touch',
+      body: 'Have questions about the Memorial Profile, Life Vault or QR plate? Our team is here for you.',
+      btn: 'Contact Us',
     },
   },
 }

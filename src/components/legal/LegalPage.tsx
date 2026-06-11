@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { useLang } from '@/i18n/context'
-import BrandLogo from '@/components/BrandLogo'
+import LandingNav from '@/components/landing/Nav'
 
 export interface TocItem {
   id: string
@@ -28,16 +28,7 @@ export default function LegalPage({
   return (
     <div className="min-h-screen bg-[#fbf8f1] text-[#173d31]">
 
-      <nav className="fixed inset-x-0 top-0 z-50 border-b border-[#e6dccb] bg-[#fbf8f1]/92 shadow-sm backdrop-blur">
-        <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5 sm:px-8">
-          <BrandLogo />
-          <div className="hidden items-center gap-6 text-sm text-[#4c463c] lg:flex">
-            <Link href="/privacy" className="hover:text-[#9a7132]">{s.privacyLink}</Link>
-            <Link href="/terms" className="hover:text-[#9a7132]">{s.termsLink}</Link>
-            <Link href="/legal/verification-policy" className="hover:text-[#9a7132]">{s.verificationLink}</Link>
-          </div>
-        </div>
-      </nav>
+      <LandingNav />
 
       <div className="mx-auto max-w-7xl px-5 pt-24 pb-20 sm:px-8 lg:grid lg:grid-cols-[220px_1fr] lg:gap-14">
 

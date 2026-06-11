@@ -3,6 +3,37 @@
 > Her oturum sonunda Claude bu dosyayı günceller.
 > Format: tarih → ne yapıldı → nerede kalındı → sıradaki adım.
 
+## 2026-06-11 — Oturum 87: İletişim Bilgileri Güncelleme + Hakkımızda Sayfası
+
+### Yapılanlar
+- **İletişim bilgileri** tüm alanlarda güncellendi:
+  - `ContactPageClient.tsx`: Telefon bölümüne Türkiye numarası eklendi (`+90 537 882 67 47`), `info@` kaldırıldı, adrese Türkiye satırı eklendi
+  - `LocalizedLanding.tsx` footer: `support@`, Georgia, `+995 555 51 18 84`, Türkiye, `+90 537 882 67 47` — Batumi/Denizli kaldırıldı sadece ülke adı kaldı; `Phone` import eklendi
+  - i18n (4 dil): `phoneTagTurkey` + `addressLine3` eklendi, adresler sadeleştirildi (Batumi/Denizli kaldırıldı)
+- **`/contact` header nav** → `LandingNav` komponenti ile değiştirildi (dil seçici + hamburger menü dahil)
+- **`quickSteps` sırası** TR/EN/KA/RU dosyalarında düzeltildi: Dijital profil ilk, QR plaka ikinci
+- **`/about` (Hakkımızda) sayfası** oluşturuldu:
+  - `src/app/about/page.tsx` + `src/app/about/AboutClient.tsx`
+  - Koyu yeşil hero, hikâye bölümü (pull quote dahil), Vizyon+Misyon kartları, 3 Değer kartı, CTA banner, İletişim CTA, `MemorialsFooter`
+  - 4 dile tam çeviri: TR/EN/KA/RU (`about` i18n bloğu eklendi)
+  - Footer'daki "Hakkımızda" linki `/contact` → `/about` olarak güncellendi (4 dil)
+  - Nav yok — sadece footer üzerinden erişilebilir (kullanıcı tercihi)
+
+### Proje Durumu
+- [x] `/contact` LandingNav'a geçirildi
+- [x] İletişim bilgileri güncellendi (support email, 2 telefon, 2 ülke)
+- [x] `/about` Hakkımızda sayfası tamamlandı (4 dil)
+- [x] quickSteps sırası düzeltildi
+- [ ] Commit bekliyor
+
+### Nerede Kaldık
+Tüm değişiklikler lokal. `/about` sayfası çalışıyor, görsel doğrulama yapıldı.
+
+### Sıradaki Adım
+1. Commit + push onayı alınabilir
+2. Diğer sayfaların iletişim bilgilerini kontrol et (pricing footer vs.)
+3. `/memorial/demo` demo profili oluşturulabilir (şu an 404)
+
 ## 2026-06-11 — Oturum 86: HOW IT WORKS — Yatay Layout (Görsel Sol, Metin Sağ)
 
 ### Yapılanlar

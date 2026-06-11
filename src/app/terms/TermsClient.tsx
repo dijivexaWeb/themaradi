@@ -83,6 +83,13 @@ export default function TermsClient() {
         <p>{c.changes.p}</p>
       </section>
 
+      <section id="iletisim">
+        <h2>{c.contactSection.h}</h2>
+        <p><a href={`mailto:${c.contactSection.email}`} className="text-[#9a7132]">{c.contactSection.email}</a></p>
+        <p>{c.contactSection.tel}</p>
+        <p>{c.contactSection.address}</p>
+      </section>
+
     </LegalPage>
   )
 }
