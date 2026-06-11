@@ -26,6 +26,7 @@ import {
 } from 'lucide-react'
 import { useLang } from '@/i18n/context'
 import { BrandMark } from '@/components/BrandLogo'
+import RecentMemorialsCarousel, { type RecentMemorial } from './RecentMemorialsCarousel'
 
 const stepIcons = [QrCode, BookOpen, Users] as const
 const securityIcons = [LockKeyhole, Database, Server, Key, QrCode, ShieldCheck] as const
@@ -36,7 +37,7 @@ const scenarioBIcons = [Heart, Users, Camera, ShieldCheck] as const
 
 import type { PricingConfig } from '@/lib/pricing'
 
-export default function LocalizedLanding({ pricing }: { pricing: PricingConfig }) {
+export default function LocalizedLanding({ pricing, recentMemorials }: { pricing: PricingConfig; recentMemorials: RecentMemorial[] }) {
   const { t } = useLang()
   const [openFaq, setOpenFaq] = useState<number | null>(null)
 
@@ -52,10 +53,10 @@ export default function LocalizedLanding({ pricing }: { pricing: PricingConfig }
   return (
     <>
       {/* HERO */}
-      <section className="relative overflow-hidden border-b border-[#e6dccb] bg-[#fbf8f1] px-5 pt-24 sm:px-8 lg:pt-28">
+      <section className="relative overflow-hidden border-b border-[#e6dccb] bg-[#fbf8f1] px-5 pt-20 sm:px-8 lg:pt-20">
         <div className="absolute inset-0 -z-10 bg-[linear-gradient(90deg,#fbf8f1_0%,#fbf8f1_38%,rgba(251,248,241,0.72)_58%,rgba(251,248,241,0)_78%)]" />
         <div className="mx-auto grid max-w-7xl items-center gap-8 lg:grid-cols-[0.78fr_1.22fr]">
-          <div className="relative z-10 max-w-2xl py-12 lg:py-24">
+          <div className="relative z-10 max-w-2xl py-8 lg:py-16">
             <div className="mb-5 flex items-center gap-3 text-[#b08340]">
               <span className="h-px w-24 bg-[#c7a76f]" />
               <Sparkles className="h-4 w-4" />
@@ -68,7 +69,7 @@ export default function LocalizedLanding({ pricing }: { pricing: PricingConfig }
               {s.hero.p}
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <Link href="/satin-al" className="inline-flex items-center justify-center gap-2 rounded-md bg-[#103b2c] px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-[#103b2c]/20 transition hover:bg-[#0b2b20]">
+              <Link href="#nasil-calisir" className="inline-flex items-center justify-center gap-2 rounded-md bg-[#103b2c] px-6 py-3.5 text-sm font-semibold text-white shadow-lg shadow-[#103b2c]/20 transition hover:bg-[#0b2b20]">
                 {s.hero.ctaPrimary}
                 <ArrowRight className="h-4 w-4" />
               </Link>
@@ -77,6 +78,10 @@ export default function LocalizedLanding({ pricing }: { pricing: PricingConfig }
                 <Users className="h-4 w-4" />
               </Link>
             </div>
+            <p className="mt-4 flex items-center gap-2 text-xs text-[#7a6e63]">
+              <ShieldCheck className="h-3.5 w-3.5 shrink-0 text-[#5a8f72]" />
+              {s.hero.trustBadge}
+            </p>
           </div>
           <div className="relative -mr-5 min-h-[360px] sm:-mr-8 lg:min-h-[560px]">
             <Image
@@ -187,6 +192,12 @@ export default function LocalizedLanding({ pricing }: { pricing: PricingConfig }
         </div>
       </section>
 
+      {/* RECENT PUBLIC MEMORIALS */}
+      <RecentMemorialsCarousel
+        memorials={recentMemorials}
+        labels={t.recentMemorials}
+      />
+
       {/* 4 VALUES + CTA BAND */}
       <section className="border-y border-[#e6dccb] bg-[#fbf8f1] px-5 py-8 sm:px-8">
         <div className="mx-auto max-w-7xl">
@@ -211,7 +222,7 @@ export default function LocalizedLanding({ pricing }: { pricing: PricingConfig }
             <div className="absolute inset-0 bg-[#06291f]/35" />
             <div className="relative z-10">
               <h2 className="font-serif text-2xl sm:text-3xl">{s.ctaBanner.heading}</h2>
-              <Link href="/satin-al" className="mt-5 inline-flex items-center justify-center gap-2 rounded-md bg-[#d1a85c] px-7 py-3 text-sm font-semibold text-[#103b2c] shadow-lg shadow-black/10 transition hover:bg-[#e0ba70]">
+              <Link href="/#fiyatlar" className="mt-5 inline-flex items-center justify-center gap-2 rounded-md bg-[#d1a85c] px-7 py-3 text-sm font-semibold text-[#103b2c] shadow-lg shadow-black/10 transition hover:bg-[#e0ba70]">
                 {s.ctaBanner.button} <ArrowRight className="h-4 w-4" />
               </Link>
             </div>
@@ -241,71 +252,75 @@ export default function LocalizedLanding({ pricing }: { pricing: PricingConfig }
         </div>
       </section>
 
-      {/* HOW IT WORKS — DETAILED */}
-      <section className="border-y border-[#e6dccb] bg-[#f7f2e9] px-5 py-16 sm:px-8">
-        <div className="mx-auto mb-10 max-w-3xl text-center">
+      {/* HOW IT WORKS — 4 STEPS */}
+      <section id="nasil-calisir" className="border-y border-[#e6dccb] bg-[#f7f2e9] px-5 py-14 sm:px-8">
+        <div className="mx-auto mb-12 max-w-3xl text-center">
           <h2 className="font-serif text-4xl text-[#173d31] sm:text-5xl">{h.heading}</h2>
-          <p className="mt-4 leading-7 text-[#665d50]">{h.sub}</p>
         </div>
-        <div className="mx-auto grid max-w-5xl gap-8 lg:grid-cols-2">
-          {/* Scenario A */}
-          <div className="rounded-2xl border border-[#e1d5c3] bg-[#fffdf8] p-7 shadow-sm">
-            <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-[#e1d5c3] bg-[#f4eee3] px-3 py-1 text-xs font-semibold text-[#b08340]">
-              {h.scenarioA.badge}
-            </div>
-            <h3 className="font-serif text-xl text-[#173d31]">{h.scenarioA.heading}</h3>
-            <div className="mt-5 space-y-4">
-              {h.scenarioA.steps.map((text, i) => {
-                const Icon = scenarioAIcons[i] ?? BookOpen
-                return (
-                  <div key={i} className="flex gap-4">
-                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#c7a76f] bg-[#f4eee3]">
-                      <Icon className="h-4 w-4 text-[#b08340]" />
+        <div className="mx-auto max-w-5xl">
+          <div className="flex flex-col gap-6 sm:grid sm:grid-cols-2 sm:gap-5 lg:flex lg:flex-row lg:items-start lg:gap-0">
+            {h.steps4.map((step, i) => {
+              const isLast = i === 3
+              return (
+                <div key={i} className="relative flex flex-1 flex-col px-3">
+                  {/* Dashed arrow — at image center height */}
+                  {!isLast && (
+                    <div className="absolute right-0 top-[60px] z-10 hidden -translate-y-1/2 translate-x-1/2 lg:block">
+                      <svg width="40" height="18" viewBox="0 0 40 18" fill="none">
+                        <line x1="0" y1="9" x2="30" y2="9" stroke="#c7a76f" strokeWidth="1.5" strokeDasharray="3 2.5"/>
+                        <polyline points="26,5 32,9 26,13" fill="none" stroke="#c7a76f" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
                     </div>
-                    <p className="pt-1 text-sm leading-6 text-[#5b5245]">{text}</p>
+                  )}
+                  {/* Image left + text right */}
+                  <div className="flex items-start gap-4">
+                    {/* Illustration — no background box */}
+                    <div className="relative h-[120px] w-[120px] shrink-0">
+                      <Image
+                        src={`/images/landing/how-step-${i + 1}.png`}
+                        alt={step.title}
+                        fill
+                        sizes="120px"
+                        className="object-contain object-center"
+                      />
+                    </div>
+                    {/* Number + title + desc */}
+                    <div className="flex-1 pt-1">
+                      <div className="mb-2 flex h-8 w-8 items-center justify-center rounded-full bg-[#173d31] text-xs font-bold text-white shadow">
+                        {i + 1}
+                      </div>
+                      <h3 className="text-[15px] font-bold leading-snug text-[#173d31]">{step.title}</h3>
+                      <p className="mt-1.5 text-xs leading-5 text-[#665d50]">{step.desc}</p>
+                    </div>
                   </div>
-                )
-              })}
-            </div>
-            <div className="mt-6 flex items-center justify-between border-t border-[#e1d5c3] pt-5">
-              <div>
-                <p className="text-xs text-[#8a7a64]">{h.scenarioA.priceLabel}</p>
-                <p className="font-serif text-2xl text-[#173d31]">{h.scenarioA.price} <span className="text-base text-[#b08340]">{h.scenarioA.currency}</span></p>
-              </div>
-              <Link href="/satin-al" className="inline-flex items-center gap-2 rounded-xl border border-[#c7a76f] px-5 py-2.5 text-sm font-semibold text-[#173d31] transition hover:bg-[#f4eee3]">
-                {h.scenarioA.detailsBtn} <ArrowRight className="h-4 w-4" />
-              </Link>
-            </div>
+                </div>
+              )
+            })}
           </div>
+        </div>
+      </section>
 
-          {/* Scenario B */}
-          <div className="rounded-2xl border-2 border-[#b08340] bg-[#fffdf8] p-7 shadow-lg ring-4 ring-[#b08340]/8">
-            <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-[#c7a76f] bg-[#f4eee3] px-3 py-1 text-xs font-semibold text-[#b08340]">
-              {h.scenarioB.badge}
-            </div>
-            <h3 className="font-serif text-xl text-[#173d31]">{h.scenarioB.heading}</h3>
-            <div className="mt-5 space-y-4">
-              {h.scenarioB.steps.map((text, i) => {
-                const Icon = scenarioBIcons[i] ?? Heart
-                return (
-                  <div key={i} className="flex gap-4">
-                    <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-[#c7a76f] bg-[#f4eee3]">
-                      <Icon className="h-4 w-4 text-[#b08340]" />
-                    </div>
-                    <p className="pt-1 text-sm leading-6 text-[#5b5245]">{text}</p>
-                  </div>
-                )
-              })}
-            </div>
-            <div className="mt-6 flex items-center justify-between border-t border-[#e1d5c3] pt-5">
-              <div>
-                <p className="text-xs text-[#8a7a64]">{h.scenarioB.priceLabel}</p>
-                <p className="font-serif text-2xl text-[#173d31]">{h.scenarioB.price} <span className="text-base text-[#b08340]">{h.scenarioB.currency}</span></p>
-                <p className="text-xs text-[#8a7a64]">{h.scenarioB.priceAlt}</p>
+      {/* GRAVESTONE QR BANNER */}
+      <section className="border-b border-[#e6dccb] bg-[#faf7f0] px-5 py-6 sm:px-8">
+        <div className="mx-auto max-w-7xl">
+          <div className="relative h-[260px] overflow-hidden rounded-2xl sm:h-[320px] lg:h-[380px]">
+            <Image
+              src="/images/landing/qr-gravestone-banner.jpg"
+              alt="Mezar taşındaki QR kod ile dijital anma profiline geçiş"
+              fill
+              sizes="(max-width:1280px) 100vw, 1280px"
+              className="object-cover object-center"
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-[#faf7f0]/90 from-20% via-[#faf7f0]/45 via-48% to-transparent" />
+            <div className="absolute inset-0 flex items-center px-8 sm:px-12">
+              <div className="max-w-[260px] sm:max-w-sm lg:max-w-md">
+                <h2 className="font-serif text-2xl leading-snug text-[#173d31] sm:text-3xl lg:text-4xl">
+                  {t.gravestoneQrBanner.heading}
+                </h2>
+                <p className="mt-3 text-sm leading-7 text-[#5b5245] sm:text-base">
+                  {t.gravestoneQrBanner.body}
+                </p>
               </div>
-              <Link href="/satin-al" className="inline-flex items-center gap-2 rounded-xl bg-[#103b2c] px-5 py-2.5 text-sm font-semibold text-white shadow transition hover:bg-[#0b2b20]">
-                {h.scenarioB.startBtn} <ArrowRight className="h-4 w-4" />
-              </Link>
             </div>
           </div>
         </div>
@@ -379,7 +394,10 @@ export default function LocalizedLanding({ pricing }: { pricing: PricingConfig }
                 </li>
               ))}
             </ul>
-            <Link href="/satin-al/anma" className="mt-7 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-[#c7a76f] px-5 py-3 text-sm font-semibold text-[#173d31] transition hover:bg-[#f4eee3]">
+            <p className="mt-4 rounded-lg border border-[#d4e8dc] bg-[#edf7f1] px-3 py-2.5 text-xs leading-5 text-[#2d5c3e]">
+              {p.memorialTrustNote}
+            </p>
+            <Link href="/satin-al/anma" className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-[#c7a76f] px-5 py-3 text-sm font-semibold text-[#173d31] transition hover:bg-[#f4eee3]">
               {p.memorialCta} <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
@@ -408,22 +426,28 @@ export default function LocalizedLanding({ pricing }: { pricing: PricingConfig }
               </div>
               <p className="text-sm text-[#8a7a64]">{p.vaultSetup.replace('49', pricing.vaultSetup)}</p>
             </div>
-            <ul className="flex-1 space-y-2.5">
+            <ul className="space-y-2.5">
               {p.vaultFeatures.map((f) => (
                 <li key={f} className="flex items-center gap-2.5 text-sm text-[#4c463c]">
                   <Check className="h-4 w-4 shrink-0 text-[#b08340]" /> {f}
                 </li>
               ))}
             </ul>
+            <div className="mt-5 rounded-xl border border-[#b08340]/30 bg-[#fdf7eb] px-4 py-3.5">
+              <p className="flex items-start gap-2.5 text-sm leading-5 text-[#7a5a1e]">
+                <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-[#b08340]" />
+                <span>{p.vaultIncludesMemorial}</span>
+              </p>
+            </div>
             <Link href="/satin-al/kasa" className="mt-7 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#103b2c] px-5 py-3 text-sm font-semibold text-white shadow-lg transition hover:bg-[#0b2b20]">
               {p.vaultCta} <ArrowRight className="h-4 w-4" />
             </Link>
           </div>
         </div>
         <p className="mt-6 text-center text-sm text-[#8a7a64]">
-          {p.viewAll}{' '}
-          <Link href="/satin-al" className="font-semibold text-[#9a7132] underline-offset-2 hover:underline">{p.viewAllLink}</Link>{' '}
-          {p.viewAllSuffix}
+          <Link href="/memorial/demo" className="font-semibold text-[#9a7132] underline-offset-2 hover:underline">
+            {p.demoProfileCta}
+          </Link>
         </p>
       </section>
 
@@ -482,7 +506,7 @@ export default function LocalizedLanding({ pricing }: { pricing: PricingConfig }
             <h2 className="font-serif text-3xl sm:text-4xl">{s.finalCta.heading}</h2>
             <p className="mt-3 text-lg text-[#e8decc]">{s.finalCta.sub}</p>
             <div className="mt-7 flex flex-col justify-center gap-3 sm:flex-row">
-              <Link href="/satin-al" className="inline-flex items-center justify-center gap-2 rounded-md bg-[#d1a85c] px-7 py-3 text-sm font-semibold text-[#103b2c] shadow-lg shadow-black/10 transition hover:bg-[#e0ba70]">
+              <Link href="/#fiyatlar" className="inline-flex items-center justify-center gap-2 rounded-md bg-[#d1a85c] px-7 py-3 text-sm font-semibold text-[#103b2c] shadow-lg shadow-black/10 transition hover:bg-[#e0ba70]">
                 {s.finalCta.primaryBtn} <ArrowRight className="h-4 w-4" />
               </Link>
               <Link href="/contact" className="inline-flex items-center justify-center gap-2 rounded-md border border-[#d1a85c] bg-[#103b2c]/25 px-7 py-3 text-sm font-semibold text-white transition hover:bg-[#103b2c]/45">

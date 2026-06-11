@@ -3,6 +3,260 @@
 > Her oturum sonunda Claude bu dosyayı günceller.
 > Format: tarih → ne yapıldı → nerede kalındı → sıradaki adım.
 
+## 2026-06-11 — Oturum 86: HOW IT WORKS — Yatay Layout (Görsel Sol, Metin Sağ)
+
+### Yapılanlar
+- `LocalizedLanding.tsx` HOW IT WORKS bölümü yeniden düzenlendi: dikey yığın → yatay layout
+  - Her adımda: `120×120px` görsel (sol, background container kaldırıldı), numara balonu + başlık + açıklama (sağ)
+  - `<div className="relative h-[120px] w-[120px] shrink-0">` — sadece relative container, bg/border yok
+  - `<div className="flex items-start gap-4">` — her kart içi yatay flex
+  - Görseller: `how-step-1.png` → `how-step-4.png` (`public/images/landing/`)
+  - Kullanıcı 4 görsel yükledi: monitör+form, fotoğraf galerisi, zarf+zincir, mezar taşı+QR
+  - Sonuç ekran görüntüsü alındı — layout doğru görünüyor
+
+### Proje Durumu
+- [x] `/memorial` listeleme sayfası (sunucu+istemci hybrid, 4 dil, alfabe filtresi, sayfalama)
+- [x] Dinamik alfabe (TR/EN/KA/RU dile göre)
+- [x] Yaşam Kasası "Anma Profili dahildir" altın kutusu
+- [x] `/satin-al` redirect → `/#fiyatlar`
+- [x] Nav tüm `/satin-al` → `/#fiyatlar`
+- [x] HOW IT WORKS — illustrasyon görseller + yatay layout (görsel sol, metin sağ)
+- [ ] Commit onayı (git commit ASLA YAPMA kuralı — kullanıcı onayı gerekli)
+
+### Kritik Kararlar / Notlar
+- Background container tamamen kaldırıldı (`rounded-2xl bg-[#ede8df]` → sadece `relative` div) — kullanıcı talebi üzerine
+- Server/Client hybrid pattern korundu: DB sorgusu server-side, çeviriler client-side (`useLang()`)
+- Git commit yapılmadı (kullanıcı kuralı)
+
+### Nerede Kaldık
+HOW IT WORKS bölümü tamamlandı. Yatay layout, 120px görseller sol + numara+başlık+açıklama sağ. Tüm değişiklikler lokal.
+
+### Sıradaki Adım
+1. Landing sayfası diğer bölümlerini gözden geçir
+2. Commit onayı istenebilir
+3. `/memorial/demo` demo sayfası oluşturulabilir (şu an 404)
+
+---
+
+## 2026-06-11 — Oturum 85: "4 Adımda Nasıl Çalışır" Görsel Tabanlı Tasarım
+
+### Yapılanlar
+- `LocalizedLanding.tsx` HOW IT WORKS bölümü yeniden tasarlandı: küçük ikonlar → büyük illustrasyon görseller
+- Her adımda: numara balonu (üstte) + `how-step-N.png` (188px yüksek, rounded-2xl) + başlık + açıklama
+- Kesikli oklar adım ortasına (top-136px) hizalandı
+- Kullanılmayan `Monitor, Images, MailOpen` import'ları + `howStepIcons` array kaldırıldı
+- Görsel placeholder yolları: `/images/landing/how-step-1.png` → `how-step-4.png`
+- **Görseller henüz oluşturulmadı** — AI prompt'ları aşağıda
+
+### Görsel Durumu
+- [ ] `how-step-1.png` — profil oluşturma (monitör + form + portre)
+- [ ] `how-step-2.png` — medya ekleme (foto galerisi + video frame)
+- [ ] `how-step-3.png` — link paylaşma (zarf + zincir ikonu)
+- [ ] `how-step-4.png` — QR plaka (mezar taşı + QR kod)
+
+### Nerede Kaldık
+Kod hazır, görseller bekliyor. Tüm değişiklikler lokal.
+
+### Sıradaki Adım
+1. AI görsellerini oluştur, `public/images/landing/how-step-1.png` ... `how-step-4.png` olarak kaydet
+2. Sayfayı test et
+
+---
+
+## 2026-06-11 — Oturum 84: /satin-al Kaldırıldı — Pricing Flow Yeniden Düzenlendi
+
+### Yapılanlar
+- **`/satin-al/page.tsx`** → `redirect('/#fiyatlar')` — sayfa artık doğrudan landing pricing bölümüne yönlendiriyor
+- **`Nav.tsx`**: `href="/satin-al"` → `href="/#fiyatlar"` (nav linki + desktop "Başla" butonu + mobile "Başla" butonu — tüm occurrences)
+- **`LocalizedLanding.tsx`**:
+  - `ctaBanner.button` → `/#fiyatlar`
+  - `finalCta.primaryBtn` → `/#fiyatlar`
+  - "Tüm detaylar için fiyatlandırma sayfasına bakın." paragrafı kaldırıldı → yerine `demoProfileCta` demo linki eklendi (`/memorial/demo`)
+- **i18n**: `pricingSection.demoProfileCta` 4 dile eklendi (TR: "Örnek anma profili sayfası için tıklayınız")
+- Test edildi: `/satin-al` → `/#fiyatlar` redirect çalışıyor; pricing kartları `/satin-al/anma` ve `/satin-al/kasa`'ya doğrudan gidiyor (değişmedi — zaten doğruydu)
+
+### Proje Durumu
+- [x] `/satin-al` devre dışı bırakıldı (redirect)
+- [x] Nav "Fiyatlar" → pricing scroll
+- [x] Pricing altındaki eski link kaldırıldı, demo linki eklendi
+
+### Nerede Kaldık
+Tüm değişiklikler lokal.
+
+### Sıradaki Adım
+1. Commit onayı alınabilir
+2. `/satin-al/anma` ve `/satin-al/kasa` form sayfaları çalışıyor, dokunulmadı
+
+---
+
+## 2026-06-11 — Oturum 83: Yaşam Kasası Kartı — "Anma Profili Dahil" Notu
+
+### Yapılanlar
+- `landing.pricingSection.vaultIncludesMemorial` i18n anahtarı eklendi (4 dil: TR/EN/KA/RU)
+- `LocalizedLanding.tsx`: features listesinden sonra, CTA butonundan önce altın renkli highlight kutu eklendi
+- Kutu: `Sparkles` ikonu + `fdf7eb` arka plan + `b08340` altın border — kart stiliyle uyumlu
+- TypeScript temiz, tarayıcıda doğrulandı
+
+### Nerede Kaldık
+Yaşam Kasası kartı tamamlandı. Tüm değişiklikler lokal.
+
+### Sıradaki Adım
+1. Commit onayı alınabilir
+2. Başka tasarım/içerik isteği varsa devam
+
+---
+
+## 2026-06-11 — Oturum 82: /memorial Sayfası Dil Desteği Tamamlandı
+
+### Yapılanlar
+- **`_MemorialsClient.tsx`** oluşturuldu: hero, kart grid, sayfalama, CTA tüm UI metni `useLang()` ile; dil anında değişiyor
+- **`page.tsx`** sadece data fetcher'a dönüştürüldü: Supabase sorgusu + `MemorialsClient`'a prop geçişi
+- **`_FilterBar.tsx`** zaten `useLang()` + `ALPHABETS` record ile dile göre alfabe gösteriyor
+- **Dinamik alfabe** per dil:
+  - TR → A B C Ç D E F G Ğ H I İ … Z
+  - EN → A B C D … Z (standart Latin)
+  - KA → ა ბ გ დ ე ვ … ჰ (Gürcü alfabesi)
+  - RU → А Б В Г … Я (Kiril)
+- Test edildi: TR, EN, KA, RU dil değişimlerinde hero, sidebar, CTA, footer tümü dile göre yenileniyor
+- Profil kartı içeriği (isim, tagline) dil bağımsız — DB'den geliyor, doğru davranış
+
+### Proje Durumu
+- [x] `/memorial` listing sayfası (arama + alfabe + sayfalama)
+- [x] Dil desteği: 4 dil tam çalışıyor (TR/EN/KA/RU)
+- [x] Dinamik alfabe: dile göre değişiyor
+- [x] TypeScript hatası yok
+
+### Kritik Kararlar / Notlar
+- UI metni client component'te (`useLang()`), data server'da (`createServiceClient()`) — hibrit yaklaşım
+- `page.tsx` server component kalıyor: searchParams okuma ve DB sorgusu için gerekli
+- Alfabe filtresi `ALPHABETS[lang]` ile anında güncelleniyor; `currentLetter` URL'de kalıyor
+
+### Nerede Kaldık
+`/memorial` sayfası 4 dil + dinamik alfabe ile tamamlandı. Tüm değişiklikler lokal.
+
+### Sıradaki Adım
+1. Kullanıcı onayı alınırsa commit yapılabilir
+2. Landing'deki "Tüm Anmaları Gör" butonu `/memorial` linkini kontrol et
+3. Mobil görünüm test edilebilir
+
+---
+
+## 2026-06-11 — Oturum 81: "Tüm Anmaları Gör" Sayfası + Landing Geliştirmeleri
+
+### Yapılanlar
+- **`/memorial` listing sayfası oluşturuldu** (3 yeni dosya):
+  - `src/app/memorial/page.tsx` — server component; searchParams ile Supabase sorgusu, sayfalama (20/sayfa), hero banner, kart grid
+  - `src/app/memorial/_FilterBar.tsx` — client component; debounced arama, Türk alfabesi filtresi (A-Z + Ç Ğ İ Ö Ş Ü), URL tabanlı state
+  - `src/app/memorial/_MemorialsFooter.tsx` — client component; `useLang()` ile `pricing.footer` rekullanımı
+- **4 dil dosyasına `memorialsPage` eklendi:** heroHeading, heroSub, searchPlaceholder, filterByLetter, allProfiles, noResults, noResultsSub, showing, ctaHeading, ctaButton, prevPage, nextPage, page, of
+- **Önceki oturumdan tamamlananlar** (context compaction öncesi başlanmış):
+  - 4-adımlı "Nasıl Çalışır" bölümü yatay layout (ikonlar + SVG kesikli oklar)
+  - Hero "Nasıl çalışır?" butonu `/satin-al` → `#nasil-calisir` scroll
+  - `memorialCta` butonu 4 dilde "Anma Profili Oluştur" olarak yenilendi
+  - `/satin-al/anma` sayfası 4 dil desteği kazandı (`_AnmaFormClient.tsx` tamamen i18n)
+  - QR mezar taşı banner bölümü eklendi (contained `max-w-7xl`, gradient overlay)
+  - `RecentMemorialsCarousel` iki renkli (krem sol / koyu yeşil sağ) layout
+  - React key uyarısı düzeltildi (`MemorialInteractions.tsx`)
+  - Hero padding azaltıldı (nav ile hero arası boşluk)
+- **TypeScript hatası yok** — `tsc --noEmit` temiz geçti
+- **Sayfa tarayıcıda test edildi** — `/memorial` 200 OK, kartlar görünüyor, CTA çalışıyor
+
+### Proje Durumu
+- [x] Landing page 4-adımlı "Nasıl Çalışır" bölümü
+- [x] Hero butonu `#nasil-calisir` scroll
+- [x] `memorialCta` i18n 4 dil
+- [x] `/satin-al/anma` 4 dil desteği
+- [x] QR mezar taşı banner
+- [x] Son anmalar carousel (yeşil/krem split)
+- [x] `/memorial` listing sayfası (arama + alfabe + sayfalama + CTA + footer)
+- [ ] Landing sayfasındaki "Tüm Anmaları Gör" butonu `/memorial` linki kontrol edilmeli
+- [ ] Commit onayı alınmamış — tüm değişiklikler lokal
+
+### Kritik Kararlar / Notlar
+- `getTranslation()` server-side lang okur (cookie: `tm_lang`), `useLang()` client-side
+- `/memorial` sayfası `revalidate = 60` — her dakika yeniden oluşturulur
+- Alfabe filtresi Türkçe karakterleri içeriyor (Ç, Ğ, İ, Ö, Ş, Ü) — diğer diller için evrensel Latin A-Z yeterli
+- `_FilterBar` debounce 400ms, URL push ile state yönetimi
+- `pricing.footer` paylaşılan footer component için yeniden kullanıldı
+
+### Nerede Kaldık
+`src/app/memorial/page.tsx` ve yardımcı componentler oluşturuldu, test edildi, TypeScript temiz. Tüm değişiklikler local, commit yapılmadı.
+
+### Sıradaki Adım
+1. `/memorial` sayfasını kullanıcıya göster, feedback al
+2. Gerekirse kart tasarımı veya sidebar layout iyileştirmesi
+3. Landing sayfasındaki "Tüm Anmaları Gör" butonunun `/memorial` linkini kontrol et
+4. Kullanıcı onaylarsa commit isteyebilir
+
+---
+
+## 2026-06-11 — Oturum 80: Landing Page Kopya Yenileme (Duygusal Yaklaşım)
+
+### Yapılanlar
+- **40 metin değişikliği** uygulandı — kullanıcının verdiği kapsamlı kopya listesine göre
+- **4 dil dosyası güncellendi:** `src/i18n/tr.ts`, `src/i18n/en.ts`, `src/i18n/ka.ts`, `src/i18n/ru.ts`
+- **`src/components/landing/LocalizedLanding.tsx`** güncellendi: 2 yeni metin elementi eklendi
+- **Yeni i18n alanları:**
+  - `landing.hero.trustBadge` — Hero altında aile onayı güven metni
+  - `landing.pricingSection.memorialTrustNote` — Pricing kartı altında mahremiyet notu
+- **TypeScript hatası yok** — `tsc --noEmit` temiz geçti
+
+### Proje Durumu
+- [x] Landing page kopya yenileme (TR/EN/KA/RU)
+- [x] Duygusal-önce, ürün-sonra yaklaşımı
+- [x] Manipülatif ifadeler temizlendi
+- [x] "Bir profilde neler yaşar?" başlığı eklendi
+- [x] FAQ soruları yenilendi (7 yeni soru — gizlilik odaklı)
+- [x] TypeScript tür uyumu korundu
+
+### Kritik Kararlar / Notlar
+- Kullanıcı önceki oturumda suçluluk temelli copy'yi reddetti ("Bu olmaz, vicdanına ve duygusal tarafına dokunmamız gerek")
+- Tüm metinler özgün duygusal rezonans üzerine kuruldu — kayıp acısı, özlem, hatıraların kaybolma korkusu
+- `git commit yapma` kuralı korundu — değişiklikler local
+
+### Nerede Kaldık
+`src/components/landing/LocalizedLanding.tsx` ve 4 dil dosyası güncellendi. Sayfa lokal çalışır durumda, commit yapılmadı.
+
+### Sıradaki Adım
+1. Tarayıcıda localhost:3010 açarak değişiklikleri gözden geçir
+2. 4 dilde (TR/EN/KA/RU) geçiş yaparak metinlerin doğru render edildiğini kontrol et
+3. Hero trustBadge ve pricing trustNote'un görsel uyumunu onayla
+4. Değişikliklerden memnunsa commit onayı al
+
+---
+
+## 2026-06-11 — Oturum 79: Favicon Düzeltmesi (Marka İkonu)
+
+### Yapılanlar
+- **`src/app/favicon.ico` silindi:** 25KB boyutundaki varsayılan Next.js favicon (React logosu) kaldırıldı
+  - Next.js App Router dosya convention'ı: `favicon.ico` varsa `256x256` ico girişini HTML head'e otomatik ekliyor
+  - Tarayıcı 256x256 `.ico` dosyasını 32x32 PNG'ye tercih ediyordu — brand ikonu görünmüyordu
+- **`src/app/layout.tsx` güncellendi:** `shortcut: '/favicon.ico'` ve `/favicon.ico` referansları kaldırıldı
+- **`src/app/memorial/[slug]/page.tsx` güncellendi:** Aynı şekilde `/favicon.ico` referansları kaldırıldı
+- Artık sadece `icon.tsx` (32x32 PNG brand marka) ve `apple-icon.tsx` (180x180) aktif
+- Commit `5f7da58` push edildi
+
+### Proje Durumu
+- [x] Favicon: marka ikonu (yaprak/kandil motifi) tarayıcı sekmesinde görünüyor
+- [x] Admin önizleme (yayınlanmamış sayfa) — çalışıyor
+- [x] Taziye onaylayınca memorial sayfasında görünüyor
+- [x] Anılar/medya/aile/ses RLS düzeltildi
+- [x] Sidebar badge — pending aksiyon sayısı
+- [ ] Havale akışı email bildirimleri
+
+### Kritik Kararlar / Notlar
+- Next.js App Router'da `favicon.ico` dosyası varsa framework OTOMATIK olarak 256x256 ico link tag ekliyor
+  — bu `icon.tsx`'ten gelen 32x32 PNG'yi eziyor. Çözüm: `.ico` dosyasını tamamen sil.
+- `/favicon.ico` 404 dönmesi sorun değil; tarayıcılar `<link rel="icon">` tag varsa onu kullanıyor
+
+### Nerede Kaldık
+Favicon sorunu tamamen çözüldü. Marka ikonunun görünmesi için deploy bekleniyor (~2-3 dakika).
+
+### Sıradaki Adım
+1. Deploy sonrası https://theeternalmemory.com/memorial/osman-istanbollu test et — favicon doğru görünüyor mu?
+2. Havale akışı email bildirimleri
+3. Email template DRY: `verificationApprovedEmailHtml` `@/lib/email/templates.ts`'e taşı
+
 ## 2026-06-11 — Oturum 78: Admin Önizleme + RLS Düzeltmeleri + Sidebar Badge
 
 ### Yapılanlar

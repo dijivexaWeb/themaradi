@@ -28,7 +28,7 @@ export default function Nav() {
     { href: '#nasil-calisir', label: t.nav.howItWorks },
     { href: '#ozellikler', label: t.nav.features },
     { href: '/memorial/demo', label: t.nav.demoProfile },
-    { href: '/satin-al', label: t.nav.pricing },
+    { href: '/#fiyatlar', label: t.nav.pricing },
     { href: '#sss', label: t.nav.faq },
   ]
 
@@ -78,7 +78,7 @@ export default function Nav() {
           </div>
 
           <Link
-            href="/satin-al"
+            href="/#fiyatlar"
             className="hidden items-center gap-2 rounded-md bg-[#103b2c] px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-[#103b2c]/15 transition hover:bg-[#0b2b20] sm:inline-flex"
           >
             {t.nav.cta}
@@ -111,7 +111,7 @@ export default function Nav() {
               </Link>
             ))}
             <Link
-              href="/satin-al"
+              href="/#fiyatlar"
               onClick={() => setOpen(false)}
               className="mt-2 inline-flex items-center justify-center gap-2 rounded-md bg-[#103b2c] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#0b2b20]"
             >

@@ -1,6 +1,6 @@
 ﻿'use client'
 
-import { useState, useTransition } from 'react'
+import React, { useState, useTransition } from 'react'
 import { ArrowRight, Feather, Flame, Heart, X } from 'lucide-react'
 import { type Lang } from '@/i18n'
 import { useLang } from '@/i18n/context'
@@ -383,12 +383,12 @@ export default function MemorialInteractions({ condolences, vaultId, initialCoun
                   {hasCustomActions ? (
                     <div className="mt-4 flex flex-wrap justify-center gap-3 text-xs text-[#8f9f96] lg:justify-start">
                       {customActions.filter(a => a.show_counter).map((a, i) => (
-                        <>
-                          {i > 0 && <span key={`sep-${a.id}`}>·</span>}
-                          <span key={a.id} className="flex items-center gap-1.5">
+                        <React.Fragment key={a.id}>
+                          {i > 0 && <span>·</span>}
+                          <span className="flex items-center gap-1.5">
                             <span>{ACTION_ICON_MAP[a.icon as ActionIcon] ?? a.icon}</span>{customCounts[a.id] ?? a.count} {a.label.toLowerCase()}
                           </span>
-                        </>
+                        </React.Fragment>
                       ))}
                     </div>
                   ) : (

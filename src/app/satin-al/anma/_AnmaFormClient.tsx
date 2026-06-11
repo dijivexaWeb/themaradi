@@ -4,8 +4,11 @@ import { useActionState, useState } from 'react'
 import { purchaseMemorialAction } from '../actions'
 import Link from 'next/link'
 import type { BankSettings } from '@/lib/bank-settings'
+import { useLang } from '@/i18n/context'
 
 export default function AnmaFormClient({ bank, amount }: { bank: BankSettings; amount: number }) {
+  const { t } = useLang()
+  const f = t.purchasePage.anma
   const [state, action, pending] = useActionState(purchaseMemorialAction, null)
   const [method, setMethod] = useState<'bank' | 'card'>('bank')
 
@@ -17,29 +20,29 @@ export default function AnmaFormClient({ bank, amount }: { bank: BankSettings; a
       <div className="min-h-screen bg-slate-950 text-white flex flex-col items-center justify-center px-4">
         <div className="max-w-md w-full text-center">
           <div className="w-20 h-20 bg-amber-500/15 rounded-full flex items-center justify-center mx-auto mb-6 text-4xl">📧</div>
-          <h1 className="text-2xl font-bold text-white mb-3">E-postanızı doğrulayın</h1>
+          <h1 className="text-2xl font-bold text-white mb-3">{f.success.title}</h1>
           <p className="text-slate-400 mb-2">
-            <span className="text-amber-400 font-medium">{'email' in state ? state.email : ''}</span> adresine
-            bir doğrulama bağlantısı gönderdik.
+            <span className="text-amber-400 font-medium">{'email' in state ? state.email : ''}</span>{' '}
+            {f.success.emailSentTo}
           </p>
           <p className="text-slate-500 text-sm mb-8 leading-6">
-            Bağlantıya tıkladıktan sonra hesabınız aktif olacak ve panelinize giriş yapabileceksiniz.
+            {f.success.clickLinkNote}
           </p>
           <div className="bg-slate-800/60 border border-slate-700 rounded-xl p-5 text-left text-sm space-y-3 mb-6">
             <div className="flex items-center gap-3 text-emerald-400">
-              <span>✓</span><span>Sipariş kaydedildi</span>
+              <span>✓</span><span>{f.success.statusOrderSaved}</span>
             </div>
             <div className="flex items-center gap-3 text-emerald-400">
-              <span>✓</span><span>Havale bilgileri ekibimize iletildi</span>
+              <span>✓</span><span>{f.success.statusBankInfoSent}</span>
             </div>
             <div className="flex items-center gap-3 text-amber-400/70">
-              <span>⏳</span><span>E-posta doğrulama bekleniyor</span>
+              <span>⏳</span><span>{f.success.statusEmailPending}</span>
             </div>
             <div className="flex items-center gap-3 text-slate-500">
-              <span>⏳</span><span>Ödeme onayından sonra panel açılacak</span>
+              <span>⏳</span><span>{f.success.statusPanelAfterPayment}</span>
             </div>
           </div>
-          <p className="text-xs text-slate-600">E-posta gelmediyse spam klasörünü kontrol edin.</p>
+          <p className="text-xs text-slate-600">{f.success.spamNote}</p>
         </div>
       </div>
     )
@@ -49,21 +52,21 @@ export default function AnmaFormClient({ bank, amount }: { bank: BankSettings; a
     <div className="min-h-screen bg-slate-950 text-white flex flex-col items-center justify-center px-4 py-16">
       <div className="max-w-lg w-full">
         <Link href="/satin-al" className="inline-flex items-center gap-2 text-slate-500 hover:text-slate-300 text-sm mb-8 transition-colors">
-          ← Paket seçimine dön
+          {f.backLink}
         </Link>
 
         <div className="border border-amber-500/20 bg-slate-900 rounded-2xl p-7">
           <div className="flex items-center gap-3 mb-6">
             <div className="w-10 h-10 bg-amber-500/15 rounded-xl flex items-center justify-center text-xl">🕯️</div>
             <div>
-              <h1 className="font-bold text-xl text-white">Anma Profili</h1>
-              <p className="text-xs text-slate-500">{amount} ₾ — tek seferlik ödeme</p>
+              <h1 className="font-bold text-xl text-white">{f.title}</h1>
+              <p className="text-xs text-slate-500">{amount} ₾ {f.priceLabel}</p>
             </div>
           </div>
 
           {/* Ödeme Yöntemi Seçimi */}
           <div className="mb-6">
-            <p className="text-xs text-slate-500 uppercase tracking-wider mb-3 font-semibold">Ödeme Yöntemi</p>
+            <p className="text-xs text-slate-500 uppercase tracking-wider mb-3 font-semibold">{f.paymentMethodLabel}</p>
             <div className="grid grid-cols-2 gap-3">
               <button
                 type="button"
@@ -75,8 +78,8 @@ export default function AnmaFormClient({ bank, amount }: { bank: BankSettings; a
                 }`}
               >
                 <div className="text-lg mb-1">🏦</div>
-                <div className="text-sm font-semibold text-white">Banka Havalesi</div>
-                <div className="text-[11px] text-emerald-400 font-medium mt-0.5">✓ Aktif</div>
+                <div className="text-sm font-semibold text-white">{f.bankTransfer.name}</div>
+                <div className="text-[11px] text-emerald-400 font-medium mt-0.5">{f.bankTransfer.status}</div>
               </button>
 
               <button
@@ -89,8 +92,8 @@ export default function AnmaFormClient({ bank, amount }: { bank: BankSettings; a
                 }`}
               >
                 <div className="text-lg mb-1">💳</div>
-                <div className="text-sm font-semibold text-slate-400">Kartla Ödeme</div>
-                <div className="text-[11px] text-amber-500/70 font-medium mt-0.5">⏳ Çok Yakında</div>
+                <div className="text-sm font-semibold text-slate-400">{f.cardPayment.name}</div>
+                <div className="text-[11px] text-amber-500/70 font-medium mt-0.5">{f.cardPayment.status}</div>
               </button>
             </div>
           </div>
@@ -99,22 +102,22 @@ export default function AnmaFormClient({ bank, amount }: { bank: BankSettings; a
           {method === 'bank' && (
             <>
               <div className="bg-slate-800/60 border border-slate-700 rounded-xl p-4 mb-6">
-                <p className="text-xs text-slate-500 uppercase tracking-wider mb-3 font-semibold">Havale Bilgileri</p>
+                <p className="text-xs text-slate-500 uppercase tracking-wider mb-3 font-semibold">{f.bankDetails.heading}</p>
                 <div className="space-y-2 text-sm">
                   <div className="flex justify-between items-center">
-                    <span className="text-slate-400">IBAN</span>
+                    <span className="text-slate-400">{f.bankDetails.ibanLabel}</span>
                     <span className="font-mono text-amber-400 select-all text-xs sm:text-sm">{bank.iban}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-slate-400">Banka</span>
+                    <span className="text-slate-400">{f.bankDetails.bankLabel}</span>
                     <span className="text-slate-200">{bank.bankName}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-slate-400">Alıcı</span>
+                    <span className="text-slate-400">{f.bankDetails.recipientLabel}</span>
                     <span className="text-slate-200">{bank.recipient}</span>
                   </div>
                   <div className="flex justify-between pt-2 border-t border-slate-700">
-                    <span className="text-slate-400">Tutar</span>
+                    <span className="text-slate-400">{f.bankDetails.amountLabel}</span>
                     <span className="text-white font-bold text-base">{amount} ₾</span>
                   </div>
                 </div>
@@ -123,57 +126,55 @@ export default function AnmaFormClient({ bank, amount }: { bank: BankSettings; a
               <form action={action} className="space-y-4">
                 <div>
                   <label className="block text-xs text-slate-400 mb-1.5 font-medium">
-                    Bu anma profili kim için? <span className="text-amber-400">*</span>
+                    {f.form.forWhom} <span className="text-amber-400">*</span>
                   </label>
-                  <input type="text" name="display_name" placeholder="Örn: Ahmet Yılmaz" required className={inp} />
-                  <p className="text-xs text-slate-600 mt-1">Anma sayfasında görünecek ad</p>
+                  <input type="text" name="display_name" placeholder={f.form.forWhomPlaceholder} required className={inp} />
+                  <p className="text-xs text-slate-600 mt-1">{f.form.forWhomHint}</p>
                 </div>
                 <div>
                   <label className="block text-xs text-slate-400 mb-1.5 font-medium">
-                    Adınız Soyadınız <span className="text-amber-400">*</span>
+                    {f.form.yourName} <span className="text-amber-400">*</span>
                   </label>
-                  <input type="text" name="sender_name" placeholder="Havaleyi gönderecek kişinin adı" required className={inp} />
+                  <input type="text" name="sender_name" placeholder={f.form.yourNamePlaceholder} required className={inp} />
                 </div>
                 <div>
                   <label className="block text-xs text-slate-400 mb-1.5 font-medium">
-                    E-posta <span className="text-amber-400">*</span>
+                    {f.form.email} <span className="text-amber-400">*</span>
                   </label>
-                  <input type="email" name="sender_email" placeholder="Bildirim gönderilecek adres" required className={inp} />
+                  <input type="email" name="sender_email" placeholder={f.form.emailPlaceholder} required className={inp} />
                 </div>
                 <div>
                   <label className="block text-xs text-slate-400 mb-1.5 font-medium">
-                    Telefon Numarası <span className="text-amber-400">*</span>
+                    {f.form.phone} <span className="text-amber-400">*</span>
                   </label>
                   <input
                     type="tel"
                     name="phone"
-                    placeholder="+90 555 000 00 00"
+                    placeholder={f.form.phonePlaceholder}
                     required
                     className={inp}
                   />
-                  <p className="text-xs text-slate-600 mt-1">Uluslararası format: +ülke kodu ile yazın</p>
+                  <p className="text-xs text-slate-600 mt-1">{f.form.phoneHint}</p>
                 </div>
                 <div className="grid sm:grid-cols-2 gap-3">
                   <div>
                     <label className="block text-xs text-slate-400 mb-1.5 font-medium">
-                      Şifre <span className="text-amber-400">*</span>
+                      {f.form.password} <span className="text-amber-400">*</span>
                     </label>
-                    <input type="password" name="password" placeholder="En az 6 karakter" required minLength={6} className={inp} />
+                    <input type="password" name="password" placeholder={f.form.passwordPlaceholder} required minLength={6} className={inp} />
                   </div>
                   <div>
                     <label className="block text-xs text-slate-400 mb-1.5 font-medium">
-                      Şifre tekrar <span className="text-amber-400">*</span>
+                      {f.form.passwordConfirm} <span className="text-amber-400">*</span>
                     </label>
-                    <input type="password" name="password_confirm" placeholder="Şifrenizi tekrar yazın" required minLength={6} className={inp} />
+                    <input type="password" name="password_confirm" placeholder={f.form.passwordConfirmPlaceholder} required minLength={6} className={inp} />
                   </div>
                 </div>
-                <p className="text-xs text-slate-600 leading-5">
-                  Bu e-posta ve şifreyle hesabınız oluşturulur. Ödeme onaylandıktan sonra aynı bilgilerle panelinize giriş yapabilirsiniz.
-                </p>
+                <p className="text-xs text-slate-600 leading-5">{f.form.accountNote}</p>
 
-                {/* İzinler & KVKK */}
+                {/* İzinler */}
                 <div className="border border-slate-700/60 bg-slate-800/30 rounded-xl p-4 space-y-4">
-                  <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">İzinler & Aydınlatma</p>
+                  <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">{f.consents.heading}</p>
 
                   <label className="flex items-start gap-3 cursor-pointer group">
                     <input
@@ -184,13 +185,10 @@ export default function AnmaFormClient({ bank, amount }: { bank: BankSettings; a
                     />
                     <div>
                       <span className="text-sm text-slate-200 leading-5">
-                        Hesabıma ait bilgilendirme e-postalarını almayı kabul ediyorum.{' '}
+                        {f.consents.emailConsent}{' '}
                         <span className="text-amber-400 text-xs">*</span>
                       </span>
-                      <p className="text-xs text-slate-500 mt-1 leading-5">
-                        Sipariş onayı, ödeme durumu ve hesap güvenliği bildirimleri gönderilir.
-                        Pazarlama veya reklam içerikleri iletilmez.
-                      </p>
+                      <p className="text-xs text-slate-500 mt-1 leading-5">{f.consents.emailConsentDesc}</p>
                     </div>
                   </label>
 
@@ -203,20 +201,17 @@ export default function AnmaFormClient({ bank, amount }: { bank: BankSettings; a
                     />
                     <div>
                       <span className="text-sm text-slate-200 leading-5">
-                        Kimlik doğrulama ve müşteri desteği amacıyla belirttiğim numaradan aranmayı kabul ediyorum.{' '}
+                        {f.consents.phoneConsent}{' '}
                         <span className="text-amber-400 text-xs">*</span>
                       </span>
-                      <p className="text-xs text-slate-500 mt-1 leading-5">
-                        Yalnızca hesap doğrulama ve sipariş takibi için sizi arayabiliriz.
-                        Telefonunuz üçüncü taraflarla paylaşılmaz.
-                      </p>
+                      <p className="text-xs text-slate-500 mt-1 leading-5">{f.consents.phoneConsentDesc}</p>
                     </div>
                   </label>
 
                   <p className="text-xs text-slate-600 leading-5 pt-1 border-t border-slate-700/50">
-                    Kişisel verileriniz 6698 sayılı KVKK kapsamında işlenmektedir.{' '}
+                    {f.consents.kvkkNote}{' '}
                     <Link href="/kvkk" className="text-amber-400/70 hover:text-amber-400 underline underline-offset-2">
-                      Kişisel Verilerin Korunması Politikası →
+                      {f.consents.kvkkLink}
                     </Link>
                   </p>
                 </div>
@@ -226,14 +221,11 @@ export default function AnmaFormClient({ bank, amount }: { bank: BankSettings; a
                 )}
                 <button type="submit" disabled={pending}
                   className="w-full bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-white font-semibold py-3 rounded-xl transition-colors text-sm">
-                  {pending ? 'İşleniyor...' : 'Havale Yaptım, Kaydı Oluştur →'}
+                  {pending ? f.submitPending : f.submitBtn}
                 </button>
               </form>
 
-              <p className="text-xs text-slate-600 mt-4 text-center leading-5">
-                Havaleyi gönderdikten sonra bu formu doldurun. Ekibimiz ödemeyi doğruladıktan sonra
-                paneliniz 24 saat içinde aktive edilir.
-              </p>
+              <p className="text-xs text-slate-600 mt-4 text-center leading-5">{f.footerNote}</p>
             </>
           )}
 
@@ -242,17 +234,14 @@ export default function AnmaFormClient({ bank, amount }: { bank: BankSettings; a
             <div className="relative">
               <div className="absolute inset-0 z-10 rounded-xl bg-slate-950/80 backdrop-blur-sm flex flex-col items-center justify-center gap-3">
                 <div className="text-4xl">🔒</div>
-                <p className="text-white font-semibold text-sm">Bu ödeme yöntemi yakında aktif olacak</p>
-                <p className="text-slate-400 text-xs text-center max-w-[220px] leading-5">
-                  Kart ödemeleri entegrasyonu üzerinde çalışıyoruz. Şimdilik banka havalesi ile devam edebilirsiniz.
-                </p>
+                <p className="text-white font-semibold text-sm">{f.cardPayment.comingSoonTitle}</p>
+                <p className="text-slate-400 text-xs text-center max-w-[220px] leading-5">{f.cardPayment.comingSoonDesc}</p>
                 <button onClick={() => setMethod('bank')}
                   className="mt-2 bg-amber-500 hover:bg-amber-400 text-white text-xs font-semibold px-5 py-2.5 rounded-xl transition-colors">
-                  Banka Havalesi ile Öde →
+                  {f.cardPayment.switchToBankBtn}
                 </button>
               </div>
 
-              {/* Grayed out card form — for show only */}
               <div className="space-y-4 opacity-30 pointer-events-none select-none p-1">
                 <div>
                   <label className="block text-xs text-slate-400 mb-1.5">Kart Sahibi Ad Soyad</label>
