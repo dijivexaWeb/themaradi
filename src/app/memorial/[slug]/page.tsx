@@ -21,12 +21,18 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const supabase = await createClient()
   const { data: vault } = await supabase
     .from('vaults')
-    .select('display_name, tagline, birth_date, death_date')
+    .select('display_name, tagline, birth_date, death_date, cover_photo_url')
     .eq('slug', slug)
     .eq('status', 'public_memorial')
     .single()
 
-  if (!vault) return { title: 'The Eternal Memory' }
+  const icons = {
+    icon: [{ url: '/favicon.ico', sizes: 'any' }, { url: '/icon', type: 'image/png', sizes: '32x32' }],
+    apple: [{ url: '/apple-icon', type: 'image/png', sizes: '180x180' }],
+    shortcut: '/favicon.ico',
+  }
+
+  if (!vault) return { title: 'The Eternal Memory', icons }
 
   const birthYear = vault.birth_date ? new Date(vault.birth_date).getFullYear() : null
   const deathYear = vault.death_date ? new Date(vault.death_date).getFullYear() : null
@@ -35,6 +41,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: `${vault.display_name}${years} - The Eternal Memory`,
     description: vault.tagline ?? `${vault.display_name} için dijital anma sayfası.`,
+    icons,
+    openGraph: {
+      title: `${vault.display_name}${years}`,
+      description: vault.tagline ?? `${vault.display_name} için dijital anma sayfası.`,
+      type: 'profile',
+      siteName: 'The Eternal Memory',
+      ...(vault.cover_photo_url ? { images: [{ url: vault.cover_photo_url }] } : {}),
+    },
   }
 }
 

@@ -13,10 +13,26 @@ export const metadata: Metadata = {
   metadataBase: new URL(
     process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
   ),
+  icons: {
+    icon: [
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/icon', type: 'image/png', sizes: '32x32' },
+    ],
+    apple: [
+      { url: '/apple-icon', type: 'image/png', sizes: '180x180' },
+    ],
+    shortcut: '/favicon.ico',
+  },
   openGraph: {
     title: "The Eternal Memory — Where memories never fade.",
     description: "Anılarınız sonsuza kadar güvende.",
     type: "website",
+    siteName: "The Eternal Memory",
+  },
+  twitter: {
+    card: 'summary',
+    title: "The Eternal Memory",
+    description: "Anılarınız sonsuza kadar güvende.",
   },
 };
 
