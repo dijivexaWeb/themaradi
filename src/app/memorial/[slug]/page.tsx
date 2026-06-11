@@ -27,9 +27,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     .single()
 
   const icons = {
-    icon: [{ url: '/favicon.ico', sizes: 'any' }, { url: '/icon', type: 'image/png', sizes: '32x32' }],
+    icon: [{ url: '/icon', type: 'image/png', sizes: '32x32' }],
     apple: [{ url: '/apple-icon', type: 'image/png', sizes: '180x180' }],
-    shortcut: '/favicon.ico',
   }
 
   if (!vault) return { title: 'The Eternal Memory', icons }
