@@ -237,6 +237,51 @@ export function condolenceReceivedEmail(params: {
   `)
 }
 
+export function adminNewRegistrationEmail(params: {
+  senderName: string
+  senderEmail: string
+  phone: string
+  productType: 'memorial_one_time' | 'vault_setup' | string
+  vaultName: string
+  paymentMethod: 'bank_transfer' | 'paypal' | string
+  amount: number
+  adminUrl: string
+}): string {
+  const productLabel = params.productType === 'memorial_one_time' ? 'Anma Sayfası' : 'Yaşam Kasası'
+  const methodLabel = params.paymentMethod === 'paypal' ? 'PayPal' : 'Banka Havalesi'
+
+  return wrap(`
+    <h2 style="margin:0 0 8px;font-size:22px;color:#0c3327;">🔔 Yeni kayıt — onay bekliyor</h2>
+    <p style="margin:0 0 20px;font-size:14px;color:#788177;font-family:-apple-system,sans-serif;">
+      Sisteme yeni bir kayıt geldi. Ödeme doğrulandıktan sonra hesabı aktifleştirebilirsiniz.
+    </p>
+
+    <div style="background:#fbf8f1;border:1px solid #e6dccb;border-radius:12px;padding:20px;margin-bottom:24px;font-family:-apple-system,sans-serif;">
+      <table style="width:100%;border-collapse:collapse;font-size:14px;">
+        <tr><td style="padding:6px 0;color:#788177;width:40%;">İsim</td><td style="padding:6px 0;color:#1f2d27;font-weight:600;">${params.senderName}</td></tr>
+        <tr><td style="padding:6px 0;color:#788177;">E-posta</td><td style="padding:6px 0;color:#1f2d27;">${params.senderEmail}</td></tr>
+        <tr><td style="padding:6px 0;color:#788177;">Telefon</td><td style="padding:6px 0;color:#1f2d27;">${params.phone}</td></tr>
+        <tr><td style="padding:6px 0;color:#788177;">Ürün</td><td style="padding:6px 0;color:#1f2d27;">${productLabel}</td></tr>
+        <tr><td style="padding:6px 0;color:#788177;">Hesap Adı</td><td style="padding:6px 0;color:#1f2d27;">${params.vaultName}</td></tr>
+        <tr><td style="padding:6px 0;color:#788177;">Ödeme Yöntemi</td><td style="padding:6px 0;color:#1f2d27;">${methodLabel}</td></tr>
+        <tr><td style="padding:6px 0;color:#788177;">Tutar</td><td style="padding:6px 0;color:#174f35;font-weight:700;">${params.amount} ₾</td></tr>
+      </table>
+    </div>
+
+    <a href="${params.adminUrl}" style="
+      display:inline-block;
+      background:#174f35;
+      color:#ffffff;
+      text-decoration:none;
+      padding:12px 24px;
+      border-radius:10px;
+      font-size:14px;
+      font-family:-apple-system,sans-serif;
+      font-weight:600;
+    ">Admin Paneline Git →</a>
+  `)
+}
+
 export function accountActivatedEmail(params: {
   authorName: string
   loginUrl: string

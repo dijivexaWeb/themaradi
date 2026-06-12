@@ -18,6 +18,7 @@ export default async function EmailSettingsPage() {
       'turnstile_site_key',
       'turnstile_secret_key',
       'inbound_webhook_secret',
+      'admin_notification_email',
     ])
 
   const settings = Object.fromEntries((data ?? []).map((r) => [r.key, r.value]))

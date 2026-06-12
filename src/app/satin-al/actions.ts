@@ -3,8 +3,8 @@
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { fetchPricingConfig } from '@/lib/pricing'
-import { sendEmail } from '@/lib/email'
-import { memorialSignupConfirmEmail, vaultSignupConfirmEmail } from '@/lib/email/templates'
+import { sendEmail, getAdminNotificationEmail } from '@/lib/email'
+import { memorialSignupConfirmEmail, vaultSignupConfirmEmail, adminNewRegistrationEmail } from '@/lib/email/templates'
 import { headers } from 'next/headers'
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://theeternalmemory.com'
@@ -150,6 +150,27 @@ export async function purchaseMemorialAction(_prev: unknown, formData: FormData)
   })
   if (paymentErr) return { error: 'Ödeme kaydı oluşturulamadı: ' + paymentErr.message }
 
+  // Admin bildirim emaili
+  try {
+    const adminEmail = await getAdminNotificationEmail()
+    if (adminEmail) {
+      await sendEmail({
+        to: adminEmail,
+        subject: `[The Eternal Memory] Yeni kayıt — ${senderName}`,
+        html: adminNewRegistrationEmail({
+          senderName, senderEmail, phone,
+          productType: 'memorial_one_time',
+          vaultName: displayName,
+          paymentMethod: 'bank_transfer',
+          amount,
+          adminUrl: `${SITE_URL}/admin/kasa`,
+        }),
+      })
+    }
+  } catch (e) {
+    console.error('[purchaseMemorialAction] admin notify error:', e)
+  }
+
   if (pendingEmailConfirmation && confirmUrl) {
     try {
       await sendEmail({
@@ -248,6 +269,27 @@ export async function purchaseVaultAction(_prev: unknown, formData: FormData) {
     notes: `Gönderen: ${senderName} <${senderEmail}> | Tel: ${phone}`,
   })
   if (paymentErr) return { error: 'Ödeme kaydı oluşturulamadı: ' + paymentErr.message }
+
+  // Admin bildirim emaili
+  try {
+    const adminEmail = await getAdminNotificationEmail()
+    if (adminEmail) {
+      await sendEmail({
+        to: adminEmail,
+        subject: `[The Eternal Memory] Yeni kayıt — ${senderName}`,
+        html: adminNewRegistrationEmail({
+          senderName, senderEmail, phone,
+          productType: 'vault_setup',
+          vaultName: displayName,
+          paymentMethod: 'bank_transfer',
+          amount: setupAmount,
+          adminUrl: `${SITE_URL}/admin/kasa`,
+        }),
+      })
+    }
+  } catch (e) {
+    console.error('[purchaseVaultAction] admin notify error:', e)
+  }
 
   if (pendingEmailConfirmation && confirmUrl) {
     try {
@@ -354,10 +396,29 @@ export async function createVaultForPayPalAction(
     notes: `PayPal ödeme bekleniyor — ${senderName} <${senderEmail}>`,
   })
 
+  // Admin bildirim emaili
+  try {
+    const adminEmail = await getAdminNotificationEmail()
+    if (adminEmail) {
+      await sendEmail({
+        to: adminEmail,
+        subject: `[The Eternal Memory] Yeni kayıt (PayPal) — ${senderName}`,
+        html: adminNewRegistrationEmail({
+          senderName, senderEmail, phone,
+          productType: isMemorial ? 'memorial_one_time' : 'vault_setup',
+          vaultName: displayName,
+          paymentMethod: 'paypal',
+          amount,
+          adminUrl: `${SITE_URL}/admin/kasa`,
+        }),
+      })
+    }
+  } catch (e) {
+    console.error('[createVaultForPayPalAction] admin notify error:', e)
+  }
+
   if (pendingEmailConfirmation && confirmUrl) {
     try {
-      const { sendEmail } = await import('@/lib/email')
-      const { memorialSignupConfirmEmail, vaultSignupConfirmEmail } = await import('@/lib/email/templates')
       await sendEmail({
         to: senderEmail,
         subject: isMemorial

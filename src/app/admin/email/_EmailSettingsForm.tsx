@@ -103,7 +103,20 @@ export default function EmailSettingsForm({ settings }: { settings: Record<strin
 
           <div className="border-t border-[#f0ebe0] pt-4">
             <h3 className="text-sm font-semibold text-[#1f2d27] mb-3">Bildirim Ayarları</h3>
-            <div className="space-y-3">
+            <div className="space-y-4">
+              <div>
+                <label className={labelCls}>Admin Bildirim Emaili</label>
+                <input
+                  type="email"
+                  name="admin_notification_email"
+                  defaultValue={settings.admin_notification_email ?? ''}
+                  placeholder="kabakci753@gmail.com"
+                  className={inputCls}
+                />
+                <p className="mt-1.5 text-xs text-[#adb5ab]">
+                  Yeni kayıt olduğunda bu adrese bildirim gönderilir.
+                </p>
+              </div>
               <label className="flex items-center gap-3 cursor-pointer">
                 <input
                   type="checkbox"

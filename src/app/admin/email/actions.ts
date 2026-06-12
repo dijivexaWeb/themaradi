@@ -14,8 +14,9 @@ export async function saveEmailSettingsAction(formData: FormData): Promise<{ err
     { key: 'email_api_key',              value: (formData.get('email_api_key') as string)?.trim() ?? '' },
     { key: 'email_from_address',         value: (formData.get('email_from_address') as string)?.trim() ?? '' },
     { key: 'email_from_name',            value: (formData.get('email_from_name') as string)?.trim() ?? '' },
-    { key: 'email_notify_new_guestbook', value: formData.get('email_notify_new_guestbook') === 'on' ? 'true' : 'false' },
-    { key: 'email_notify_approved',      value: formData.get('email_notify_approved') === 'on' ? 'true' : 'false' },
+    { key: 'email_notify_new_guestbook',  value: formData.get('email_notify_new_guestbook') === 'on' ? 'true' : 'false' },
+    { key: 'email_notify_approved',       value: formData.get('email_notify_approved') === 'on' ? 'true' : 'false' },
+    { key: 'admin_notification_email',    value: (formData.get('admin_notification_email') as string)?.trim() ?? '' },
   ]
 
   for (const { key, value } of fields) {

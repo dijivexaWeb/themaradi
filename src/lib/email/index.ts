@@ -13,14 +13,20 @@ async function getEmailSettings() {
   const { data } = await supabase
     .from('platform_settings')
     .select('key, value')
-    .in('key', ['email_api_key', 'email_from_address', 'email_from_name', 'email_provider'])
+    .in('key', ['email_api_key', 'email_from_address', 'email_from_name', 'email_provider', 'admin_notification_email'])
 
   const s = Object.fromEntries((data ?? []).map((r) => [r.key, r.value]))
   return {
     apiKey: s.email_api_key as string | undefined,
     fromAddress: (s.email_from_address as string) || 'noreply@theeternalmemory.com',
     fromName: (s.email_from_name as string) || 'The Eternal Memory',
+    adminEmail: (s.admin_notification_email as string) || null,
   }
+}
+
+export async function getAdminNotificationEmail(): Promise<string | null> {
+  const { adminEmail } = await getEmailSettings()
+  return adminEmail
 }
 
 export async function sendEmail(payload: EmailPayload): Promise<{ success: boolean; error?: string }> {
