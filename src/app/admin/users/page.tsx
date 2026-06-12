@@ -3,6 +3,7 @@ import { createServiceClient } from '@/lib/supabase/server'
 import StatusBadge from '../_components/StatusBadge'
 import UserRoleForm from './_UserRoleForm'
 import BanUserButton from './_BanUserButton'
+import ConfirmEmailButton from './_ConfirmEmailButton'
 
 function getActiveBanInfo(bannedUntil: string | null | undefined) {
   if (!bannedUntil) return { isBanned: false, text: null }
@@ -45,6 +46,12 @@ export default async function UsersPage() {
       : authUsers.data.users.map((user) => [user.id, user.banned_until ?? null])
   )
 
+  const emailConfirmedByUserId = new Map(
+    authUsers.error
+      ? []
+      : authUsers.data.users.map((user) => [user.id, !!user.email_confirmed_at])
+  )
+
   return (
     <div className="p-6 max-w-7xl mx-auto">
       <div className="mb-6">
@@ -78,20 +85,29 @@ export default async function UsersPage() {
                   </td>
                   <td className="px-4 py-3"><StatusBadge status={p.role ?? 'user'} /></td>
                   <td className="px-4 py-3">
-                    <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${banInfo.isBanned ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-700'}`}>
-                      {banInfo.isBanned ? 'Banlı' : 'Aktif'}
-                    </span>
-                    {banInfo.text && (
-                      <p className="mt-1 text-xs text-slate-400">
-                        {banInfo.text}
-                      </p>
-                    )}
+                    <div className="flex flex-col gap-1">
+                      <span className={`text-xs font-semibold px-2 py-0.5 rounded-full w-fit ${banInfo.isBanned ? 'bg-red-100 text-red-700' : 'bg-emerald-100 text-emerald-700'}`}>
+                        {banInfo.isBanned ? 'Banlı' : 'Aktif'}
+                      </span>
+                      {emailConfirmedByUserId.get(p.id)
+                        ? <span className="text-xs text-slate-400">✓ Email onaylı</span>
+                        : <span className="text-xs text-amber-600 font-medium">⚠ Email onaylanmadı</span>
+                      }
+                      {banInfo.text && (
+                        <p className="text-xs text-slate-400">{banInfo.text}</p>
+                      )}
+                    </div>
                   </td>
                   <td className="px-4 py-3 text-slate-600">{countMap[p.id] ?? 0}</td>
                   <td className="px-4 py-3 text-xs text-slate-400">{new Date(p.created_at).toLocaleDateString('tr-TR')}</td>
-                  <td className="px-4 py-3 flex gap-2 items-center">
-                    <UserRoleForm userId={p.id} currentRole={p.role ?? 'user'} />
-                    <BanUserButton userId={p.id} isBanned={banInfo.isBanned} bannedUntil={bannedUntil} />
+                  <td className="px-4 py-3">
+                    <div className="flex flex-wrap gap-2 items-center">
+                      <UserRoleForm userId={p.id} currentRole={p.role ?? 'user'} />
+                      <BanUserButton userId={p.id} isBanned={banInfo.isBanned} bannedUntil={bannedUntil} />
+                      {!emailConfirmedByUserId.get(p.id) && (
+                        <ConfirmEmailButton userId={p.id} />
+                      )}
+                    </div>
                   </td>
                 </tr>
               )

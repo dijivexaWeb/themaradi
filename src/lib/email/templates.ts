@@ -237,6 +237,40 @@ export function condolenceReceivedEmail(params: {
   `)
 }
 
+export function accountActivatedEmail(params: {
+  authorName: string
+  loginUrl: string
+}): string {
+  return wrap(`
+    <h2 style="margin:0 0 8px;font-size:22px;color:#0c3327;">Hesabınız aktifleştirildi ✓</h2>
+    <p style="margin:0 0 20px;font-size:14px;color:#788177;font-family:-apple-system,sans-serif;">
+      Sayın ${params.authorName},
+    </p>
+    <p style="margin:0 0 20px;font-size:15px;color:#1f2d27;line-height:1.7;font-family:-apple-system,sans-serif;">
+      The Eternal Memory hesabınız ekibimiz tarafından onaylandı ve aktifleştirildi. Artık giriş yapabilirsiniz.
+    </p>
+
+    <div style="text-align:center;margin:32px 0;">
+      <a href="${params.loginUrl}" style="
+        display:inline-block;
+        background:#174f35;
+        color:#ffffff;
+        text-decoration:none;
+        padding:14px 32px;
+        border-radius:12px;
+        font-size:15px;
+        font-family:-apple-system,sans-serif;
+        font-weight:600;
+        letter-spacing:0.02em;
+      ">Giriş Yap →</a>
+    </div>
+
+    <p style="margin:0;font-size:13px;color:#788177;line-height:1.6;font-family:-apple-system,sans-serif;">
+      Herhangi bir sorunuz için bize ulaşabilirsiniz.
+    </p>
+  `)
+}
+
 export function testEmail(toName: string): string {
   return wrap(`
     <h2 style="margin:0 0 8px;font-size:22px;color:#0c3327;">Test emaili</h2>
