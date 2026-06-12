@@ -274,6 +274,7 @@ const ru: LangDict = {
         { label: 'Демо профиль', href: '/memorial/demo' },
         { label: 'Цены', href: '/pricing' },
         { label: 'FAQ', href: '#sss' },
+        { label: 'Войти', href: '/login' },
       ],
       corporateLinks: [
         { label: 'О нас', href: '/about' },

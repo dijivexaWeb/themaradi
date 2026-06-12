@@ -274,6 +274,7 @@ const tr: LangDict = {
         { label: 'Örnek Profil', href: '/memorial/demo' },
         { label: 'Fiyatlandırma', href: '/pricing' },
         { label: 'SSS', href: '#sss' },
+        { label: 'Giriş yap', href: '/login' },
       ],
       corporateLinks: [
         { label: 'Hakkımızda', href: '/about' },

@@ -78,6 +78,13 @@ export default function Nav() {
           </div>
 
           <Link
+            href="/login"
+            className="hidden items-center gap-1.5 rounded-md border border-[#c7a76f] px-4 py-2.5 text-sm font-semibold text-[#173d31] transition hover:bg-[#f4eee3] sm:inline-flex"
+          >
+            {t.nav.login}
+          </Link>
+
+          <Link
             href="/#fiyatlar"
             className="hidden items-center gap-2 rounded-md bg-[#103b2c] px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-[#103b2c]/15 transition hover:bg-[#0b2b20] sm:inline-flex"
           >
@@ -111,9 +118,16 @@ export default function Nav() {
               </Link>
             ))}
             <Link
+              href="/login"
+              onClick={() => setOpen(false)}
+              className="mt-2 inline-flex items-center justify-center rounded-md border border-[#c7a76f] px-5 py-3 text-sm font-semibold text-[#173d31] transition hover:bg-[#f4eee3]"
+            >
+              {t.nav.login}
+            </Link>
+            <Link
               href="/#fiyatlar"
               onClick={() => setOpen(false)}
-              className="mt-2 inline-flex items-center justify-center gap-2 rounded-md bg-[#103b2c] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#0b2b20]"
+              className="mt-1 inline-flex items-center justify-center gap-2 rounded-md bg-[#103b2c] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#0b2b20]"
             >
               {t.nav.cta}
               <ArrowRight className="h-4 w-4" />

@@ -274,6 +274,7 @@ const ka: LangDict = {
         { label: 'დემო პროფილი', href: '/memorial/demo' },
         { label: 'ფასები', href: '/pricing' },
         { label: 'კითხვები', href: '#sss' },
+        { label: 'შესვლა', href: '/login' },
       ],
       corporateLinks: [
         { label: 'ჩვენ შესახებ', href: '/about' },

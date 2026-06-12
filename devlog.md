@@ -3,6 +3,29 @@
 > Her oturum sonunda Claude bu dosyayı günceller.
 > Format: tarih → ne yapıldı → nerede kalındı → sıradaki adım.
 
+## 2026-06-12 — Oturum 88: Header & Footer Giriş Butonu
+
+### Yapılanlar
+- **Nav.tsx**: Desktop'ta dil seçici ile CTA arasına "Giriş yap" ghost buton eklendi (`/login`)
+- **Nav.tsx**: Mobile menüye "Giriş yap" butonu eklendi (CTA'nın üstünde)
+- **i18n/tr.ts, en.ts, ka.ts, ru.ts**: `landing.footer.platformLinks` dizisine giriş linki eklendi (TR: "Giriş yap", EN: "Sign in", KA: "შესვლა", RU: "Войти")
+
+### Proje Durumu
+- [x] Header'da giriş butonu (desktop + mobile)
+- [x] Footer platformLinks'te giriş linki (4 dil)
+
+### Kritik Kararlar / Notlar
+- Giriş butonu ghost/outline stilinde tasarlandı (brand rengi border, hover bg), ana CTA (koyu yeşil) ile görsel hiyerarşi korundu
+- `nav.login` key'i zaten tüm i18n dosyalarında mevcuttu, yeni key eklenmedi
+
+### Nerede Kaldık
+Nav.tsx header ve footer platformLinks güncellendi. Aktif oturum yönetimi (kullanıcı giriş yapmışsa panele yönlendirme gibi) henüz yapılmadı.
+
+### Sıradaki Adım
+1. Nav'da kullanıcı giriş durumuna göre koşullu render (giriş yapmışsa "Dashboard" / avatar göster)
+2. Footer'a sosyal medya linkleri veya iletişim bilgisi eklenmesi
+3. Mobil test ve QA
+
 ## 2026-06-11 — Oturum 87: İletişim Bilgileri Güncelleme + Hakkımızda Sayfası
 
 ### Yapılanlar

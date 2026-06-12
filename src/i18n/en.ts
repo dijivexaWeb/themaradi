@@ -272,6 +272,7 @@ const en = {
         { label: 'Demo Profile', href: '/memorial/demo' },
         { label: 'Pricing', href: '/pricing' },
         { label: 'FAQ', href: '#sss' },
+        { label: 'Sign in', href: '/login' },
       ],
       corporateLinks: [
         { label: 'About Us', href: '/about' },
