@@ -279,6 +279,11 @@ export function adminNewRegistrationEmail(params: {
       font-family:-apple-system,sans-serif;
       font-weight:600;
     ">Admin Paneline Git →</a>
+
+    <p style="margin:20px 0 0;font-size:12px;color:#adb5ab;font-family:-apple-system,sans-serif;line-height:1.6;">
+      Veya bu adresi tarayıcınıza kopyalayın:<br>
+      <a href="${params.adminUrl}" style="color:#5a9e7a;word-break:break-all;">${params.adminUrl}</a>
+    </p>
   `)
 }
 
