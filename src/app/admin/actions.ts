@@ -485,7 +485,7 @@ export async function updateBankSettings(formData: FormData): Promise<ActionResu
   const { user, profile } = await requireAdmin()
   const supabase = await createServiceClient()
 
-  const keys = ['bank_iban', 'bank_name', 'bank_recipient']
+  const keys = ['bank_iban', 'bank_name', 'bank_recipient', 'paypal_link']
   const updates = keys.map((key) => ({
     key,
     value: (formData.get(key) ?? '').toString().trim(),

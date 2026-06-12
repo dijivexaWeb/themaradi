@@ -44,6 +44,16 @@ export default function BankSettingsForm({ settings }: { settings: Record<string
         </div>
       </div>
 
+      <div className="border-t border-slate-100 pt-4">
+        <label className="block text-xs font-medium text-slate-700 mb-1">PayPal.me Linki</label>
+        <input name="paypal_link" type="url" defaultValue={settings.paypal_link ?? ''}
+          placeholder="https://paypal.me/kullaniciadin"
+          className={inp} />
+        <p className="text-xs text-slate-400 mt-1">
+          Ödeme sayfasında PayPal butonu için kullanılır. Tutar otomatik eklenir: <code className="bg-slate-100 px-1 rounded">paypal.me/xxx/249</code>
+        </p>
+      </div>
+
       {error && <p className="text-sm text-red-600">{error}</p>}
 
       <div className="flex items-center gap-3 pt-2 border-t border-slate-100">

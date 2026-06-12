@@ -3,6 +3,99 @@
 > Her oturum sonunda Claude bu dosyayı günceller.
 > Format: tarih → ne yapıldı → nerede kalındı → sıradaki adım.
 
+## 2026-06-12 — Oturum 91: PayPal Entegrasyonu (Sandbox)
+
+### Yapılanlar
+- `@paypal/react-paypal-js` paketi kuruldu
+- `src/lib/paypal.ts` oluşturuldu: `getAccessToken`, `createOrder`, `captureOrder`, `getPublicClientId` fonksiyonları
+- `POST /api/paypal/create-order` API route: form validate → user/vault oluştur → PayPal order döner
+- `POST /api/paypal/capture-order` API route: PayPal capture → payment `status: paid`, `paid_at` set, vault `pending_verification` kalır
+- `src/components/PayPalCheckoutButton.tsx`: PayPalScriptProvider + PayPalButtons client component
+- `/satin-al/anma/_AnmaFormClient.tsx`: "yakında" kart overlay kaldırıldı, PayPal butonu eklendi, form alanları controlled state'e taşındı
+- `/satin-al/kasa/_KasaFormClient.tsx`: aynı güncelleme
+- Her iki sayfaya BrandLogo header + trust badges (SSL/güvenli ödeme) eklendi
+
+### Proje Durumu
+- [x] PayPal sandbox entegrasyonu (create-order + capture-order)
+- [x] /satin-al/anma PayPal butonu aktif
+- [x] /satin-al/kasa PayPal butonu aktif
+- [x] Checkout sayfaları branding (logo + trust badges)
+- [ ] Env variables eklenmeli (NEXT_PUBLIC_PAYPAL_CLIENT_ID, PAYPAL_CLIENT_SECRET)
+- [ ] Sandbox test edilecek
+- [ ] Live'a geçiş (PAYPAL_MODE=live, LIVE credentials)
+- [ ] Abonelik (vault monthly) — PayPal Subscription Plan oluşturulacak
+
+### Kritik Kararlar / Notlar
+- PayPal status `paid` olarak set edildi (admin `_PaymentStatusForm` statüsleriyle uyumlu: `['pending','paid','overdue','failed','refunded','cancelled']`)
+- Vault status `pending_payment` → `pending_verification` (admin hâlâ manuel doğrular)
+- GEL (Georgian Lari) para birimi kullanılıyor; PayPal GEL desteği sandbox'ta test edilmeli
+- `paypal_order_id` kolonu DB'de yok; PayPal order ID `notes` alanına yazılıyor
+- Admin `/admin/kasa` sayfası PayPal ödemelerini de gösterecek (payment_method=paypal, notes=PayPal Order: ...)
+
+### Nerede Kaldık
+PayPal entegrasyonu tamamlandı, TS hatası yok. Env variables eklenmesi + sandbox test bekleniyor.
+
+### Sıradaki Adım
+1. Admin → Settings → PayPal link alanına `https://www.paypal.com/ncp/payment/DFZ6AJFSZBDPY` ekle
+2. `/satin-al/anma` sayfasında PayPal flow'u test et
+3. `/satin-al/kasa` formunu da aynı şekilde güncelle
+4. Kasa formu için ayrı PayPal linki oluşturulabilir (farklı tutar)
+
+## 2026-06-12 — Oturum 90: CookieBanner Fix + RealMemorialPage İnceleme
+
+### Yapılanlar
+- **CookieBanner dil hatası düzeltildi**: `layout.tsx`'te `<CookieBanner />` `<LangProvider>` dışındaydı, tüm kullanıcılara Gürcüce (KA default) görünüyordu. `LangProvider` içine taşındı.
+- **RealMemorialPage.tsx incelendi**: Gerçek vault'lar için 1000 satırlık server component. 9 paralel Supabase sorgusu, tüm bölümler feature-complete.
+- **Tespit**: Stats bar'daki "Ziyaretçi" / "Bu sayfayı ziyaret etti" metinleri hardcoded Türkçe (line 402-403) — i18n'e alınmamış.
+
+### Proje Durumu
+- [x] CookieBanner dil hatası (LangProvider scope fix)
+- [x] Demo sayfası üst banner + alt CTA (4 dil)
+- [x] Header/footer giriş butonu
+- [ ] Stats bar "Ziyaretçi" metni i18n'e alınacak
+- [ ] Telefon numaraları güncelleme (+995 KA numarası)
+
+### Kritik Kararlar / Notlar
+- `i18n/context.tsx` default lang değeri `'ka'` — LangProvider dışında kalan herhangi bir component otomatik Gürcüce'ye düşer
+- RealMemorialPage anı defteri (MemoryBookClient): `memory_book_entries` tablosundan onaylı kayıtları çekiyor (max 30)
+
+### Nerede Kaldık
+RealMemorialPage.tsx içeriği incelendi ve kaydedildi. MemoryBookClient bileşeni henüz incelenmedi.
+
+### Sıradaki Adım
+1. Kullanıcının belirlediği farklı bir görev
+2. Stats bar "Ziyaretçi" metnini i18n'e almak (`t.memorial.visitors` key ekle)
+3. Telefon numaraları güncelleme: +995 555 76 64 76 (KA) ekleme
+
+## 2026-06-12 — Oturum 89: Demo Sayfası Banner & Bottom CTA
+
+### Yapılanlar
+- **DemoBanner** komponenti eklendi: sayfanın en üstünde sabit (fixed top-0 z-[60]), "Ana Sayfa" linki + demo etiketi + "Profil Oluştur" CTA butonu
+- **MemorialNav** `top-0` → `top-11` kaydırıldı (banner yüksekliği = 44px)
+- **Yapışkan sekmeler** `top-0` → `top-[108px]` (banner 44px + nav 64px)
+- **Hero `pt`** `pt-22` → `pt-[108px]` (banner+nav yüksekliği)
+- **BottomCta bölümü** eklendi (footer öncesinde): `/fiyatlar` → `#fiyatlar` CTA + Ana Sayfa geri butonu, `final-cta-leaves.png` arka plan
+- **4 dil copy** (TR/EN/KA/RU) `demoBanner` ve `bottomCta` key'leri `memorialCopyBase` içine eklendi
+- **Encoding bug fix**: Edit aracı `"` smart quote (U+201C/D) soktu, PowerShell ile tüm dosyada ASCII quote'a dönüştürüldü
+
+### Proje Durumu
+- [x] Demo sayfası üst banner (4 dil)
+- [x] Demo sayfası alt CTA (4 dil)
+- [x] Header giriş butonu
+- [x] Footer platformLinks giriş linki
+
+### Kritik Kararlar / Notlar
+- Edit aracı zaman zaman Unicode smart quote (`"` U+201D) sokabiliyor — büyük string değişikliklerinde encoding kontrolü gerekli
+- `DemoBanner` component ana function'dan sonra tanımlandı; JS function hoisting sayesinde çalışıyor
+
+### Nerede Kaldık
+`MemorialPageClient.tsx` demo sayfası tamamlandı. Commit: `a16181c`
+
+### Sıradaki Adım
+1. Telefon numaraları güncelleme: +995 555 76 64 76 (KA) ekleme, dil etiketleri (TR/KA/Türkiye)
+2. Nav'da kullanıcı oturum durumuna göre koşullu render (giriş yapmışsa Dashboard)
+3. QR üretim ve email gönderim akışı teknik tasarımı
+
 ## 2026-06-12 — Oturum 88: Header & Footer Giriş Butonu
 
 ### Yapılanlar
