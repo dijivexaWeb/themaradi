@@ -153,6 +153,17 @@ const memorialCopyBase = {
       kvkk: 'KVKK',
       rights: '© 2026 The Eternal Memory. Tüm hakları saklıdır.',
     },
+    demoBanner: {
+      text: 'Bu bir örnek anma profilidir.',
+      cta: 'Profil Oluştur',
+      home: 'Ana Sayfa',
+    },
+    bottomCta: {
+      heading: 'Siz de sevdiklerinizi bu şekilde anabilirsiniz.',
+      sub: 'Ahmet Yılmaz gibi bir profil birkaç dakikada oluşturulur.',
+      primaryBtn: 'Fiyatları Gör',
+      secondaryBtn: 'Ana Sayfaya Dön',
+    },
   },
   en: {
     nav: { home: 'Home', how: 'How it works', memorials: 'Digital Memorials', contact: 'Contact', start: 'Start' },
@@ -268,6 +279,17 @@ const memorialCopyBase = {
       kvkk: 'KVKK',
       rights: '© 2026 The Eternal Memory. All rights reserved.',
     },
+    demoBanner: {
+      text: 'This is a demo memorial profile.',
+      cta: 'Create a Profile',
+      home: 'Home',
+    },
+    bottomCta: {
+      heading: 'You can memorialize your loved ones this way.',
+      sub: 'A profile like this takes just minutes to create.',
+      primaryBtn: 'See Pricing',
+      secondaryBtn: 'Back to Home',
+    },
   },
 }
 
@@ -341,6 +363,8 @@ const memorialCopy: Record<Lang, typeof memorialCopyBase.tr> = {
     ],
     visit: { label: 'მონახულების ინფორმაცია', titleA: 'საფლავთან', titleB: 'მონახულება.', imageAlt: 'აჰმეთ ილმაზის საფლავი', cemeteryLine: '1940 - 2020 · უჩლერის სასაფლაო, კონია', infoTitle: 'საფლავის ინფორმაცია', cemetery: 'სასაფლაო', plot: 'უბანი / ნაკვეთი', row: 'რიგი / ნომერი', hours: 'მონახულების საათები', cemeteryValue: 'უჩლერის სასაფლაო, კონია', plotValue: 'უბანი: 245 · ნაკვეთი: 18', rowValue: 'რიგი: C · საფლავი No: 7', hoursValue: 'ყოველდღე 08:00 - 19:00', noteLabel: 'შენიშვნა:', note: 'მნახველებისთვის ხელმისაწვდომია კომფორტული სასეირნო ბილიკები. მთავარი შესასვლელიდან D კარიბჭისკენ გაემართეთ; C რიგამდე 50 მეტრია.', mapTitle: 'სასაფლაოს მდებარეობა' },
     footer: { motto: 'მოგონებები ცოცხლობს, დიდი სიყვარული უსასრულოა.', platform: 'პლატფორმა', corporate: 'კომპანია', documents: 'დოკუმენტები', home: 'მთავარი', demo: 'დემო პროფილი', pricing: 'ფასები', about: 'ჩვენ შესახებ', contact: 'კონტაქტი', privacy: 'კონფიდენციალურობა', terms: 'გამოყენების პირობები', kvkk: 'KVKK', rights: '© 2026 The Eternal Memory. ყველა უფლება დაცულია.' },
+    demoBanner: { text: 'ეს სადემონსტრაციო პროფილია.', cta: 'პროფილის შექმნა', home: 'მთავარი' },
+    bottomCta: { heading: 'შეგიძლიათ ასე გაიხსენოთ თქვენი საყვარელი ადამიანები.', sub: 'ამ მსგავსი პროფილი რამდენიმე წუთში იქმნება.', primaryBtn: 'ფასების ნახვა', secondaryBtn: 'მთავარ გვერდზე' },
   },
   ru: {
     ...memorialCopyBase.en,
@@ -403,6 +427,8 @@ const memorialCopy: Record<Lang, typeof memorialCopyBase.tr> = {
     ],
     visit: { label: 'Информация о посещении', titleA: 'Посещение', titleB: 'у могилы.', imageAlt: 'Могила Ахмета Йылмаза', cemeteryLine: '1940 - 2020 · Кладбище Учлер, Кония', infoTitle: 'Информация о могиле', cemetery: 'Кладбище', plot: 'Участок / Парцелла', row: 'Ряд / Номер', hours: 'Часы посещения', cemeteryValue: 'Кладбище Учлер, Кония', plotValue: 'Участок: 245 · Парцелла: 18', rowValue: 'Ряд: C · Могила No: 7', hoursValue: 'Ежедневно 08:00 - 19:00', noteLabel: 'Примечание:', note: 'Для посетителей есть удобные пешеходные дорожки. От главного входа направляйтесь к воротам D; ряд C находится в 50 метрах.', mapTitle: 'Местоположение кладбища' },
     footer: { motto: 'Воспоминания живут, большая любовь бесконечна.', platform: 'Платформа', corporate: 'Компания', documents: 'Документы', home: 'Главная', demo: 'Демо профиль', pricing: 'Цены', about: 'О нас', contact: 'Контакты', privacy: 'Политика конфиденциальности', terms: 'Условия использования', kvkk: 'KVKK', rights: '© 2026 The Eternal Memory. Все права защищены.' },
+    demoBanner: { text: 'Это демонстрационный профиль.', cta: 'Создать профиль', home: 'Главная' },
+    bottomCta: { heading: 'Вы тоже можете увековечить своих близких.', sub: 'Профиль как этот создаётся за несколько минут.', primaryBtn: 'Смотреть цены', secondaryBtn: 'На главную' },
   },
 }
 const voiceMemoryBars = [
@@ -543,9 +569,10 @@ export default function MemorialPage() {
 
   return (
     <div className="min-h-screen bg-[#fbf8f1] text-[#173d31]">
+      <DemoBanner copy={copy.demoBanner} />
       <MemorialNav lang={lang} setLang={setLang} copy={copy.nav} />
 
-      {/* â”€â”€ HERO â”€â”€ */}
+      {/* â"€â"€ HERO â"€â"€ */}
       <section className="relative flex min-h-screen items-center overflow-hidden bg-[#0c3327]">
         <Image
           src="/images/landing/memorial-cemetery.png"
@@ -556,7 +583,7 @@ export default function MemorialPage() {
         />
         <div className="absolute inset-0 bg-gradient-to-r from-[#0c3327] via-[#0c3327]/85 to-[#0c3327]/20" />
 
-        <div className="relative mx-auto grid w-full max-w-7xl items-center gap-5 px-5 pt-22 pb-12 sm:px-8 sm:pt-24 sm:pb-16 lg:grid-cols-[1fr_380px_1fr] lg:gap-10 lg:pt-20 lg:pb-20">
+        <div className="relative mx-auto grid w-full max-w-7xl items-center gap-5 px-5 pt-[108px] pb-12 sm:px-8 sm:pt-[108px] sm:pb-16 lg:grid-cols-[1fr_380px_1fr] lg:gap-10 lg:pt-[108px] lg:pb-20">
           <div className="order-2 rounded-2xl border border-[#c7a76f]/20 bg-[#091712]/55 p-5 shadow-2xl shadow-black/20 backdrop-blur-sm sm:p-6 lg:order-1">
             <div className="mb-3 flex items-center gap-3 text-[#c7a76f] sm:mb-4">
               <span className="h-px w-8 bg-[#c7a76f] sm:w-10" />
@@ -639,7 +666,7 @@ export default function MemorialPage() {
         </div>
       </section>
 
-      {/* â”€â”€ YAÅAM RAKAMLARI â”€â”€ */}
+      {/* â"€â"€ YAÅAM RAKAMLARI â"€â"€ */}
       <section className="bg-[#173d31] px-5 py-0 sm:px-8">
         <div className="mx-auto grid max-w-7xl grid-cols-2 divide-x divide-y divide-[#2a5a45] sm:grid-cols-4 sm:divide-y-0">
           <LifeStat number={String(yearsLived)} suffix={copy.stats[0].suffix} label={copy.stats[0].label} />
@@ -649,8 +676,8 @@ export default function MemorialPage() {
         </div>
       </section>
 
-      {/* â”€â”€ YAPIÅKAN SEKMELER â”€â”€ */}
-      <nav id="sekmeler" className="sticky top-0 z-40 border-b border-[#e6dccb] bg-[#fbf8f1]/96 shadow-sm backdrop-blur">
+      {/* â"€â"€ YAPIÅKAN SEKMELER â"€â"€ */}
+      <nav id="sekmeler" className="sticky top-[108px] z-40 border-b border-[#e6dccb] bg-[#fbf8f1]/96 shadow-sm backdrop-blur">
         <div className="mx-auto flex max-w-7xl overflow-x-auto px-5 text-sm text-[#665d50] sm:px-8">
           {['#hikaye', '#kronoloji', '#videolar', '#fotograflar', '#son-mesaj', '#taziye', '#ziyaret'].map((href, index) => (
             <TabLink key={href} href={href} label={copy.tabs[index]} />
@@ -658,7 +685,7 @@ export default function MemorialPage() {
         </div>
       </nav>
 
-      {/* â”€â”€ BÄ°YOGRAFÄ° â”€â”€ */}
+      {/* â"€â"€ BÄ°YOGRAFÄ° â"€â"€ */}
       <section id="hikaye" className="px-5 py-16 sm:px-8">
         <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[1.1fr_0.9fr]">
           <div>
@@ -813,7 +840,7 @@ export default function MemorialPage() {
         </div>
       </section>
 
-      {/* â”€â”€ VÄ°DEO ANILAR â”€â”€ */}
+      {/* â"€â"€ VÄ°DEO ANILAR â"€â"€ */}
       <section id="videolar" className="bg-[#0c3327] px-5 py-16 sm:px-8">
         <div className="mx-auto max-w-7xl">
           <div className="mb-10">
@@ -874,7 +901,7 @@ export default function MemorialPage() {
         </div>
       </section>
 
-      {/* â”€â”€ FOTOÄRAFLAR â”€â”€ */}
+      {/* â"€â"€ FOTOÄRAFLAR â"€â"€ */}
       <section id="fotograflar" className="px-5 py-16 sm:px-8">
         <div className="mx-auto max-w-7xl">
           <div className="mb-10 flex items-end justify-between">
@@ -908,7 +935,7 @@ export default function MemorialPage() {
         </div>
       </section>
 
-      {/* â”€â”€ SON MESAJ â”€â”€ */}
+      {/* â"€â"€ SON MESAJ â"€â"€ */}
       <section id="son-mesaj" className="border-y border-[#e6dccb] bg-[#f7f2e9] px-5 py-20 sm:px-8">
         <div className="mx-auto max-w-4xl text-center">
           <SectionLabel text={copy.finalMessage.label} />
@@ -939,7 +966,7 @@ export default function MemorialPage() {
         </div>
       </section>
 
-      {/* â”€â”€ SESLENDÄ°RÄ°LMÄ°Å ANILAR â”€â”€ */}
+      {/* â"€â"€ SESLENDÄ°RÄ°LMÄ°Å ANILAR â"€â"€ */}
       <section className="bg-[#0c3327] px-5 py-16 sm:px-8">
         <div className="mx-auto max-w-7xl">
           <div className="mb-10">
@@ -985,7 +1012,7 @@ export default function MemorialPage() {
         </div>
       </section>
 
-      {/* â”€â”€ Ã–NE Ã‡IKAN ANILAR â”€â”€ */}
+      {/* â"€â"€ Ã–NE Ã‡IKAN ANILAR â"€â"€ */}
       <section className="px-5 py-16 sm:px-8">
         <div className="mx-auto max-w-7xl">
           <div className="mb-12 text-center">
@@ -1016,7 +1043,7 @@ export default function MemorialPage() {
         </div>
       </section>
 
-      {/* â”€â”€ TAZÄ°YE + Ä°NTERAKSÄ°YON (client) â”€â”€ */}
+      {/* â"€â"€ TAZÄ°YE + Ä°NTERAKSÄ°YON (client) â"€â"€ */}
       <MemorialInteractions condolences={condolences.map((c, i) => ({ ...c, id: `demo-${i}`, reactions: { heart: 0, pray: 0, smile: 0, cry: 0, dove: 0 } }))} />
 
       <section id="aile-baglari" className="bg-[#091712] px-5 py-12 text-[#efe7d8] sm:px-8">
@@ -1106,7 +1133,7 @@ export default function MemorialPage() {
         </div>
       </section>
 
-      {/* â”€â”€ ZÄ°YARET BÄ°LGÄ°SÄ° â”€â”€ */}
+      {/* â"€â"€ ZÄ°YARET BÄ°LGÄ°SÄ° â"€â"€ */}
       <section id="ziyaret" className="border-t border-[#e6dccb] px-5 py-16 sm:px-8">
         <div className="mx-auto max-w-7xl">
           <div className="mb-10">
@@ -1115,7 +1142,7 @@ export default function MemorialPage() {
           </div>
 
           <div className="overflow-hidden rounded-2xl border border-[#e1d5c3] shadow-xl shadow-[#4d3d26]/8">
-            {/* Mezar fotosu â€” tam geniÅŸlik */}
+            {/* Mezar fotosu â€" tam geniÅŸlik */}
             <div className="relative h-[280px] w-full sm:h-[340px]">
               <Image
                 src="/images/landing/memorial-hero-cemetery.png"
@@ -1170,7 +1197,56 @@ export default function MemorialPage() {
         </div>
       </section>
 
+      {/* ── BOTTOM CTA ── */}
+      <section className="bg-[#0c3327] px-5 pb-16 pt-4 sm:px-8">
+        <div className="relative mx-auto max-w-4xl overflow-hidden rounded-[1.35rem] px-6 py-12 text-center text-white shadow-2xl shadow-black/20 sm:px-10">
+          <Image src="/images/landing/final-cta-leaves.png" alt="" fill sizes="100vw" className="absolute inset-0 object-cover" />
+          <div className="absolute inset-0 bg-[#06291f]/25" />
+          <div className="relative z-10">
+            <h2 className="font-serif text-3xl sm:text-4xl">{copy.bottomCta.heading}</h2>
+            <p className="mt-3 text-base text-[#e8decc] sm:text-lg">{copy.bottomCta.sub}</p>
+            <div className="mt-8 flex flex-col justify-center gap-3 sm:flex-row">
+              <Link
+                href="/#fiyatlar"
+                className="inline-flex items-center justify-center gap-2 rounded-md bg-[#d1a85c] px-7 py-3 text-sm font-semibold text-[#103b2c] shadow-lg shadow-black/10 transition hover:bg-[#e0ba70]"
+              >
+                {copy.bottomCta.primaryBtn}
+                <ArrowRight className="h-4 w-4" />
+              </Link>
+              <Link
+                href="/"
+                className="inline-flex items-center justify-center gap-2 rounded-md border border-[#d1a85c] bg-[#103b2c]/25 px-7 py-3 text-sm font-semibold text-white transition hover:bg-[#103b2c]/45"
+              >
+                {copy.bottomCta.secondaryBtn}
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <MemorialFooter copy={copy.footer} />
+    </div>
+  )
+}
+
+function DemoBanner({ copy }: { copy: { text: string; cta: string; home: string } }) {
+  return (
+    <div className="fixed inset-x-0 top-0 z-[60] flex h-11 items-center justify-between bg-[#103b2c] px-4 sm:px-8">
+      <Link
+        href="/"
+        className="flex items-center gap-1.5 text-xs font-semibold text-[#c7a76f] transition hover:text-white"
+      >
+        <ArrowRight className="h-3 w-3 rotate-180" />
+        <span>{copy.home}</span>
+      </Link>
+      <p className="hidden text-xs text-[#b8aa93] sm:block">{copy.text}</p>
+      <Link
+        href="/#fiyatlar"
+        className="flex items-center gap-1.5 rounded-md bg-[#b08340] px-3 py-1.5 text-xs font-semibold text-white transition hover:bg-[#c7944e]"
+      >
+        {copy.cta}
+        <ArrowRight className="h-3 w-3" />
+      </Link>
     </div>
   )
 }
@@ -1185,7 +1261,7 @@ function MemorialNav({
   copy: typeof memorialCopy.tr.nav
 }) {
   return (
-    <nav className="fixed inset-x-0 top-0 z-50 border-b border-[#e6dccb]/50 bg-[#fbf8f1]/90 shadow-sm backdrop-blur">
+    <nav className="fixed inset-x-0 top-11 z-50 border-b border-[#e6dccb]/50 bg-[#fbf8f1]/90 shadow-sm backdrop-blur">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5 sm:px-8">
         <BrandLogo />
         <div className="hidden items-center gap-7 text-sm font-medium text-[#4c463c] lg:flex">
