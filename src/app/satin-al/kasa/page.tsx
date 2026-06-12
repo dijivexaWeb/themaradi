@@ -1,6 +1,5 @@
 import { getBankSettings } from '@/lib/bank-settings'
 import { fetchPricingConfig } from '@/lib/pricing'
-import { getPublicClientId } from '@/lib/paypal'
 import KasaFormClient from './_KasaFormClient'
 
 export default async function KasaSatinAlPage() {
@@ -12,5 +11,5 @@ export default async function KasaSatinAlPage() {
     ? Number(pricing.campaignVaultMonthly)
     : Number(pricing.vaultMonthly)
 
-  return <KasaFormClient bank={bank} setupAmount={setupAmount} monthlyAmount={monthlyAmount} paypalClientId={getPublicClientId()} />
+  return <KasaFormClient bank={bank} setupAmount={setupAmount} monthlyAmount={monthlyAmount} />
 }

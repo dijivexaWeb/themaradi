@@ -76,9 +76,12 @@ export default function AnmaFormClient({
             </div>
           )}
 
-          <p className="text-xs text-slate-600 leading-5 mb-6">
+          <p className="text-xs text-slate-600 leading-5 mb-3">
             Ödemeyi tamamladıktan sonra ekibimiz siparişinizi onaylayacak ve hesabınızı aktifleştirecek.
           </p>
+          <div className="bg-slate-800/60 border border-slate-700 rounded-xl px-4 py-3 mb-4 text-xs text-slate-400 leading-5">
+            🕕 Saat <strong className="text-slate-300">18:00</strong>&apos;dan sonra yapılan ödemeler bir sonraki iş günü içinde onaylanır.
+          </div>
 
           {ppState.pendingEmailConfirmation && (
             <div className="bg-slate-800/60 border border-slate-700 rounded-xl p-4 text-sm text-left space-y-2">
