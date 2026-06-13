@@ -4,6 +4,7 @@ import { notFound } from 'next/navigation'
 import StatusBadge from '../../_components/StatusBadge'
 import VaultStatusForm from './_VaultStatusForm'
 import NotableForm from './_NotableForm'
+import ObjectionToggleForm from './_ObjectionToggleForm'
 import Link from 'next/link'
 
 export default async function VaultDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -104,6 +105,20 @@ export default async function VaultDetailPage({ params }: { params: Promise<{ id
             {(heirs ?? []).length === 0 && <tr><td colSpan={4} className="px-4 py-4 text-center text-slate-400">Varis yok</td></tr>}
           </tbody>
         </table>
+      </div>
+
+      {/* Objection Toggle */}
+      <div className="bg-white border border-slate-200 rounded-xl shadow-sm mb-6">
+        <div className="px-5 py-4 border-b border-slate-100 flex items-center gap-2">
+          <span>🚫</span>
+          <h2 className="font-semibold text-slate-800">İtiraz Bölümü</h2>
+          {vault.hide_objection && (
+            <span className="ml-auto rounded-full bg-slate-100 px-2 py-0.5 text-[10px] font-bold text-slate-500 uppercase tracking-wide">Gizli</span>
+          )}
+        </div>
+        <div className="p-5">
+          <ObjectionToggleForm vaultId={vault.id} initialHide={vault.hide_objection ?? false} />
+        </div>
       </div>
 
       {/* Notable Profile */}

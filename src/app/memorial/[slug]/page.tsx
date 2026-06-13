@@ -142,7 +142,7 @@ export default async function MemorialPage({ params, searchParams }: PropsWithSe
     <>
       <ViewTracker vaultId={vault.id} />
       <RealMemorialPage vault={vault} />
-      {vault.status === 'public_memorial' && <ObjectionSection vaultId={vault.id} />}
+      {vault.status === 'public_memorial' && !vault.is_notable && !vault.hide_objection && <ObjectionSection vaultId={vault.id} />}
     </>
   )
 }

@@ -639,3 +639,33 @@ export async function saveNotableProfile(
   if (vault?.slug) revalidatePath(`/memorial/${vault.slug}`)
   return { success: true }
 }
+
+// ─── Hide Objection Toggle ───────────────────────────────────────────────────
+
+export async function saveHideObjection(vaultId: string, hide: boolean): Promise<ActionResult> {
+  const { user, profile } = await requireAdmin()
+  if (!z.string().uuid().safeParse(vaultId).success) return { success: false, error: 'Geçersiz vault ID' }
+
+  const supabase = await createServiceClient()
+  const { data: vault, error } = await supabase
+    .from('vaults')
+    .update({ hide_objection: hide, updated_at: new Date().toISOString() })
+    .eq('id', vaultId)
+    .select('slug')
+    .single()
+
+  if (error) return { success: false, error: error.message }
+
+  await logAdminAction({
+    adminId: user.id,
+    adminEmail: user.email ?? profile.email ?? '',
+    action: 'hide_objection_updated',
+    entityType: 'vault',
+    entityId: vaultId,
+    newValue: { hide_objection: hide },
+  })
+
+  revalidatePath(`/admin/memorials/${vaultId}`)
+  if (vault?.slug) revalidatePath(`/memorial/${vault.slug}`)
+  return { success: true }
+}
