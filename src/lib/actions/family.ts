@@ -5,31 +5,28 @@ import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 import { generateFileKey, getPublicUrl, uploadR2Object } from '@/lib/r2'
 
-function cleanFilename(name: string) {
-  const cleaned = name
-    .toLowerCase()
-    .replace(/ş/g, 's').replace(/ğ/g, 'g').replace(/ü/g, 'u')
-    .replace(/ö/g, 'o').replace(/ı/g, 'i').replace(/ç/g, 'c')
-    .replace(/[^a-z0-9._-]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '')
-  return cleaned || 'photo'
-}
-
 async function assertOwner(supabase: Awaited<ReturnType<typeof createClient>>, vaultId: string, userId: string) {
   const { data } = await supabase.from('vaults').select('id, status').eq('id', vaultId).eq('owner_id', userId).single()
   if (!data) return null
   return data
 }
 
-async function uploadFamilyPhoto(vaultId: string, userId: string, formData: FormData): Promise<string | null> {
-  const file = formData.get('photo_file')
-  const urlInput = (formData.get('photo_url') as string)?.trim() || null
+async function uploadFamilyPhoto(vaultId: string, formData: FormData): Promise<string | null> {
+  // R2ImageUpload sends file_key + bucket after client-side presigned upload
+  const fileKey = (formData.get('file_key') as string | null)?.trim()
+  const bucket = (formData.get('bucket') as string | null)?.trim()
+  if (fileKey && bucket) {
+    return getPublicUrl(fileKey)
+  }
 
+  // Direct file upload fallback
+  const file = formData.get('photo_file')
   if (file instanceof File && file.size > 0 && file.type.startsWith('image/')) {
     try {
-      const bucket = process.env.R2_PUBLIC_BUCKET || 'tem-public-media'
+      const r2Bucket = process.env.R2_PUBLIC_BUCKET || 'tem-public-media'
       const key = generateFileKey('family_member', vaultId, file.name)
       const buffer = Buffer.from(await file.arrayBuffer())
-      await uploadR2Object(bucket, key, buffer, file.type)
+      await uploadR2Object(r2Bucket, key, buffer, file.type)
       return getPublicUrl(key)
     } catch (e) {
       console.error('[uploadFamilyPhoto] R2 upload error:', e)
@@ -37,7 +34,8 @@ async function uploadFamilyPhoto(vaultId: string, userId: string, formData: Form
     }
   }
 
-  return urlInput
+  // Manual URL input
+  return (formData.get('photo_url') as string)?.trim() || null
 }
 
 export async function addFamilyMemberAction(vaultId: string, formData: FormData): Promise<void> {
@@ -51,9 +49,11 @@ export async function addFamilyMemberAction(vaultId: string, formData: FormData)
   const relationship = formData.get('relationship') as string
   const fullName = (formData.get('full_name') as string)?.trim()
   const birthDate = (formData.get('birth_date') as string) || null
+  const birthDatePrecision = (formData.get('birth_date_precision') as string) || 'day'
   const deathDate = (formData.get('death_date') as string) || null
+  const deathDatePrecision = (formData.get('death_date_precision') as string) || 'day'
   const isAlive = formData.get('is_alive') !== 'false'
-  const photoUrl = await uploadFamilyPhoto(vaultId, user.id, formData)
+  const photoUrl = await uploadFamilyPhoto(vaultId, formData)
   const notes = (formData.get('notes') as string)?.trim() || null
 
   const validRels = [
@@ -71,15 +71,17 @@ export async function addFamilyMemberAction(vaultId: string, formData: FormData)
     relationship,
     full_name: fullName,
     birth_date: birthDate,
+    birth_date_precision: birthDate ? birthDatePrecision : null,
     death_date: isAlive ? null : deathDate,
+    death_date_precision: !isAlive && deathDate ? deathDatePrecision : null,
     is_alive: isAlive,
     photo_url: photoUrl,
     notes,
     parent_member_id: parentMemberId,
   })
 
-  revalidatePath(`/dashboard/vault/${vaultId}/aile`)
-  revalidatePath(`/dashboard/vault/${vaultId}`)
+  revalidatePath(`/anma-paneli/${vaultId}/aile`)
+  revalidatePath(`/anma-paneli/${vaultId}`)
 }
 
 export async function updateFamilyMemberAction(memberId: string, vaultId: string, formData: FormData): Promise<void> {
@@ -93,9 +95,11 @@ export async function updateFamilyMemberAction(memberId: string, vaultId: string
   const relationship = formData.get('relationship') as string
   const fullName = (formData.get('full_name') as string)?.trim()
   const birthDate = (formData.get('birth_date') as string) || null
+  const birthDatePrecision = (formData.get('birth_date_precision') as string) || 'day'
   const deathDate = (formData.get('death_date') as string) || null
+  const deathDatePrecision = (formData.get('death_date_precision') as string) || 'day'
   const isAlive = formData.get('is_alive') !== 'false'
-  const photoUrl = await uploadFamilyPhoto(vaultId, user.id, formData)
+  const photoUrl = await uploadFamilyPhoto(vaultId, formData)
   const notes = (formData.get('notes') as string)?.trim() || null
 
   if (!fullName) return
@@ -107,7 +111,9 @@ export async function updateFamilyMemberAction(memberId: string, vaultId: string
       relationship,
       full_name: fullName,
       birth_date: birthDate,
+      birth_date_precision: birthDate ? birthDatePrecision : null,
       death_date: isAlive ? null : deathDate,
+      death_date_precision: !isAlive && deathDate ? deathDatePrecision : null,
       is_alive: isAlive,
       photo_url: photoUrl,
       notes,
@@ -116,9 +122,9 @@ export async function updateFamilyMemberAction(memberId: string, vaultId: string
     .eq('id', memberId)
     .eq('vault_id', vaultId)
 
-  revalidatePath(`/dashboard/vault/${vaultId}/aile`)
-  revalidatePath(`/dashboard/vault/${vaultId}`)
-  redirect(`/dashboard/vault/${vaultId}/aile`)
+  revalidatePath(`/anma-paneli/${vaultId}/aile`)
+  revalidatePath(`/anma-paneli/${vaultId}`)
+  redirect(`/anma-paneli/${vaultId}/aile`)
 }
 
 export async function deleteFamilyMemberAction(memberId: string, vaultId: string): Promise<void> {
@@ -131,6 +137,6 @@ export async function deleteFamilyMemberAction(memberId: string, vaultId: string
 
   await supabase.from('vault_family_members').delete().eq('id', memberId).eq('vault_id', vaultId)
 
-  revalidatePath(`/dashboard/vault/${vaultId}/aile`)
-  revalidatePath(`/dashboard/vault/${vaultId}`)
+  revalidatePath(`/anma-paneli/${vaultId}/aile`)
+  revalidatePath(`/anma-paneli/${vaultId}`)
 }

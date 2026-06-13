@@ -139,14 +139,22 @@ export async function updateMemorialFamilyMemberAction(
   const fullName = (formData.get('full_name') as string)?.trim()
   if (!fullName) return
 
+  const birthDate = (formData.get('birth_date') as string) || null
+  const birthDatePrecision = (formData.get('birth_date_precision') as string) || 'day'
+  const isAlive = formData.get('is_alive') !== 'false'
+  const deathDate = isAlive ? null : (formData.get('death_date') as string) || null
+  const deathDatePrecision = (formData.get('death_date_precision') as string) || 'day'
+
   await supabase
     .from('vault_family_members')
     .update({
       relationship: formData.get('relationship') as string,
       full_name: fullName,
-      birth_date: (formData.get('birth_date') as string) || null,
-      death_date: formData.get('is_alive') !== 'false' ? null : (formData.get('death_date') as string) || null,
-      is_alive: formData.get('is_alive') !== 'false',
+      birth_date: birthDate,
+      birth_date_precision: birthDate ? birthDatePrecision : null,
+      death_date: deathDate,
+      death_date_precision: deathDate ? deathDatePrecision : null,
+      is_alive: isAlive,
       photo_url: photoUrl,
       notes: (formData.get('notes') as string)?.trim() || null,
       parent_member_id: (formData.get('parent_member_id') as string) || null,

@@ -6,6 +6,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { ImageUploadInput } from './ImageUploadInput'
 import { CemeteryLocationPicker } from './CemeteryLocationPicker'
+import PartialDateInput from './PartialDateInput'
 
 interface Props {
   vault: {
@@ -15,7 +16,9 @@ interface Props {
     profession: string | null
     hobbies: string | null
     birth_date: string | null
+    birth_date_precision: string | null
     death_date: string | null
+    death_date_precision: string | null
     birth_place: string | null
     death_place: string | null
     cover_photo_url: string | null
@@ -228,11 +231,23 @@ export default function ProfileWizardForm({ vault, saveProfileAction, isLocked }
             <div className="grid grid-cols-2 gap-4 pt-2">
               <div>
                 <label className={labelCls}>Doğum Tarihi</label>
-                <input type="date" name="birth_date" defaultValue={vault.birth_date ?? ''} disabled={isLocked} className={inputCls} />
+                <PartialDateInput
+                  name="birth_date"
+                  defaultDate={vault.birth_date}
+                  defaultPrecision={vault.birth_date_precision}
+                  disabled={isLocked}
+                  inputCls={inputCls}
+                />
               </div>
               <div>
                 <label className={labelCls}>Vefat Tarihi</label>
-                <input type="date" name="death_date" defaultValue={vault.death_date ?? ''} disabled={isLocked} className={inputCls} />
+                <PartialDateInput
+                  name="death_date"
+                  defaultDate={vault.death_date}
+                  defaultPrecision={vault.death_date_precision}
+                  disabled={isLocked}
+                  inputCls={inputCls}
+                />
               </div>
             </div>
             

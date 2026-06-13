@@ -7,6 +7,7 @@ import { updateMemorialFamilyMemberAction } from '../actions'
 import FamilyTreeCanvas from '@/components/FamilyTreeCanvas'
 import R2ImageUpload from '@/components/R2ImageUpload'
 import SubmitButton from '@/components/SubmitButton'
+import PartialDateInput from '@/components/PartialDateInput'
 
 interface Props {
   params: Promise<{ id: string }>
@@ -199,16 +200,7 @@ export default async function MemorialAilePage({ params, searchParams }: Props) 
                             </select>
                           </div>
                         )}
-                        <div className="grid grid-cols-3 gap-3">
-                          <div>
-                            <label className={dLabelCls}>Doğum Tarihi</label>
-                            <input
-                              type="date"
-                              name="birth_date"
-                              defaultValue={editMember.birth_date ?? ''}
-                              className={dInputCls}
-                            />
-                          </div>
+                        <div className="space-y-3">
                           <div>
                             <label className={dLabelCls}>Durum</label>
                             <select
@@ -220,14 +212,27 @@ export default async function MemorialAilePage({ params, searchParams }: Props) 
                               <option value="false">Vefat Etti</option>
                             </select>
                           </div>
-                          <div>
-                            <label className={dLabelCls}>Vefat Tarihi</label>
-                            <input
-                              type="date"
-                              name="death_date"
-                              defaultValue={editMember.death_date ?? ''}
-                              className={dInputCls}
-                            />
+                          <div className="grid grid-cols-2 gap-3">
+                            <div>
+                              <label className={dLabelCls}>Doğum Tarihi</label>
+                              <PartialDateInput
+                                name="birth_date"
+                                defaultDate={(editMember as Record<string, unknown>).birth_date as string | null}
+                                defaultPrecision={(editMember as Record<string, unknown>).birth_date_precision as string | null}
+                                inputCls={dInputCls}
+                                selectCls={dSelectCls}
+                              />
+                            </div>
+                            <div>
+                              <label className={dLabelCls}>Vefat Tarihi</label>
+                              <PartialDateInput
+                                name="death_date"
+                                defaultDate={(editMember as Record<string, unknown>).death_date as string | null}
+                                defaultPrecision={(editMember as Record<string, unknown>).death_date_precision as string | null}
+                                inputCls={dInputCls}
+                                selectCls={dSelectCls}
+                              />
+                            </div>
                           </div>
                         </div>
                         <div>
@@ -320,11 +325,7 @@ export default async function MemorialAilePage({ params, searchParams }: Props) 
                             </select>
                           </div>
                         )}
-                        <div className="grid grid-cols-3 gap-3">
-                          <div>
-                            <label className={dLabelCls}>Doğum Tarihi</label>
-                            <input type="date" name="birth_date" className={dInputCls} />
-                          </div>
+                        <div className="space-y-3">
                           <div>
                             <label className={dLabelCls}>Durum</label>
                             <select name="is_alive" className={dSelectCls}>
@@ -332,9 +333,23 @@ export default async function MemorialAilePage({ params, searchParams }: Props) 
                               <option value="false">Vefat Etti</option>
                             </select>
                           </div>
-                          <div>
-                            <label className={dLabelCls}>Vefat Tarihi</label>
-                            <input type="date" name="death_date" className={dInputCls} />
+                          <div className="grid grid-cols-2 gap-3">
+                            <div>
+                              <label className={dLabelCls}>Doğum Tarihi</label>
+                              <PartialDateInput
+                                name="birth_date"
+                                inputCls={dInputCls}
+                                selectCls={dSelectCls}
+                              />
+                            </div>
+                            <div>
+                              <label className={dLabelCls}>Vefat Tarihi</label>
+                              <PartialDateInput
+                                name="death_date"
+                                inputCls={dInputCls}
+                                selectCls={dSelectCls}
+                              />
+                            </div>
                           </div>
                         </div>
                         <div>

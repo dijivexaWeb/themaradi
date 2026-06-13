@@ -3,6 +3,156 @@
 > Her oturum sonunda Claude bu dosyayı günceller.
 > Format: tarih → ne yapıldı → nerede kalındı → sıradaki adım.
 
+## 2026-06-13 — Oturum 96: Login Düzeltmesi, R2 Ortam Değişkenleri, NEXT_REDIRECT Açıklaması
+
+### Yapılanlar
+- `src/app/login/_LoginPageClient.tsx` — giriş formu düzeltildi: `<input>` alanlarına `name="email"` ve `name="password"` eklendi (FormData server action'a değer göndermiyordu, bu yüzden "Lütfen tüm alanları doldurun" hatası veriyordu)
+- `src/proxy.ts` — geo-tabanlı dil algılama `proxy.ts` içine taşındı (`src/middleware.ts` oluşturulmuş fakat `proxy.ts` ile çakışıyordu → "Both middleware file and proxy file detected" build hatası); `middleware.ts` silindi
+- Admin "Email Onayla" butonu (`src/app/admin/users/_ConfirmEmailButton.tsx`) ve `confirmUserEmailAction` (`src/app/admin/users/actions.ts`) eklendi — onaylanmamış kullanıcıları admin panelinden doğruluyor + kullanıcıya "Hesabınız aktifleştirildi" emaili gönderiyor
+- Admin bildirim emailine sade metin admin URL'si eklendi (`adminNewRegistrationEmail` template güncellendi)
+- Vercel'e 4 eksik R2 ortam değişkeni eklendi: `R2_ACCOUNT_ID`, `R2_PUBLIC_BUCKET`, `R2_PRIVATE_BUCKET`, `R2_PUBLIC_URL` (fotoğraflar bu sayede görünmeye başladı)
+- `NEXT_REDIRECT` uyarısı açıklandı: Next.js `redirect()` dahili olarak exception fırlatır; try/catch içinde yakalanırsa uyarı görünür ama zararsız
+
+### Proje Durumu
+- [x] Login formu çalışıyor (name attribute düzeltmesi)
+- [x] Profil foto yükleme çalışıyor (R2 env vars eklendi)
+- [x] Admin "Email Onayla" butonu aktif
+- [x] Geo-tabanlı dil algılama (proxy.ts'e taşındı, middleware.ts silindi)
+- [x] Admin kayıt bildirimi + düz metin URL
+
+### Kritik Kararlar / Notlar
+- Bu proje `proxy.ts`'i middleware olarak kullanıyor; `src/middleware.ts` OLUŞTURULMAMALI — build hatası verir
+- `NEXT_REDIRECT` = benign; `redirect()` çağrısı try/catch içindeyse suppress etmek için `isRedirectError` kontrolü eklenebilir ama zorunlu değil
+
+### Nerede Kaldık
+Tüm görevler tamamlandı. Profil foto yükleme ve görüntüleme çalışıyor, login çalışıyor, admin email onayla butonu aktif.
+
+### Sıradaki Adım
+1. Gerçek kullanıcıyla uçtan uca satın alma akışı testi
+2. Admin email ayarlarına PayPal linki girilmesi (opsiyonel)
+3. Geo dil tespitini farklı ülkelerden test etmek (sadece Vercel deploy'da çalışır)
+
+---
+
+## 2026-06-12 — Oturum 95: Admin Kayıt Bildirim Emaili
+
+### Yapılanlar
+- `adminNewRegistrationEmail` template eklendi: isim/email/tel/ürün/tutar/ödeme yöntemi tablosu + "Admin Paneline Git" butonu
+- `getAdminNotificationEmail()` helper: platform_settings'den admin_notification_email okur
+- `purchaseMemorialAction`, `purchaseVaultAction`, `createVaultForPayPalAction` — ödeme kaydı oluşturulduktan sonra admin bildirimi gönderiliyor
+- Admin Email Ayarları sayfasına "Admin Bildirim Emaili" alanı eklendi
+- DB'ye `admin_notification_email = kabakci753@gmail.com` seed edildi
+- Commit: `19f9728`
+
+### Proje Durumu
+- [x] Admin bildirim emaili (yeni kayıt → kabakci753@gmail.com)
+- [x] Admin email ayarları sayfasından değiştirilebilir
+
+### Kritik Kararlar / Notlar
+- Email gönderimi fire-and-forget (try/catch) — hata olursa kullanıcı akışını kesmez
+
+### Nerede Kaldık
+Admin kayıt bildirimi aktif. Tüm purchase flow'ları bildirim gönderiyor.
+
+### Sıradaki Adım
+1. Deploy + gerçek kayıtla test
+2. Admin ayarlarından PayPal link girilmesi
+
+---
+
+## 2026-06-12 — Oturum 94: Geo-Tabanlı Dil Algılama
+
+### Yapılanlar
+- `src/middleware.ts` oluşturuldu (daha önce `proxy.ts` vardı ama bağlı değildi)
+- Vercel'in `x-vercel-ip-country` IP header'ından ülke okunuyor
+- Ülke → dil eşlemesi: GE→ka, TR→tr, RU/AZ/UA/AM/BY/KZ/UZ/KG/TJ/TM/MD→ru, diğerleri→en
+- Fallback: tarayıcı `Accept-Language` header'ı
+- Kullanıcı manuel dil seçmişse (tm_lang cookie) geo tespit çalışmaz, seçim korunur
+- Supabase `updateSession` da middleware içine alındı (daha önce çalışmıyordu)
+- Commit: `143de62`
+
+### Proje Durumu
+- [x] Geo-tabanlı dil tespiti (Vercel IP header)
+- [x] Supabase session middleware aktif
+- [x] TR/KA/RU/EN dil desteği
+
+### Kritik Kararlar / Notlar
+- `x-vercel-ip-country` header'ı sadece Vercel deployment'ta gelir; lokalda test etmek için tarayıcı dilini değiştir
+- CIS ülkelerinin tamamı RU'ya yönlendiriliyor (Azerbaycan dahil)
+
+### Nerede Kaldık
+Middleware oluşturuldu ve commit edildi.
+
+### Sıradaki Adım
+1. Deploy sonrası farklı ülkelerden test
+2. Dil seçici UI bileşeni (kullanıcı manuel değiştirebilsin)
+
+---
+
+## 2026-06-12 — Oturum 93: Admin Email Onay Sistemi
+
+### Yapılanlar
+- `mturadze99@mail.ru` test kayıtları DB'den tamamen silindi (user_consents, payments, vaults, profiles, auth.users)
+- `accountActivatedEmail` template eklendi — "Hesabınız aktifleştirildi" bildirimi
+- `confirmUserEmailAction` eklendi `admin/users/actions.ts`:
+  - `auth.admin.updateUserById(id, { email_confirm: true })` ile email onaylar
+  - Kullanıcıya `accountActivatedEmail` gönderir
+  - Admin audit log'a yazar
+- `_ConfirmEmailButton.tsx` yeni client component: email onaylanmamış kullanıcılarda sarı "Email Onayla" butonu
+- `admin/users/page.tsx`: her kullanıcıda email onay durumu gösteriliyor (✓ onaylı / ⚠ onaylanmadı), onaylanmamışlara buton çıkıyor
+- Commit: `ab86440`
+
+### Proje Durumu
+- [x] Admin users sayfasında email onay butonu
+- [x] Onay → otomatik bildirim emaili kullanıcıya
+
+### Kritik Kararlar / Notlar
+- mail.ru ve benzeri Rus email sağlayıcıları Resend'i engelliyor; artık admin "Email Onayla" butonuyla hem onaylayabilir hem bildirim gönderebilir
+
+### Nerede Kaldık
+Admin users sayfası tamamlandı. Email onay akışı hem otomatik (purchase flow) hem manuel (admin butonu) çalışıyor.
+
+### Sıradaki Adım
+1. Admin ayarlarından PayPal link girilmesi
+2. Gerçek müşteriyle test
+3. Vault monthly abonelik sistemi
+
+---
+
+## 2026-06-12 — Oturum 92: PayPal Link Flow Tamamlandı + Email Onay Sorunu
+
+### Yapılanlar
+- `_KasaFormClient.tsx` baştan yazıldı: eski PayPal SDK yaklaşımı kaldırıldı, `createVaultForPayPalAction` kullanılacak şekilde anma formuyla aynı mantığa getirildi
+- `_AnmaFormClient.tsx`: `paypalReady` success ekranına 18:00 saati notası eklendi
+- `_KasaFormClient.tsx`: `paypalReady` success ekranına aynı 18:00 notası eklendi
+- `kasa/page.tsx`: `paypalClientId` prop temizlendi (artık gerekmiyor)
+- `mturadze99@mail.ru` kullanıcısının email onayı DB'den manuel yapıldı (`email_confirmed_at = NOW()`)
+  - Sebep: mail.ru spam filtresi Resend'den gelen onay mailini silmiş/engellemiş
+- Commit: `b6bd358`
+
+### Proje Durumu
+- [x] PayPal hosted link akışı (anma + kasa form ikisi de)
+- [x] 18:00 cutoff notu PayPal success ekranında
+- [x] Checkout sayfaları branding (logo + trust badges)
+- [x] Admin PayPal link ayarı (platform_settings → paypal_link)
+- [ ] Admin ayarlarından PayPal linki girilmesi (https://www.paypal.com/ncp/payment/DFZ6AJFSZBDPY)
+- [ ] Live test (gerçek müşteri siparişi)
+
+### Kritik Kararlar / Notlar
+- PayPal SDK entegrasyonu (API tabanlı) korundu ama aktif değil — ileride şirket kaydıyla kullanılabilir
+- PayPal link yaklaşımı: form submit → vault+payment oluştur → PayPal link göster → admin manuel onay
+- mail.ru ve benzeri Rus/eski email sağlayıcıları Resend maillerini engelleyebilir; bu durumda Supabase SQL ile email_confirmed_at manuel set edilmeli
+
+### Nerede Kaldık
+`_KasaFormClient.tsx` ve `_AnmaFormClient.tsx` güncellemeleri commit edildi. `mturadze99@mail.ru` kullanıcısı aktive edildi. PayPal link admin settings'den girilmeyi bekliyor.
+
+### Sıradaki Adım
+1. Admin panelinden PayPal link alanına `https://www.paypal.com/ncp/payment/DFZ6AJFSZBDPY` girilmesi
+2. Gerçek müşteriyle test: form doldur → PayPal'a git → öde → admin /admin/kasa'dan onay ver
+3. Vault monthly abonelik sistemi (BOG Pay veya şirket kaydı sonrası)
+
+---
+
 ## 2026-06-12 — Oturum 91: PayPal Entegrasyonu (Sandbox)
 
 ### Yapılanlar

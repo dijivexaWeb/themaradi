@@ -6,6 +6,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { BookOpen, User, Music, Heart, MapPin, Upload, Loader2 } from 'lucide-react'
+import PartialDateInput from '@/components/PartialDateInput'
 
 interface VaultData {
   display_name: string
@@ -13,7 +14,9 @@ interface VaultData {
   status: string
   cover_photo_url: string | null
   birth_date: string | null
+  birth_date_precision: string | null
   death_date: string | null
+  death_date_precision: string | null
   tagline: string | null
   profession: string | null
   hobbies: string | null
@@ -37,7 +40,9 @@ export default function BiyografiPage() {
   // Profil
   const [displayName, setDisplayName] = useState('')
   const [birthDate, setBirthDate] = useState('')
+  const [birthDatePrecision, setBirthDatePrecision] = useState('day')
   const [deathDate, setDeathDate] = useState('')
+  const [deathDatePrecision, setDeathDatePrecision] = useState('day')
   const [tagline, setTagline] = useState('')
   const [coverPhotoUrl, setCoverPhotoUrl] = useState('')
   const [photoObjectPos, setPhotoObjectPos] = useState('center 20%')
@@ -91,7 +96,7 @@ export default function BiyografiPage() {
   useEffect(() => {
     supabase
       .from('vaults')
-      .select('display_name, biography, status, cover_photo_url, birth_date, death_date, tagline, profession, hobbies, birth_place, death_place, favorite_song_title, favorite_song_url, last_message, donation_preference, donation_url, hero_bg_url, profile_video_url')
+      .select('display_name, biography, status, cover_photo_url, birth_date, birth_date_precision, death_date, death_date_precision, tagline, profession, hobbies, birth_place, death_place, favorite_song_title, favorite_song_url, last_message, donation_preference, donation_url, hero_bg_url, profile_video_url')
       .eq('id', id)
       .single()
       .then(({ data }) => {
@@ -100,7 +105,9 @@ export default function BiyografiPage() {
           setVault(v)
           setDisplayName(v.display_name ?? '')
           setBirthDate(v.birth_date ?? '')
+          setBirthDatePrecision(v.birth_date_precision ?? 'day')
           setDeathDate(v.death_date ?? '')
+          setDeathDatePrecision(v.death_date_precision ?? 'day')
           setTagline(v.tagline ?? '')
           setCoverPhotoUrl(v.cover_photo_url ?? '')
           setHeroBgUrl(v.hero_bg_url ?? '')
@@ -161,13 +168,15 @@ export default function BiyografiPage() {
     await supabase.from('vaults').update({
       display_name: displayName.trim() || vault?.display_name,
       birth_date: birthDate || null,
+      birth_date_precision: birthDate ? birthDatePrecision : null,
       death_date: deathDate || null,
+      death_date_precision: deathDate ? deathDatePrecision : null,
       tagline: tagline.trim() || null,
       cover_photo_url: coverPhotoUrl.trim() || null,
       hero_bg_url: heroBgUrl.trim() || null,
       profile_video_url: profileVideoUrl.trim() || null,
     }).eq('id', id)
-    setVault(prev => prev ? { ...prev, display_name: displayName, birth_date: birthDate || null, death_date: deathDate || null, tagline: tagline || null, cover_photo_url: coverPhotoUrl || null, hero_bg_url: heroBgUrl || null, profile_video_url: profileVideoUrl || null } : prev)
+    setVault(prev => prev ? { ...prev, display_name: displayName, birth_date: birthDate || null, birth_date_precision: birthDatePrecision, death_date: deathDate || null, death_date_precision: deathDatePrecision, tagline: tagline || null, cover_photo_url: coverPhotoUrl || null, hero_bg_url: heroBgUrl || null, profile_video_url: profileVideoUrl || null } : prev)
     setProfileSaving(false)
     setProfileSaved(true)
     setTimeout(() => setProfileSaved(false), 2500)
@@ -336,11 +345,25 @@ export default function BiyografiPage() {
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div>
                     <label className={labelCls}>Doğum Tarihi</label>
-                    <input type="date" value={birthDate} onChange={e => setBirthDate(e.target.value)} disabled={isLocked ?? false} className={inputCls} />
+                    <PartialDateInput
+                      name="birth_date_ctrl"
+                      defaultDate={birthDate || null}
+                      defaultPrecision={birthDatePrecision}
+                      disabled={isLocked ?? false}
+                      inputCls={inputCls}
+                      onChange={(d, p) => { setBirthDate(d); setBirthDatePrecision(p) }}
+                    />
                   </div>
                   <div>
                     <label className={labelCls}>Vefat Tarihi</label>
-                    <input type="date" value={deathDate} onChange={e => setDeathDate(e.target.value)} disabled={isLocked ?? false} className={inputCls} />
+                    <PartialDateInput
+                      name="death_date_ctrl"
+                      defaultDate={deathDate || null}
+                      defaultPrecision={deathDatePrecision}
+                      disabled={isLocked ?? false}
+                      inputCls={inputCls}
+                      onChange={(d, p) => { setDeathDate(d); setDeathDatePrecision(p) }}
+                    />
                   </div>
                 </div>
               </div>
