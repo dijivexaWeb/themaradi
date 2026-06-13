@@ -619,10 +619,10 @@ export async function saveNotableProfile(
 
   const supabase = await createServiceClient()
 
-  const { error } = await supabase.from('vaults').update({
+  const { data: vault, error } = await supabase.from('vaults').update({
     ...data,
     updated_at: new Date().toISOString(),
-  }).eq('id', vaultId)
+  }).eq('id', vaultId).select('slug').single()
 
   if (error) return { success: false, error: error.message }
 
@@ -636,6 +636,6 @@ export async function saveNotableProfile(
   })
 
   revalidatePath(`/admin/memorials/${vaultId}`)
-  revalidatePath('/memorial/[slug]', 'page')
+  if (vault?.slug) revalidatePath(`/memorial/${vault.slug}`)
   return { success: true }
 }
