@@ -3,6 +3,70 @@
 > Her oturum sonunda Claude bu dosyayı günceller.
 > Format: tarih → ne yapıldı → nerede kalındı → sıradaki adım.
 
+## 2026-06-13 — Oturum 98: Anılar Sayfası Yeniden Tasarımı
+
+### Yapılanlar
+- **`anilar/page.tsx` tam yeniden yazımı**: Anı/Kronoloji sekme navigasyonu, sol foto + sağ metin kart layout
+- **İki sekme**: "✍️ Anılar" (genel + öne çıkan) ve "📅 Kronoloji" — `?tab=kronoloji` URL parametresiyle
+- **Kart layout değişikliği**: Foto artık tam genişlik değil; 96×96px kare küçük fotoğraf solda, metin sağda
+- **Kronoloji görünümü**: Sol timeline çizgi + yuvarlak nokta, tarih sarı renkle vurgulu
+- **Add form sekmeye bağlı**: Anılar sekmesinde `section="genel"` default, Kronoloji sekmesinde `section="kronoloji"` default
+- **`memories.ts` düzeltmeleri**: Kullanılmayan `MEDIA_BUCKET`, `cleanFilename`, `userId` kaldırıldı; `revalidatePath` `/dashboard/vault/...` → `/anma-paneli/...` güncellendi; `resolveMemoryMedia` imzası düzeltildi
+
+### Proje Durumu
+- [x] Kısmi tarih desteği (yıl/ay/gün opsiyonel)
+- [x] Aile ağacı foto yükleme düzeltildi
+- [x] Vault sahibi anı defterine direkt anı ekleyebiliyor
+- [x] Anılar sayfası — sekme navigasyonu (Anılar / Kronoloji)
+- [x] Anılar sayfası — küçük sol foto + sağ metin layout
+- [ ] `formatPartialDate` public memorial page ve FamilyTreeCanvas'ta entegre edilmedi
+
+### Kritik Kararlar / Notlar
+- `?tab=kronoloji` URL param → Kronoloji sekmesi; diğer her şey Anılar sekmesi
+- Kronoloji kartları timeline stili, Anılar kartları düz liste stili
+- Düzenle/Sil butonları hover'da görünür (group-hover/opacity-0 → opacity-100)
+
+### Nerede Kaldık
+`anilar/page.tsx` tamamen yeniden yazıldı. `.next/dev/types/validator.ts` uyarısı Next.js cache'inden geliyor — kaynak kod temiz, `next dev` yeniden başlatınca çözülür.
+
+### Sıradaki Adım
+1. Sayfayı `next dev`'de aç ve sekmeleri test et
+2. `formatPartialDate` public memorial sayfasına (`/memorial/[slug]`) entegre et — doğum/ölüm tarihleri precision'a göre gösterilsin
+3. FamilyTreeCanvas'ta aile üyesi tarihleri precision'a göre formatla
+
+## 2026-06-13 — Oturum 97: Kısmi Tarih, Aile Ağacı Foto Fix, Owner Anı Ekleme
+
+### Yapılanlar
+- **Migration 014**: `birth_date_precision` ve `death_date_precision` TEXT kolonları `vaults` ve `vault_family_members` tablolarına eklendi (Supabase MCP ile uygulandı)
+- **PartialDateInput bileşeni** (`src/components/PartialDateInput.tsx`): Yıl (zorunlu) + Ay (opsiyonel) + Gün (opsiyonel) — hem form hidden input hem controlled `onChange` modu
+- **dateUtils.ts**: `formatPartialDate` (precision'a göre "1945" / "Mart 1945" / "15 Mart 1945") ve `composeDate` yardımcıları
+- **Aile ağacı foto bug fix** (`family.ts`): `uploadFamilyPhoto` `photo_file` (raw File) yerine artık `file_key`/`bucket` (R2ImageUpload hidden inputs) okuyor — foto artık kaydediliyor
+- **Yanlış revalidatePath düzeltmesi** (`family.ts`): `/dashboard/vault/...` → `/anma-paneli/...`
+- **Precision kayıt**: `addFamilyMemberAction`, `updateFamilyMemberAction`, `updateMemorialFamilyMemberAction`, `saveVaultProfileAction` — hepsi precision okuyor ve DB'ye yazıyor
+- **Form güncellemeleri**: `aile/page.tsx` (ekle + düzenle form), `biyografi/page.tsx`, `ProfileWizardForm.tsx` — `PartialDateInput` ile güncellendi
+- **Owner anı ekleme**: `addOwnerMemoryAction` (direkt `approved`, rate limit yok), `_AddOwnerMemoryForm.tsx` bileşeni, `ani-defteri/page.tsx` sayfasına eklendi
+
+### Proje Durumu
+- [x] Kısmi tarih desteği (yıl/ay/gün opsiyonel)
+- [x] Aile ağacı foto yükleme düzeltildi
+- [x] Vault sahibi anı defterine direkt anı ekleyebiliyor
+- [x] Revalidate path hataları düzeltildi
+
+### Kritik Kararlar / Notlar
+- `biyografi/page.tsx` controlled mode kullandığı için `PartialDateInput`'a `onChange` callback eklendi
+- Owner memory action `ip_address: 'owner'` depoluyor (rate limit bypass için)
+- `formatPartialDate` utility henüz display katmanında (public memorial page, FamilyTreeCanvas) tam entegre edilmedi — sadece form/kayıt tarafı yapıldı
+
+### Nerede Kaldık
+Üç özellik deploy edildi. Vercel build başladı.
+
+### Sıradaki Adım
+1. `formatPartialDate` utility'i public memorial page ve FamilyTreeCanvas'a entegre et (display katmanı)
+2. Gerçek Ilia Chavchavadze profilinde aile ağacı foto ve tarih testini yap
+3. `anı defteri` sayfasında ziyaretçi anı ekleme formunu da kontrol et (public memorial page)
+
+---
+
 ## 2026-06-13 — Oturum 96: Login Düzeltmesi, R2 Ortam Değişkenleri, NEXT_REDIRECT Açıklaması
 
 ### Yapılanlar

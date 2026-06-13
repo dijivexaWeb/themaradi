@@ -5,21 +5,11 @@ import { generateFileKey, getPublicUrl, uploadR2Object } from '@/lib/r2'
 import { redirect } from 'next/navigation'
 import { revalidatePath } from 'next/cache'
 
-const MEDIA_BUCKET = 'vault-media'
 const MAX_MEMORY_MEDIA_BYTES = 50 * 1024 * 1024
 
 type MemoryMediaResult =
   | { ok: true; mediaUrl: string | null; mediaType: string | null }
   | { ok: false; error: string }
-
-function cleanFilename(name: string) {
-  const cleaned = name
-    .toLowerCase()
-    .replace(/ş/g, 's').replace(/ğ/g, 'g').replace(/ü/g, 'u')
-    .replace(/ö/g, 'o').replace(/ı/g, 'i').replace(/ç/g, 'c')
-    .replace(/[^a-z0-9._-]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '')
-  return cleaned || 'media'
-}
 
 async function assertOwner(supabase: Awaited<ReturnType<typeof createClient>>, vaultId: string, userId: string) {
   const { data } = await supabase.from('vaults').select('id, status').eq('id', vaultId).eq('owner_id', userId).single()
@@ -56,7 +46,6 @@ async function uploadToCloudflareStream(file: File): Promise<string> {
 
 async function resolveMemoryMedia(
   vaultId: string,
-  userId: string,
   formData: FormData,
 ): Promise<MemoryMediaResult> {
   const file = formData.get('media_file')
@@ -117,7 +106,7 @@ export async function addMemoryAction(vaultId: string, redirectTo: string | null
 
   if (!content || !memoryDate) return
 
-  const mediaResult = await resolveMemoryMedia(vaultId, user.id, formData)
+  const mediaResult = await resolveMemoryMedia(vaultId, formData)
   if (!mediaResult.ok) redirectWithMemoryError(redirectTo, mediaResult.error)
 
   await supabase.from('vault_memories').insert({
@@ -131,10 +120,8 @@ export async function addMemoryAction(vaultId: string, redirectTo: string | null
     media_type: mediaResult.mediaType,
   })
 
-  revalidatePath(`/dashboard/vault/${vaultId}/anilar`)
-  revalidatePath(`/dashboard/vault/${vaultId}/gizli-kasa`)
-  revalidatePath(`/dashboard/vault/${vaultId}/vasiyet`)
-  revalidatePath(`/dashboard/vault/${vaultId}`)
+  revalidatePath(`/anma-paneli/${vaultId}/anilar`)
+  revalidatePath(`/anma-paneli/${vaultId}`)
 
   if (redirectTo) {
     const sep = redirectTo.includes('?') ? '&' : '?'
@@ -162,10 +149,8 @@ export async function updateMemoryAction(memoryId: string, vaultId: string, redi
     .eq('id', memoryId)
     .eq('vault_id', vaultId)
 
-  revalidatePath(`/dashboard/vault/${vaultId}/anilar`)
-  revalidatePath(`/dashboard/vault/${vaultId}/gizli-kasa`)
-  revalidatePath(`/dashboard/vault/${vaultId}/vasiyet`)
-  revalidatePath(`/dashboard/vault/${vaultId}`)
+  revalidatePath(`/anma-paneli/${vaultId}/anilar`)
+  revalidatePath(`/anma-paneli/${vaultId}`)
   redirect(redirectTo)
 }
 
@@ -179,8 +164,6 @@ export async function deleteMemoryAction(memoryId: string, vaultId: string): Pro
 
   await supabase.from('vault_memories').delete().eq('id', memoryId).eq('vault_id', vaultId)
 
-  revalidatePath(`/dashboard/vault/${vaultId}/anilar`)
-  revalidatePath(`/dashboard/vault/${vaultId}/gizli-kasa`)
-  revalidatePath(`/dashboard/vault/${vaultId}/vasiyet`)
-  revalidatePath(`/dashboard/vault/${vaultId}`)
+  revalidatePath(`/anma-paneli/${vaultId}/anilar`)
+  revalidatePath(`/anma-paneli/${vaultId}`)
 }

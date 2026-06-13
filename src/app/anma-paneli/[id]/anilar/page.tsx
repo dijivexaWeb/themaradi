@@ -8,7 +8,7 @@ import MemorySubmitButton from './_MemorySubmitButton'
 
 interface Props {
   params: Promise<{ id: string }>
-  searchParams: Promise<{ edit?: string; section?: string; error?: string; saved?: string }>
+  searchParams: Promise<{ edit?: string; tab?: string; error?: string; saved?: string }>
 }
 
 function getVideoEmbed(url: string): string | null {
@@ -20,14 +20,14 @@ function getVideoEmbed(url: string): string | null {
 }
 
 const SECTION_LABELS: Record<string, { label: string; badge: string; badgeCls: string }> = {
-  genel: { label: 'Genel Anı', badge: 'Genel', badgeCls: 'bg-[#f5efdf] text-[#788177]' },
-  kronoloji: { label: 'Kronoloji (Zaman Tüneli)', badge: 'Kronoloji', badgeCls: 'bg-[#0c3327]/10 text-[#174f35]' },
-  featured: { label: 'Öne Çıkan', badge: 'Öne Çıkan', badgeCls: 'bg-[#dfbd72]/20 text-[#93620f]' },
+  genel:     { label: 'Genel Anı',  badge: 'Anı',       badgeCls: 'bg-[#f5efdf] text-[#788177]' },
+  kronoloji: { label: 'Kronoloji',  badge: 'Kronoloji',  badgeCls: 'bg-[#0c3327]/10 text-[#174f35]' },
+  featured:  { label: 'Öne Çıkan', badge: 'Öne Çıkan', badgeCls: 'bg-[#dfbd72]/20 text-[#93620f]' },
 }
 
 export default async function MemorialAnilarPage({ params, searchParams }: Props) {
   const { id } = await params
-  const { edit: editId, section: filterSection, error, saved } = await searchParams
+  const { edit: editId, tab, error, saved } = await searchParams
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
@@ -46,13 +46,18 @@ export default async function MemorialAnilarPage({ params, searchParams }: Props
   const pageUrl = `/anma-paneli/${id}/anilar`
   const addAction = addMemoryAction.bind(null, id, pageUrl)
 
-  const filtered = filterSection ? memories?.filter(m => (m as Record<string, unknown>).section === filterSection) : memories
-  const counts = {
-    all: memories?.length ?? 0,
-    genel: memories?.filter(m => !(m as Record<string, unknown>).section || (m as Record<string, unknown>).section === 'genel').length ?? 0,
-    kronoloji: memories?.filter(m => (m as Record<string, unknown>).section === 'kronoloji').length ?? 0,
-    featured: memories?.filter(m => (m as Record<string, unknown>).section === 'featured').length ?? 0,
-  }
+  const isKronoloji = tab === 'kronoloji'
+
+  const anilarItems = memories?.filter(m => {
+    const sec = (m as Record<string, unknown>).section as string ?? 'genel'
+    return sec === 'genel' || sec === 'featured'
+  }) ?? []
+  const kronolojItems = memories?.filter(m =>
+    (m as Record<string, unknown>).section === 'kronoloji'
+  ) ?? []
+
+  const activeItems = isKronoloji ? kronolojItems : anilarItems
+  const defaultSection = isKronoloji ? 'kronoloji' : 'genel'
 
   const inputCls = `w-full rounded-xl border border-[#e5dccb] bg-white px-4 py-3 text-sm text-[#1f2d27] placeholder-[#adb5ab] outline-none focus:border-[#174f35] focus:ring-2 focus:ring-[#174f35]/10`
   const labelCls = `mb-1.5 block text-xs font-semibold text-[#4a5e55]`
@@ -60,8 +65,12 @@ export default async function MemorialAnilarPage({ params, searchParams }: Props
   return (
     <div className="px-5 py-8 sm:px-8">
       <div className="max-w-3xl mx-auto">
+
+        {/* Breadcrumb */}
         <div className="flex items-center gap-2 text-sm mb-5">
-          <Link href={`/anma-paneli/${id}`} className="text-[#788177] hover:text-[#174f35] transition-colors">{vault.display_name}</Link>
+          <Link href={`/anma-paneli/${id}`} className="text-[#788177] hover:text-[#174f35] transition-colors">
+            {vault.display_name}
+          </Link>
           <span className="text-[#c8bfb0]">/</span>
           <span className="font-semibold text-[#22362e]">Anılar</span>
         </div>
@@ -80,204 +89,178 @@ export default async function MemorialAnilarPage({ params, searchParams }: Props
           <div className="mb-5 rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-sm text-red-700">{error}</div>
         )}
 
-        <div className="flex items-end justify-between mb-5">
-          <div>
-            <h1 className="font-serif text-3xl text-[#1f2d27]">Anılar</h1>
-            <p className="text-xs text-[#788177] mt-0.5">{counts.all} anı</p>
-          </div>
-        </div>
+        {/* Başlık + Sekmeler */}
+        <div className="mb-6">
+          <h1 className="font-serif text-3xl text-[#1f2d27] mb-4">Anılar</h1>
 
-        {/* Filtre sekmeleri */}
-        <div className="flex items-center gap-2 mb-7 flex-wrap">
-          {[
-            { key: undefined, label: `Tümü (${counts.all})` },
-            { key: 'genel', label: `Genel (${counts.genel})` },
-            { key: 'kronoloji', label: `Kronoloji (${counts.kronoloji})` },
-            { key: 'featured', label: `Öne Çıkan (${counts.featured})` },
-          ].map(f => (
+          <div className="flex gap-1 rounded-2xl border border-[#e5dccb] bg-[#f9f5ee] p-1 w-fit">
             <Link
-              key={f.key ?? 'all'}
-              href={f.key ? `${pageUrl}?section=${f.key}` : pageUrl}
-              className={`rounded-full px-3 py-1.5 text-xs font-semibold transition-colors ${
-                (f.key === undefined && !filterSection) || f.key === filterSection
-                  ? 'bg-[#174f35] text-white'
-                  : 'bg-[#f5efdf] text-[#788177] hover:bg-[#e8dece]'
+              href={pageUrl}
+              className={`rounded-xl px-5 py-2 text-sm font-semibold transition-all ${
+                !isKronoloji
+                  ? 'bg-white text-[#174f35] shadow-sm border border-[#e5dccb]'
+                  : 'text-[#788177] hover:text-[#1f2d27]'
               }`}
             >
-              {f.label}
+              ✍️ Anılar
+              <span className="ml-1.5 rounded-full bg-[#174f35]/10 px-1.5 py-0.5 text-[10px] font-bold text-[#174f35]">
+                {anilarItems.length}
+              </span>
             </Link>
-          ))}
+            <Link
+              href={`${pageUrl}?tab=kronoloji`}
+              className={`rounded-xl px-5 py-2 text-sm font-semibold transition-all ${
+                isKronoloji
+                  ? 'bg-white text-[#174f35] shadow-sm border border-[#e5dccb]'
+                  : 'text-[#788177] hover:text-[#1f2d27]'
+              }`}
+            >
+              📅 Kronoloji
+              <span className="ml-1.5 rounded-full bg-[#174f35]/10 px-1.5 py-0.5 text-[10px] font-bold text-[#174f35]">
+                {kronolojItems.length}
+              </span>
+            </Link>
+          </div>
         </div>
 
         {/* Add form */}
         {!isLocked && !editId && (
-          <div className="rounded-3xl border border-[#e5dccb] bg-[#fffdf8] p-6 shadow-[0_4px_24px_rgba(64,48,24,0.05)] mb-10">
+          <div className="rounded-3xl border border-[#e5dccb] bg-[#fffdf8] p-6 shadow-[0_4px_24px_rgba(64,48,24,0.05)] mb-8">
             <div className="flex items-center gap-2 mb-4">
-              <span className="text-lg">✍️</span>
-              <h2 className="font-semibold text-[#1f2d27]">Yeni Anı Ekle</h2>
+              <span className="text-lg">{isKronoloji ? '📅' : '✍️'}</span>
+              <h2 className="font-semibold text-[#1f2d27]">
+                {isKronoloji ? 'Kronoloji Ekle' : 'Anı Ekle'}
+              </h2>
             </div>
             <form action={addAction} className="space-y-4">
               <input type="hidden" name="is_secret" value="false" />
-              <div className="grid sm:grid-cols-3 gap-4">
+              <input type="hidden" name="section" value={defaultSection} />
+
+              <div className="grid sm:grid-cols-2 gap-4">
                 <div>
-                  <label className={labelCls}>Anı Tarihi <span className="text-[#dfbd72]">*</span></label>
+                  <label className={labelCls}>Tarih <span className="text-[#dfbd72]">*</span></label>
                   <input type="date" name="memory_date" required className={inputCls} />
-                  <p className="mt-1 text-xs text-[#adb5ab]">Tarih seçilmeden anı kaydedilmez</p>
                 </div>
                 <div>
-                  <label className={labelCls}>Başlık (opsiyonel)</label>
-                  <input type="text" name="title" placeholder="Anı başlığı..." className={inputCls} />
-                </div>
-                <div>
-                  <label className={labelCls}>Bölüm</label>
-                  <select name="section" className={inputCls}>
-                    <option value="genel">Genel Anı</option>
-                    <option value="kronoloji">Kronoloji (Zaman Tüneli)</option>
-                    <option value="featured">Öne Çıkan</option>
-                  </select>
-                  <p className="mt-1 text-xs text-[#adb5ab]">Kronoloji ve öne çıkan anılar ayrı bölümlerde görünür</p>
+                  <label className={labelCls}>Başlık <span className="font-normal text-[#adb5ab]">(opsiyonel)</span></label>
+                  <input type="text" name="title" placeholder={isKronoloji ? 'örn. Doğdu, Evlendi...' : 'Anı başlığı...'} className={inputCls} />
                 </div>
               </div>
+
               <div>
-                <label className={labelCls}>Anı <span className="text-[#dfbd72]">*</span></label>
-                <textarea name="content" required rows={4} placeholder="Bu anıyı yazın... Bir gün, bir an, bir söz." className={inputCls + ' resize-none'} />
+                <label className={labelCls}>{isKronoloji ? 'Açıklama' : 'Anı'} <span className="text-[#dfbd72]">*</span></label>
+                <textarea
+                  name="content"
+                  required
+                  rows={4}
+                  placeholder={isKronoloji
+                    ? 'Bu tarihteki olayı kısaca açıklayın...'
+                    : 'Bu anıyı yazın... Bir gün, bir an, bir söz.'}
+                  className={inputCls + ' resize-none'}
+                />
               </div>
+
               <div className="rounded-2xl border border-[#e5dccb] bg-white p-4 space-y-3">
                 <p className="text-xs font-semibold text-[#4a5e55] flex items-center gap-1.5">
-                  <span>🖼️</span> Fotoğraf veya Video <span className="font-normal text-[#adb5ab]">(opsiyonel)</span>
+                  <span>🖼️</span> Fotoğraf <span className="font-normal text-[#adb5ab]">(opsiyonel)</span>
                 </p>
                 <div>
-                  <label className={labelCls}>Dosya Yükle</label>
                   <ImageUploadInput
                     name="media_file"
-                    accept="image/*,video/*"
+                    accept="image/*"
                     className="w-full cursor-pointer rounded-xl border border-[#e5dccb] bg-[#fbf8f0] px-3 py-2.5 text-sm text-[#1f2d27] file:mr-3 file:rounded-lg file:border-0 file:bg-[#174f35]/10 file:px-3 file:py-1.5 file:text-[#174f35] file:font-medium outline-none"
                   />
+                  <p className="mt-1 text-[11px] text-[#adb5ab]">veya</p>
                 </div>
-                <div className="flex items-end gap-3">
-                  <div className="flex-1">
-                    <label className={labelCls}>veya URL</label>
-                    <input type="url" name="media_url" placeholder="https://... (fotoğraf veya YouTube)" className={inputCls} />
-                  </div>
-                  <div className="shrink-0">
-                    <label className={labelCls}>Tür</label>
-                    <select name="media_type" className="rounded-xl border border-[#e5dccb] bg-white px-4 py-3 text-sm text-[#1f2d27] outline-none focus:border-[#174f35]">
-                      <option value="image">Fotoğraf</option>
-                      <option value="video">Video</option>
-                    </select>
-                  </div>
+                <div>
+                  <input type="url" name="media_url" placeholder="Fotoğraf / YouTube URL..." className={inputCls} />
                 </div>
+                <input type="hidden" name="media_type" value="image" />
               </div>
+
               <MemorySubmitButton />
             </form>
           </div>
         )}
 
-        {/* Timeline */}
-        {!filtered?.length ? (
-          <div className="rounded-3xl border border-dashed border-[#e5dccb] bg-[#fffdf8] py-20 text-center">
-            <p className="text-6xl mb-4">💭</p>
-            <p className="font-serif text-xl text-[#1f2d27] mb-1">Henüz anı yok</p>
-            <p className="text-sm text-[#788177] max-w-xs mx-auto">Paylaşmak istediğiniz bir hatıra, söz veya özel anı ekleyin.</p>
+        {/* Liste */}
+        {activeItems.length === 0 ? (
+          <div className="rounded-3xl border border-dashed border-[#e5dccb] bg-[#fffdf8] py-16 text-center">
+            <p className="text-5xl mb-3">{isKronoloji ? '📅' : '💭'}</p>
+            <p className="font-serif text-xl text-[#1f2d27] mb-1">
+              {isKronoloji ? 'Henüz kronoloji yok' : 'Henüz anı yok'}
+            </p>
+            <p className="text-sm text-[#788177] max-w-xs mx-auto">
+              {isKronoloji
+                ? 'Doğum, evlilik, kariyer gibi önemli yaşam olaylarını ekleyin.'
+                : 'Paylaşmak istediğiniz bir hatıra, söz veya özel anı ekleyin.'}
+            </p>
           </div>
-        ) : (
+        ) : isKronoloji ? (
+          /* Kronoloji — timeline görünümü */
           <div className="relative">
             <div className="absolute left-[7px] top-3 bottom-3 w-0.5 rounded-full bg-[#e5dccb]" />
-            <div className="space-y-0">
-              {filtered.map((m) => {
+            <div className="space-y-4">
+              {activeItems.map((m) => {
                 const del = deleteMemoryAction.bind(null, m.id, id)
-                const update = updateMemoryAction.bind(null, m.id, id, pageUrl)
-                const embedUrl = m.media_type === 'video' && m.media_url ? getVideoEmbed(m.media_url) : null
+                const update = updateMemoryAction.bind(null, m.id, id, pageUrl + '?tab=kronoloji')
                 const isEditing = editId === m.id
-                const sec = (m as Record<string, unknown>).section as string ?? 'genel'
-                const sectionInfo = SECTION_LABELS[sec] ?? SECTION_LABELS.genel
 
                 return (
-                  <div key={m.id} className="relative pl-10 pb-8 last:pb-0 group">
-                    <div className="absolute left-0 top-2 h-4 w-4 rounded-full border-2 border-[#174f35] bg-white shadow-sm" />
+                  <div key={m.id} className="relative pl-10 group">
+                    <div className="absolute left-0 top-3 h-4 w-4 rounded-full border-2 border-[#174f35] bg-white shadow-sm" />
 
                     {isEditing ? (
                       <div className="rounded-2xl border-2 border-[#174f35]/30 bg-[#fffdf8] p-5 shadow-sm">
-                        <p className="text-xs font-semibold text-[#174f35] mb-4 flex items-center gap-1.5">
-                          <span>✏️</span> Anıyı Düzenle
-                        </p>
+                        <p className="text-xs font-semibold text-[#174f35] mb-4 flex items-center gap-1.5">✏️ Düzenle</p>
                         <form action={update} className="space-y-3">
-                          <div className="grid sm:grid-cols-3 gap-3">
+                          <input type="hidden" name="section" value="kronoloji" />
+                          <div className="grid sm:grid-cols-2 gap-3">
                             <div>
-                              <label className={labelCls}>Tarih <span className="text-[#dfbd72]">*</span></label>
+                              <label className={labelCls}>Tarih *</label>
                               <input type="date" name="memory_date" required defaultValue={m.memory_date ?? ''} className={inputCls} />
                             </div>
                             <div>
                               <label className={labelCls}>Başlık</label>
-                              <input type="text" name="title" defaultValue={m.title ?? ''} placeholder="Başlık..." className={inputCls} />
-                            </div>
-                            <div>
-                              <label className={labelCls}>Bölüm</label>
-                              <select name="section" defaultValue={sec} className={inputCls}>
-                                <option value="genel">Genel Anı</option>
-                                <option value="kronoloji">Kronoloji</option>
-                                <option value="featured">Öne Çıkan</option>
-                              </select>
+                              <input type="text" name="title" defaultValue={m.title ?? ''} className={inputCls} />
                             </div>
                           </div>
                           <div>
-                            <label className={labelCls}>Anı <span className="text-[#dfbd72]">*</span></label>
-                            <textarea name="content" required rows={4} defaultValue={m.content ?? ''} className={inputCls + ' resize-none'} />
+                            <label className={labelCls}>Açıklama *</label>
+                            <textarea name="content" required rows={3} defaultValue={m.content ?? ''} className={inputCls + ' resize-none'} />
                           </div>
-                          <div className="flex items-center gap-3 pt-1">
+                          <div className="flex items-center gap-3">
                             <MemorySubmitButton label="Kaydet" pendingLabel="Kaydediliyor..." />
-                            <Link href={pageUrl} className="rounded-xl border border-[#e5dccb] px-5 py-2.5 text-sm font-medium text-[#788177] hover:bg-[#f5efdf] transition-colors">
-                              İptal
-                            </Link>
+                            <Link href={`${pageUrl}?tab=kronoloji`} className="rounded-xl border border-[#e5dccb] px-5 py-2.5 text-sm font-medium text-[#788177] hover:bg-[#f5efdf] transition-colors">İptal</Link>
                           </div>
                         </form>
                       </div>
                     ) : (
-                      <div className="rounded-2xl border border-[#e5dccb] bg-white overflow-hidden hover:border-[#174f35]/20 transition-colors">
-                        {m.media_type === 'image' && m.media_url && (
-                          <div className="relative w-full">
-                            <Image src={m.media_url} alt={m.title ?? 'Anı fotoğrafı'} width={0} height={0}
-                              sizes="(max-width: 768px) 100vw, 672px" style={{ width: '100%', height: 'auto' }}
-                              className="rounded-t-2xl" unoptimized />
-                          </div>
-                        )}
-                        {m.media_type === 'video' && embedUrl && (
-                          <div className="aspect-video">
-                            <iframe src={embedUrl} className="w-full h-full" allowFullScreen title={m.title ?? 'Video'} />
-                          </div>
-                        )}
-                        {m.media_type === 'video' && m.media_url && !embedUrl && (
-                          <div className="bg-[#f5efdf] px-5 py-3 flex items-center gap-2">
-                            <span>🎬</span>
-                            <a href={m.media_url} target="_blank" rel="noopener noreferrer" className="text-sm text-[#174f35] hover:underline font-medium">Videoyu Aç →</a>
-                          </div>
-                        )}
-                        <div className="p-5">
-                          <div className="flex items-start justify-between gap-3">
-                            <div className="flex-1">
-                              <div className="flex flex-wrap items-center gap-2 mb-1.5">
-                                {m.memory_date && (
-                                  <p className="text-xs font-semibold text-[#dfbd72] tracking-wide">
-                                    {new Date(m.memory_date).toLocaleDateString('tr-TR', { year: 'numeric', month: 'long', day: 'numeric' })}
-                                  </p>
-                                )}
-                                <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${sectionInfo.badgeCls}`}>
-                                  {sectionInfo.badge}
-                                </span>
-                              </div>
-                              {m.title && <h3 className="font-semibold text-[#1f2d27] mb-1.5 font-serif text-lg">{m.title}</h3>}
-                              <p className="text-[#4a5e55] text-sm leading-7 whitespace-pre-wrap">{m.content}</p>
+                      <div className="rounded-2xl border border-[#e5dccb] bg-white p-4 hover:border-[#174f35]/20 transition-colors">
+                        <div className="flex items-start gap-4">
+                          {m.media_type === 'image' && m.media_url && (
+                            <div className="relative h-20 w-20 shrink-0 overflow-hidden rounded-xl border border-[#e5dccb]">
+                              <Image src={m.media_url} alt={m.title ?? ''} fill className="object-cover" unoptimized />
                             </div>
-                            {!isLocked && (
-                              <div className="flex items-center gap-2 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
-                                <Link href={`?edit=${m.id}`} className="text-xs font-medium text-[#174f35] hover:underline">Düzenle</Link>
-                                <span className="text-[#e5dccb]">·</span>
-                                <form action={del}>
-                                  <button type="submit" className="text-xs font-medium text-[#e5dccb] hover:text-red-400 transition-colors">Sil</button>
-                                </form>
-                              </div>
+                          )}
+                          <div className="flex-1 min-w-0">
+                            {m.memory_date && (
+                              <p className="text-xs font-bold text-[#dfbd72] tracking-wide mb-0.5">
+                                {new Date(m.memory_date).toLocaleDateString('tr-TR', { year: 'numeric', month: 'long', day: 'numeric' })}
+                              </p>
                             )}
+                            {m.title && <h3 className="font-semibold text-[#1f2d27] font-serif">{m.title}</h3>}
+                            <p className="text-sm text-[#4a5e55] leading-6 mt-0.5 whitespace-pre-wrap">{m.content}</p>
                           </div>
+                          {!isLocked && (
+                            <div className="flex items-center gap-2 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <Link href={`?tab=kronoloji&edit=${m.id}`} className="text-xs font-medium text-[#174f35] hover:underline">Düzenle</Link>
+                              <span className="text-[#e5dccb]">·</span>
+                              <form action={del}>
+                                <button type="submit" className="text-xs font-medium text-[#e5dccb] hover:text-red-400 transition-colors">Sil</button>
+                              </form>
+                            </div>
+                          )}
                         </div>
                       </div>
                     )}
@@ -286,7 +269,104 @@ export default async function MemorialAnilarPage({ params, searchParams }: Props
               })}
             </div>
           </div>
+        ) : (
+          /* Anılar — kart görünümü: sol foto + sağ metin */
+          <div className="space-y-3">
+            {activeItems.map((m) => {
+              const del = deleteMemoryAction.bind(null, m.id, id)
+              const update = updateMemoryAction.bind(null, m.id, id, pageUrl)
+              const embedUrl = m.media_type === 'video' && m.media_url ? getVideoEmbed(m.media_url) : null
+              const isEditing = editId === m.id
+              const sec = (m as Record<string, unknown>).section as string ?? 'genel'
+              const sectionInfo = SECTION_LABELS[sec] ?? SECTION_LABELS.genel
+
+              return (
+                <div key={m.id} className="group rounded-2xl border border-[#e5dccb] bg-white overflow-hidden hover:border-[#174f35]/20 transition-colors">
+                  {isEditing ? (
+                    <div className="p-5">
+                      <p className="text-xs font-semibold text-[#174f35] mb-4 flex items-center gap-1.5">✏️ Anıyı Düzenle</p>
+                      <form action={update} className="space-y-3">
+                        <div className="grid sm:grid-cols-3 gap-3">
+                          <div>
+                            <label className={labelCls}>Tarih *</label>
+                            <input type="date" name="memory_date" required defaultValue={m.memory_date ?? ''} className={inputCls} />
+                          </div>
+                          <div>
+                            <label className={labelCls}>Başlık</label>
+                            <input type="text" name="title" defaultValue={m.title ?? ''} className={inputCls} />
+                          </div>
+                          <div>
+                            <label className={labelCls}>Bölüm</label>
+                            <select name="section" defaultValue={sec} className={inputCls}>
+                              <option value="genel">Genel Anı</option>
+                              <option value="featured">Öne Çıkan</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div>
+                          <label className={labelCls}>Anı *</label>
+                          <textarea name="content" required rows={4} defaultValue={m.content ?? ''} className={inputCls + ' resize-none'} />
+                        </div>
+                        <div className="flex items-center gap-3">
+                          <MemorySubmitButton label="Kaydet" pendingLabel="Kaydediliyor..." />
+                          <Link href={pageUrl} className="rounded-xl border border-[#e5dccb] px-5 py-2.5 text-sm font-medium text-[#788177] hover:bg-[#f5efdf] transition-colors">İptal</Link>
+                        </div>
+                      </form>
+                    </div>
+                  ) : (
+                    <div className="flex gap-4 p-4">
+                      {/* Sol: küçük foto */}
+                      {m.media_type === 'image' && m.media_url ? (
+                        <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-xl border border-[#e5dccb]">
+                          <Image src={m.media_url} alt={m.title ?? 'Anı fotoğrafı'} fill className="object-cover" unoptimized />
+                        </div>
+                      ) : embedUrl ? (
+                        <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-xl border border-[#e5dccb] bg-[#1f2d27] flex items-center justify-center">
+                          <span className="text-2xl">🎬</span>
+                        </div>
+                      ) : null}
+
+                      {/* Sağ: içerik */}
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex flex-wrap items-center gap-2 mb-1">
+                            {m.memory_date && (
+                              <span className="text-xs font-semibold text-[#dfbd72] tracking-wide">
+                                {new Date(m.memory_date).toLocaleDateString('tr-TR', { year: 'numeric', month: 'long', day: 'numeric' })}
+                              </span>
+                            )}
+                            <span className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${sectionInfo.badgeCls}`}>
+                              {sectionInfo.badge}
+                            </span>
+                          </div>
+                          {!isLocked && (
+                            <div className="flex items-center gap-2 shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                              <Link href={`?edit=${m.id}`} className="text-xs font-medium text-[#174f35] hover:underline">Düzenle</Link>
+                              <span className="text-[#e5dccb]">·</span>
+                              <form action={del}>
+                                <button type="submit" className="text-xs font-medium text-[#e5dccb] hover:text-red-400 transition-colors">Sil</button>
+                              </form>
+                            </div>
+                          )}
+                        </div>
+                        {m.title && <h3 className="font-semibold text-[#1f2d27] font-serif mb-0.5">{m.title}</h3>}
+                        <p className="text-sm text-[#4a5e55] leading-6 line-clamp-3 whitespace-pre-wrap">{m.content}</p>
+
+                        {embedUrl && (
+                          <a href={m.media_url!} target="_blank" rel="noopener noreferrer"
+                            className="mt-2 inline-flex items-center gap-1.5 text-xs font-medium text-[#174f35] hover:underline">
+                            🎬 Videoyu İzle →
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )
+            })}
+          </div>
         )}
+
       </div>
     </div>
   )
