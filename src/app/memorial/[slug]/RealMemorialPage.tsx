@@ -14,6 +14,7 @@ import MemoriesAccordion from './MemoriesAccordion'
 import PhotoGallery from './PhotoGallery'
 import { getTurnstileSiteKey } from '@/lib/turnstile'
 import { getTranslation } from '@/i18n/server'
+import NotableProfilePhoto from './NotableProfilePhoto'
 
 interface VaultRow {
   id: string
@@ -40,6 +41,15 @@ interface VaultRow {
   theme: string | null
   hero_left_react_heart: number; hero_left_react_pray: number; hero_left_react_smile: number; hero_left_react_cry: number; hero_left_react_dove: number
   hero_right_react_heart: number; hero_right_react_pray: number; hero_right_react_smile: number; hero_right_react_cry: number; hero_right_react_dove: number
+  // Notable / National Heritage fields
+  is_notable: boolean | null
+  nationality: string | null
+  notable_subtitle: string | null
+  notable_motto: string | null
+  notable_motto_tr: string | null
+  featured_quote: string | null
+  notable_legacy_text: string | null
+  notable_verified_note: string | null
 }
 
 interface Props {
@@ -70,6 +80,11 @@ function getCoordinate(value: unknown): string | null {
   if (typeof value === 'number' && Number.isFinite(value)) return String(value)
   if (typeof value === 'string' && value.trim()) return value.trim()
   return null
+}
+
+function nationalityFlag(code: string | null): string {
+  if (!code || code.length !== 2) return ''
+  return code.toUpperCase().split('').map(c => String.fromCodePoint(c.charCodeAt(0) + 127397)).join('')
 }
 
 export default async function RealMemorialPage({ vault, isPreview = false }: Props) {
@@ -240,17 +255,39 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
 
           {/* Center — Portrait */}
           <div className="order-1 text-center lg:order-2">
-            <div className="mx-auto mb-4 flex w-fit items-center gap-3 text-[#c7a76f]">
-              <span className="h-px w-8 bg-[#c7a76f]" />
-              <span className="text-xs tracking-[0.25em] uppercase">{t.memorial.digitalMonumentProfile}</span>
-              <span className="h-px w-8 bg-[#c7a76f]" />
-            </div>
+            {vault.is_notable ? (
+              /* Notable badge — rozet mühür */
+              <div className="mx-auto mb-4 flex w-fit flex-col items-center gap-1">
+                <div className="flex items-center gap-2 text-[#dfbd72]">
+                  <span className="h-px w-6 bg-[#dfbd72]" />
+                  <span className="text-[10px] tracking-[0.3em] uppercase font-semibold">{t.memorial.notableBadgeTitle}</span>
+                  <span className="h-px w-6 bg-[#dfbd72]" />
+                </div>
+                {vault.notable_subtitle && (
+                  <p className="text-[11px] text-[#c7a76f]/80 italic max-w-[260px] leading-relaxed">{vault.notable_subtitle}</p>
+                )}
+              </div>
+            ) : (
+              <div className="mx-auto mb-4 flex w-fit items-center gap-3 text-[#c7a76f]">
+                <span className="h-px w-8 bg-[#c7a76f]" />
+                <span className="text-xs tracking-[0.25em] uppercase">{t.memorial.digitalMonumentProfile}</span>
+                <span className="h-px w-8 bg-[#c7a76f]" />
+              </div>
+            )}
 
-            <ProfilePhotoCircle
-              src={vault.cover_photo_url ?? ''}
-              alt={vault.display_name}
-              initial={vaultInitial}
-            />
+            {vault.is_notable ? (
+              <NotableProfilePhoto
+                src={vault.cover_photo_url ?? ''}
+                alt={vault.display_name}
+                initial={vaultInitial}
+              />
+            ) : (
+              <ProfilePhotoCircle
+                src={vault.cover_photo_url ?? ''}
+                alt={vault.display_name}
+                initial={vaultInitial}
+              />
+            )}
 
             <h1 className="mt-5 font-serif text-4xl leading-none text-white sm:mt-7 sm:text-6xl">
               {vault.display_name}
@@ -259,6 +296,9 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
               <span>{birthYear ?? '?'}</span>
               <Feather className="h-4 w-4 text-[#c7a76f]" />
               <span>{deathYear ?? '?'}</span>
+              {vault.is_notable && vault.nationality && (
+                <span className="text-2xl">{nationalityFlag(vault.nationality)}</span>
+              )}
             </div>
             {vault.birth_place && (
               <p className="mx-auto mt-2 max-w-xs font-serif text-sm italic leading-6 text-[#cfc3ad]">
@@ -349,6 +389,42 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
         </div>
       </section>
 
+      {/* ── Notable: Motto band ── */}
+      {vault.is_notable && vault.notable_motto && (
+        <div className="bg-[#0c2a1e] border-y border-[#dfbd72]/20 px-5 py-6 text-center sm:px-8">
+          <div className="mx-auto max-w-3xl">
+            <div className="flex items-center justify-center gap-4 mb-2">
+              <span className="h-px flex-1 max-w-[60px] bg-[#dfbd72]/30" />
+              <span className="text-[#dfbd72]/50 text-lg">✦</span>
+              <span className="h-px flex-1 max-w-[60px] bg-[#dfbd72]/30" />
+            </div>
+            <p className="font-serif text-2xl sm:text-3xl text-[#dfbd72] tracking-wide leading-relaxed">
+              {vault.notable_motto}
+            </p>
+            {vault.notable_motto_tr && (
+              <p className="mt-2 text-sm text-[#c7a76f]/70 italic tracking-wide">{vault.notable_motto_tr}</p>
+            )}
+            <div className="flex items-center justify-center gap-4 mt-2">
+              <span className="h-px flex-1 max-w-[60px] bg-[#dfbd72]/30" />
+              <span className="text-[#dfbd72]/50 text-lg">✦</span>
+              <span className="h-px flex-1 max-w-[60px] bg-[#dfbd72]/30" />
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ── Notable: Verified strip ── */}
+      {vault.is_notable && (
+        <div className="bg-[#091712] border-b border-[#dfbd72]/15 px-5 py-3 sm:px-8">
+          <div className="mx-auto flex max-w-7xl items-center justify-center gap-2.5">
+            <span className="text-[#dfbd72] text-sm">🏛</span>
+            <p className="text-[11px] text-[#c7a76f]/80 tracking-wide text-center">
+              {vault.notable_verified_note ?? t.memorial.notableVerifiedNote}
+            </p>
+          </div>
+        </div>
+      )}
+
       <section className="bg-[#173d31] px-5 py-0 sm:px-8">
         {hasPersonalDetails && (
           <div className="mx-auto grid max-w-7xl border-b border-[#2a5a45] text-[#efe7d8] md:grid-cols-2">
@@ -429,10 +505,12 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
             <div>
               <div className="flex items-center gap-3 text-[#b08340]">
                 <span className="h-px w-10 bg-[#c7a76f]" />
-                <span className="text-xs tracking-[0.2em] uppercase">{t.memorial.lifeStory}</span>
+                <span className="text-xs tracking-[0.2em] uppercase">
+                  {vault.is_notable ? t.memorial.nationsMemory : t.memorial.lifeStory}
+                </span>
               </div>
               <h2 className="mt-3 font-serif text-5xl leading-tight text-[#173d31]">
-                {t.memorial.lifeStoryHeading}
+                {vault.is_notable ? t.memorial.nationsMemory : t.memorial.lifeStoryHeading}
               </h2>
               {vault.biography ? (
                 <div className="mt-7 space-y-5 text-base leading-8 text-[#4c463c]">
@@ -959,6 +1037,42 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
                   <div className="pointer-events-none absolute inset-0 rounded-br-2xl border border-[#e1d5c3]" />
                 </div>
               </div>
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ── Notable: Legacy section ── */}
+      {vault.is_notable && vault.notable_legacy_text && (
+        <section className="bg-[#0f2a1e] px-5 py-16 sm:px-8 border-t border-[#dfbd72]/15">
+          <div className="mx-auto max-w-3xl text-center">
+            <div className="flex items-center justify-center gap-3 mb-5 text-[#dfbd72]">
+              <span className="h-px w-12 bg-[#dfbd72]/40" />
+              <span className="text-[10px] tracking-[0.3em] uppercase font-semibold">{t.memorial.notableLegacyTitle}</span>
+              <span className="h-px w-12 bg-[#dfbd72]/40" />
+            </div>
+            <div className="text-5xl text-[#dfbd72]/20 font-serif mb-2 leading-none">&ldquo;</div>
+            <div className="font-serif text-lg sm:text-xl leading-9 text-[#e8dfc8] space-y-5">
+              {vault.notable_legacy_text.split('\n\n').filter(Boolean).map((para, i) => (
+                <p key={i}>{para}</p>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ── Notable: Featured quote band ── */}
+      {vault.is_notable && vault.featured_quote && (
+        <section className="bg-[#173d31] px-5 py-12 sm:px-8 border-t border-[#dfbd72]/10">
+          <div className="mx-auto max-w-2xl text-center">
+            <div className="text-5xl text-[#dfbd72]/25 font-serif leading-none">&ldquo;</div>
+            <blockquote className="mt-3 font-serif text-2xl sm:text-3xl italic leading-relaxed text-[#efe7d8]">
+              {vault.featured_quote}
+            </blockquote>
+            <div className="mt-4 flex items-center justify-center gap-3 text-[#c7a76f]/60">
+              <span className="h-px w-8 bg-[#c7a76f]/30" />
+              <span className="text-xs tracking-widest uppercase">{vault.display_name}</span>
+              <span className="h-px w-8 bg-[#c7a76f]/30" />
             </div>
           </div>
         </section>

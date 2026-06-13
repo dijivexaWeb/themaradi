@@ -1166,6 +1166,11 @@ const tr: LangDict = {
     noLocationInfo: 'Konum bilgisi eklenmemiş',
     memoriesLiveLoveIsInfinite: 'Anılar yaşar, büyük sevgiler sonsuzdur.',
     allRightsReserved: 'Tüm hakları saklıdır.',
+    notableBadgeTitle: 'Ulusal Miras Profili',
+    notableVerifiedNote: 'Bu profil arşiv kaynakları, müze bilgileri ve tarihsel kayıtlar esas alınarak hazırlanmıştır.',
+    nationsMemory: 'Bir Milletin Hafızası',
+    notableLegacyTitle: 'Bugüne Uzanan Miras',
+    notableArchiveMemories: 'Arşivden Anılar',
   },
 
   memorialsPage: {

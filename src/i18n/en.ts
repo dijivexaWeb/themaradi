@@ -1164,6 +1164,11 @@ const en = {
     noLocationInfo: 'Location details not added',
     memoriesLiveLoveIsInfinite: 'Memories live, great love is infinite.',
     allRightsReserved: 'All rights reserved.',
+    notableBadgeTitle: 'National Heritage Profile',
+    notableVerifiedNote: 'This profile has been prepared based on archival sources, museum records and historical documents.',
+    nationsMemory: "A Nation's Memory",
+    notableLegacyTitle: 'Legacy That Lives On',
+    notableArchiveMemories: 'Memories from the Archive',
   },
 
   memorialsPage: {

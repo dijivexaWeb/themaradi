@@ -3,6 +3,44 @@
 > Her oturum sonunda Claude bu dosyayı günceller.
 > Format: tarih → ne yapıldı → nerede kalındı → sıradaki adım.
 
+## 2026-06-13 — Oturum 99: Ulusal Miras Profili
+
+### Yapılanlar
+- **Migration 015** (`015_notable_profile_fields`): `is_notable`, `nationality`, `notable_subtitle`, `notable_motto`, `notable_motto_tr`, `featured_quote`, `notable_legacy_text`, `notable_verified_note` alanları `vaults` tablosuna eklendi
+- **i18n** (tr/en/ka/ru): `memorial` bölümüne 5 yeni anahtar eklendi — `notableBadgeTitle`, `notableVerifiedNote`, `nationsMemory`, `notableLegacyTitle`, `notableArchiveMemories`
+- **`NotableProfilePhoto.tsx`** (YENİ bileşen): Yaldızlı süslü çerçeve — conic-gradient altın halka, koyu separator, iç gradient ring, 4 kardinal noktada diamond ornament, 45° nokta aksan
+- **`RealMemorialPage.tsx`** güncellemeleri:
+  - VaultRow interface'e yeni alanlar eklendi
+  - `nationalityFlag()` yardımcı fonksiyonu (ISO kodu → emoji bayrak)
+  - Hero center: `is_notable` ise `NotableProfilePhoto` + rozet badge, yoksa `ProfilePhotoCircle` + mevcut label
+  - Hero altında tarihler yanına bayrak emoji
+  - Hero sonrasına **motto bandı** (koyu yeşil bg, altın metin, ✦ aksan)
+  - Motto altında **doğrulanmış profil şeridi** (küçük 🏛 icon + metin)
+  - Biyografi section başlığı `is_notable` ise "Bir Milletin Hafızası" olarak değişiyor
+  - Footer öncesinde **legacy bölümü** (`notable_legacy_text`) ve **alıntı bandı** (`featured_quote`)
+- **`biyografi/page.tsx`** güncellemeleri: VaultData interface, useEffect select + state set, `handleSaveNotable`, "Ulusal Miras Profili" admin formu (toggle + milliyet dropdown + metin alanları)
+
+### Proje Durumu
+- [x] Ulusal Miras Profili — DB, i18n, admin panel, public page
+- [x] Yaldızlı profil fotoğrafı çerçevesi
+- [x] Motto bandı + Verified şeridi
+- [x] Legacy ve alıntı bölümleri
+- [x] Çok dil desteği (TR/EN/KA/RU)
+
+### Kritik Kararlar / Notlar
+- `is_notable = false` olan profiller hiçbir değişiklik görmez — tamamen backwards compatible
+- Bayrak: ISO 3166-1 alpha-2 → Unicode regional indicator emoji dönüşümü (`charCodeAt + 127397`)
+- Profil fotoğrafı çerçevesi: conic-gradient (açı bazlı dönüşümlü altın) + 4 diamond SVG ornament cardinal noktalarda
+- `featured_quote` profil sonuna büyük alıntı bandı olarak eklendi
+
+### Nerede Kaldık
+Tüm kod hazır, TypeScript hatasız. Push bekleniyor.
+
+### Sıradaki Adım
+1. Biyografi sayfasında `is_notable = true` yapıp Ilia profilini test et
+2. `formatPartialDate` public memorial sayfasına entegre et
+3. "Anılar" sekmesindeki section label'ları (`notableArchiveMemories`) memorial sayfasında da kullanılabilir
+
 ## 2026-06-13 — Oturum 98: Anılar Sayfası Yeniden Tasarımı
 
 ### Yapılanlar

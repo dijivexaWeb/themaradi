@@ -1166,6 +1166,11 @@ const ka: LangDict = {
     noLocationInfo: 'ადგილმდებარეობის ინფორმაცია არ არის დამატებული',
     memoriesLiveLoveIsInfinite: 'მოგონებები ცოცხლობს, დიდი სიყვარული მარადიულია.',
     allRightsReserved: 'ყველა უფლება დაცულია.',
+    notableBadgeTitle: 'ეროვნული მემკვიდრეობის პროფილი',
+    notableVerifiedNote: 'პროფილი მომზადებულია საარქივო მასალების, მუზეუმების მონაცემებისა და ისტორიული წყაროების საფუძველზე.',
+    nationsMemory: 'ერის მეხსიერება',
+    notableLegacyTitle: 'მემკვიდრეობა დღემდე',
+    notableArchiveMemories: 'არქივიდან მოგონებები',
   },
 
   memorialsPage: {

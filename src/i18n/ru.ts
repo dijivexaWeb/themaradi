@@ -1166,6 +1166,11 @@ const ru: LangDict = {
     noLocationInfo: 'Информация о местоположении не добавлена',
     memoriesLiveLoveIsInfinite: 'Воспоминания живут, великая любовь бесконечна.',
     allRightsReserved: 'Все права защищены.',
+    notableBadgeTitle: 'Профиль национального наследия',
+    notableVerifiedNote: 'Профиль подготовлен на основе архивных материалов, данных музеев и исторических источников.',
+    nationsMemory: 'Память народа',
+    notableLegacyTitle: 'Наследие, живущее сегодня',
+    notableArchiveMemories: 'Воспоминания из архива',
   },
 
   memorialsPage: {
