@@ -80,6 +80,49 @@ export async function submitMemoryAction(
   return {}
 }
 
+export async function addOwnerMemoryAction(vaultId: string, formData: FormData): Promise<void> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) redirect('/login')
+
+  const { data: vault } = await supabase
+    .from('vaults')
+    .select('id')
+    .eq('id', vaultId)
+    .eq('owner_id', user.id)
+    .single()
+  if (!vault) return
+
+  const authorName = (formData.get('author_name') as string)?.trim()
+  const memoryText = (formData.get('memory_text') as string)?.trim()
+  const relation = (formData.get('relation') as string)?.trim() || null
+
+  if (!authorName || !memoryText) return
+  if (memoryText.length > 1500) return
+
+  let photoUrl: string | null = null
+  const fileKey = (formData.get('file_key') as string | null)?.trim()
+  const bucket = (formData.get('bucket') as string | null)?.trim()
+  if (fileKey && bucket) {
+    photoUrl = getPublicUrl(fileKey)
+  }
+
+  const service = await createServiceClient()
+  await service.from('memory_book_entries').insert({
+    vault_id: vaultId,
+    author_name: authorName,
+    relation,
+    memory_text: memoryText,
+    photo_url: photoUrl,
+    author_email: user.email ?? null,
+    ip_address: 'owner',
+    status: 'approved',
+  })
+
+  revalidatePath(`/anma-paneli/${vaultId}/ani-defteri`)
+  revalidatePath('/memorial/[slug]', 'page')
+}
+
 export async function approveMemoryAction(entryId: string, vaultId: string): Promise<void> {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()

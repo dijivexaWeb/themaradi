@@ -3,6 +3,7 @@ import { notFound, redirect } from 'next/navigation'
 import Image from 'next/image'
 import Link from 'next/link'
 import { approveMemoryAction, rejectMemoryAction } from '@/lib/actions/memory'
+import AddOwnerMemoryForm from './_AddOwnerMemoryForm'
 
 interface Props {
   params: Promise<{ id: string }>
@@ -69,9 +70,12 @@ export default async function AniDefteri({ params }: Props) {
         <div className="mb-7">
           <h1 className="font-serif text-3xl text-[#1f2d27]">Anı Defteri</h1>
           <p className="mt-1 text-sm text-[#788177]">
-            Paylaşılan anıları onaylayın veya kaldırın.
+            Anı ekleyin, ziyaretçi anılarını onaylayın veya kaldırın.
           </p>
         </div>
+
+        {/* Owner add form */}
+        <AddOwnerMemoryForm vaultId={id} vaultName={vault.display_name} />
 
         {/* Stats */}
         <div className="mb-8 grid grid-cols-2 gap-4">
