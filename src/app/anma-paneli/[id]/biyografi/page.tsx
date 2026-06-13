@@ -371,7 +371,10 @@ export default function BiyografiPage() {
             </div>
 
             <div>
-              <label className={labelCls}>Kısa Anı Sözü</label>
+              <div className="mb-1.5 flex items-center justify-between">
+                <label className={labelCls} style={{marginBottom: 0}}>Kısa Anı Sözü</label>
+                <span className={`text-xs ${tagline.length >= 180 ? 'text-red-400' : 'text-[#adb5ab]'}`}>{tagline.length}/200</span>
+              </div>
               <input type="text" value={tagline} onChange={e => setTagline(e.target.value)} disabled={isLocked ?? false} placeholder="Kalbimizde yaşıyor... veya en sevdiği söz" maxLength={200} className={inputCls} />
             </div>
             <div>
