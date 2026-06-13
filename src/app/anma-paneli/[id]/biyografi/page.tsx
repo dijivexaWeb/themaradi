@@ -29,14 +29,6 @@ interface VaultData {
   donation_url: string | null
   hero_bg_url: string | null
   profile_video_url: string | null
-  is_notable: boolean | null
-  nationality: string | null
-  notable_subtitle: string | null
-  notable_motto: string | null
-  notable_motto_tr: string | null
-  featured_quote: string | null
-  notable_legacy_text: string | null
-  notable_verified_note: string | null
 }
 
 export default function BiyografiPage() {
@@ -44,18 +36,6 @@ export default function BiyografiPage() {
   const supabase = useMemo(() => createClient(), [])
 
   const [vault, setVault] = useState<VaultData | null>(null)
-
-  // Ulusal Miras
-  const [isNotable, setIsNotable] = useState(false)
-  const [nationality, setNationality] = useState('')
-  const [notableSubtitle, setNotableSubtitle] = useState('')
-  const [notableMotto, setNotableMotto] = useState('')
-  const [notableMottoTr, setNotableMottoTr] = useState('')
-  const [featuredQuote, setFeaturedQuote] = useState('')
-  const [notableLegacyText, setNotableLegacyText] = useState('')
-  const [notableVerifiedNote, setNotableVerifiedNote] = useState('')
-  const [notableSaving, setNotableSaving] = useState(false)
-  const [notableSaved, setNotableSaved] = useState(false)
 
   // Profil
   const [displayName, setDisplayName] = useState('')
@@ -116,7 +96,7 @@ export default function BiyografiPage() {
   useEffect(() => {
     supabase
       .from('vaults')
-      .select('display_name, biography, status, cover_photo_url, birth_date, birth_date_precision, death_date, death_date_precision, tagline, profession, hobbies, birth_place, death_place, favorite_song_title, favorite_song_url, last_message, donation_preference, donation_url, hero_bg_url, profile_video_url, is_notable, nationality, notable_subtitle, notable_motto, notable_motto_tr, featured_quote, notable_legacy_text, notable_verified_note')
+      .select('display_name, biography, status, cover_photo_url, birth_date, birth_date_precision, death_date, death_date_precision, tagline, profession, hobbies, birth_place, death_place, favorite_song_title, favorite_song_url, last_message, donation_preference, donation_url, hero_bg_url, profile_video_url')
       .eq('id', id)
       .single()
       .then(({ data }) => {
@@ -143,14 +123,6 @@ export default function BiyografiPage() {
           setProfileVideoUrl(v.profile_video_url ?? '')
           setBio(v.biography ?? '')
           setInitialBio(v.biography ?? '')
-          setIsNotable(v.is_notable ?? false)
-          setNationality(v.nationality ?? '')
-          setNotableSubtitle(v.notable_subtitle ?? '')
-          setNotableMotto(v.notable_motto ?? '')
-          setNotableMottoTr(v.notable_motto_tr ?? '')
-          setFeaturedQuote(v.featured_quote ?? '')
-          setNotableLegacyText(v.notable_legacy_text ?? '')
-          setNotableVerifiedNote(v.notable_verified_note ?? '')
         }
       })
   }, [id, supabase])
@@ -252,23 +224,6 @@ export default function BiyografiPage() {
     setTimeout(() => setExtraSaved(false), 2500)
   }
 
-  const handleSaveNotable = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setNotableSaving(true)
-    await supabase.from('vaults').update({
-      is_notable: isNotable,
-      nationality: nationality.trim() || null,
-      notable_subtitle: notableSubtitle.trim() || null,
-      notable_motto: notableMotto.trim() || null,
-      notable_motto_tr: notableMottoTr.trim() || null,
-      featured_quote: featuredQuote.trim() || null,
-      notable_legacy_text: notableLegacyText.trim() || null,
-      notable_verified_note: notableVerifiedNote.trim() || null,
-    }).eq('id', id)
-    setNotableSaving(false)
-    setNotableSaved(true)
-    setTimeout(() => setNotableSaved(false), 2500)
-  }
 
   const inputCls = 'w-full rounded-xl border border-[#e5dccb] bg-white px-4 py-3 text-sm text-[#1f2d27] placeholder-[#adb5ab] outline-none focus:border-[#174f35] focus:ring-2 focus:ring-[#174f35]/10 disabled:opacity-40'
   const labelCls = 'mb-1.5 block text-xs font-semibold text-[#4a5e55]'
@@ -795,95 +750,6 @@ export default function BiyografiPage() {
                 {extraSaving ? 'Kaydediliyor...' : 'Kaydet'}
               </button>
               {extraSaved && <span className="flex items-center gap-1.5 text-xs font-medium text-[#174f35]">✓ Kaydedildi</span>}
-            </div>
-          </form>
-        </div>
-
-        {/* Ulusal Miras Profili */}
-        <div className={`${blockCls} mb-6 overflow-hidden`}>
-          <div className={headerCls}>
-            <div className="flex items-center gap-2">
-              <span className="text-base">🏛</span>
-              <div>
-                <h2 className="font-semibold text-[#1f2d27]">Ulusal Miras Profili</h2>
-                <p className="mt-0.5 text-xs text-[#adb5ab]">Tarihi veya ulusal önemi olan isimler için özel sunum</p>
-              </div>
-            </div>
-          </div>
-          <form onSubmit={handleSaveNotable} className="space-y-5 p-6">
-            {/* Toggle */}
-            <div className="flex items-center justify-between rounded-xl border border-[#e5dccb] bg-white px-4 py-3">
-              <div>
-                <p className="text-sm font-semibold text-[#1f2d27]">Ulusal Miras Profili Olarak İşaretle</p>
-                <p className="text-xs text-[#788177] mt-0.5">Açıkken özel rozet, yaldız çerçeve ve miras bölümleri gösterilir</p>
-              </div>
-              <button
-                type="button"
-                onClick={() => setIsNotable(v => !v)}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${isNotable ? 'bg-[#174f35]' : 'bg-[#e5dccb]'}`}
-              >
-                <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${isNotable ? 'translate-x-6' : 'translate-x-1'}`} />
-              </button>
-            </div>
-
-            {isNotable && (
-              <>
-                <div className="grid sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className={labelCls}>Milliyet (ISO Ülke Kodu)</label>
-                    <select value={nationality} onChange={e => setNationality(e.target.value)} className={inputCls}>
-                      <option value="">Seç...</option>
-                      <option value="GE">🇬🇪 Gürcistan</option>
-                      <option value="TR">🇹🇷 Türkiye</option>
-                      <option value="AZ">🇦🇿 Azerbaycan</option>
-                      <option value="AM">🇦🇲 Ermenistan</option>
-                      <option value="RU">🇷🇺 Rusya</option>
-                      <option value="UA">🇺🇦 Ukrayna</option>
-                      <option value="DE">🇩🇪 Almanya</option>
-                      <option value="FR">🇫🇷 Fransa</option>
-                      <option value="GB">🇬🇧 İngiltere</option>
-                      <option value="US">🇺🇸 ABD</option>
-                    </select>
-                  </div>
-                  <div>
-                    <label className={labelCls}>Altyazı / Kısa Tanım</label>
-                    <input type="text" value={notableSubtitle} onChange={e => setNotableSubtitle(e.target.value)} placeholder="Gürcü milletinin manevi sembolü..." className={inputCls} />
-                  </div>
-                </div>
-
-                <div className="grid sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className={labelCls}>Motto (Orijinal Dil)</label>
-                    <input type="text" value={notableMotto} onChange={e => setNotableMotto(e.target.value)} placeholder="მამული, ენა, სარწმუნოება" className={inputCls} />
-                  </div>
-                  <div>
-                    <label className={labelCls}>Motto Çevirisi (Türkçe)</label>
-                    <input type="text" value={notableMottoTr} onChange={e => setNotableMottoTr(e.target.value)} placeholder="Vatan, Dil, İnanç" className={inputCls} />
-                  </div>
-                </div>
-
-                <div>
-                  <label className={labelCls}>Öne Çıkan Alıntı</label>
-                  <textarea value={featuredQuote} onChange={e => setFeaturedQuote(e.target.value)} rows={3} placeholder="Bu kişiden ünlü bir alıntı..." className={`${inputCls} resize-none`} />
-                </div>
-
-                <div>
-                  <label className={labelCls}>Doğrulanmış Profil Notu <span className="font-normal text-[#adb5ab]">(boş bırakılırsa standart metin kullanılır)</span></label>
-                  <input type="text" value={notableVerifiedNote} onChange={e => setNotableVerifiedNote(e.target.value)} placeholder="Bu profil arşiv kaynakları esas alınarak hazırlanmıştır." className={inputCls} />
-                </div>
-
-                <div>
-                  <label className={labelCls}>Bugüne Uzanan Miras <span className="font-normal text-[#adb5ab]">(sayfa sonunda gösterilir)</span></label>
-                  <textarea value={notableLegacyText} onChange={e => setNotableLegacyText(e.target.value)} rows={5} placeholder="Bu kişinin değerleri ve mirası bugün nasıl yaşıyor..." className={`${inputCls} resize-none`} />
-                </div>
-              </>
-            )}
-
-            <div className="flex items-center gap-3">
-              <button type="submit" disabled={notableSaving} className={saveBtnCls}>
-                {notableSaving ? 'Kaydediliyor...' : 'Kaydet'}
-              </button>
-              {notableSaved && <span className="flex items-center gap-1.5 text-xs font-medium text-[#174f35]">✓ Kaydedildi</span>}
             </div>
           </form>
         </div>

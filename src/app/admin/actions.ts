@@ -598,3 +598,44 @@ export async function addPricingExemption(formData: FormData): Promise<ActionRes
   revalidatePath('/admin/settings')
   return { success: true }
 }
+
+// ─── Notable Profile ────────────────────────────────────────────────────────
+
+export async function saveNotableProfile(
+  vaultId: string,
+  data: {
+    is_notable: boolean
+    nationality: string | null
+    notable_subtitle: string | null
+    notable_motto: string | null
+    notable_motto_tr: string | null
+    featured_quote: string | null
+    notable_legacy_text: string | null
+    notable_verified_note: string | null
+  }
+): Promise<ActionResult> {
+  const { user, profile } = await requireAdmin()
+  if (!z.string().uuid().safeParse(vaultId).success) return { success: false, error: 'Geçersiz vault ID' }
+
+  const supabase = await createServiceClient()
+
+  const { error } = await supabase.from('vaults').update({
+    ...data,
+    updated_at: new Date().toISOString(),
+  }).eq('id', vaultId)
+
+  if (error) return { success: false, error: error.message }
+
+  await logAdminAction({
+    adminId: user.id,
+    adminEmail: user.email ?? profile.email ?? '',
+    action: 'notable_profile_updated',
+    entityType: 'vault',
+    entityId: vaultId,
+    newValue: { is_notable: data.is_notable, nationality: data.nationality },
+  })
+
+  revalidatePath(`/admin/memorials/${vaultId}`)
+  revalidatePath('/memorial/[slug]', 'page')
+  return { success: true }
+}

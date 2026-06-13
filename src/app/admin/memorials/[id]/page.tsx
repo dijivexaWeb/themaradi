@@ -3,6 +3,7 @@ import { createServiceClient } from '@/lib/supabase/server'
 import { notFound } from 'next/navigation'
 import StatusBadge from '../../_components/StatusBadge'
 import VaultStatusForm from './_VaultStatusForm'
+import NotableForm from './_NotableForm'
 import Link from 'next/link'
 
 export default async function VaultDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -103,6 +104,32 @@ export default async function VaultDetailPage({ params }: { params: Promise<{ id
             {(heirs ?? []).length === 0 && <tr><td colSpan={4} className="px-4 py-4 text-center text-slate-400">Varis yok</td></tr>}
           </tbody>
         </table>
+      </div>
+
+      {/* Notable Profile */}
+      <div className="bg-white border border-slate-200 rounded-xl shadow-sm mb-6">
+        <div className="px-5 py-4 border-b border-slate-100 flex items-center gap-2">
+          <span>🏛</span>
+          <h2 className="font-semibold text-slate-800">Ulusal Miras Profili</h2>
+          {vault.is_notable && (
+            <span className="ml-auto rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-bold text-emerald-700 uppercase tracking-wide">Aktif</span>
+          )}
+        </div>
+        <div className="p-5">
+          <NotableForm
+            vaultId={vault.id}
+            initial={{
+              is_notable: vault.is_notable ?? false,
+              nationality: vault.nationality ?? null,
+              notable_subtitle: vault.notable_subtitle ?? null,
+              notable_motto: vault.notable_motto ?? null,
+              notable_motto_tr: vault.notable_motto_tr ?? null,
+              featured_quote: vault.featured_quote ?? null,
+              notable_legacy_text: vault.notable_legacy_text ?? null,
+              notable_verified_note: vault.notable_verified_note ?? null,
+            }}
+          />
+        </div>
       </div>
 
       {/* Payments */}
