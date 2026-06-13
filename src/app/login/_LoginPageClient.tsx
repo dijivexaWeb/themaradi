@@ -187,6 +187,7 @@ export default function LoginPageClient({ siteKey }: { siteKey: string }) {
           <form onSubmit={handleSubmit} className="space-y-3">
             <input
               type="email"
+              name="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               placeholder={c.email}
@@ -195,6 +196,7 @@ export default function LoginPageClient({ siteKey }: { siteKey: string }) {
             />
             <input
               type="password"
+              name="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder={c.password}
