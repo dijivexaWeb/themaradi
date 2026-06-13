@@ -33,7 +33,7 @@ export async function approveVault(vaultId: string): Promise<ActionResult> {
 
   const { error } = await supabase
     .from('vaults')
-    .update({ status: 'public_memorial', updated_at: new Date().toISOString() })
+    .update({ status: 'public_memorial', updated_at: new Date().toISOString(), published_at: new Date().toISOString() })
     .eq('id', vaultId)
 
   if (error) return { success: false, error: error.message }
@@ -106,9 +106,14 @@ export async function changeVaultStatus(vaultId: string, newStatus: string): Pro
     .eq('id', vaultId)
     .single()
 
+  const now = new Date().toISOString()
+  const extraFields = newStatus === 'public_memorial' && oldVault?.status !== 'public_memorial'
+    ? { published_at: now }
+    : {}
+
   const { error } = await supabase
     .from('vaults')
-    .update({ status: newStatus, updated_at: new Date().toISOString() })
+    .update({ status: newStatus, updated_at: now, ...extraFields })
     .eq('id', vaultId)
 
   if (error) return { success: false, error: error.message }
@@ -612,6 +617,7 @@ export async function saveNotableProfile(
     featured_quote: string | null
     notable_legacy_text: string | null
     notable_verified_note: string | null
+    notable_sort_order: number | null
   }
 ): Promise<ActionResult> {
   const { user, profile } = await requireAdmin()

@@ -17,10 +17,19 @@ export type MemorialItem = {
   death_date: string | null
   cover_photo_url: string | null
   birth_place: string | null
+  is_notable?: boolean | null
+  nationality?: string | null
+  notable_sort_order?: number | null
+}
+
+function nationalityFlag(code: string | null | undefined): string {
+  if (!code || code.length !== 2) return ''
+  return code.toUpperCase().split('').map(c => String.fromCodePoint(c.charCodeAt(0) + 127397)).join('')
 }
 
 export default function MemorialsClient({
   memorials,
+  notableMemorials = [],
   count,
   currentPage,
   totalPages,
@@ -28,6 +37,7 @@ export default function MemorialsClient({
   letter,
 }: {
   memorials: MemorialItem[]
+  notableMemorials?: MemorialItem[]
   count: number
   currentPage: number
   totalPages: number
@@ -70,6 +80,78 @@ export default function MemorialsClient({
 
           {/* CONTENT */}
           <div className="min-w-0 flex-1">
+
+            {/* NOTABLE / PINNED SECTION */}
+            {notableMemorials.length > 0 && !searchTerm && !letter && (
+              <div className="mb-8">
+                <div className="mb-4 flex items-center gap-2">
+                  <span className="text-base">🏛</span>
+                  <h2 className="font-serif text-base font-semibold text-[#173d31]">Ulusal Miras Profilleri</h2>
+                  <div className="h-px flex-1 bg-[#dfbd72]/40" />
+                </div>
+                <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 xl:grid-cols-4">
+                  {notableMemorials.map((m, idx) => {
+                    const birthYear = m.birth_date ? new Date(m.birth_date).getFullYear() : null
+                    const deathYear = m.death_date ? new Date(m.death_date).getFullYear() : null
+                    const years = birthYear && deathYear ? `${birthYear} – ${deathYear}` : birthYear ? `${birthYear}` : null
+                    const flag = nationalityFlag(m.nationality)
+                    const order = m.notable_sort_order
+
+                    return (
+                      <Link
+                        key={m.id}
+                        href={`/memorial/${m.slug}`}
+                        className="group relative overflow-hidden rounded-xl border border-[#dfbd72]/60 bg-gradient-to-b from-[#fdf8ee] to-white shadow-sm transition-all hover:border-[#dfbd72] hover:shadow-md"
+                      >
+                        {/* Sıra numarası */}
+                        {order != null && (
+                          <div className="absolute left-2 top-2 z-10 flex h-5 w-5 items-center justify-center rounded-full bg-[#dfbd72] text-[10px] font-bold text-[#1a1208]">
+                            {order}
+                          </div>
+                        )}
+                        {/* Bayrak */}
+                        {flag && (
+                          <div className="absolute right-2 top-2 z-10 text-base leading-none">{flag}</div>
+                        )}
+                        <div className="relative h-[170px] w-full overflow-hidden bg-[#ede8df]">
+                          {m.cover_photo_url ? (
+                            <Image
+                              src={m.cover_photo_url}
+                              alt={m.display_name}
+                              fill
+                              sizes="(max-width: 640px) 50vw, (max-width: 1280px) 33vw, 25vw"
+                              className="object-cover object-top transition-transform duration-300 group-hover:scale-105"
+                            />
+                          ) : (
+                            <div className="flex h-full items-center justify-center">
+                              <Users className="h-12 w-12 text-[#c7b89a]" />
+                            </div>
+                          )}
+                        </div>
+                        <div className="p-3.5">
+                          <div className="mb-1 inline-flex items-center gap-1 rounded-full bg-[#dfbd72]/20 px-2 py-0.5">
+                            <span className="text-[9px] font-bold uppercase tracking-wide text-[#9a7132]">Ulusal Miras</span>
+                          </div>
+                          <h3 className="font-serif text-sm font-semibold leading-snug text-[#173d31] transition-colors group-hover:text-[#0b6b3a]">
+                            {m.display_name}
+                          </h3>
+                          {years && (
+                            <p className="mt-0.5 text-xs font-medium text-[#9a7132]">{years}</p>
+                          )}
+                          {m.tagline && (
+                            <p className="mt-1.5 line-clamp-2 text-xs italic leading-5 text-[#665d50]">
+                              &ldquo;{m.tagline}&rdquo;
+                            </p>
+                          )}
+                        </div>
+                      </Link>
+                    )
+                  })}
+                </div>
+                <div className="mt-6 border-t border-[#e6dccb]" />
+              </div>
+            )}
+
             <p className="mb-5 text-sm text-[#7a6f5e]">
               <span className="font-semibold text-[#173d31]">{count}</span>{' '}
               {labels.showing}

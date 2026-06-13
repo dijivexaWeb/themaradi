@@ -14,6 +14,7 @@ interface Props {
     featured_quote: string | null
     notable_legacy_text: string | null
     notable_verified_note: string | null
+    notable_sort_order: number | null
   }
 }
 
@@ -26,6 +27,7 @@ export default function NotableForm({ vaultId, initial }: Props) {
   const [quote, setQuote] = useState(initial.featured_quote ?? '')
   const [legacy, setLegacy] = useState(initial.notable_legacy_text ?? '')
   const [verifiedNote, setVerifiedNote] = useState(initial.notable_verified_note ?? '')
+  const [sortOrder, setSortOrder] = useState<string>(initial.notable_sort_order != null ? String(initial.notable_sort_order) : '')
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
   const [error, setError] = useState('')
@@ -43,6 +45,7 @@ export default function NotableForm({ vaultId, initial }: Props) {
       featured_quote: quote.trim() || null,
       notable_legacy_text: legacy.trim() || null,
       notable_verified_note: verifiedNote.trim() || null,
+      notable_sort_order: sortOrder !== '' ? parseInt(sortOrder, 10) : null,
     })
     setSaving(false)
     if (result.success) {
@@ -77,6 +80,17 @@ export default function NotableForm({ vaultId, initial }: Props) {
         <>
           <div className="grid sm:grid-cols-2 gap-3">
             <div>
+              <label className={lbl}>Sıra No <span className="font-normal normal-case text-slate-400">(landing'de sıralama, boş = sırasız)</span></label>
+              <input
+                type="number"
+                min={1}
+                value={sortOrder}
+                onChange={e => setSortOrder(e.target.value)}
+                placeholder="1, 2, 3…"
+                className={inp}
+              />
+            </div>
+            <div>
               <label className={lbl}>Milliyet</label>
               <select value={nationality} onChange={e => setNationality(e.target.value)} className={inp}>
                 <option value="">Seç...</option>
@@ -93,10 +107,11 @@ export default function NotableForm({ vaultId, initial }: Props) {
                 <option value="US">🇺🇸 ABD</option>
               </select>
             </div>
-            <div>
-              <label className={lbl}>Altyazı / Kısa Tanım</label>
-              <input type="text" value={subtitle} onChange={e => setSubtitle(e.target.value)} placeholder="Gürcü milletinin manevi sembolü..." className={inp} />
-            </div>
+          </div>
+
+          <div>
+            <label className={lbl}>Altyazı / Kısa Tanım</label>
+            <input type="text" value={subtitle} onChange={e => setSubtitle(e.target.value)} placeholder="Gürcü milletinin manevi sembolü..." className={inp} />
           </div>
 
           <div className="grid sm:grid-cols-2 gap-3">

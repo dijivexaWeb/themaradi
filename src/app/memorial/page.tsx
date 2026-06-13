@@ -18,14 +18,25 @@ export default async function MemorialsIndexPage({ searchParams }: Props) {
 
   const supabase = await createServiceClient()
 
+  const SELECT_FIELDS = 'id, display_name, slug, tagline, birth_date, death_date, cover_photo_url, birth_place, is_notable, nationality, notable_sort_order'
+
+  // Notable profiles — always pinned at top, ordered by sort_order then name
+  const { data: notableMemorials } = await supabase
+    .from('vaults')
+    .select(SELECT_FIELDS)
+    .eq('status', 'public_memorial')
+    .eq('is_notable', true)
+    .order('notable_sort_order', { ascending: true, nullsFirst: false })
+    .order('display_name', { ascending: true })
+
+  // Regular profiles — exclude notables, apply filters, paginate
   let query = supabase
     .from('vaults')
-    .select(
-      'id, display_name, slug, tagline, birth_date, death_date, cover_photo_url, birth_place',
-      { count: 'exact' },
-    )
+    .select(SELECT_FIELDS, { count: 'exact' })
     .eq('status', 'public_memorial')
-    .order('updated_at', { ascending: false })
+    .or('is_notable.is.null,is_notable.eq.false')
+    .order('published_at', { ascending: false, nullsFirst: false })
+    .order('created_at', { ascending: false })
 
   if (searchTerm) {
     query = query.ilike('display_name', `%${searchTerm}%`)
@@ -43,6 +54,7 @@ export default async function MemorialsIndexPage({ searchParams }: Props) {
       <LandingNav />
       <MemorialsClient
         memorials={(memorials ?? []) as MemorialItem[]}
+        notableMemorials={(notableMemorials ?? []) as MemorialItem[]}
         count={count ?? 0}
         currentPage={currentPage}
         totalPages={totalPages}

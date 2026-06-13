@@ -142,6 +142,7 @@ export default async function VaultDetailPage({ params }: { params: Promise<{ id
               featured_quote: vault.featured_quote ?? null,
               notable_legacy_text: vault.notable_legacy_text ?? null,
               notable_verified_note: vault.notable_verified_note ?? null,
+              notable_sort_order: vault.notable_sort_order ?? null,
             }}
           />
         </div>
