@@ -3,6 +3,47 @@
 > Her oturum sonunda Claude bu dosyayı günceller.
 > Format: tarih → ne yapıldı → nerede kalındı → sıradaki adım.
 
+## 2026-06-14 — Oturum 110: QR Tabela Kargo Adresi Sistemi
+
+### Yapılanlar
+- **DB migration**: `vaults.shipping_address text` kolonu eklendi (nullable, Supabase MCP ile)
+- **Satın alma formu** (`_AnmaFormClient.tsx`): "QR Kod Tabela Kargo Adresi" textarea alanı eklendi — zorunlu, "Daha sonra admin panelinden güncelleyebilirsiniz" notu ile
+- **purchaseMemorialAction**: `shipping_address` formdan okunup `vaults` insert'e dahil edildi; validasyon eklendi
+- **createVaultForPayPalAction**: memorial_one_time için shipping_address kaydediliyor
+- **Admin vault detay** (`/admin/memorials/[id]/page.tsx`): "📦 QR Tabela Kargo Adresi" bölümü eklendi — mevcut adres monospace font ile gösteriliyor, "Adres Var/Yok" badge'i, amber border ile dikkat çekici
+- **`_ShippingAddressForm.tsx`**: Admin formundan adres güncelleme (server action + audit log + revalidate)
+- **`admin/actions.ts`**: `updateShippingAddressAction` eklendi — UUID validasyon, audit log, revalidatePath
+
+### Değiştirilen Dosyalar
+- `src/app/satin-al/anma/_AnmaFormClient.tsx` — kargo adresi textarea
+- `src/app/satin-al/actions.ts` — shipping_address okuma ve kayıt
+- `src/app/admin/actions.ts` — updateShippingAddressAction
+- `src/app/admin/memorials/[id]/page.tsx` — kargo adresi bölümü
+- `src/app/admin/memorials/[id]/_ShippingAddressForm.tsx` — yeni dosya
+
+### Proje Durumu
+- [x] QR tabela kargo adresi satın alma formunda toplanıyor
+- [x] Adres DB'ye kaydediliyor (vaults.shipping_address)
+- [x] Admin panelde görünüyor ve güncellenebilir
+- [x] LangProvider dil değiştirme bug fix (oturum 109)
+- [x] Google Translate kaldırıldı
+- [x] Notable profil label override'ları
+
+### Kritik Kararlar / Notlar
+- Kargo adresi `vaults` tablosunda (payments'da değil) — çünkü vault'a özgü, panelden erişmesi kolay
+- PayPal flow'da da kaydediliyor ama `purchaseVaultAction` (life_vault) için adres yok — QR tabela sadece anma profili ürünüyle geliyor
+- Mevcut kayıtlarda adres yok → admin "Adres Yok" badge'i ile görür, formdan ekleyebilir
+
+### Nerede Kaldık
+62cf617 push edildi, Vercel'de deploy oluyor.
+
+### Sıradaki Adım
+1. Deploy sonrası satın alma formunu test et — adres alanı görünmeli, zorunlu validation çalışmalı
+2. Admin `/admin/memorials/[id]` sayfasında kargo adresi bölümünü kontrol et
+3. Mevcut kayıtlar için retroaktif adres girişi admin'den yapılabilir
+
+---
+
 ## 2026-06-14 — Oturum 109: LangProvider Dil Değiştirme Bug Fix
 
 ### Yapılanlar
