@@ -188,6 +188,8 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
     ? `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(cemeteryQuery)}`
     : null
 
+  const isNotable = !!vault.is_notable
+
   const tabs = [
     { href: '#hikaye', label: t.memorial.lifeStory, show: hasStory },
     { href: '#kronoloji', label: t.memorial.chronology, show: hasTimeline },
@@ -198,8 +200,6 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
     { href: '#taziye', label: t.memorial.guestbook, show: true },
     { href: '#ziyaret', label: t.memorial.visitInfo, show: hasCemetery },
   ].filter((t) => t.show)
-
-  const isNotable = !!vault.is_notable
 
   return (
     <div className={`theme-${vault.theme || 'classic_emerald'} min-h-screen bg-[#fbf8f1] text-[#173d31]`}>
