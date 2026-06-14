@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist } from "next/font/google";
 import { LangProvider } from "@/i18n/context";
 import CookieBanner from "@/components/CookieBanner";
+import Script from "next/script";
 import "./globals.css";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
@@ -44,6 +45,16 @@ export default async function RootLayout({
       className={`${geistSans.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-zinc-950 text-zinc-100">
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-LX3BRV79MJ"
+          strategy="afterInteractive"
+        />
+        <Script id="google-analytics" strategy="afterInteractive">{`
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-LX3BRV79MJ');
+        `}</Script>
         <LangProvider serverLang={lang}>
           {children}
           <CookieBanner />
