@@ -19,13 +19,7 @@ export function LangProvider({ children, serverLang = 'tr' }: { children: ReactN
   const [lang, setLangState] = useState<Lang>(serverLang)
 
   useEffect(() => {
-    const clientLang = detectLang()
-    if (clientLang !== serverLang) {
-      const timer = setTimeout(() => {
-        setLangState(clientLang)
-      }, 0)
-      return () => clearTimeout(timer)
-    }
+    setLangState(detectLang())
   }, [serverLang])
 
   function setLang(l: Lang) {
