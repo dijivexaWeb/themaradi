@@ -552,11 +552,15 @@ export async function addWitnessAction(vaultId: string, formData: FormData): Pro
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://theeternalmemory.com'
   const confirmUrl = `${baseUrl}/verify/witness?token=${witness.token}`
 
-  await sendEmail({
-    to: email,
-    subject: `${vault.display_name} için vefat doğrulaması — Şahit onayı`,
-    html: witnessEmailHtml(fullName, vault.display_name as string, confirmUrl),
-  })
+  try {
+    await sendEmail({
+      to: email,
+      subject: `${vault.display_name} için vefat doğrulaması — Şahit onayı`,
+      html: witnessEmailHtml(fullName, vault.display_name as string, confirmUrl),
+    })
+  } catch (e) {
+    console.error('[addWitnessAction] email error:', e)
+  }
 
   revalidatePath(`/anma-paneli/${vaultId}/dogrulama`)
   redirect(`/anma-paneli/${vaultId}/dogrulama`)
@@ -579,11 +583,15 @@ export async function resendWitnessEmailAction(witnessId: string, vaultId: strin
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://theeternalmemory.com'
   const confirmUrl = `${baseUrl}/verify/witness?token=${witness.token}`
 
-  await sendEmail({
-    to: witness.email,
-    subject: `${vault.display_name} için vefat doğrulaması — Şahit onayı (Yeniden)`,
-    html: witnessEmailHtml(witness.full_name, vault.display_name as string, confirmUrl),
-  })
+  try {
+    await sendEmail({
+      to: witness.email,
+      subject: `${vault.display_name} için vefat doğrulaması — Şahit onayı (Yeniden)`,
+      html: witnessEmailHtml(witness.full_name, vault.display_name as string, confirmUrl),
+    })
+  } catch (e) {
+    console.error('[resendWitnessEmailAction] email error:', e)
+  }
 
   revalidatePath(`/anma-paneli/${vaultId}/dogrulama`)
   redirect(`/anma-paneli/${vaultId}/dogrulama`)

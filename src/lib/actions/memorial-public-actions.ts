@@ -8,18 +8,12 @@ export async function incrementMemorialActionAction(
 ): Promise<{ success: boolean; newCount: number }> {
   const supabase = await createServiceClient()
 
-  const { data: action } = await supabase
-    .from('memorial_actions')
-    .select('count')
-    .eq('id', actionId)
-    .eq('memorial_id', vaultId)
-    .eq('is_active', true)
-    .single()
+  const { data: newCount, error } = await supabase.rpc('increment_memorial_action_count', {
+    p_action_id: actionId,
+    p_vault_id: vaultId,
+  })
 
-  if (!action) return { success: false, newCount: 0 }
+  if (error || newCount === null) return { success: false, newCount: 0 }
 
-  const newCount = (action.count ?? 0) + 1
-  await supabase.from('memorial_actions').update({ count: newCount }).eq('id', actionId)
-
-  return { success: true, newCount }
+  return { success: true, newCount: newCount as number }
 }

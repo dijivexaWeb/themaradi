@@ -21,21 +21,15 @@ export async function reactToEntryAction(
   const col = `react_${emoji}` as const
   const service = await createServiceClient()
 
-  const { data } = await service
-    .from('guestbook_entries')
-    .select(`id, ${col}`)
-    .eq('id', entryId)
-    .eq('status', 'approved')
-    .single()
+  const { data: newCount, error } = await service.rpc('update_entry_reaction', {
+    p_entry_id: entryId,
+    p_col: col,
+    p_delta: delta,
+  })
 
-  if (!data) return { success: false, newCount: 0 }
-
-  const current = (data as Record<string, number>)[col] ?? 0
-  const newCount = Math.max(0, current + delta)
-
-  await service.from('guestbook_entries').update({ [col]: newCount }).eq('id', entryId)
+  if (error) return { success: false, newCount: 0 }
   revalidatePath('/memorial/[slug]', 'page')
-  return { success: true, newCount }
+  return { success: true, newCount: (newCount as number) ?? 0 }
 }
 
 export async function reactToHeroPanelAction(
@@ -50,20 +44,15 @@ export async function reactToHeroPanelAction(
   const col = `hero_${panel}_react_${emoji}` as const
   const service = await createServiceClient()
 
-  const { data } = await service
-    .from('vaults')
-    .select(`id, ${col}`)
-    .eq('id', vaultId)
-    .single()
+  const { data: newCount, error } = await service.rpc('update_vault_reaction', {
+    p_vault_id: vaultId,
+    p_col: col,
+    p_delta: delta,
+  })
 
-  if (!data) return { success: false, newCount: 0 }
-
-  const current = (data as Record<string, number>)[col] ?? 0
-  const newCount = Math.max(0, current + delta)
-
-  await service.from('vaults').update({ [col]: newCount }).eq('id', vaultId)
+  if (error) return { success: false, newCount: 0 }
   revalidatePath('/memorial/[slug]', 'page')
-  return { success: true, newCount }
+  return { success: true, newCount: (newCount as number) ?? 0 }
 }
 
 export async function addReactionAction(vaultId: string, type: 'candle' | 'flower' | 'prayer'): Promise<void> {

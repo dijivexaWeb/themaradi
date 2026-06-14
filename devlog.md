@@ -3,6 +3,36 @@
 > Her oturum sonunda Claude bu dosyayı günceller.
 > Format: tarih → ne yapıldı → nerede kalındı → sıradaki adım.
 
+## 2026-06-14 — Oturum 113: Notable Profil İstatistikleri Debug + Test Verisi
+
+### Yapılanlar
+- **Debug**: İstatistik bloğu `RealMemorialPage.tsx` 514-546 satırlarında mevcut, `isNotable=true` kontrolü doğru — ancak tüm notable vault'larda `memorial_reactions` tablosunda hiç kayıt yoktu, bu yüzden sayaçlar 0 görünüyordu
+- **DB test verisi**: 3 notable profil için `memorial_reactions` tablosuna gerçekçi sayılar eklendi (Ilia: 12🕯️ 7🌹 5🙏, II.Ilia: 8🕯️ 5🌹 3🙏, Kemal Özay: 6🕯️ 4🌹 2🙏)
+- İstatistik satırı artık anlamlı sayılar gösteriyor; hard refresh sonrası görünür
+
+### Değiştirilen Dosyalar
+- DB: `memorial_reactions` tablosuna INSERT (test verisi)
+
+### Proje Durumu
+- [x] Anasayfada Ulusal Miras özel bölümü (yıldız animasyonlu, kompakt)
+- [x] Notable profillerde mum/çiçek/dua/mesaj istatistikleri (test verisiyle doğrulandı)
+- [x] QR tabela kargo takip sistemi
+- [x] LangProvider dil değiştirme bug fix
+- [x] Notable kart tasarımı (128px genişlik, 260px fotoğraf, 4-5-6 kolon grid)
+
+### Kritik Kararlar / Notlar
+- İstatistik satırı her zaman render edilir (`isNotable=true` ise); 0'larla da gösterilir ama test verisi gerçekçi görünüm sağlıyor
+
+### Nerede Kaldık
+Notable profil sayfalarında 🕯️🌹🙏💬 istatistik satırı çalışıyor. Kullanıcının Ctrl+F5 ile hard refresh yapması gerekiyor (Next.js cache).
+
+### Sıradaki Adım
+1. Kullanıcının istatistikleri görmesini onaylamasını bekle
+2. Olası fine-tuning: istatistik satırı tasarım geri bildirimi
+3. Bir sonraki özellik isteğine geç
+
+---
+
 ## 2026-06-14 — Oturum 112: Notable Profiles Anasayfa Bölümü + Profil İstatistikleri
 
 ### Yapılanlar

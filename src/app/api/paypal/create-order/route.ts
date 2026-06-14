@@ -139,6 +139,12 @@ export async function POST(req: NextRequest) {
 
     const paypalOrder = await createOrder(amount.toFixed(2), currency, description)
 
+    // orderId'yi payments tablosuna bağla — capture'da vault swap saldırısını önler
+    await service.from('payments')
+      .update({ external_payment_id: paypalOrder.id })
+      .eq('vault_id', vault.id)
+      .eq('status', 'pending')
+
     return NextResponse.json({
       orderId: paypalOrder.id,
       vaultId: vault.id,

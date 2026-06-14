@@ -10,6 +10,19 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'orderId ve vaultId zorunludur' }, { status: 400 })
     }
 
+    // orderId bu vault'a ait mi doğrula — vault swap saldırısını önler
+    const { data: payment } = await service
+      .from('payments')
+      .select('id')
+      .eq('vault_id', vaultId)
+      .eq('external_payment_id', orderId)
+      .eq('status', 'pending')
+      .single()
+
+    if (!payment) {
+      return NextResponse.json({ error: 'Geçersiz ödeme isteği' }, { status: 403 })
+    }
+
     const capture = await captureOrder(orderId)
 
     if (capture.status !== 'COMPLETED') {

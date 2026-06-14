@@ -111,11 +111,11 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
   ] = await Promise.all([
     supabase.from('media').select('*').eq('vault_id', id).eq('media_type', 'image').eq('is_public', true).order('sort_order', { ascending: true }).limit(24),
     supabase.from('media').select('*').eq('vault_id', id).eq('media_type', 'video').eq('is_public', true).order('sort_order', { ascending: true }).limit(6),
-    supabase.from('vault_memories').select('*').eq('vault_id', id).eq('is_secret', false).order('memory_date', { ascending: true }),
+    supabase.from('vault_memories').select('*').eq('vault_id', id).eq('is_secret', false).order('memory_date', { ascending: true }).limit(200),
     supabase.from('vault_family_members').select('*').eq('vault_id', id).order('sort_order'),
     supabase.from('vault_audio_recordings').select('*').eq('vault_id', id).eq('is_public', true).order('sort_order'),
     supabase.from('guestbook_entries').select('*').eq('vault_id', id).eq('status', 'approved').order('created_at', { ascending: false }).limit(20),
-    supabase.from('memorial_reactions').select('reaction_type').eq('vault_id', id),
+    supabase.rpc('count_memorial_reactions', { p_vault_id: id }),
     supabase.from('memorial_actions').select('id, label, icon, show_counter, count, sort_order').eq('memorial_id', id).eq('is_active', true).order('sort_order', { ascending: true }),
     supabase.from('memory_book_entries').select('id, author_name, relation, memory_text, photo_url, created_at').eq('vault_id', id).eq('status', 'approved').order('created_at', { ascending: false }).limit(30),
   ])
@@ -141,11 +141,11 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
     react_dove: number
   }[]
 
-  const reactionData = (reactionsResult.data ?? []) as { reaction_type: string }[]
+  const reactionAgg = (reactionsResult.data ?? {}) as { candle?: number; flower?: number; prayer?: number }
   const initialCounts = {
-    candle: reactionData.filter((r) => r.reaction_type === 'candle').length,
-    flower: reactionData.filter((r) => r.reaction_type === 'flower').length,
-    prayer: reactionData.filter((r) => r.reaction_type === 'prayer').length,
+    candle: reactionAgg.candle ?? 0,
+    flower: reactionAgg.flower ?? 0,
+    prayer: reactionAgg.prayer ?? 0,
   }
 
   const turnstileSiteKey = await getTurnstileSiteKey()

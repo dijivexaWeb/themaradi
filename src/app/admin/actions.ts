@@ -138,6 +138,7 @@ export async function changeVaultStatus(vaultId: string, newStatus: string): Pro
   })
 
   revalidatePath('/admin/memorials')
+  revalidatePath('/')
   return { success: true }
 }
 
