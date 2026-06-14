@@ -16,6 +16,7 @@ import { getTurnstileSiteKey } from '@/lib/turnstile'
 import { getTranslation } from '@/i18n/server'
 import NotableProfilePhoto from './NotableProfilePhoto'
 import LangSwitcher from './LangSwitcher'
+import NotableShareButton from './NotableShareButton'
 import NotableIntroPopup from './NotableIntroPopup'
 
 interface VaultRow {
@@ -313,7 +314,14 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
               <Feather className="h-4 w-4 text-[#c7a76f]" />
               <span>{deathYear ?? '?'}</span>
               {vault.is_notable && vault.nationality && (
-                <span className="text-2xl" style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>{nationalityFlag(vault.nationality)}</span>
+                <img
+                  src={`https://flagcdn.com/32x24/${vault.nationality!.toLowerCase()}.png`}
+                  srcSet={`https://flagcdn.com/64x48/${vault.nationality!.toLowerCase()}.png 2x`}
+                  width={32}
+                  height={24}
+                  alt={vault.nationality!}
+                  className="rounded-sm inline-block"
+                />
               )}
             </div>
             {vault.birth_place && (
@@ -438,6 +446,13 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
               {vault.notable_verified_note ?? t.memorial.notableVerifiedNote}
             </p>
           </div>
+        </div>
+      )}
+
+      {/* ── Notable: Share button ── */}
+      {isNotable && (
+        <div className="bg-[#091712] border-b border-[#dfbd72]/10 px-5 py-4 sm:px-8 flex justify-center">
+          <NotableShareButton displayName={vault.display_name} lang={lang} />
         </div>
       )}
 
