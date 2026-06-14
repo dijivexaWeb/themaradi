@@ -2,6 +2,7 @@
 
 import { LangProvider } from '@/i18n/context'
 import MemorialInteractions, { type CustomAction } from './MemorialInteractions'
+import type { Lang } from '@/i18n'
 
 interface GuestbookEntry {
   id: string
@@ -23,9 +24,10 @@ interface Props {
   siteKey: string
   customActions?: CustomAction[]
   isNotable?: boolean
+  serverLang?: Lang
 }
 
-export default function RealMemorialInteractionsWrapper({ entries, vaultId, initialCounts, siteKey, customActions = [], isNotable = false }: Props) {
+export default function RealMemorialInteractionsWrapper({ entries, vaultId, initialCounts, siteKey, customActions = [], isNotable = false, serverLang = 'tr' }: Props) {
   const condolences = entries.map((e) => ({
     id: e.id,
     name: e.author_name,
@@ -46,7 +48,7 @@ export default function RealMemorialInteractionsWrapper({ entries, vaultId, init
   }))
 
   return (
-    <LangProvider>
+    <LangProvider serverLang={serverLang}>
       <MemorialInteractions condolences={condolences} vaultId={vaultId} initialCounts={initialCounts} siteKey={siteKey} customActions={customActions} isNotable={isNotable} />
     </LangProvider>
   )

@@ -193,7 +193,7 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
     { href: '#kronoloji', label: t.memorial.chronology, show: hasTimeline },
     { href: '#videolar', label: t.memorial.videoMemories, show: hasVideos },
     { href: '#fotograflar', label: t.memorial.photoArchive, show: hasPhotos },
-    { href: '#son-mesaj', label: t.memorial.lastMessageTitle, show: !!vault.last_message },
+    { href: '#son-mesaj', label: isNotable ? (lang === "ka" ? "დარჩენილი სიტყვა" : lang === "ru" ? "Оставленные слова" : lang === "en" ? "Remaining Words" : "Geride Kalan Söz") : t.memorial.lastMessageTitle, show: !!vault.last_message },
     { href: '#anilar', label: t.memorial.memories, show: hasRegularMemories },
     { href: '#taziye', label: t.memorial.guestbook, show: true },
     { href: '#ziyaret', label: t.memorial.visitInfo, show: hasCemetery },
@@ -252,7 +252,7 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
           <div className="order-2 rounded-2xl border border-[#c7a76f]/20 bg-[#091712]/55 p-5 shadow-2xl shadow-black/20 backdrop-blur-sm sm:p-6 lg:order-1">
             <div className="mb-3 flex items-center gap-3 text-[#c7a76f]">
               <span className="h-px w-8 bg-[#c7a76f]" />
-              <span className="text-xs tracking-[0.22em] uppercase">{t.memorial.fromFamily}</span>
+              <span className="text-xs tracking-[0.22em] uppercase">{isNotable ? (lang === "ka" ? "ეროვნული მემკვიდრეობა" : lang === "ru" ? "Национальное наследие" : lang === "en" ? "National Heritage" : "Milli Miras") : t.memorial.fromFamily}</span>
             </div>
             <p className="font-serif text-lg leading-8 text-white sm:text-xl sm:leading-9">
               {vault.tagline ?? 'Saygıyla anıyoruz. Bize bıraktığı sevgi ve hatıralar her zaman kalbimizde yaşayacak.'}
@@ -506,8 +506,8 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
             <div className="font-serif text-5xl text-white">
               {((v.view_count as number) ?? 0).toLocaleString(lang)}
             </div>
-            <div className="text-sm font-semibold text-[#c7a76f]">Ziyaretçi</div>
-            <div className="mt-1 text-xs text-[#6b9e86]">Bu sayfayı ziyaret etti</div>
+            <div className="text-sm font-semibold text-[#c7a76f]">{lang === "ka" ? "მნახველი" : lang === "ru" ? "Посетители" : lang === "en" ? "Visitors" : "Ziyaretçi"}</div>
+            <div className="mt-1 text-xs text-[#6b9e86]">{lang === "ka" ? "ამ გვერდს ეწვია" : lang === "ru" ? "Посетили эту страницу" : lang === "en" ? "Visited this page" : "Bu sayfayı ziyaret etti"}</div>
           </div>
         </div>
       </section>
@@ -581,7 +581,7 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
                     <div className="h-px flex-1 bg-[#e1d5c3]" />
                     <div className="text-right">
                       <div className="font-serif text-base text-[#173d31]">{vault.display_name}</div>
-                      <div className="text-xs text-[#8a7a64]">{t.memorial.fromFamily}</div>
+                      <div className="text-xs text-[#8a7a64]">{isNotable ? (lang === "ka" ? "ეროვნული მემკვიდრეობა" : lang === "ru" ? "Национальное наследие" : lang === "en" ? "National Heritage" : "Milli Miras") : t.memorial.fromFamily}</div>
                     </div>
                   </div>
                 </div>
@@ -745,10 +745,10 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
           <div className="mx-auto max-w-4xl text-center">
             <div className="flex items-center justify-center gap-3 text-[#b08340]">
               <span className="h-px w-10 bg-[#c7a76f]" />
-              <span className="text-xs tracking-[0.2em] uppercase">{t.memorial.lastMessageTitle}</span>
+              <span className="text-xs tracking-[0.2em] uppercase">{isNotable ? (lang === "ka" ? "დარჩენილი სიტყვა" : lang === "ru" ? "Оставленные слова" : lang === "en" ? "Remaining Words" : "Geride Kalan Söz") : t.memorial.lastMessageTitle}</span>
             </div>
             <h2 className="mt-3 font-serif text-5xl text-[#173d31]">
-              {t.memorial.linesLeftForLovedOnes}
+              {isNotable ? (lang === "ka" ? "სამშობლოს და თაობებისთვის დარჩენილი სიტყვები." : lang === "ru" ? "Слова, оставленные народу и поколениям." : lang === "en" ? "Words left for the nation and generations." : "Milletine ve nesillere bıraktığı satırlar.") : t.memorial.linesLeftForLovedOnes}
             </h2>
           </div>
 
@@ -865,7 +865,7 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
 
       {/* ── TAZİYE DEFTERİ ── */}
       <div id="taziye">
-        <RealMemorialInteractionsWrapper entries={guestbookEntries} vaultId={id} initialCounts={initialCounts} siteKey={turnstileSiteKey} customActions={customActions} isNotable={isNotable} />
+        <RealMemorialInteractionsWrapper entries={guestbookEntries} vaultId={id} initialCounts={initialCounts} siteKey={turnstileSiteKey} customActions={customActions} isNotable={isNotable} serverLang={lang} />
       </div>
 
       {/* ── ANI DEFTERİ ── */}
