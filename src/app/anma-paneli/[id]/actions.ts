@@ -291,13 +291,13 @@ export async function addMemorialAudioAction(vaultId: string, formData: FormData
     .select('id, status')
     .eq('id', vaultId)
     .eq('owner_id', user.id)
-    .eq('product_type', 'memorial_profile')
     .single()
-  if (!vault || vault.status === 'pending_verification') return
+  if (!vault) return { error: 'vault_not_found' }
+  if (vault.status === 'pending_verification') return { error: 'locked' }
 
   const title = (formData.get('title') as string)?.trim()
   const author = (formData.get('author') as string)?.trim() || null
-  if (!title) return
+  if (!title) return { error: 'no_title' }
 
   const fileKey = (formData.get('file_key') as string | null)?.trim()
   const bucket = (formData.get('bucket') as string | null)?.trim()
@@ -307,9 +307,9 @@ export async function addMemorialAudioAction(vaultId: string, formData: FormData
     audioUrl = getPublicUrl(fileKey)
   }
 
-  if (!audioUrl) return
+  if (!audioUrl) return { error: 'no_url' }
 
-  await supabase.from('vault_audio_recordings').insert({
+  const { error: insertError } = await supabase.from('vault_audio_recordings').insert({
     vault_id: vaultId,
     title,
     author,
@@ -318,6 +318,8 @@ export async function addMemorialAudioAction(vaultId: string, formData: FormData
     file_key: fileKey || null,
     storage_bucket: bucket || null
   })
+
+  if (insertError) return { error: insertError.message }
 
   revalidatePath(`/anma-paneli/${vaultId}/ses-kayitlari`)
   revalidatePath(`/anma-paneli/${vaultId}`)

@@ -132,9 +132,9 @@ export default function AudioUploadForm({ vaultId, isLocked }: Props) {
       }
 
       const result = await addMemorialAudioAction(vaultId, formData)
-      if (result?.error === 'auth') {
-        router.push('/login')
-        return
+      if (result?.error) {
+        if (result.error === 'auth') { router.push('/login'); return }
+        throw new Error(`Kayıt hatası: ${result.error}`)
       }
 
       setFile(null)
