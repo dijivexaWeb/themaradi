@@ -69,7 +69,10 @@ export async function verifyTurnstile(token: string | null | undefined): Promise
     }
   }
 
-  if (!secretKey) return true  // not configured → skip check
+  if (!secretKey) {
+    console.error('[Turnstile] Secret key not configured — denying all requests')
+    return false
+  }
 
   try {
     const resp = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {

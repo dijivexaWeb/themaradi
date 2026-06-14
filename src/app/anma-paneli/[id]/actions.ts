@@ -454,6 +454,15 @@ export async function uploadVerificationDocAction(vaultId: string, formData: For
 
   const fileSize = parseInt(fileSizeRaw as string, 10)
 
+  if (!ALLOWED_DOC_MIME.has(mimeType)) {
+    console.error('[uploadVerificationDocAction] Invalid MIME type:', mimeType)
+    return
+  }
+  if (isNaN(fileSize) || fileSize > MAX_DOC_BYTES) {
+    console.error('[uploadVerificationDocAction] File too large:', fileSize)
+    return
+  }
+
   // Önceki pending/rejected belgeler varsa sil (her vault için 1 aktif belge)
   await supabase.from('memorial_verification_docs')
     .delete().eq('vault_id', vaultId).in('status', ['pending', 'rejected'])
@@ -774,10 +783,10 @@ export async function saveMemorialStyleAction(
   const existingIds = new Set((existingRows ?? []).map((r: { id: string }) => r.id))
   const incomingIds = new Set(actions.filter(a => a.id).map(a => a.id!))
 
-  // Silinenleri temizle
+  // Silinenleri temizle — memorial_id skopuyla RLS bypass'ı önle
   const toDelete = [...existingIds].filter(id => !incomingIds.has(id))
   if (toDelete.length > 0) {
-    await service.from('memorial_actions').delete().in('id', toDelete)
+    await service.from('memorial_actions').delete().eq('memorial_id', vaultId).in('id', toDelete)
   }
 
   // Mevcutları güncelle

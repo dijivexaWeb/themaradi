@@ -10,8 +10,8 @@ export async function GET(request: NextRequest) {
     const supabase = await createClient()
     const { error } = await supabase.auth.exchangeCodeForSession(code)
     if (!error) {
-      // Explicit next parametresi varsa kullan
-      if (next) {
+      // Explicit next parametresi varsa kullan — yalnızca kendi domain'e yönlendir
+      if (next && next.startsWith('/') && !next.startsWith('//')) {
         return NextResponse.redirect(`${origin}${next}`)
       }
 

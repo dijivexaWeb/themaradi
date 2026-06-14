@@ -3,7 +3,11 @@
 import { createClient } from '@/lib/supabase/server'
 import { headers } from 'next/headers'
 
+const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+
 export async function submitObjectionAction(vaultId: string, formData: FormData) {
+  if (!UUID_RE.test(vaultId)) return { success: false, error: 'Geçersiz istek.' }
+
   const name = (formData.get('name') as string | null)?.trim()
   const phone = (formData.get('phone') as string | null)?.trim()
   const email = (formData.get('email') as string | null)?.trim()
@@ -24,6 +28,15 @@ export async function submitObjectionAction(vaultId: string, formData: FormData)
   const ip = headersList.get('x-forwarded-for')?.split(',')[0]?.trim() ?? null
 
   const supabase = await createClient()
+
+  // Vault'un herkese açık bir anma sayfası olduğunu doğrula
+  const { data: vault } = await supabase
+    .from('vaults')
+    .select('id')
+    .eq('id', vaultId)
+    .eq('status', 'public_memorial')
+    .single()
+  if (!vault) return { success: false, error: 'Geçersiz istek.' }
 
   const { error } = await supabase.from('memorial_objections').insert({
     vault_id: vaultId,

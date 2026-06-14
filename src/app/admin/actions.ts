@@ -2,7 +2,7 @@
 
 import { requireAdmin } from '@/lib/admin/auth'
 import { logAdminAction } from '@/lib/admin/audit'
-import { createServiceClient } from '@/lib/supabase/server'
+import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { z } from 'zod'
 import { revalidatePath } from 'next/cache'
 import { sendEmail } from '@/lib/email'
@@ -926,6 +926,10 @@ export async function updateShippingStatusAction(_prev: unknown, formData: FormD
 }
 
 export async function confirmDeliveryAction(vaultId: string) {
+  const authClient = await createClient()
+  const { data: { user } } = await authClient.auth.getUser()
+  if (!user) return { error: 'Yetkisiz erişim' }
+
   const supabase = await createServiceClient()
 
   const { data: vault, error: fetchErr } = await supabase
@@ -935,6 +939,7 @@ export async function confirmDeliveryAction(vaultId: string) {
     .single()
 
   if (fetchErr || !vault) return { error: 'Vault bulunamadı' }
+  if (vault.owner_id !== user.id) return { error: 'Yetkisiz erişim' }
   if (vault.shipping_status !== 'delivered') return { error: 'Bu işlem şu anda yapılamaz' }
 
   const { error } = await supabase
