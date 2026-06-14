@@ -10,6 +10,8 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'orderId ve vaultId zorunludur' }, { status: 400 })
     }
 
+    const service = await createServiceClient()
+
     // orderId bu vault'a ait mi doğrula — vault swap saldırısını önler
     const { data: payment } = await service
       .from('payments')
@@ -24,12 +26,6 @@ export async function POST(req: NextRequest) {
     }
 
     const capture = await captureOrder(orderId)
-
-    if (capture.status !== 'COMPLETED') {
-      return NextResponse.json({ error: `Ödeme tamamlanamadı: ${capture.status}` }, { status: 400 })
-    }
-
-    const service = await createServiceClient()
 
     await service.from('payments')
       .update({ status: 'paid', paid_at: new Date().toISOString(), payment_method: 'paypal', notes: `PayPal Order: ${orderId}` })
