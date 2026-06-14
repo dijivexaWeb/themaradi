@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server'
+import { createServiceClient } from '@/lib/supabase/server'
 
 export type PricingConfig = {
   // GEL (₾) — base currency
@@ -61,7 +61,7 @@ const DEFAULTS: PricingConfig = {
 
 export async function fetchPricingConfig(): Promise<PricingConfig> {
   try {
-    const supabase = await createClient()
+    const supabase = await createServiceClient()
     const { data } = await supabase
       .from('platform_settings')
       .select('key, value')

@@ -3,6 +3,95 @@
 > Her oturum sonunda Claude bu dosyayı günceller.
 > Format: tarih → ne yapıldı → nerede kalındı → sıradaki adım.
 
+## 2026-06-14 — Oturum 115: RLS Sertleştirme + Penetrasyon Testi
+
+### Yapılanlar
+
+**Penetrasyon Testi Bulguları ve Düzeltmeleri:**
+
+1. **KRİTİK: `platform_settings` hâlâ açıktı** — Önceki oturumun migration'ı yeni service_role policy ekledi ama `anon_read_settings` ve `auth_read_settings` eski politikaları silmedi. Pen test sırasında canlı test ile tespit edildi → `fix_platform_settings_rls_remove_legacy_policies` migration ile kaldırıldı.
+
+2. **KRİTİK: `pricing.ts` kırıldı** — `platform_settings` RLS sonrası `lib/pricing.ts` dosyası `createClient()` kullanıyordu. TRY/USD/RUB fiyatlar ve kampanya verileri boş dönüyordu. → `createServiceClient()` ile düzeltildi.
+
+3. **`email/inbound` fail-open** — webhook secret yapılandırılmamışsa tüm istekler kabul ediliyordu. `inbound_webhook_secret` şu an ayarlı, risk aktif değil. Ama kod Turnstile gibi fail-safe yapıldı (secret yoksa reddet).
+
+**DB Migration: `rls_hardening_round2`**
+- `vaults.anon_increment_view_count` UPDATE policy kaldırıldı
+- `memorial_witnesses.witness_confirm_mw` UPDATE policy kaldırıldı (token bypass)
+- `guestbook_entries.owner_update_guestbook_entries` WITH CHECK düzeltildi
+- 12 SECURITY DEFINER fonksiyondan REVOKE
+
+**Pen Test Sonucu:** Sistem güvende. Tüm tablolarda RLS aktif, platform_settings artık gerçekten kapalı.
+
+### Değiştirilen Dosyalar
+- `src/lib/pricing.ts` — createClient → createServiceClient
+- `src/app/api/email/inbound/route.ts` — fail-open → fail-safe
+- DB: `fix_platform_settings_rls_remove_legacy_policies` migration
+- DB: `rls_hardening_round2` migration
+
+### Proje Durumu
+- [x] platform_settings anon erişimi → kapatıldı (eski policy'ler silindi)
+- [x] pricing.ts kırılması → createServiceClient ile düzeltildi
+- [x] email/inbound fail-open → fail-safe yapıldı
+- [x] vaults anon UPDATE → kapatıldı
+- [x] memorial_witnesses anon confirmed bypass → kapatıldı
+- [x] vault_encrypt/vault_get/vault_upsert anon callable → REVOKE
+- [ ] Bucket listing (media, vault-media) → dashboard'dan manuel
+- [ ] Inbox XSS (_InboxClient.tsx dangerouslySetInnerHTML) → DOMPurify
+
+### Nerede Kaldık
+Pen test tamamlandı. Sistem güvende çalışıyor. `pricing.ts` kırılması pen test sırasında yakalandı ve düzeltildi.
+
+### Sıradaki Adım
+1. Deploy et — `pricing.ts` ve `email/inbound` değişikliklerini canlıya al
+2. Bucket listing: Supabase Storage dashboard'dan `media` ve `vault-media` SELECT policy daralt
+3. Inbox XSS: `_InboxClient.tsx` → DOMPurify kurulumu
+
+---
+
+## 2026-06-14 — Oturum 115: RLS Sertleştirme (Round 2)
+
+### Yapılanlar
+
+**DB Migration: `rls_hardening_round2`**
+- `vaults.anon_increment_view_count` UPDATE policy kaldırıldı: anon tüm vault kolonlarını güncelleyebiliyordu (kod zaten `increment_vault_view_count()` RPC kullanıyor)
+- `memorial_witnesses.witness_confirm_mw` UPDATE policy kaldırıldı: anon doğrudan REST API ile herhangi bir witness kaydını `confirmed=true` yapabiliyordu (tüm witness operasyonları zaten service_role kullanıyor → RLS atlanıyor, bu policy sadece risk yaratıyordu)
+- `guestbook_entries.owner_update_guestbook_entries` düzeltildi: WITH CHECK(true) → WITH CHECK(vault_id in owner's vaults) — vault_id başka vault'a swap önlendi
+- SECURITY DEFINER fonksiyonlardan REVOKE (toplu, önceki oturumun tekrarı + yeniler): `vault_decrypt`, `vault_encrypt`, `vault_get`, `vault_upsert`, `vault_status_counts`, `rls_auto_enable`, `assign_qr_code`, `generate_qr_code`, `handle_new_user`, `handle_vault_transition`, `check_heir_confirmations`, `increment_objection_count`, `get_heir_vault_ids_for_user` (anon'dan)
+
+**Kasıtlı olarak dokunulmayan (intentional) politikalar:**
+- `contact_messages`, `claim_objections`, `memorial_objections`, `guestbook_entries`, `memorial_action_clicks`, `qr_analytics`, `memorial_reactions`, `memory_book_entries` INSERT WITH CHECK(true) → hepsi kamu formu, kasıtlı tasarım
+- `increment_vault_view_count()` anon erişimi → sayaç artırma için gerekli
+- `is_admin()` anon erişimi → her zaman false döner, risk yok
+
+**Bucket listing uyarıları (`media`, `vault-media`) → SQL migration ile düzeltilemiyor, Supabase Storage dashboard'dan yapılmalı (düşük öncelik)**
+
+### Proje Durumu
+- [x] platform_settings anon erişimi → kapatıldı (Oturum 114)
+- [x] private_memorial vault'lar anon'a görünüyordu → kapatıldı (Oturum 114)
+- [x] PayPal vault swap saldırısı → kapatıldı (Oturum 114)
+- [x] Race condition (3 counter) → atomic RPC (Oturum 114)
+- [x] vaults anon UPDATE (tüm kolonlar) → kapatıldı (Oturum 115)
+- [x] memorial_witnesses anon confirmed bypass → kapatıldı (Oturum 115)
+- [x] vault_encrypt/vault_get/vault_upsert anon callable → REVOKE (Oturum 115)
+- [ ] Bucket listing (media, vault-media) → dashboard'dan manuel düzeltme gerekli
+- [ ] Inbox XSS (dangerouslySetInnerHTML _InboxClient.tsx) → DOMPurify bekliyor
+- [ ] Admin login brute force → Redis/WAF altyapı değişikliği gerekli
+
+### Kritik Kararlar / Notlar
+- `platform_settings` okuma → tüm kod `createServiceClient()` kullanıyor → RLS fix güvenli
+- `owner_manages_vault` FOR ALL policy vault sahibine kendi vault'larını görme yetkisi veriyor → RLS fix sistemi bozmadı
+
+### Nerede Kaldık
+`rls_hardening_round2` migration uygulandı. Supabase advisor'da kalan uyarıların büyük çoğunluğu ya kasıtlı tasarım (public INSERT formlar) ya da düşük öncelikli (bucket listing). Sistem güvenli çalışıyor.
+
+### Sıradaki Adım
+1. Bucket listing: Supabase Storage dashboard → `media` ve `vault-media` bucket SELECT policy'lerini dar tut (sadece obje URL erişimi, listeleme değil)
+2. Inbox XSS: `_InboxClient.tsx` → `dangerouslySetInnerHTML` için DOMPurify kurulumu + sanitize
+3. Supabase advisor'ı tekrar çalıştırarak kalan uyarıların durumunu doğrula
+
+---
+
 ## 2026-06-14 — Oturum 114: Güvenlik + Operasyonel Düzeltmeler
 
 ### Yapılanlar

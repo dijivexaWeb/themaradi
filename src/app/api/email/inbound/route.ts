@@ -76,11 +76,13 @@ export async function POST(req: NextRequest) {
     .single()
 
   const secret = tokenRow?.value?.trim()
-  if (secret) {
-    const incoming = req.nextUrl.searchParams.get('token')
-    if (incoming !== secret) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-    }
+  if (!secret) {
+    console.error('[email/inbound] inbound_webhook_secret yapılandırılmamış — istek reddedildi')
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+  }
+  const incoming = req.nextUrl.searchParams.get('token')
+  if (incoming !== secret) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
   let payload: JsonRecord
