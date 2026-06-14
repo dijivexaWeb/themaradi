@@ -1220,6 +1220,18 @@ const tr: LangDict = {
     leaveTribute: 'Saygılarımı Sun',
   },
 
+  notableSection: {
+    eyebrow: 'Ulusal Miras',
+    heading: 'Milletin Hafızası',
+    sub: 'Gürcü tarihine iz bırakan isimler.',
+    visit: 'Mirasa Git',
+    candlesLit: 'Mum Yakıldı',
+    flowersLeft: 'Çiçek Bırakıldı',
+    prayersMade: 'Dua Edildi',
+    visitors: 'Ziyaretçi',
+    tributeMessages: 'Saygı Mesajı',
+  },
+
   gravestoneQrBanner: {
     heading: 'Mezar taşından dijital anmaya.',
     body: 'Mezar taşındaki basit bir QR kod, ailenin anıları, fotoğrafları ve taziye mesajlarıyla dolu güzel bir anma sayfasını açar.',

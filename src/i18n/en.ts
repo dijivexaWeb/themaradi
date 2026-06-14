@@ -1218,6 +1218,18 @@ const en = {
     leaveTribute: 'Leave Tribute',
   },
 
+  notableSection: {
+    eyebrow: 'National Heritage',
+    heading: "A Nation's Memory",
+    sub: 'Names that left their mark on Georgian history.',
+    visit: 'Visit Heritage',
+    candlesLit: 'Candles Lit',
+    flowersLeft: 'Flowers Left',
+    prayersMade: 'Prayers Made',
+    visitors: 'Visitors',
+    tributeMessages: 'Tribute Messages',
+  },
+
   gravestoneQrBanner: {
     heading: 'From gravestone to digital remembrance.',
     body: 'A simple QR code on the gravestone opens a beautiful memorial page filled with family memories, photos, and condolence messages.',

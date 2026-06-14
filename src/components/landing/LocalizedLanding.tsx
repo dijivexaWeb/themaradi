@@ -28,6 +28,7 @@ import {
 import { useLang } from '@/i18n/context'
 import { BrandMark } from '@/components/BrandLogo'
 import RecentMemorialsCarousel, { type RecentMemorial } from './RecentMemorialsCarousel'
+import NotableProfilesSection, { type NotableMemorial } from './NotableProfilesSection'
 
 const stepIcons = [QrCode, BookOpen, Users] as const
 const securityIcons = [LockKeyhole, Database, Server, Key, QrCode, ShieldCheck] as const
@@ -82,7 +83,7 @@ function buildCurrencyView(pricing: PricingConfig, lang: string): CurrencyView {
   }
 }
 
-export default function LocalizedLanding({ pricing, recentMemorials }: { pricing: PricingConfig; recentMemorials: RecentMemorial[] }) {
+export default function LocalizedLanding({ pricing, notableMemorials, recentMemorials }: { pricing: PricingConfig; notableMemorials: NotableMemorial[]; recentMemorials: RecentMemorial[] }) {
   const { t, lang } = useLang()
   const [openFaq, setOpenFaq] = useState<number | null>(null)
   const cur = buildCurrencyView(pricing, lang)
@@ -237,6 +238,9 @@ export default function LocalizedLanding({ pricing, recentMemorials }: { pricing
           </div>
         </div>
       </section>
+
+      {/* ULUSAL MİRAS */}
+      <NotableProfilesSection memorials={notableMemorials} />
 
       {/* RECENT PUBLIC MEMORIALS */}
       <RecentMemorialsCarousel
