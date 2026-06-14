@@ -3,6 +3,38 @@
 > Her oturum sonunda Claude bu dosyayı günceller.
 > Format: tarih → ne yapıldı → nerede kalındı → sıradaki adım.
 
+## 2026-06-14 — Oturum 106: Çoklu Para Birimi Fiyatlandırma (TRY/USD/RUB/GEL)
+
+### Yapılanlar
+- **`src/lib/pricing.ts`**: `PricingConfig` tipine 12 yeni alan eklendi — `memorialTry/Usd/Rub`, `vaultSetupTry/Usd/Rub`, `vaultMonthlyTry/Usd/Rub` ve kampanya karşılıkları. `fetchPricingConfig()` yeni key'leri de çekiyor
+- **`src/app/admin/actions.ts`**: `updatePricingSettings()` yeni currency key'lerini de FormData'dan okuyup `platform_settings`'e upsert ediyor
+- **`src/app/admin/settings/_PricingSettingsForm.tsx`**: "Normal Fiyatlar" bölümü 4 currency grubuna ayrıldı (₾ GEL / ₺ TRY / $ USD / ₽ RUB). `PriceField` componentine `symbol` prop eklendi. Kampanya bölümüne de döviz alanları eklendi
+- **`src/components/landing/LocalizedLanding.tsx`**: `buildCurrencyView()` helper fonksiyonu eklendi — `useLang()` ile gelen `lang`'a göre doğru fiyatı ve sembolü seçiyor. TRY/USD/RUB için admin'de fiyat girilmemişse GEL'e fallback yapıyor
+
+### Proje Durumu
+- [x] Çoklu para birimi fiyatlandırma (landing page)
+- [x] Admin panelinde döviz fiyat girişi
+- [x] QR SVG vektörel indirme
+- [x] Ses kaydı yükleme çalışıyor
+- [x] Google Translate entegrasyonu (memorial page)
+- [x] Language switcher (memorial page)
+
+### Kritik Kararlar / Notlar
+- DB migration yok — `platform_settings` key-value olduğu için yeni satır ekleniyor
+- TRY/USD/RUB için fiyat girilmemişse GEL fallback yapıyor (geriye dönük uyumlu)
+- `buildCurrencyView()` component dışında tanımlandı (re-render'da yeniden oluşturulmasın)
+- `page.tsx`'deki `revalidate: 3600` cache değişmedi — tüm currency fiyatlar server'da çekiliyor, client'ta `useLang()` ile seçiliyor
+
+### Nerede Kaldık
+Push yapıldı. Admin'den TRY/USD/RUB fiyatlarını girdikten sonra landing page'de dil değişiminde fiyatlar da değişecek.
+
+### Sıradaki Adım
+1. Admin → Ayarlar → Fiyatlandırma → TRY/USD/RUB değerlerini gir, kaydet
+2. Landing page'de TR/EN/RU dilinde fiyat değişimi test et
+3. Ses kayıtlarına çalarken dalga animasyonu (önceki oturumda istenmişti)
+
+---
+
 ## 2026-06-14 — Oturum 105: QR SVG Vektörel İndirme + Ses Kaydı Fix
 
 ### Yapılanlar
