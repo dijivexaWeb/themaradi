@@ -315,8 +315,6 @@ export async function addMemorialAudioAction(vaultId: string, formData: FormData
     author,
     audio_url: audioUrl,
     is_public: true,
-    file_key: fileKey || null,
-    storage_bucket: bucket || null
   })
 
   if (insertError) return { error: insertError.message }
