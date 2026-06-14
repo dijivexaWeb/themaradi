@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createAdminMemorial } from '../../actions'
+import PartialDateInput from '@/components/PartialDateInput'
 
 export default function CreateMemorialForm() {
   const router = useRouter()
@@ -55,7 +56,6 @@ export default function CreateMemorialForm() {
 
   const inp = 'w-full rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-800 outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500'
   const lbl = 'mb-1 block text-xs font-semibold text-slate-500 uppercase tracking-wide'
-  const sel = 'rounded-lg border border-slate-200 bg-white px-3 py-2.5 text-sm text-slate-700 outline-none focus:border-emerald-500'
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6 max-w-2xl">
@@ -88,25 +88,19 @@ export default function CreateMemorialForm() {
         <div className="grid sm:grid-cols-2 gap-4">
           <div>
             <label className={lbl}>Doğum Tarihi</label>
-            <div className="flex gap-2">
-              <input type="text" value={birthDate} onChange={e => setBirthDate(e.target.value)} placeholder="1837-10-27" className={`${inp} flex-1`} />
-              <select value={birthPrec} onChange={e => setBirthPrec(e.target.value)} className={sel}>
-                <option value="year">Yıl</option>
-                <option value="month">Ay</option>
-                <option value="day">Gün</option>
-              </select>
-            </div>
+            <PartialDateInput
+              name="birth_date_ctrl"
+              inputCls={inp}
+              onChange={(d, p) => { setBirthDate(d); setBirthPrec(p) }}
+            />
           </div>
           <div>
             <label className={lbl}>Ölüm Tarihi</label>
-            <div className="flex gap-2">
-              <input type="text" value={deathDate} onChange={e => setDeathDate(e.target.value)} placeholder="1907-08-12" className={`${inp} flex-1`} />
-              <select value={deathPrec} onChange={e => setDeathPrec(e.target.value)} className={sel}>
-                <option value="year">Yıl</option>
-                <option value="month">Ay</option>
-                <option value="day">Gün</option>
-              </select>
-            </div>
+            <PartialDateInput
+              name="death_date_ctrl"
+              inputCls={inp}
+              onChange={(d, p) => { setDeathDate(d); setDeathPrec(p) }}
+            />
           </div>
         </div>
 
