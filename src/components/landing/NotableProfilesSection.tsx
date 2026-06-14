@@ -15,9 +15,7 @@ export type NotableMemorial = {
   cover_photo_url: string | null
   nationality: string | null
   notable_subtitle: string | null
-  candle_count?: number
-  flower_count?: number
-  prayer_count?: number
+  interaction_count?: number
 }
 
 // Fixed star positions — no random, no hydration issues
@@ -163,11 +161,10 @@ export default function NotableProfilesSection({ memorials }: { memorials: Notab
                       {m.tagline || m.notable_subtitle}
                     </p>
                   )}
-                  {((m.candle_count ?? 0) > 0 || (m.flower_count ?? 0) > 0 || (m.prayer_count ?? 0) > 0) && (
-                    <div className="flex items-center gap-1.5 text-[9px] text-[#5a7a65]">
-                      {(m.candle_count ?? 0) > 0 && <span>🕯️ {m.candle_count}</span>}
-                      {(m.flower_count ?? 0) > 0 && <span>🌹 {m.flower_count}</span>}
-                      {(m.prayer_count ?? 0) > 0 && <span>🙏 {m.prayer_count}</span>}
+                  {(m.interaction_count ?? 0) > 0 && (
+                    <div className="flex items-center gap-1 text-[9px] text-[#5a7a65]">
+                      <span>✦</span>
+                      <span>{m.interaction_count} etkileşim</span>
                     </div>
                   )}
                   <div className="mt-auto flex items-center justify-between">

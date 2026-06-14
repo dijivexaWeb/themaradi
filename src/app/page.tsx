@@ -29,24 +29,21 @@ export default async function LandingPage() {
   ])
 
   const notableIds = (notableRaw ?? []).map((v) => v.id)
-  const reactionCounts: Record<string, { candle: number; flower: number; prayer: number }> = {}
+  const interactionTotals: Record<string, number> = {}
   if (notableIds.length > 0) {
-    const { data: reactions } = await supabase
-      .from('memorial_reactions')
-      .select('vault_id, reaction_type')
-      .in('vault_id', notableIds)
-    for (const r of reactions ?? []) {
-      if (!reactionCounts[r.vault_id]) reactionCounts[r.vault_id] = { candle: 0, flower: 0, prayer: 0 }
-      const k = r.reaction_type as 'candle' | 'flower' | 'prayer'
-      if (k in reactionCounts[r.vault_id]) reactionCounts[r.vault_id][k]++
+    const { data: actions } = await supabase
+      .from('memorial_actions')
+      .select('memorial_id, count')
+      .in('memorial_id', notableIds)
+      .eq('is_active', true)
+    for (const a of actions ?? []) {
+      interactionTotals[a.memorial_id] = (interactionTotals[a.memorial_id] ?? 0) + ((a.count as number) ?? 0)
     }
   }
 
   const notableMemorials: NotableMemorial[] = (notableRaw ?? []).map((v) => ({
     ...v,
-    candle_count: reactionCounts[v.id]?.candle ?? 0,
-    flower_count: reactionCounts[v.id]?.flower ?? 0,
-    prayer_count: reactionCounts[v.id]?.prayer ?? 0,
+    interaction_count: interactionTotals[v.id] ?? 0,
   }))
 
   return (

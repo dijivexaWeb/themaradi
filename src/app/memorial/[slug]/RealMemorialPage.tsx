@@ -14,6 +14,7 @@ import MemoriesAccordion from './MemoriesAccordion'
 import PhotoGallery from './PhotoGallery'
 import { getTurnstileSiteKey } from '@/lib/turnstile'
 import { getTranslation } from '@/i18n/server'
+import { ACTION_ICON_MAP, type ActionIcon } from '@/lib/memorial-style-templates'
 import NotableProfilePhoto from './NotableProfilePhoto'
 import LangSwitcher from './LangSwitcher'
 import NotableShareButton from './NotableShareButton'
@@ -511,30 +512,44 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
           </div>
         </div>
 
-        {/* Notable profillerde anma istatistikleri — her zaman göster */}
+        {/* Notable profillerde anma istatistikleri — anma türüne göre */}
         {isNotable && (
           <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center divide-x divide-[#2a5a45] border-t border-[#2a5a45]">
-            <div className="flex items-center gap-2 px-5 py-4">
-              <span className="text-xl">🕯️</span>
-              <div className="text-center">
-                <div className="font-serif text-2xl text-white">{initialCounts.candle.toLocaleString(lang)}</div>
-                <p className="text-[11px] text-[#c7a76f] mt-0.5">{lang === "ka" ? "სანთელი" : lang === "ru" ? "Свечей" : lang === "en" ? "Candles" : "Mum"}</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2 px-5 py-4">
-              <span className="text-xl">🌹</span>
-              <div className="text-center">
-                <div className="font-serif text-2xl text-white">{initialCounts.flower.toLocaleString(lang)}</div>
-                <p className="text-[11px] text-[#c7a76f] mt-0.5">{lang === "ka" ? "ყვავილი" : lang === "ru" ? "Цветов" : lang === "en" ? "Flowers" : "Çiçek"}</p>
-              </div>
-            </div>
-            <div className="flex items-center gap-2 px-5 py-4">
-              <span className="text-xl">🙏</span>
-              <div className="text-center">
-                <div className="font-serif text-2xl text-white">{initialCounts.prayer.toLocaleString(lang)}</div>
-                <p className="text-[11px] text-[#c7a76f] mt-0.5">{lang === "ka" ? "ლოცვა" : lang === "ru" ? "Молитв" : lang === "en" ? "Prayers" : "Dua"}</p>
-              </div>
-            </div>
+            {customActions.length > 0 ? (
+              customActions.map((action) => (
+                <div key={action.id} className="flex items-center gap-2 px-5 py-4">
+                  <span className="text-xl">{ACTION_ICON_MAP[action.icon as ActionIcon] ?? '⚡'}</span>
+                  <div className="text-center">
+                    <div className="font-serif text-2xl text-white">{action.count.toLocaleString(lang)}</div>
+                    <p className="text-[11px] text-[#c7a76f] mt-0.5 max-w-[80px] leading-tight">{action.label}</p>
+                  </div>
+                </div>
+              ))
+            ) : (
+              <>
+                <div className="flex items-center gap-2 px-5 py-4">
+                  <span className="text-xl">🕯️</span>
+                  <div className="text-center">
+                    <div className="font-serif text-2xl text-white">{initialCounts.candle.toLocaleString(lang)}</div>
+                    <p className="text-[11px] text-[#c7a76f] mt-0.5">{lang === "ka" ? "სანთელი" : lang === "ru" ? "Свечей" : lang === "en" ? "Candles" : "Mum"}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 px-5 py-4">
+                  <span className="text-xl">🌹</span>
+                  <div className="text-center">
+                    <div className="font-serif text-2xl text-white">{initialCounts.flower.toLocaleString(lang)}</div>
+                    <p className="text-[11px] text-[#c7a76f] mt-0.5">{lang === "ka" ? "ყვავილი" : lang === "ru" ? "Цветов" : lang === "en" ? "Flowers" : "Çiçek"}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-2 px-5 py-4">
+                  <span className="text-xl">🙏</span>
+                  <div className="text-center">
+                    <div className="font-serif text-2xl text-white">{initialCounts.prayer.toLocaleString(lang)}</div>
+                    <p className="text-[11px] text-[#c7a76f] mt-0.5">{lang === "ka" ? "ლოცვა" : lang === "ru" ? "Молитв" : lang === "en" ? "Prayers" : "Dua"}</p>
+                  </div>
+                </div>
+              </>
+            )}
             <div className="flex items-center gap-2 px-5 py-4">
               <span className="text-xl">💬</span>
               <div className="text-center">
