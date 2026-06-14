@@ -1223,7 +1223,7 @@ const tr: LangDict = {
   notableSection: {
     eyebrow: 'Ulusal Miras',
     heading: 'Milletin Hafızası',
-    sub: 'Gürcü tarihine iz bırakan isimler.',
+    sub: 'Tarihe iz bırakan önemli isimler.',
     visit: 'Mirasa Git',
     candlesLit: 'Mum Yakıldı',
     flowersLeft: 'Çiçek Bırakıldı',

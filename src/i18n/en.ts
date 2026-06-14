@@ -1221,7 +1221,7 @@ const en = {
   notableSection: {
     eyebrow: 'National Heritage',
     heading: "A Nation's Memory",
-    sub: 'Names that left their mark on Georgian history.',
+    sub: 'Names that left their mark on history.',
     visit: 'Visit Heritage',
     candlesLit: 'Candles Lit',
     flowersLeft: 'Flowers Left',

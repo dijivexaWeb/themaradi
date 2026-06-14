@@ -511,45 +511,37 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
           </div>
         </div>
 
-        {/* Notable profillerde anma istatistikleri — kompakt satır */}
-        {isNotable && (initialCounts.candle + initialCounts.flower + initialCounts.prayer) > 0 && (
-          <div className="mx-auto flex max-w-7xl items-center justify-center gap-0 divide-x divide-[#2a5a45] border-t border-[#2a5a45]">
-            {initialCounts.candle > 0 && (
-              <div className="flex items-center gap-2 px-6 py-4 text-center">
-                <span className="text-lg">🕯️</span>
-                <div>
-                  <span className="font-serif text-2xl text-white">{initialCounts.candle.toLocaleString(lang)}</span>
-                  <p className="text-[11px] text-[#c7a76f] mt-0.5">{lang === "ka" ? "სანთელი" : lang === "ru" ? "Свечей" : lang === "en" ? "Candles" : "Mum"}</p>
-                </div>
+        {/* Notable profillerde anma istatistikleri — her zaman göster */}
+        {isNotable && (
+          <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-center divide-x divide-[#2a5a45] border-t border-[#2a5a45]">
+            <div className="flex items-center gap-2 px-5 py-4">
+              <span className="text-xl">🕯️</span>
+              <div className="text-center">
+                <div className="font-serif text-2xl text-white">{initialCounts.candle.toLocaleString(lang)}</div>
+                <p className="text-[11px] text-[#c7a76f] mt-0.5">{lang === "ka" ? "სანთელი" : lang === "ru" ? "Свечей" : lang === "en" ? "Candles" : "Mum"}</p>
               </div>
-            )}
-            {initialCounts.flower > 0 && (
-              <div className="flex items-center gap-2 px-6 py-4 text-center">
-                <span className="text-lg">🌹</span>
-                <div>
-                  <span className="font-serif text-2xl text-white">{initialCounts.flower.toLocaleString(lang)}</span>
-                  <p className="text-[11px] text-[#c7a76f] mt-0.5">{lang === "ka" ? "ყვავილი" : lang === "ru" ? "Цветов" : lang === "en" ? "Flowers" : "Çiçek"}</p>
-                </div>
+            </div>
+            <div className="flex items-center gap-2 px-5 py-4">
+              <span className="text-xl">🌹</span>
+              <div className="text-center">
+                <div className="font-serif text-2xl text-white">{initialCounts.flower.toLocaleString(lang)}</div>
+                <p className="text-[11px] text-[#c7a76f] mt-0.5">{lang === "ka" ? "ყვავილი" : lang === "ru" ? "Цветов" : lang === "en" ? "Flowers" : "Çiçek"}</p>
               </div>
-            )}
-            {initialCounts.prayer > 0 && (
-              <div className="flex items-center gap-2 px-6 py-4 text-center">
-                <span className="text-lg">🙏</span>
-                <div>
-                  <span className="font-serif text-2xl text-white">{initialCounts.prayer.toLocaleString(lang)}</span>
-                  <p className="text-[11px] text-[#c7a76f] mt-0.5">{lang === "ka" ? "ლოცვა" : lang === "ru" ? "Молитв" : lang === "en" ? "Prayers" : "Dua"}</p>
-                </div>
+            </div>
+            <div className="flex items-center gap-2 px-5 py-4">
+              <span className="text-xl">🙏</span>
+              <div className="text-center">
+                <div className="font-serif text-2xl text-white">{initialCounts.prayer.toLocaleString(lang)}</div>
+                <p className="text-[11px] text-[#c7a76f] mt-0.5">{lang === "ka" ? "ლოცვა" : lang === "ru" ? "Молитв" : lang === "en" ? "Prayers" : "Dua"}</p>
               </div>
-            )}
-            {guestbookEntries.length > 0 && (
-              <div className="flex items-center gap-2 px-6 py-4 text-center">
-                <span className="text-lg">💬</span>
-                <div>
-                  <span className="font-serif text-2xl text-white">{guestbookEntries.length.toLocaleString(lang)}</span>
-                  <p className="text-[11px] text-[#c7a76f] mt-0.5">{lang === "ka" ? "გზავნილი" : lang === "ru" ? "Сообщений" : lang === "en" ? "Tributes" : "Mesaj"}</p>
-                </div>
+            </div>
+            <div className="flex items-center gap-2 px-5 py-4">
+              <span className="text-xl">💬</span>
+              <div className="text-center">
+                <div className="font-serif text-2xl text-white">{guestbookEntries.length.toLocaleString(lang)}</div>
+                <p className="text-[11px] text-[#c7a76f] mt-0.5">{lang === "ka" ? "გზავნილი" : lang === "ru" ? "Сообщений" : lang === "en" ? "Tributes" : "Mesaj"}</p>
               </div>
-            )}
+            </div>
           </div>
         )}
       </section>
