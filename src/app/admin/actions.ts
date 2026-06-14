@@ -646,6 +646,103 @@ export async function saveNotableProfile(
   return { success: true }
 }
 
+// ─── Admin: Create Memorial ──────────────────────────────────────────────────
+
+function slugify(str: string): string {
+  return str
+    .toLowerCase()
+    .replace(/ğ/g, 'g').replace(/ü/g, 'u').replace(/ş/g, 's')
+    .replace(/ı/g, 'i').replace(/ö/g, 'o').replace(/ç/g, 'c')
+    .replace(/[^a-z0-9\s-]/g, '')
+    .trim().replace(/\s+/g, '-').replace(/-+/g, '-')
+}
+
+function randomSuffix(n = 8): string {
+  return Math.random().toString(36).slice(2, 2 + n)
+}
+
+export async function createAdminMemorial(data: {
+  email: string
+  password: string
+  display_name: string
+  birth_date: string | null
+  birth_date_precision: string
+  death_date: string | null
+  death_date_precision: string
+  tagline: string | null
+  is_notable: boolean
+  nationality: string | null
+  notable_sort_order: number | null
+}): Promise<{ success: boolean; vaultId?: string; error?: string }> {
+  const { user, profile } = await requireAdmin()
+
+  const supabase = await createServiceClient()
+
+  // 1. Create auth user (auto-confirmed, no email sent)
+  const { data: authData, error: authError } = await supabase.auth.admin.createUser({
+    email: data.email.trim().toLowerCase(),
+    password: data.password,
+    email_confirm: true,
+  })
+  if (authError || !authData.user) {
+    return { success: false, error: authError?.message ?? 'Kullanıcı oluşturulamadı.' }
+  }
+  const newUserId = authData.user.id
+
+  // 2. Create profile
+  const { error: profileError } = await supabase.from('profiles').insert({
+    id: newUserId,
+    full_name: data.display_name.trim(),
+    email: data.email.trim().toLowerCase(),
+    role: 'user',
+  })
+  if (profileError) {
+    await supabase.auth.admin.deleteUser(newUserId)
+    return { success: false, error: profileError.message }
+  }
+
+  // 3. Create vault
+  const slug = `${slugify(data.display_name)}-${randomSuffix()}`
+  const now = new Date().toISOString()
+  const { data: vault, error: vaultError } = await supabase.from('vaults').insert({
+    owner_id: newUserId,
+    display_name: data.display_name.trim(),
+    slug,
+    status: 'public_memorial',
+    product_type: 'memorial_profile',
+    published_at: now,
+    updated_at: now,
+    birth_date: data.birth_date || null,
+    birth_date_precision: data.birth_date ? data.birth_date_precision : null,
+    death_date: data.death_date || null,
+    death_date_precision: data.death_date ? data.death_date_precision : null,
+    tagline: data.tagline?.trim() || null,
+    is_notable: data.is_notable,
+    nationality: data.is_notable ? data.nationality : null,
+    notable_sort_order: data.is_notable ? data.notable_sort_order : null,
+    hide_objection: data.is_notable,
+  }).select('id').single()
+
+  if (vaultError || !vault) {
+    await supabase.auth.admin.deleteUser(newUserId)
+    return { success: false, error: vaultError?.message ?? 'Vault oluşturulamadı.' }
+  }
+
+  await logAdminAction({
+    adminId: user.id,
+    adminEmail: user.email ?? profile.email ?? '',
+    action: 'admin_memorial_created',
+    entityType: 'vault',
+    entityId: vault.id,
+    newValue: { display_name: data.display_name, email: data.email, is_notable: data.is_notable },
+  })
+
+  revalidatePath('/admin/memorials')
+  revalidatePath('/memorial')
+
+  return { success: true, vaultId: vault.id }
+}
+
 // ─── Hide Objection Toggle ───────────────────────────────────────────────────
 
 export async function saveHideObjection(vaultId: string, hide: boolean): Promise<ActionResult> {

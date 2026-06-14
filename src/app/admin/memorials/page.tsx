@@ -40,6 +40,12 @@ export default async function MemorialsPage({
           <h1 className="text-2xl font-bold text-slate-900">Tüm Vaultlar</h1>
           <p className="text-slate-500 text-sm mt-1">Toplam: {count ?? 0}</p>
         </div>
+        <Link
+          href="/admin/memorials/create"
+          className="inline-flex items-center gap-2 rounded-lg bg-emerald-700 px-4 py-2 text-sm font-semibold text-white hover:bg-emerald-800 transition-colors"
+        >
+          + Yeni Memorial
+        </Link>
       </div>
 
       {/* Filters */}
