@@ -3,6 +3,48 @@
 > Her oturum sonunda Claude bu dosyayı günceller.
 > Format: tarih → ne yapıldı → nerede kalındı → sıradaki adım.
 
+## 2026-06-14 — Oturum 111: QR Tabela Kargo Takip Sistemi (End-to-End)
+
+### Yapılanlar
+- **DB migration**: `vaults` tablosuna `shipping_status` (default: pending), `tracking_number`, `tracking_carrier`, `shipped_at`, `delivered_at`, `shipping_confirmed_at` kolonları eklendi
+- **Admin `/admin/kargo`**: Yeni kargo takip ekranı — kargo adresi dolu tüm memorial profillerin listesi; filtre sekmeleri (Tümü/Bekliyor/Hazırlanıyor/Hazır/Kargoda/Teslim/Tamamlandı); her satırda müşteri bilgisi, kargo adresi, inline status güncelleme butonu; kargoya verme formunda kargo firması + takip numarası girişi
+- **Admin sidebar**: "Kargo Takibi" linki eklendi (Package ikonu)
+- **`updateShippingStatusAction`**: Status geçişi + otomatik email tetikleyici + audit log; preparing/shipped/delivered statüsünde farklı email template
+- **`confirmDeliveryAction`**: Kullanıcı "Teslim Aldım" onayı — DB güncelleme + onay emaili
+- **Kullanıcı `/anma-paneli/[id]/kargo`**: Adım adım durum gösterimi (progress steps); kargo firması + takip no; "Teslim Aldım" butonu (sadece delivered'da); email linkinden `?confirm=1` ile otomatik onay
+- **Anma paneli sidebar**: `shipping_address` varsa "📦 QR Tabela Kargo" linki görünür; teslim edildi statüsünde kırmızı badge
+- **4 email template**: hazırlanıyor / kargoya verildi (takip no ile) / teslim edildi (Teslim Aldım linki ile) / onaylandı
+
+### Status Akışı
+`pending` → `preparing` → `ready` → `shipped` → `delivered` → `confirmed`
+
+### Değiştirilen / Oluşturulan Dosyalar
+- `src/app/admin/kargo/page.tsx` — yeni
+- `src/app/admin/kargo/_KargoClient.tsx` — yeni
+- `src/app/anma-paneli/[id]/kargo/page.tsx` — yeni
+- `src/app/anma-paneli/[id]/kargo/_ConfirmDeliveryButton.tsx` — yeni
+- `src/app/admin/actions.ts` — updateShippingStatusAction, confirmDeliveryAction
+- `src/app/admin/AdminSidebar.tsx` — Kargo Takibi linki
+- `src/app/anma-paneli/[id]/layout.tsx` — kargo nav item
+- `src/lib/email/templates.ts` — 4 shipping template
+
+### Proje Durumu
+- [x] QR tabela kargo takip sistemi (end-to-end)
+- [x] QR tabela kargo adresi satın alma formunda
+- [x] LangProvider dil değiştirme bug fix
+- [x] Google Translate kaldırıldı
+- [x] Notable profil label override'ları
+
+### Nerede Kaldık
+fcfd3b5 push edildi, Vercel deploy bekleniyor.
+
+### Sıradaki Adım
+1. Deploy sonrası `/admin/kargo` sayfasını test et
+2. Test satın alımıyla kargo adresini doldur, akışı baştan sona test et
+3. Email gönderimini her statüs değişiminde kontrol et
+
+---
+
 ## 2026-06-14 — Oturum 110: QR Tabela Kargo Adresi Sistemi
 
 ### Yapılanlar
