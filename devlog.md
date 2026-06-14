@@ -3,6 +3,32 @@
 > Her oturum sonunda Claude bu dosyayı günceller.
 > Format: tarih → ne yapıldı → nerede kalındı → sıradaki adım.
 
+## 2026-06-14 — Oturum 102: createAdminMemorial Duplicate Key Fix
+
+### Yapılanlar
+- **`profiles` duplicate key hatası giderildi**: Supabase'in `auth.users` insert trigger'ı otomatik profiles kaydı oluşturuyordu; `insert` → `upsert({ onConflict: 'id' })` ile çakışma engellendi
+- **`_CreateMemorialForm.tsx` `sel` undefined hatası giderildi**: tanımsız `sel` değişkeni `inp` ile değiştirildi
+
+### Proje Durumu
+- [x] createAdminMemorial upsert fix
+- [ ] Deploy + test: yeni memorial oluşturmak hatasız çalışıyor mu?
+- [ ] Notable profil public sayfasında bayrak (admin'den tekrar kaydet)
+- [ ] GA4 Realtime kontrolü
+
+### Kritik Kararlar / Notlar
+- Supabase'de `on_auth_user_created` trigger'ı `profiles` tablosuna otomatik kayıt ekliyor; action'da `insert` değil `upsert` kullanılmalı
+
+### Nerede Kaldık
+`src/app/admin/actions.ts` ve `_CreateMemorialForm.tsx` güncellendi. Deploy edilmesi bekleniyor.
+
+### Sıradaki Adım
+1. Deploy sonrası `/admin/memorials/create` ile yeni profil oluştur — hata yoksa tamamlandı
+2. Notable profil admin'den kaydet → public sayfada bayrak çıkıyor mu kontrol et
+3. `NEXT_PUBLIC_APP_URL` Vercel'de `https://theeternalmemory.com` olarak güncelle
+4. GA4 Realtime panelde ziyaret görünüyor mu kontrol et
+
+---
+
 ## 2026-06-14 — Oturum 101: Admin Memorial Oluşturma + Analitik + Notable Pinning
 
 ### Yapılanlar

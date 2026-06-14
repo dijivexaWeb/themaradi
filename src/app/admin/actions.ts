@@ -689,13 +689,13 @@ export async function createAdminMemorial(data: {
   }
   const newUserId = authData.user.id
 
-  // 2. Create profile
-  const { error: profileError } = await supabase.from('profiles').insert({
+  // 2. Upsert profile (trigger may have already inserted a row)
+  const { error: profileError } = await supabase.from('profiles').upsert({
     id: newUserId,
     full_name: data.display_name.trim(),
     email: data.email.trim().toLowerCase(),
     role: 'user',
-  })
+  }, { onConflict: 'id' })
   if (profileError) {
     await supabase.auth.admin.deleteUser(newUserId)
     return { success: false, error: profileError.message }

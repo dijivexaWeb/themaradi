@@ -127,7 +127,7 @@ export default function CreateMemorialForm() {
           <div className="grid sm:grid-cols-2 gap-4">
             <div>
               <label className={lbl}>Milliyet</label>
-              <select value={nationality} onChange={e => setNationality(e.target.value)} className={`${sel} w-full`}>
+              <select value={nationality} onChange={e => setNationality(e.target.value)} className={inp}>
                 <option value="">Seç...</option>
                 <option value="GE">🇬🇪 Gürcistan</option>
                 <option value="TR">🇹🇷 Türkiye</option>
