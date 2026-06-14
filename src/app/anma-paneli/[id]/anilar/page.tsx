@@ -44,7 +44,8 @@ export default async function MemorialAnilarPage({ params, searchParams }: Props
 
   const isLocked = vault.status === 'pending_verification'
   const pageUrl = `/anma-paneli/${id}/anilar`
-  const addAction = addMemoryAction.bind(null, id, pageUrl)
+  const returnUrl = tab === 'kronoloji' ? `${pageUrl}?tab=kronoloji` : pageUrl
+  const addAction = addMemoryAction.bind(null, id, returnUrl)
 
   const isKronoloji = tab === 'kronoloji'
 
@@ -82,7 +83,7 @@ export default async function MemorialAnilarPage({ params, searchParams }: Props
         )}
         {saved === '1' && (
           <div className="mb-5 flex items-center gap-2 rounded-2xl border border-[#c7e4c7] bg-[#e9f5ec] px-5 py-4 text-sm font-medium text-[#174f35]">
-            <span>✓</span> Anı başarıyla kaydedildi.
+            <span>✓</span> {isKronoloji ? 'Kronoloji kaydı eklendi.' : 'Anı başarıyla kaydedildi.'}
           </div>
         )}
         {error && (
