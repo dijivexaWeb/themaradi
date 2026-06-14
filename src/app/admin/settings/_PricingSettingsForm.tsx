@@ -26,12 +26,55 @@ export default function PricingSettingsForm({ settings }: { settings: Record<str
   return (
     <form onSubmit={handleSubmit} className="bg-white border border-slate-200 rounded-xl shadow-sm p-6 space-y-6">
       {/* Base prices */}
-      <div>
-        <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-3">Normal Fiyatlar</p>
-        <div className="grid gap-4 sm:grid-cols-3">
-          <PriceField name="price_memorial_one_time" label="Anma Profili" sub="Tek seferlik" defaultValue={settings.price_memorial_one_time ?? '249'} />
-          <PriceField name="price_vault_setup" label="Yaşam Kasası Kurulum" sub="Tek seferlik" defaultValue={settings.price_vault_setup ?? '49'} />
-          <PriceField name="price_vault_monthly" label="Yaşam Kasası Aylık" sub="Aylık tekrarlayan" defaultValue={settings.price_vault_monthly ?? '12.90'} />
+      <div className="space-y-4">
+        <p className="text-xs font-semibold uppercase tracking-wider text-slate-500">Normal Fiyatlar</p>
+
+        <div>
+          <p className="text-[11px] font-semibold text-slate-400 mb-2 flex items-center gap-1.5">
+            <span className="inline-block w-5 h-5 rounded bg-slate-100 text-center leading-5 text-slate-500">₾</span>
+            Gürcü Larisi (GEL) — Ana para birimi
+          </p>
+          <div className="grid gap-4 sm:grid-cols-3">
+            <PriceField name="price_memorial_one_time" label="Anma Profili" sub="Tek seferlik" symbol="₾" defaultValue={settings.price_memorial_one_time ?? '249'} />
+            <PriceField name="price_vault_setup" label="Yaşam Kasası Kurulum" sub="Tek seferlik" symbol="₾" defaultValue={settings.price_vault_setup ?? '49'} />
+            <PriceField name="price_vault_monthly" label="Yaşam Kasası Aylık" sub="Aylık tekrarlayan" symbol="₾" defaultValue={settings.price_vault_monthly ?? '12.90'} />
+          </div>
+        </div>
+
+        <div>
+          <p className="text-[11px] font-semibold text-slate-400 mb-2 flex items-center gap-1.5">
+            <span className="inline-block w-5 h-5 rounded bg-red-50 text-center leading-5 text-red-400">₺</span>
+            Türk Lirası (TRY) — TR ziyaretçiler
+          </p>
+          <div className="grid gap-4 sm:grid-cols-3">
+            <PriceField name="price_memorial_try" label="Anma Profili" sub="Tek seferlik" symbol="₺" defaultValue={settings.price_memorial_try ?? ''} required={false} />
+            <PriceField name="price_vault_setup_try" label="Kasası Kurulum" sub="Tek seferlik" symbol="₺" defaultValue={settings.price_vault_setup_try ?? ''} required={false} />
+            <PriceField name="price_vault_monthly_try" label="Kasası Aylık" sub="Aylık tekrarlayan" symbol="₺" defaultValue={settings.price_vault_monthly_try ?? ''} required={false} />
+          </div>
+        </div>
+
+        <div>
+          <p className="text-[11px] font-semibold text-slate-400 mb-2 flex items-center gap-1.5">
+            <span className="inline-block w-5 h-5 rounded bg-blue-50 text-center leading-5 text-blue-400">$</span>
+            Amerikan Doları (USD) — EN ziyaretçiler
+          </p>
+          <div className="grid gap-4 sm:grid-cols-3">
+            <PriceField name="price_memorial_usd" label="Anma Profili" sub="Tek seferlik" symbol="$" defaultValue={settings.price_memorial_usd ?? ''} required={false} />
+            <PriceField name="price_vault_setup_usd" label="Kasası Kurulum" sub="Tek seferlik" symbol="$" defaultValue={settings.price_vault_setup_usd ?? ''} required={false} />
+            <PriceField name="price_vault_monthly_usd" label="Kasası Aylık" sub="Aylık tekrarlayan" symbol="$" defaultValue={settings.price_vault_monthly_usd ?? ''} required={false} />
+          </div>
+        </div>
+
+        <div>
+          <p className="text-[11px] font-semibold text-slate-400 mb-2 flex items-center gap-1.5">
+            <span className="inline-block w-5 h-5 rounded bg-orange-50 text-center leading-5 text-orange-400">₽</span>
+            Rus Rublesi (RUB) — RU ziyaretçiler
+          </p>
+          <div className="grid gap-4 sm:grid-cols-3">
+            <PriceField name="price_memorial_rub" label="Anma Profili" sub="Tek seferlik" symbol="₽" defaultValue={settings.price_memorial_rub ?? ''} required={false} />
+            <PriceField name="price_vault_setup_rub" label="Kasası Kurulum" sub="Tek seferlik" symbol="₽" defaultValue={settings.price_vault_setup_rub ?? ''} required={false} />
+            <PriceField name="price_vault_monthly_rub" label="Kasası Aylık" sub="Aylık tekrarlayan" symbol="₽" defaultValue={settings.price_vault_monthly_rub ?? ''} required={false} />
+          </div>
         </div>
       </div>
 
@@ -63,10 +106,26 @@ export default function PricingSettingsForm({ settings }: { settings: Record<str
                 className="w-full rounded-lg border border-amber-200 bg-white px-3 py-2 text-sm text-slate-800 outline-none focus:border-amber-400"
               />
             </div>
-            <div className="grid gap-4 sm:grid-cols-3">
-              <PriceField name="campaign_price_memorial" label="Kampanya: Anma" sub="Boşsa kampanya yok" defaultValue={settings.campaign_price_memorial ?? ''} required={false} />
-              <PriceField name="campaign_price_vault_setup" label="Kampanya: Kurulum" sub="Boşsa kampanya yok" defaultValue={settings.campaign_price_vault_setup ?? ''} required={false} />
-              <PriceField name="campaign_price_vault_monthly" label="Kampanya: Aylık" sub="Boşsa kampanya yok" defaultValue={settings.campaign_price_vault_monthly ?? ''} required={false} />
+            <div className="space-y-3">
+              <div>
+                <p className="text-[11px] text-slate-500 font-medium mb-2">₾ GEL fiyatları</p>
+                <div className="grid gap-4 sm:grid-cols-3">
+                  <PriceField name="campaign_price_memorial" label="Anma (GEL)" sub="Boşsa kampanya yok" symbol="₾" defaultValue={settings.campaign_price_memorial ?? ''} required={false} />
+                  <PriceField name="campaign_price_vault_setup" label="Kurulum (GEL)" sub="Boşsa kampanya yok" symbol="₾" defaultValue={settings.campaign_price_vault_setup ?? ''} required={false} />
+                  <PriceField name="campaign_price_vault_monthly" label="Aylık (GEL)" sub="Boşsa kampanya yok" symbol="₾" defaultValue={settings.campaign_price_vault_monthly ?? ''} required={false} />
+                </div>
+              </div>
+              <div>
+                <p className="text-[11px] text-slate-500 font-medium mb-2">₺ TRY / $ USD / ₽ RUB kampanya fiyatları</p>
+                <div className="grid gap-3 sm:grid-cols-3">
+                  <PriceField name="campaign_price_memorial_try" label="Anma (TRY)" sub="" symbol="₺" defaultValue={settings.campaign_price_memorial_try ?? ''} required={false} />
+                  <PriceField name="campaign_price_memorial_usd" label="Anma (USD)" sub="" symbol="$" defaultValue={settings.campaign_price_memorial_usd ?? ''} required={false} />
+                  <PriceField name="campaign_price_memorial_rub" label="Anma (RUB)" sub="" symbol="₽" defaultValue={settings.campaign_price_memorial_rub ?? ''} required={false} />
+                  <PriceField name="campaign_price_vault_monthly_try" label="Aylık (TRY)" sub="" symbol="₺" defaultValue={settings.campaign_price_vault_monthly_try ?? ''} required={false} />
+                  <PriceField name="campaign_price_vault_monthly_usd" label="Aylık (USD)" sub="" symbol="$" defaultValue={settings.campaign_price_vault_monthly_usd ?? ''} required={false} />
+                  <PriceField name="campaign_price_vault_monthly_rub" label="Aylık (RUB)" sub="" symbol="₽" defaultValue={settings.campaign_price_vault_monthly_rub ?? ''} required={false} />
+                </div>
+              </div>
             </div>
             <div>
               <label className="block text-xs font-medium text-slate-600 mb-1">Kampanya Bitiş Tarihi</label>
@@ -98,7 +157,7 @@ export default function PricingSettingsForm({ settings }: { settings: Record<str
   )
 }
 
-function PriceField({ name, label, sub, defaultValue, required = true }: { name: string; label: string; sub: string; defaultValue: string; required?: boolean }) {
+function PriceField({ name, label, sub, defaultValue, symbol = '₾', required = true }: { name: string; label: string; sub: string; defaultValue: string; symbol?: string; required?: boolean }) {
   return (
     <div>
       <label className="block text-xs font-medium text-slate-700 mb-1">{label}</label>
@@ -113,9 +172,9 @@ function PriceField({ name, label, sub, defaultValue, required = true }: { name:
           placeholder="0.00"
           className="w-full rounded-xl border border-slate-200 pl-3 pr-10 py-2.5 text-sm text-slate-800 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/15"
         />
-        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400 font-medium">₾</span>
+        <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-slate-400 font-medium">{symbol}</span>
       </div>
-      <p className="text-xs text-slate-400 mt-1">{sub}</p>
+      {sub && <p className="text-xs text-slate-400 mt-1">{sub}</p>}
     </div>
   )
 }

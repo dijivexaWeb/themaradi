@@ -452,8 +452,14 @@ export async function updatePricingSettings(formData: FormData): Promise<ActionR
 
   const keys = [
     'price_memorial_one_time', 'price_vault_setup', 'price_vault_monthly',
+    'price_memorial_try', 'price_vault_setup_try', 'price_vault_monthly_try',
+    'price_memorial_usd', 'price_vault_setup_usd', 'price_vault_monthly_usd',
+    'price_memorial_rub', 'price_vault_setup_rub', 'price_vault_monthly_rub',
     'campaign_active', 'campaign_label',
     'campaign_price_memorial', 'campaign_price_vault_setup', 'campaign_price_vault_monthly',
+    'campaign_price_memorial_try', 'campaign_price_vault_monthly_try',
+    'campaign_price_memorial_usd', 'campaign_price_vault_monthly_usd',
+    'campaign_price_memorial_rub', 'campaign_price_vault_monthly_rub',
     'campaign_ends_at',
   ]
 

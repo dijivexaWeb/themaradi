@@ -38,9 +38,54 @@ const scenarioBIcons = [Heart, Users, Camera, ShieldCheck] as const
 
 import type { PricingConfig } from '@/lib/pricing'
 
+type CurrencyView = { symbol: string; memorial: string; vaultSetup: string; vaultMonthly: string; campaignMemorial: string; campaignVaultMonthly: string }
+
+function buildCurrencyView(pricing: PricingConfig, lang: string): CurrencyView {
+  if (lang === 'tr' && pricing.memorialTry) {
+    return {
+      symbol: '₺',
+      memorial: pricing.memorialTry,
+      vaultSetup: pricing.vaultSetupTry || pricing.vaultSetup,
+      vaultMonthly: pricing.vaultMonthlyTry || pricing.vaultMonthly,
+      campaignMemorial: pricing.campaignMemorialTry,
+      campaignVaultMonthly: pricing.campaignVaultMonthlyTry,
+    }
+  }
+  if (lang === 'en' && pricing.memorialUsd) {
+    return {
+      symbol: '$',
+      memorial: pricing.memorialUsd,
+      vaultSetup: pricing.vaultSetupUsd || pricing.vaultSetup,
+      vaultMonthly: pricing.vaultMonthlyUsd || pricing.vaultMonthly,
+      campaignMemorial: pricing.campaignMemorialUsd,
+      campaignVaultMonthly: pricing.campaignVaultMonthlyUsd,
+    }
+  }
+  if (lang === 'ru' && pricing.memorialRub) {
+    return {
+      symbol: '₽',
+      memorial: pricing.memorialRub,
+      vaultSetup: pricing.vaultSetupRub || pricing.vaultSetup,
+      vaultMonthly: pricing.vaultMonthlyRub || pricing.vaultMonthly,
+      campaignMemorial: pricing.campaignMemorialRub,
+      campaignVaultMonthly: pricing.campaignVaultMonthlyRub,
+    }
+  }
+  // Default: GEL
+  return {
+    symbol: '₾',
+    memorial: pricing.memorialPrice,
+    vaultSetup: pricing.vaultSetup,
+    vaultMonthly: pricing.vaultMonthly,
+    campaignMemorial: pricing.campaignMemorial,
+    campaignVaultMonthly: pricing.campaignVaultMonthly,
+  }
+}
+
 export default function LocalizedLanding({ pricing, recentMemorials }: { pricing: PricingConfig; recentMemorials: RecentMemorial[] }) {
-  const { t } = useLang()
+  const { t, lang } = useLang()
   const [openFaq, setOpenFaq] = useState<number | null>(null)
+  const cur = buildCurrencyView(pricing, lang)
 
   const quickSteps = t.landing.quickSteps
   const securityItems = t.landing.securityItems
@@ -375,16 +420,16 @@ export default function LocalizedLanding({ pricing, recentMemorials }: { pricing
             <p className="text-xs font-semibold uppercase tracking-widest text-[#8a7a64]">{p.memorialBadge}</p>
             <h3 className="mt-1 font-serif text-2xl text-[#173d31]">{p.memorialTitle}</h3>
             <div className="my-5 flex items-end gap-2">
-              {pricing.campaignActive && pricing.campaignMemorial ? (
+              {pricing.campaignActive && cur.campaignMemorial ? (
                 <>
-                  <span className="font-serif text-3xl text-[#8a7a64] line-through">{pricing.memorialPrice}</span>
-                  <span className="font-serif text-5xl text-[#173d31]">{pricing.campaignMemorial}</span>
+                  <span className="font-serif text-3xl text-[#8a7a64] line-through">{cur.memorial}</span>
+                  <span className="font-serif text-5xl text-[#173d31]">{cur.campaignMemorial}</span>
                 </>
               ) : (
-                <span className="font-serif text-5xl text-[#173d31]">{pricing.memorialPrice}</span>
+                <span className="font-serif text-5xl text-[#173d31]">{cur.memorial}</span>
               )}
               <div className="mb-1.5">
-                <span className="text-xl font-semibold text-[#b08340]">₾</span>
+                <span className="text-xl font-semibold text-[#b08340]">{cur.symbol}</span>
                 <p className="text-sm text-[#8a7a64]">{p.memorialPriceLabel}</p>
               </div>
             </div>
@@ -412,20 +457,20 @@ export default function LocalizedLanding({ pricing, recentMemorials }: { pricing
             <h3 className="mt-1 font-serif text-2xl text-[#173d31]">{p.vaultTitle}</h3>
             <div className="my-5">
               <div className="flex items-end gap-2">
-                {pricing.campaignActive && pricing.campaignVaultMonthly ? (
+                {pricing.campaignActive && cur.campaignVaultMonthly ? (
                   <>
-                    <span className="font-serif text-3xl text-[#8a7a64] line-through">{pricing.vaultMonthly}</span>
-                    <span className="font-serif text-5xl text-[#173d31]">{pricing.campaignVaultMonthly}</span>
+                    <span className="font-serif text-3xl text-[#8a7a64] line-through">{cur.vaultMonthly}</span>
+                    <span className="font-serif text-5xl text-[#173d31]">{cur.campaignVaultMonthly}</span>
                   </>
                 ) : (
-                  <span className="font-serif text-5xl text-[#173d31]">{pricing.vaultMonthly}</span>
+                  <span className="font-serif text-5xl text-[#173d31]">{cur.vaultMonthly}</span>
                 )}
                 <div className="mb-1.5">
                   <span className="text-xl font-semibold text-[#b08340]">{p.vaultPriceMonthly}</span>
                   <p className="text-sm text-[#8a7a64]">{p.vaultPriceAlt}</p>
                 </div>
               </div>
-              <p className="text-sm text-[#8a7a64]">{p.vaultSetup.replace('49', pricing.vaultSetup)}</p>
+              <p className="text-sm text-[#8a7a64]">{p.vaultSetup.replace('49', cur.vaultSetup)}</p>
             </div>
             <ul className="space-y-2.5">
               {p.vaultFeatures.map((f) => (
