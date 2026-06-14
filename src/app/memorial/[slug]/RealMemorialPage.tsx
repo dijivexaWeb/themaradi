@@ -836,6 +836,31 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
       {/* ── ANI DEFTERİ ── */}
       <MemoryBookClient
         vaultId={id}
+        lang={lang}
+        texts={{
+          guestbook: t.memorial.guestbook,
+          sharedMemories: t.memorial.sharedMemories,
+          shareMemory: t.memorial.shareMemory,
+          shareYourMemory: t.memorial.shareYourMemory,
+          memoriesModeratedNote: t.memorial.memoriesModeratedNote,
+          memorySubmitted: t.memorial.memorySubmitted,
+          fullName: t.memorial.fullName,
+          yourRelation: t.memorial.yourRelation,
+          relationPlaceholder: t.memorial.relationPlaceholder,
+          memoryLabel: t.memorial.memoryLabel,
+          memoryPlaceholder: t.memorial.memoryPlaceholder,
+          photoOptionalLabel: t.memorial.photoOptionalLabel,
+          addPhoto: t.memorial.addPhoto,
+          emailOptional: t.memorial.emailOptional,
+          uploadingLabel: t.memorial.uploadingLabel,
+          submittingLabel: t.memorial.submittingLabel,
+          submitLabel: t.memorial.submitLabel,
+          noSharedMemories: t.memorial.noSharedMemories,
+          beFirstToShare: t.memorial.beFirstToShare,
+          requiredError: t.memorial.requiredError,
+          photoError: t.memorial.photoError,
+          photoUploadError: t.memorial.photoUploadError,
+        }}
         initialMemories={(approvedMemories ?? []) as {
           id: string
           author_name: string

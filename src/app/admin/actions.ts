@@ -643,6 +643,7 @@ export async function saveNotableProfile(
 
   revalidatePath(`/admin/memorials/${vaultId}`)
   if (vault?.slug) revalidatePath(`/memorial/${vault.slug}`)
+  revalidatePath('/memorial')
   return { success: true }
 }
 
