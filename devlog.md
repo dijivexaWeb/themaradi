@@ -3,6 +3,41 @@
 > Her oturum sonunda Claude bu dosyayı günceller.
 > Format: tarih → ne yapıldı → nerede kalındı → sıradaki adım.
 
+## 2026-06-14 — Oturum 103: Çoklu Fotoğraf + Kronoloji Slayt + Tab Fix
+
+### Yapılanlar
+- **Çoklu fotoğraf seçimi**: `PhotoUploadForm.tsx` — `multiple` attribute, sıralı R2 upload, "X / N yükleniyor" progress
+- **Kronoloji tab fix**: Kronoloji sekmesinde kayıt yapınca sayfa anılar sekmesine dönmüyordu — `returnUrl` ile `?tab=kronoloji` korunuyor
+- **Slayt Gösterisi**: `TimelineClient.tsx` — Timeline / Slayt sekmeleri artık çalışıyor
+  - Yaş Seçimi kaldırıldı (3. tab)
+  - Slayt modunda animasyonlu geçiş (translateX + opacity, exit → enter)
+  - Auto-advance 6 sn, dot indikatörler, ok butonları
+  - Arka plan ghost yıl dekorasyonu, sağda görsel panel
+  - i18n 4 dile milestone eklendi
+- **Admin create form tarihleri**: PartialDateInput → basit yıl/ay/gün alanları, "bilinmiyor" confusing text kaldırıldı
+- **createAdminMemorial upsert fix**: profiles duplicate key → upsert ile düzeltildi
+
+### Proje Durumu
+- [x] Çoklu fotoğraf yükleme
+- [x] Kronoloji tab'da kalma
+- [x] Slayt gösterisi animasyonlu çalışıyor
+- [x] Admin create form tarih alanları düzgün
+- [x] createAdminMemorial upsert fix
+
+### Kritik Kararlar / Notlar
+- Slayt geçiş animasyonu: 3-phase state (idle/exit/enter) + double rAF ile CSS transition tetikleniyor
+- TimelineSection standalone component olarak kaldı, TimelineClient içinde çağrılıyor
+
+### Nerede Kaldık
+Tüm özellikler push edildi, Vercel build bekleniyor.
+
+### Sıradaki Adım
+1. Deploy sonrası kronoloji slayt modunu test et
+2. Profil sayfasında "Slayt Gösterisi" tıklanınca yıl animasyonu doğru çalışıyor mu kontrol et
+3. Admin memorials/create ile yeni profil oluştur, tarih alanlarını test et
+
+---
+
 ## 2026-06-14 — Oturum 102: createAdminMemorial Duplicate Key Fix
 
 ### Yapılanlar
