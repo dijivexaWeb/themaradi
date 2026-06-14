@@ -16,6 +16,7 @@ import { getTurnstileSiteKey } from '@/lib/turnstile'
 import { getTranslation } from '@/i18n/server'
 import NotableProfilePhoto from './NotableProfilePhoto'
 import LangSwitcher from './LangSwitcher'
+import GoogleTranslate from './GoogleTranslate'
 
 interface VaultRow {
   id: string
@@ -198,6 +199,7 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
 
   return (
     <div className={`theme-${vault.theme || 'classic_emerald'} min-h-screen bg-[#fbf8f1] text-[#173d31]`}>
+      <GoogleTranslate />
 
       {/* ── Preview banner ── */}
       {isPreview && (
