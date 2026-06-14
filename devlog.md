@@ -3,6 +3,38 @@
 > Her oturum sonunda Claude bu dosyayı günceller.
 > Format: tarih → ne yapıldı → nerede kalındı → sıradaki adım.
 
+## 2026-06-14 — Oturum 108: Google Translate Geri Alındı + Notable Metin Güncellemeleri
+
+### Yapılanlar
+- **Google Translate tamamen kaldırıldı**: `GoogleTranslate.tsx` artık `RealMemorialPage.tsx`'e import edilmiyor. `LangSwitcher.tsx` `setGoogTrans()` ve `window.location.reload()` kaldırıldı — sadece `saveLang()` + `router.refresh()` kalıyor. i18n UI string çevirisi çalışmaya devam ediyor, DB içeriği yazıldığı gibi geliyor.
+- **Notable CTA başlığı**: "Taziye mesajı bırakmak ister misiniz?" → notable profillerde "Saygınızı birkaç cümleyle paylaşabilirsiniz." (4 dil)
+- **Notable entries header**: Guestbook entries listesi başlığı → notable profillerde "Saygı mesajları." / "Messages of tribute." / "Сообщения уважения." / "პატივისცემის შეტყობინებები."
+
+### Değiştirilen Dosyalar
+- `src/app/memorial/[slug]/LangSwitcher.tsx` — GT kodu temizlendi
+- `src/app/memorial/[slug]/RealMemorialPage.tsx` — GoogleTranslate import + JSX kaldırıldı
+- `src/app/memorial/[slug]/MemorialInteractions.tsx` — `notableCtaTitle` eklendi, entries header notable-aware yapıldı
+
+### Proje Durumu
+- [x] Google Translate kaldırıldı (içerik DB'den yazıldığı gibi gelir)
+- [x] Notable profillerde Saygı Defteri başlığı
+- [x] Giriş popup (3D animasyon, admin'den metin)
+- [x] Ülke bayrağı font fix
+- [x] Fotoğraf NEXT_REDIRECT hatası giderildi
+- [x] Çoklu para birimi fiyatlandırma
+
+### Kritik Kararlar / Notlar
+- Google Translate kalitesi yetersizdi — DB içeriği (biyografi, isimler) bozuk çevriliyor. i18n sistemi sadece UI label'larını (başlık, buton) dil değişimine göre çeviriyor, bu yeterli.
+
+### Nerede Kaldık
+LangSwitcher, RealMemorialPage, MemorialInteractions güncellendi. Deploy bekleniyor.
+
+### Sıradaki Adım
+1. Deploy sonrası notable profillerde "Saygı mesajları." başlığını kontrol et
+2. Ses kayıtları çalarken animasyon (bekleyen feature)
+
+---
+
 ## 2026-06-14 — Oturum 107: Saygı Defteri + Notable Giriş Popup + Bayrak Fix
 
 ### Yapılanlar

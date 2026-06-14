@@ -1,30 +1,15 @@
 'use client'
 
 import { saveLang, langs } from '@/i18n'
+import { useRouter } from 'next/navigation'
 import type { Lang } from '@/i18n'
 
-// Google Translate lang codes (same as ours, but let's be explicit)
-const GT_LANGS: Record<Lang, string> = { tr: 'tr', ka: 'ka', ru: 'ru', en: 'en' }
-
-function setGoogTrans(lang: Lang) {
-  const exp = new Date(Date.now() + 365 * 24 * 60 * 60 * 1000).toUTCString()
-  if (lang === 'tr') {
-    // Clear translation — restore original page
-    document.cookie = 'googtrans=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC'
-    document.cookie = `googtrans=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC; domain=.${window.location.hostname}`
-  } else {
-    const gtLang = GT_LANGS[lang]
-    document.cookie = `googtrans=/tr/${gtLang}; path=/; expires=${exp}`
-    document.cookie = `googtrans=/tr/${gtLang}; path=/; expires=${exp}; domain=.${window.location.hostname}`
-  }
-}
-
 export default function LangSwitcher({ currentLang }: { currentLang: Lang }) {
+  const router = useRouter()
   function switchLang(code: Lang) {
     if (code === currentLang) return
-    saveLang(code)       // tm_lang → UI strings
-    setGoogTrans(code)   // googtrans → içerik çevirisi
-    window.location.reload()
+    saveLang(code)
+    router.refresh()
   }
 
   return (

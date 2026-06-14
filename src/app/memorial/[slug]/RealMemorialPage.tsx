@@ -16,7 +16,6 @@ import { getTurnstileSiteKey } from '@/lib/turnstile'
 import { getTranslation } from '@/i18n/server'
 import NotableProfilePhoto from './NotableProfilePhoto'
 import LangSwitcher from './LangSwitcher'
-import GoogleTranslate from './GoogleTranslate'
 import NotableIntroPopup from './NotableIntroPopup'
 
 interface VaultRow {
@@ -203,7 +202,6 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
 
   return (
     <div className={`theme-${vault.theme || 'classic_emerald'} min-h-screen bg-[#fbf8f1] text-[#173d31]`}>
-      <GoogleTranslate />
       {isNotable && vault.notable_intro_text && !isPreview && (
         <NotableIntroPopup
           slug={vault.id}
@@ -719,7 +717,9 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
           }))}
           photoCount={photos!.length}
           photoArchiveLabel={t.memorial.photoArchive}
-          tracesLabel={t.memorial.tracesLeftByLovedOnes}
+          tracesLabel={isNotable
+            ? (lang === 'tr' ? 'Hayatından önemli anlar.' : lang === 'ka' ? 'მნიშვნელოვანი მომენტები.' : lang === 'ru' ? 'Важные моменты.' : 'Important moments.')
+            : t.memorial.tracesLeftByLovedOnes}
           photosLabel={t.memorial.photos}
         />
       )}
@@ -826,7 +826,9 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
               <span className="text-xs tracking-[0.2em] uppercase">{t.memorial.memories}</span>
             </div>
             <h2 className="mb-8 font-serif text-4xl text-[#173d31] sm:text-5xl">
-              {t.memorial.tracesLeftByLovedOnes}
+              {isNotable
+                ? (lang === 'tr' ? 'Hayatından önemli anlar.' : lang === 'ka' ? 'მნიშვნელოვანი მომენტები.' : lang === 'ru' ? 'Важные моменты.' : 'Important moments.')
+                : t.memorial.tracesLeftByLovedOnes}
             </h2>
             <MemoriesAccordion
               memories={regularMemories.map((m) => ({
