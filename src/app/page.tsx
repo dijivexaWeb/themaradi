@@ -10,7 +10,7 @@ export const revalidate = 3600
 export default async function LandingPage() {
   const supabase = await createServiceClient()
 
-  const [pricing, { data: notableMemorials }, { data: recentMemorials }] = await Promise.all([
+  const [pricing, { data: notableRaw }, { data: recentMemorials }] = await Promise.all([
     fetchPricingConfig(),
     supabase
       .from('vaults')
@@ -28,12 +28,33 @@ export default async function LandingPage() {
       .limit(10),
   ])
 
+  const notableIds = (notableRaw ?? []).map((v) => v.id)
+  const reactionCounts: Record<string, { candle: number; flower: number; prayer: number }> = {}
+  if (notableIds.length > 0) {
+    const { data: reactions } = await supabase
+      .from('memorial_reactions')
+      .select('vault_id, reaction_type')
+      .in('vault_id', notableIds)
+    for (const r of reactions ?? []) {
+      if (!reactionCounts[r.vault_id]) reactionCounts[r.vault_id] = { candle: 0, flower: 0, prayer: 0 }
+      const k = r.reaction_type as 'candle' | 'flower' | 'prayer'
+      if (k in reactionCounts[r.vault_id]) reactionCounts[r.vault_id][k]++
+    }
+  }
+
+  const notableMemorials: NotableMemorial[] = (notableRaw ?? []).map((v) => ({
+    ...v,
+    candle_count: reactionCounts[v.id]?.candle ?? 0,
+    flower_count: reactionCounts[v.id]?.flower ?? 0,
+    prayer_count: reactionCounts[v.id]?.prayer ?? 0,
+  }))
+
   return (
     <div className="theme-corporate min-h-screen overflow-x-hidden bg-[#fbf8f1] text-[#173d31]">
       <LandingNav />
       <LocalizedLanding
         pricing={pricing}
-        notableMemorials={(notableMemorials ?? []) as NotableMemorial[]}
+        notableMemorials={notableMemorials}
         recentMemorials={(recentMemorials ?? []) as RecentMemorial[]}
       />
     </div>

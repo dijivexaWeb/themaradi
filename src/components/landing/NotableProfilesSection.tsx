@@ -15,6 +15,9 @@ export type NotableMemorial = {
   cover_photo_url: string | null
   nationality: string | null
   notable_subtitle: string | null
+  candle_count?: number
+  flower_count?: number
+  prayer_count?: number
 }
 
 // Fixed star positions — no random, no hydration issues
@@ -153,12 +156,19 @@ export default function NotableProfilesSection({ memorials }: { memorials: Notab
                   )}
                 </div>
 
-                {/* Tagline + CTA */}
+                {/* Tagline + Stats + CTA */}
                 <div className="flex flex-1 flex-col px-3 py-2.5 gap-2">
                   {(m.tagline || m.notable_subtitle) && (
                     <p className="line-clamp-2 text-[10px] italic leading-4 text-[#6a8e78]">
                       {m.tagline || m.notable_subtitle}
                     </p>
+                  )}
+                  {((m.candle_count ?? 0) > 0 || (m.flower_count ?? 0) > 0 || (m.prayer_count ?? 0) > 0) && (
+                    <div className="flex items-center gap-1.5 text-[9px] text-[#5a7a65]">
+                      {(m.candle_count ?? 0) > 0 && <span>🕯️ {m.candle_count}</span>}
+                      {(m.flower_count ?? 0) > 0 && <span>🌹 {m.flower_count}</span>}
+                      {(m.prayer_count ?? 0) > 0 && <span>🙏 {m.prayer_count}</span>}
+                    </div>
                   )}
                   <div className="mt-auto flex items-center justify-between">
                     <span className="text-[10px] font-semibold tracking-wide text-[#c7a76f] group-hover:text-[#e8d5a8] transition-colors">
