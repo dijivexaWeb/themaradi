@@ -3,6 +3,38 @@
 > Her oturum sonunda Claude bu dosyayı günceller.
 > Format: tarih → ne yapıldı → nerede kalındı → sıradaki adım.
 
+## 2026-06-14 — Oturum 112: Notable Profiles Anasayfa Bölümü + Profil İstatistikleri
+
+### Yapılanlar
+- **`NotableProfilesSection.tsx`**: Koyu zemin (`#080f0b`), CSS twinkle yıldız animasyonu (20 nokta, staggered delay), altın detaylar; bayrak, fotoğraf (hover scale), isim, yıllar, tagline; mobilde yatay scroll, desktop'ta responsive grid (2→3→4 kolon)
+- **`page.tsx`**: İki ayrı Supabase sorgusu — notable profiller `notable_sort_order ASC` ile, regular profiller `is_notable != true` filtresiyle
+- **`LocalizedLanding.tsx`**: NotableProfilesSection hero'dan hemen sonra, RecentMemorialsCarousel'den önce eklendi; regular carousel'a artık notable profiller dahil edilmiyor
+- **`RealMemorialPage.tsx`**: Notable profillerde stats grid'inin altına kompakt istatistik satırı — 🕯️ mum / 🌹 çiçek / 🙏 dua / 💬 mesaj; sadece 0'dan büyük değerler gösterilir, 4 dil
+- **i18n (4 dil)**: `notableSection` bloğu eklendi — eyebrow, heading, sub, visit ve 5 stats etiketi
+
+### Değiştirilen Dosyalar
+- `src/app/page.tsx`
+- `src/components/landing/NotableProfilesSection.tsx` — yeni
+- `src/components/landing/LocalizedLanding.tsx`
+- `src/app/memorial/[slug]/RealMemorialPage.tsx`
+- `src/i18n/tr.ts`, `ka.ts`, `en.ts`, `ru.ts`
+
+### Proje Durumu
+- [x] Anasayfada Ulusal Miras özel bölümü (yıldız animasyonlu, kompakt)
+- [x] Notable profillerde mum/çiçek/dua/mesaj istatistikleri
+- [x] QR tabela kargo takip sistemi
+- [x] LangProvider dil değiştirme bug fix
+
+### Nerede Kaldık
+e8815f2 push edildi, Vercel deploy bekleniyor.
+
+### Sıradaki Adım
+1. Deploy sonrası anasayfayı test et — notable profil yoksa bölüm görünmez (doğru davranış)
+2. İstatistik satırı — kullanıcı etkileşimi sonrası (mum yaktıktan sonra) gerçek zamanlı güncelleme test et
+3. Kart tasarımı / spacing fine-tuning gerekirse
+
+---
+
 ## 2026-06-14 — Oturum 111: QR Tabela Kargo Takip Sistemi (End-to-End)
 
 ### Yapılanlar
