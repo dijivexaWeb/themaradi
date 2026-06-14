@@ -252,7 +252,7 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
           <div className="order-2 rounded-2xl border border-[#c7a76f]/20 bg-[#091712]/55 p-5 shadow-2xl shadow-black/20 backdrop-blur-sm sm:p-6 lg:order-1">
             <div className="mb-3 flex items-center gap-3 text-[#c7a76f]">
               <span className="h-px w-8 bg-[#c7a76f]" />
-              <span className="text-xs tracking-[0.22em] uppercase">{isNotable ? (lang === "ka" ? "ეროვნული მემკვიდრეობა" : lang === "ru" ? "Национальное наследие" : lang === "en" ? "National Heritage" : "Milli Miras") : t.memorial.fromFamily}</span>
+              <span className="text-xs tracking-[0.22em] uppercase">{isNotable ? (lang === "ka" ? "ქართველი ხალხისგან" : lang === "ru" ? "От грузинского народа" : lang === "en" ? "From the Georgian People" : "Gürcü Halkından") : t.memorial.fromFamily}</span>
             </div>
             <p className="font-serif text-lg leading-8 text-white sm:text-xl sm:leading-9">
               {vault.tagline ?? 'Saygıyla anıyoruz. Bize bıraktığı sevgi ve hatıralar her zaman kalbimizde yaşayacak.'}
@@ -581,7 +581,7 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
                     <div className="h-px flex-1 bg-[#e1d5c3]" />
                     <div className="text-right">
                       <div className="font-serif text-base text-[#173d31]">{vault.display_name}</div>
-                      <div className="text-xs text-[#8a7a64]">{isNotable ? (lang === "ka" ? "ეროვნული მემკვიდრეობა" : lang === "ru" ? "Национальное наследие" : lang === "en" ? "National Heritage" : "Milli Miras") : t.memorial.fromFamily}</div>
+                      <div className="text-xs text-[#8a7a64]">{isNotable ? (lang === "ka" ? "ქართველი ხალხისგან" : lang === "ru" ? "От грузинского народа" : lang === "en" ? "From the Georgian People" : "Gürcü Halkından") : t.memorial.fromFamily}</div>
                     </div>
                   </div>
                 </div>

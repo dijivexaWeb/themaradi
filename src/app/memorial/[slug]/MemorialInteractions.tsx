@@ -226,12 +226,12 @@ export default function MemorialInteractions({ condolences, vaultId, initialCoun
             </div>
             <h2 className="mt-3 font-serif text-4xl text-white sm:text-5xl">
               {isNotable
-                ? (lang === 'tr' ? 'Saygı ve' : lang === 'ka' ? 'გამოხატეთ' : lang === 'ru' ? 'Выразите своё' : 'Share your')
+                ? (lang === 'tr' ? 'Saygı ve' : lang === 'ka' ? 'პატივისცემისა და' : lang === 'ru' ? 'Пространство' : 'A space of')
                 : (lang === 'tr' ? 'Sevenlerinin' : lang === 'ka' ? 'საყვარელი ადამიანების' : lang === 'ru' ? 'Словами' : 'With words of')
               }<br />
               <span className="text-[#c7a76f]">
                 {isNotable
-                  ? (lang === 'tr' ? 'minnettarlığınızı.' : lang === 'ka' ? 'პატივისცემა.' : lang === 'ru' ? 'уважение.' : 'tribute.')
+                  ? (lang === 'tr' ? 'minnettarlığınızı.' : lang === 'ka' ? 'მადლიერების სივრცე.' : lang === 'ru' ? 'уважения и благодарности.' : 'respect and gratitude.')
                   : (lang === 'tr' ? 'sözleriyle.' : lang === 'ka' ? 'სიტყვებით.' : lang === 'ru' ? 'любящих.' : 'loved ones.')
                 }
               </span>
