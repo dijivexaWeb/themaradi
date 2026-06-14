@@ -15,6 +15,7 @@ interface Props {
     notable_legacy_text: string | null
     notable_verified_note: string | null
     notable_sort_order: number | null
+    notable_intro_text: string | null
   }
 }
 
@@ -27,6 +28,7 @@ export default function NotableForm({ vaultId, initial }: Props) {
   const [quote, setQuote] = useState(initial.featured_quote ?? '')
   const [legacy, setLegacy] = useState(initial.notable_legacy_text ?? '')
   const [verifiedNote, setVerifiedNote] = useState(initial.notable_verified_note ?? '')
+  const [introText, setIntroText] = useState(initial.notable_intro_text ?? '')
   const [sortOrder, setSortOrder] = useState<string>(initial.notable_sort_order != null ? String(initial.notable_sort_order) : '')
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
@@ -46,6 +48,7 @@ export default function NotableForm({ vaultId, initial }: Props) {
       notable_legacy_text: legacy.trim() || null,
       notable_verified_note: verifiedNote.trim() || null,
       notable_sort_order: sortOrder !== '' ? parseInt(sortOrder, 10) : null,
+      notable_intro_text: introText.trim() || null,
     })
     setSaving(false)
     if (result.success) {
@@ -133,6 +136,11 @@ export default function NotableForm({ vaultId, initial }: Props) {
           <div>
             <label className={lbl}>Doğrulanmış Profil Notu <span className="font-normal normal-case text-slate-400">(boş = standart metin)</span></label>
             <input type="text" value={verifiedNote} onChange={e => setVerifiedNote(e.target.value)} placeholder="Bu profil arşiv kaynakları esas alınarak hazırlanmıştır." className={inp} />
+          </div>
+
+          <div>
+            <label className={lbl}>Giriş Popup Metni <span className="font-normal normal-case text-slate-400">(sayfa ilk açıldığında animasyonlu popup — boşsa gösterilmez)</span></label>
+            <textarea value={introText} onChange={e => setIntroText(e.target.value)} rows={3} placeholder="Bu sayfa, Gürcistan'ın manevi hafızasında yer eden büyük bir insana adanmıştır." className={`${inp} resize-none`} />
           </div>
 
           <div>

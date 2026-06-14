@@ -624,6 +624,7 @@ export async function saveNotableProfile(
     notable_legacy_text: string | null
     notable_verified_note: string | null
     notable_sort_order: number | null
+    notable_intro_text: string | null
   }
 ): Promise<ActionResult> {
   const { user, profile } = await requireAdmin()

@@ -102,7 +102,7 @@ const interactionCopy: Record<Lang, InteractionCopy> = {
 }
 interface InitialCounts { candle: number; flower: number; prayer: number }
 
-export default function MemorialInteractions({ condolences, vaultId, initialCounts, siteKey = '', customActions = [] }: { condolences: Condolence[]; vaultId?: string; initialCounts?: InitialCounts; siteKey?: string; customActions?: CustomAction[] }) {
+export default function MemorialInteractions({ condolences, vaultId, initialCounts, siteKey = '', customActions = [], isNotable = false }: { condolences: Condolence[]; vaultId?: string; initialCounts?: InitialCounts; siteKey?: string; customActions?: CustomAction[]; isNotable?: boolean }) {
   const { lang } = useLang()
   const copy = interactionCopy[lang]
   const [candlesLit, setCandlesLit] = useState(initialCounts?.candle ?? 0)
@@ -215,13 +215,24 @@ export default function MemorialInteractions({ condolences, vaultId, initialCoun
             <div className="flex items-center justify-center gap-3 text-[#c7a76f]">
               <span className="h-px w-10 bg-[#c7a76f]" />
               <span className="text-xs tracking-[0.2em] uppercase">
-                {lang === 'tr' ? 'Taziye Defteri' : lang === 'ka' ? 'სამძიმრის წიგნი' : lang === 'ru' ? 'Книга соболезнований' : 'Condolence Book'}
+                {isNotable
+                  ? (lang === 'tr' ? 'Saygı Defteri' : lang === 'ka' ? 'პატივისცემის წიგნი' : lang === 'ru' ? 'Книга Уважения' : 'Book of Tribute')
+                  : (lang === 'tr' ? 'Taziye Defteri' : lang === 'ka' ? 'სამძიმრის წიგნი' : lang === 'ru' ? 'Книга соболезнований' : 'Condolence Book')
+                }
               </span>
               <span className="h-px w-10 bg-[#c7a76f]" />
             </div>
             <h2 className="mt-3 font-serif text-4xl text-white sm:text-5xl">
-              {lang === 'tr' ? 'Sevenlerinin' : lang === 'ka' ? 'საყვარელი ადამიანების' : lang === 'ru' ? 'Словами' : 'With words of'}<br />
-              <span className="text-[#c7a76f]">{lang === 'tr' ? 'sözleriyle.' : lang === 'ka' ? 'სიტყვებით.' : lang === 'ru' ? 'любящих.' : 'loved ones.'}</span>
+              {isNotable
+                ? (lang === 'tr' ? 'Saygı ve' : lang === 'ka' ? 'გამოხატეთ' : lang === 'ru' ? 'Выразите своё' : 'Share your')
+                : (lang === 'tr' ? 'Sevenlerinin' : lang === 'ka' ? 'საყვარელი ადამიანების' : lang === 'ru' ? 'Словами' : 'With words of')
+              }<br />
+              <span className="text-[#c7a76f]">
+                {isNotable
+                  ? (lang === 'tr' ? 'minnettarlığınızı.' : lang === 'ka' ? 'პატივისცემა.' : lang === 'ru' ? 'уважение.' : 'tribute.')
+                  : (lang === 'tr' ? 'sözleriyle.' : lang === 'ka' ? 'სიტყვებით.' : lang === 'ru' ? 'любящих.' : 'loved ones.')
+                }
+              </span>
             </h2>
           </div>
 

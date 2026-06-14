@@ -17,6 +17,7 @@ import { getTranslation } from '@/i18n/server'
 import NotableProfilePhoto from './NotableProfilePhoto'
 import LangSwitcher from './LangSwitcher'
 import GoogleTranslate from './GoogleTranslate'
+import NotableIntroPopup from './NotableIntroPopup'
 
 interface VaultRow {
   id: string
@@ -52,6 +53,7 @@ interface VaultRow {
   featured_quote: string | null
   notable_legacy_text: string | null
   notable_verified_note: string | null
+  notable_intro_text: string | null
 }
 
 interface Props {
@@ -197,9 +199,19 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
     { href: '#ziyaret', label: t.memorial.visitInfo, show: hasCemetery },
   ].filter((t) => t.show)
 
+  const isNotable = !!vault.is_notable
+
   return (
     <div className={`theme-${vault.theme || 'classic_emerald'} min-h-screen bg-[#fbf8f1] text-[#173d31]`}>
       <GoogleTranslate />
+      {isNotable && vault.notable_intro_text && !isPreview && (
+        <NotableIntroPopup
+          slug={vault.id}
+          introText={vault.notable_intro_text}
+          displayName={vault.display_name}
+          lang={lang}
+        />
+      )}
 
       {/* ── Preview banner ── */}
       {isPreview && (
@@ -303,7 +315,7 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
               <Feather className="h-4 w-4 text-[#c7a76f]" />
               <span>{deathYear ?? '?'}</span>
               {vault.is_notable && vault.nationality && (
-                <span className="text-2xl">{nationalityFlag(vault.nationality)}</span>
+                <span className="text-2xl" style={{ fontFamily: 'system-ui, -apple-system, sans-serif' }}>{nationalityFlag(vault.nationality)}</span>
               )}
             </div>
             {vault.birth_place && (
@@ -836,7 +848,7 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
 
       {/* ── TAZİYE DEFTERİ ── */}
       <div id="taziye">
-        <RealMemorialInteractionsWrapper entries={guestbookEntries} vaultId={id} initialCounts={initialCounts} siteKey={turnstileSiteKey} customActions={customActions} />
+        <RealMemorialInteractionsWrapper entries={guestbookEntries} vaultId={id} initialCounts={initialCounts} siteKey={turnstileSiteKey} customActions={customActions} isNotable={isNotable} />
       </div>
 
       {/* ── ANI DEFTERİ ── */}

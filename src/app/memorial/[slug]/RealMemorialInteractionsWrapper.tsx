@@ -22,9 +22,10 @@ interface Props {
   initialCounts: { candle: number; flower: number; prayer: number }
   siteKey: string
   customActions?: CustomAction[]
+  isNotable?: boolean
 }
 
-export default function RealMemorialInteractionsWrapper({ entries, vaultId, initialCounts, siteKey, customActions = [] }: Props) {
+export default function RealMemorialInteractionsWrapper({ entries, vaultId, initialCounts, siteKey, customActions = [], isNotable = false }: Props) {
   const condolences = entries.map((e) => ({
     id: e.id,
     name: e.author_name,
@@ -46,7 +47,7 @@ export default function RealMemorialInteractionsWrapper({ entries, vaultId, init
 
   return (
     <LangProvider>
-      <MemorialInteractions condolences={condolences} vaultId={vaultId} initialCounts={initialCounts} siteKey={siteKey} customActions={customActions} />
+      <MemorialInteractions condolences={condolences} vaultId={vaultId} initialCounts={initialCounts} siteKey={siteKey} customActions={customActions} isNotable={isNotable} />
     </LangProvider>
   )
 }

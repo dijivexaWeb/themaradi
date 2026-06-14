@@ -143,6 +143,7 @@ export default async function VaultDetailPage({ params }: { params: Promise<{ id
               notable_legacy_text: vault.notable_legacy_text ?? null,
               notable_verified_note: vault.notable_verified_note ?? null,
               notable_sort_order: vault.notable_sort_order ?? null,
+              notable_intro_text: (vault as any).notable_intro_text ?? null,
             }}
           />
         </div>
