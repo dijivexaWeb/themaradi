@@ -3,6 +3,34 @@
 > Her oturum sonunda Claude bu dosyayı günceller.
 > Format: tarih → ne yapıldı → nerede kalındı → sıradaki adım.
 
+## 2026-06-14 — Oturum 105: QR SVG Vektörel İndirme + Ses Kaydı Fix
+
+### Yapılanlar
+- **Ses kaydı insert fix**: `product_type='memorial_profile'` filtresi kaldırıldı (ownership check yeterli); `file_key`/`storage_bucket` kolonları DB'de olmadığı için insert'ten çıkarıldı; her hata adımı artık mesaj döndürüyor
+- **QR SVG vektörel indirme**: `_QrLinkClient.tsx` — "Baskı için İndir (SVG Vektörel)" butonu eklendi
+  - `qrcode.toString(url, { type: 'svg' })` ile QR paths alınıyor
+  - Custom SVG: profil adı (üstte, serif), QR (orta), www.theeternalmemory.com (altta), altın dekoratif çizgiler
+  - `Blob` → download olarak kaydediliyor, font bağımlılığı yok (system font)
+
+### Proje Durumu
+- [x] Ses kaydı yükleme çalışıyor (insert başarılı)
+- [x] QR SVG vektörel indirme (baskı için)
+- [x] QR PNG indirme (mevcut)
+
+### Kritik Kararlar / Notlar
+- `vault_audio_recordings` tablosunda `file_key`/`storage_bucket` kolonları yok — insert'e eklenmemeli
+- SVG'deki text elementleri system font kullanıyor; Illustrator'da "Create Outlines" ile path'e çevrilebilir
+
+### Nerede Kaldık
+QR SVG feature push edildi, deploy bekleniyor.
+
+### Sıradaki Adım
+1. Deploy sonrası QR SVG indir butonunu test et
+2. SVG'yi Illustrator/Inkscape'de aç, görünüm kontrol et
+3. Ses kayıtlarına animasyon eklenebilir (çalarken dalga animasyonu)
+
+---
+
 ## 2026-06-14 — Oturum 104: Ses Kaydı "Yetkisiz Erişim" Fix (middleware.ts eksikti)
 
 ### Yapılanlar

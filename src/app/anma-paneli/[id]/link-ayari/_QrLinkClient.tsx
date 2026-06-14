@@ -67,6 +67,58 @@ export default function QrLinkClient({ vaultId, currentSlug, qrId, qrDataUrl, qr
     a.click()
   }
 
+  async function downloadSvgQr() {
+    const QRCode = (await import('qrcode')).default
+
+    const qrSvgStr: string = await QRCode.toString(qrUrl, {
+      type: 'svg',
+      margin: 0,
+      color: { dark: '#1a1a1a', light: '#ffffff' },
+    })
+
+    // Extract viewBox and path elements via simple string parsing
+    const viewBox = qrSvgStr.match(/viewBox="([^"]+)"/)?.[1] ?? '0 0 37 37'
+    const paths = [...qrSvgStr.matchAll(/<path[^>]+\/>/g)].map(m => m[0]).join('\n      ')
+
+    const W = 400
+    const qrSize = 280
+    const qrX = (W - qrSize) / 2   // 60
+    const qrY = 80
+    const nameY = 52
+    const urlY = qrY + qrSize + 36
+    const H = urlY + 48
+
+    function escXml(s: string) {
+      return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    }
+
+    const svg = `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
+  <rect width="${W}" height="${H}" fill="#ffffff"/>
+  <line x1="40" y1="22" x2="${W - 40}" y2="22" stroke="#c7a76f" stroke-width="1.2"/>
+  <text x="${W / 2}" y="${nameY}"
+    font-family="Georgia,'Times New Roman',serif"
+    font-size="20" font-weight="bold" fill="#173d31" text-anchor="middle">${escXml(displayName)}</text>
+  <svg x="${qrX}" y="${qrY}" width="${qrSize}" height="${qrSize}" viewBox="${viewBox}">
+    ${paths}
+  </svg>
+  <line x1="40" y1="${urlY - 10}" x2="${W - 40}" y2="${urlY - 10}" stroke="#c7a76f" stroke-width="0.8"/>
+  <text x="${W / 2}" y="${urlY + 14}"
+    font-family="Arial,Helvetica,sans-serif"
+    font-size="13" fill="#7b837d" text-anchor="middle">www.theeternalmemory.com</text>
+</svg>`
+
+    const blob = new Blob([svg], { type: 'image/svg+xml' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `qr-${displayName.replace(/\s+/g, '-').toLowerCase()}.svg`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  }
+
   const statusIcon = {
     idle: null,
     checking: <Loader2 className="h-4 w-4 animate-spin text-[#adb5ab]" />,
@@ -186,7 +238,7 @@ export default function QrLinkClient({ vaultId, currentSlug, qrId, qrDataUrl, qr
               <span className="font-mono text-xs text-[#173d31]">{qrId}</span>
             </div>
 
-            {/* İndir butonu */}
+            {/* İndir butonları */}
             <button
               onClick={downloadQr}
               className="flex w-full items-center justify-center gap-2 rounded-xl border border-[#174f35] px-4 py-2.5 text-sm font-semibold text-[#174f35] transition-colors hover:bg-[#174f35] hover:text-white"
@@ -195,8 +247,16 @@ export default function QrLinkClient({ vaultId, currentSlug, qrId, qrDataUrl, qr
               QR Kodu İndir (PNG)
             </button>
 
+            <button
+              onClick={downloadSvgQr}
+              className="flex w-full items-center justify-center gap-2 rounded-xl border border-[#c7a76f] bg-[#fffdf7] px-4 py-2.5 text-sm font-semibold text-[#8a6020] transition-colors hover:bg-[#c7a76f] hover:text-white"
+            >
+              <Download className="h-4 w-4" />
+              Baskı için İndir (SVG Vektörel)
+            </button>
+
             <p className="text-xs text-[#adb5ab]">
-              400×400 px, bilgisayar ve telefona kaydedebilirsiniz.
+              SVG: isim + QR + site adresi, sonsuz çözünürlük — matbaa için ideal.
             </p>
           </div>
         </div>
