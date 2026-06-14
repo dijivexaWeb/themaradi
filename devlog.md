@@ -3,6 +3,35 @@
 > Her oturum sonunda Claude bu dosyayı günceller.
 > Format: tarih → ne yapıldı → nerede kalındı → sıradaki adım.
 
+## 2026-06-14 — Oturum 109: LangProvider Dil Değiştirme Bug Fix
+
+### Yapılanlar
+- **Kritik bug fix**: Dil değiştirince `MemorialInteractions` (Saygı Defteri) bölümü güncellenmiyordu, tam sayfa yenilemesi gerekiyordu.
+- **Kök neden**: `LangProvider`'daki `useEffect` koşulu yanlıştı — `if (clientLang !== serverLang)` ifadesi, `router.refresh()` sonrası ikisi de 'ka' olunca `false` dönüyor, `setLangState` hiç çağrılmıyordu. State 'tr' kalıyordu.
+- **Düzeltme**: `useEffect`'teki gereksiz koşul kaldırıldı. Artık `serverLang` prop'u değiştiğinde (yani `router.refresh()` sunucudan yeni prop gönderdiğinde) her zaman `detectLang()` çalışıp state güncelleniyor.
+
+### Değiştirilen Dosyalar
+- `src/i18n/context.tsx` — useEffect koşulu kaldırıldı (7 satır → 1 satır)
+
+### Proje Durumu
+- [x] Dil değiştirince Saygı Defteri bölümü anlık güncelleniyor
+- [x] Google Translate kaldırıldı
+- [x] Notable profil label override'ları (From Family, Last Message, Visitor, Guestbook H2)
+- [x] NotableShareButton ("Bu mirası paylaş")
+- [x] Bayrak flagcdn.com img ile render ediliyor
+
+### Kritik Kararlar / Notlar
+- `useEffect(() => { setLangState(detectLang()) }, [serverLang])` — minimal ve doğru çözüm. serverLang prop'u değiştiğinde (router.refresh ile) cookie'den doğru dili okur. Önceki setTimeout + koşul gereksizdi ve hatalıydı.
+
+### Nerede Kaldık
+162a48f push edildi, Vercel'de deploy oluyor.
+
+### Sıradaki Adım
+1. Deploy sonrası KA dil geçişinde Saygı Defteri bölümünü test et — badge, H2, CTA metinleri güncellenmeli
+2. Ses kayıtları çalarken animasyon (bekleyen feature)
+
+---
+
 ## 2026-06-14 — Oturum 108: Google Translate Geri Alındı + Notable Metin Güncellemeleri
 
 ### Yapılanlar
