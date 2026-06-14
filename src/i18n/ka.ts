@@ -1139,6 +1139,7 @@ const ka: LangDict = {
     timeline: 'დროის ხაზი',
     slideshow: 'სლაიდშოუ',
     ageSelection: 'ასაკის შერჩევა',
+    milestone: 'მეხსიერების წერტილი',
     videoMemories: 'ვიდეო მოგონებები',
     movingMoments: 'მოძრავი მომენტები.',
     photoArchive: 'ფოტო არქივი',

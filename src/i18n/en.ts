@@ -1137,6 +1137,7 @@ const en = {
     timeline: 'Timeline',
     slideshow: 'Slideshow',
     ageSelection: 'Age Selection',
+    milestone: 'Milestone',
     videoMemories: 'Video Memories',
     movingMoments: 'Moving moments.',
     photoArchive: 'Photo Archive',

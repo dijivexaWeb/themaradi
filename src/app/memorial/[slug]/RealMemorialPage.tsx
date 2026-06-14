@@ -8,7 +8,7 @@ import AudioPlayerSection from './AudioPlayerSection'
 import RealMemorialInteractionsWrapper from './RealMemorialInteractionsWrapper'
 import ProfilePhotoCircle from './ProfilePhotoCircle'
 import HeroPanelEmojiBar from './HeroPanelEmojiBar'
-import TimelineSection from './TimelineSection'
+import TimelineClient from './TimelineClient'
 import MemoryBookClient from './MemoryBookClient'
 import MemoriesAccordion from './MemoriesAccordion'
 import PhotoGallery from './PhotoGallery'
@@ -582,32 +582,7 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
       {hasTimeline && (
         <section id="kronoloji" className="border-y border-[#172d25] bg-[#091712] px-5 py-16 text-[#efe7d8] sm:px-8">
           <div className="mx-auto max-w-7xl">
-            <div className="mb-9 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
-              <div>
-                <div className="flex items-center gap-3 text-[#c7a76f]">
-                  <span className="h-px w-10 bg-[#c7a76f]" />
-                  <span className="text-xs tracking-[0.2em] uppercase">{t.memorial.chronology}</span>
-                </div>
-                <h2 className="mt-3 font-serif text-5xl text-white">{t.memorial.timeTravel}</h2>
-                <p className="mt-4 max-w-xl text-sm leading-7 text-[#b8aa93]">
-                  {t.memorial.journeyToMoments}{yearsLived !== null ? ` ${yearsLived} ${t.memorial.yearsStory}` : ''}
-                </p>
-              </div>
-              <div className="flex w-full gap-1 rounded-xl border border-white/10 bg-white/[0.04] p-1 text-xs font-semibold text-[#cfc3ad] sm:w-auto">
-                {[t.memorial.timeline, t.memorial.slideshow, t.memorial.ageSelection].map((label, i) => (
-                  <div
-                    key={label}
-                    className={`flex-1 rounded-lg px-4 py-2.5 text-center transition sm:flex-none ${
-                      i === 0 ? 'bg-[#c7a76f] text-[#091712] shadow-lg shadow-black/20' : 'text-[#cfc3ad]'
-                    }`}
-                  >
-                    {label}
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            <TimelineSection
+            <TimelineClient
               events={timelineMemories.map((e) => ({
                 id: e.id,
                 year: e.memory_date ? String(new Date(e.memory_date).getFullYear()) : null,
@@ -615,6 +590,16 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
                 content: e.content ?? null,
                 media_url: e.media_url ?? null,
               }))}
+              labels={{
+                timeline: t.memorial.timeline,
+                slideshow: t.memorial.slideshow,
+                chronology: t.memorial.chronology,
+                timeTravel: t.memorial.timeTravel,
+                journeyToMoments: t.memorial.journeyToMoments,
+                yearsStory: t.memorial.yearsStory,
+                milestone: t.memorial.milestone,
+              }}
+              yearsLived={yearsLived}
             />
           </div>
         </section>

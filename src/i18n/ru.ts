@@ -1139,6 +1139,7 @@ const ru: LangDict = {
     timeline: 'Шкала времени',
     slideshow: 'Слайд-шоу',
     ageSelection: 'Выбор возраста',
+    milestone: 'Веха',
     videoMemories: 'Видео воспоминания',
     movingMoments: 'Движущиеся моменты.',
     photoArchive: 'Фотоархив',

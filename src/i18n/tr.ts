@@ -1139,6 +1139,7 @@ const tr: LangDict = {
     timeline: 'Zaman Çizgisi',
     slideshow: 'Slayt Gösterisi',
     ageSelection: 'Yaş Seçimi',
+    milestone: 'Dönüm Noktası',
     videoMemories: 'Video Anılar',
     movingMoments: 'Hareket eden anlar.',
     photoArchive: 'Fotoğraf Arşivi',
