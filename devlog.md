@@ -3,6 +3,74 @@
 > Her oturum sonunda Claude bu dosyayı günceller.
 > Format: tarih → ne yapıldı → nerede kalındı → sıradaki adım.
 
+## 2026-06-14 — Oturum 114: Güvenlik + Operasyonel Düzeltmeler
+
+### Yapılanlar
+
+**Güvenlik (6 açık kapatıldı — commit 7d4d981):**
+- `confirmDeliveryAction`: auth check + owner_id doğrulama eklendi (herkes çağırabiliyordu)
+- Auth callback `/auth/callback`: open redirect — `next` param artık `//` ile başlayamaz
+- `memorial_actions` delete: `.eq('memorial_id', vaultId)` eklendi (RLS bypass önlendi)
+- Turnstile: secret key yokken `true` değil `false` döndürüyor
+- File upload MIME/boyut validasyonu: `ALLOWED_DOC_MIME` ve `MAX_DOC_BYTES` artık gerçekten uygulanıyor
+- `submitObjectionAction`: UUID format kontrolü + vault public_memorial doğrulaması
+
+**PayPal Kritik Açık (commit 505124b):**
+- `create-order`: PayPal orderId artık `payments.external_payment_id`'ye kaydediliyor
+- `capture-order`: orderId+vaultId çifti doğrulanıyor — vault swap saldırısı önlendi
+
+**Race Condition (commit 505124b):**
+- `incrementMemorialActionAction`: read-modify-write → `increment_memorial_action_count` RPC (atomic)
+- `reactToEntryAction`: → `update_entry_reaction` RPC (atomic)
+- `reactToHeroPanelAction`: → `update_vault_reaction` RPC (atomic)
+- DB migration: 4 RPC fonksiyonu + `memorial_reactions(vault_id)` index oluşturuldu
+
+**Operasyonel (commit 505124b):**
+- `memorial_reactions` sorgusu: tüm satırlar yerine `count_memorial_reactions` RPC (aggregate)
+- `vault_memories` sorgusu: `.limit(200)` eklendi (unbounded → bounded)
+- `addWitnessAction` + `resendWitnessEmailAction`: email hataları artık action'ı çöküntürmüyor (try/catch)
+- `changeVaultStatus`: `revalidatePath('/')` eklendi (vault yayınlanınca anasayfa güncellenmiyordu)
+
+**Kod (notable istatistikler):**
+- Anasayfa notable kartlarda toplam etkileşim sayısı gösterimi
+- Profil sayfasında istatistikler anma türüne göre (custom actions)
+- `memorial_reactions` fake test verisi temizlendi
+
+### Değiştirilen Dosyalar
+- `src/app/admin/actions.ts`
+- `src/app/auth/callback/route.ts`
+- `src/app/anma-paneli/[id]/actions.ts`
+- `src/app/memorial/[slug]/actions.ts`
+- `src/lib/turnstile.ts`
+- `src/app/api/paypal/capture-order/route.ts`
+- `src/app/api/paypal/create-order/route.ts`
+- `src/lib/actions/condolences.ts`
+- `src/lib/actions/memorial-public-actions.ts`
+- `src/app/memorial/[slug]/RealMemorialPage.tsx`
+- DB: 4 RPC fonksiyon + 1 index (migration: atomic_counters_and_indexes)
+
+### Proje Durumu
+- [x] Güvenlik açıkları (kritik + yüksek) kapatıldı
+- [x] PayPal vault swap açığı kapatıldı
+- [x] Race condition atomic RPC'ye taşındı
+- [x] Sınırsız DB sorguları bounded yapıldı
+- [ ] Inbox stored XSS (DOMPurify) — henüz yapılmadı
+- [ ] Admin brute-force rate limiting — altyapı değişikliği gerekiyor
+
+### Kritik Kararlar
+- Turnstile yapılandırılmamışsa artık deny (önceden allow) — daha güvenli varsayılan
+- PayPal orderId → `external_payment_id` bağlantısı tüm yeni siparişleri kapsıyor; eski pending kayıtlar etkilenmiyor
+
+### Nerede Kaldık
+Tüm kritik ve yüksek öncelikli açıklar kapatıldı. Inbox XSS (DOMPurify) ve rate limiting açık.
+
+### Sıradaki Adım
+1. Inbox XSS: `npm install dompurify @types/dompurify` + `_InboxClient.tsx`'te sanitize
+2. Admin login rate limiting: Upstash Redis veya Cloudflare WAF
+3. Notable profil istatistikleri kullanıcı onayını bekle
+
+---
+
 ## 2026-06-14 — Oturum 113: Notable Profil İstatistikleri Debug + Test Verisi
 
 ### Yapılanlar
