@@ -3,6 +3,37 @@
 > Her oturum sonunda Claude bu dosyayı günceller.
 > Format: tarih → ne yapıldı → nerede kalındı → sıradaki adım.
 
+## 2026-06-14 — Oturum 107: Saygı Defteri + Notable Giriş Popup + Bayrak Fix
+
+### Yapılanlar
+- **Saygı Defteri**: Notable profillerde guestbook başlığı ve h2 "Saygı Defteri / Book of Tribute / Книга Уважения / პატივისცემის წიგნი" olarak değişiyor. `MemorialInteractions.tsx`'e `isNotable` prop eklendi, zincir: RealMemorialPage → Wrapper → Interactions.
+- **Notable Giriş Popup**: `NotableIntroPopup.tsx` oluşturuldu — 3D perspektif CSS animasyonu (rotateX + scale), sessionStorage ile tek gösterim (profil başına), admin'den kişiye özel metin, 4 dil close butonu, altın/koyu tema, mobil uyumlu
+- **DB migration**: `vaults.notable_intro_text text` kolonu eklendi
+- **Admin Notable Form**: "Giriş Popup Metni" textarea eklendi; boş bırakılırsa popup gösterilmez
+- **Bayrak Fix**: Flag emoji `font-serif` parent'dan kurtarıldı → `style={{ fontFamily: 'system-ui, sans-serif' }}` eklendi
+- **Fotoğraf NEXT_REDIRECT fix**: `addMemorialPhotoAction` sonundaki `redirect()` kaldırıldı, client'ta `router.refresh()` kullanıldı
+
+### Proje Durumu
+- [x] Notable profillerde Saygı Defteri başlığı
+- [x] Giriş popup (3D animasyon, admin'den metin, tek gösterim)
+- [x] Ülke bayrağı font fix
+- [x] Fotoğraf NEXT_REDIRECT hatası giderildi
+- [x] Çoklu para birimi fiyatlandırma
+
+### Kritik Kararlar / Notlar
+- Popup sessionStorage kullanıyor (localStorage değil) — tab kapatılınca sıfırlanır; kullanıcı tekrar gelince bir daha görür. Kalıcı olması istenirse localStorage'a geçilmeli.
+- `(vault as any).notable_intro_text` — Supabase'in TS tipi yeni kolonu henüz tanımıyor, `as any` geçici çözüm; `supabase gen types` çalıştırılınca kaldırılmalı
+
+### Nerede Kaldık
+feeb764 push edildi, deploy bekleniyor.
+
+### Sıradaki Adım
+1. Deploy sonrası Ilia Chavchavadze profiline popup metni gir (admin → memorial → notable form)
+2. Bayrak görünümünü test et
+3. Ses kayıtları çalarken animasyon (önceki oturumdan bekleyen)
+
+---
+
 ## 2026-06-14 — Oturum 106: Çoklu Para Birimi Fiyatlandırma (TRY/USD/RUB/GEL)
 
 ### Yapılanlar
