@@ -93,7 +93,7 @@ export default function NotableProfilesSection({ memorials }: { memorials: Notab
 
         {/* Cards */}
         <div
-          className="flex gap-3 overflow-x-auto pb-1 sm:grid sm:grid-cols-3 sm:overflow-visible lg:grid-cols-4 xl:grid-cols-5"
+          className="flex gap-2.5 overflow-x-auto pb-1 sm:grid sm:grid-cols-4 sm:overflow-visible lg:grid-cols-5 xl:grid-cols-6"
           style={{ scrollbarWidth: 'none' }}
         >
           {memorials.map((m, idx) => {
@@ -107,17 +107,17 @@ export default function NotableProfilesSection({ memorials }: { memorials: Notab
               <Link
                 key={m.id}
                 href={`/memorial/${m.slug}`}
-                className="group relative flex w-[148px] shrink-0 flex-col overflow-hidden rounded-xl border border-[#243d2e] bg-[#0c1a11] transition-all duration-300 hover:border-[#c7a76f]/60 hover:shadow-[0_0_18px_rgba(199,167,111,0.14)] sm:w-auto"
+                className="group relative flex w-[128px] shrink-0 flex-col overflow-hidden rounded-xl border border-[#243d2e] bg-[#0c1a11] transition-all duration-300 hover:border-[#c7a76f]/60 hover:shadow-[0_0_18px_rgba(199,167,111,0.14)] sm:w-auto"
               >
                 {/* Photo — tall portrait */}
-                <div className="relative w-full overflow-hidden bg-[#111d14]" style={{ height: '200px' }}>
+                <div className="relative w-full overflow-hidden bg-[#111d14]" style={{ height: '260px' }}>
                   {m.cover_photo_url ? (
                     <Image
                       src={m.cover_photo_url}
                       alt={m.display_name}
                       fill
                       priority={idx < 4}
-                      sizes="(max-width: 640px) 148px, (max-width: 1024px) 33vw, 20vw"
+                      sizes="(max-width: 640px) 128px, (max-width: 1024px) 25vw, 17vw"
                       className="object-cover object-center transition-transform duration-500 group-hover:scale-[1.04]"
                     />
                   ) : (
