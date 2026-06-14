@@ -73,6 +73,7 @@ export async function purchaseMemorialAction(_prev: unknown, formData: FormData)
   const senderName = (formData.get('sender_name') as string)?.trim()
   const senderEmail = (formData.get('sender_email') as string)?.trim().toLowerCase()
   const phone = (formData.get('phone') as string)?.trim()
+  const shippingAddress = (formData.get('shipping_address') as string)?.trim()
   const emailConsent = formData.get('email_consent') === 'on'
   const phoneConsent = formData.get('phone_consent') === 'on'
 
@@ -80,6 +81,7 @@ export async function purchaseMemorialAction(_prev: unknown, formData: FormData)
   if (!senderName) return { error: 'Ad Soyad zorunludur' }
   if (!senderEmail || !senderEmail.includes('@')) return { error: 'Geçerli bir e-posta girin' }
   if (!phone) return { error: 'Telefon numarası zorunludur' }
+  if (!shippingAddress) return { error: 'QR kod tabela kargo adresi zorunludur' }
   if (!emailConsent) return { error: 'E-posta bilgilendirme iznini onaylamanız gerekmektedir' }
   if (!phoneConsent) return { error: 'Telefon araması iznini onaylamanız gerekmektedir' }
 
@@ -130,6 +132,7 @@ export async function purchaseMemorialAction(_prev: unknown, formData: FormData)
     status: 'pending_verification',
     product_type: 'memorial_profile',
     vault_origin: 'family',
+    shipping_address: shippingAddress || null,
   }).select('id').single()
 
   if (vaultErr || !vault) return { error: 'Vault oluşturulamadı: ' + vaultErr?.message }
@@ -322,6 +325,7 @@ export async function createVaultForPayPalAction(
   const senderName  = (formData.get('sender_name') as string)?.trim()
   const senderEmail = (formData.get('sender_email') as string)?.trim().toLowerCase()
   const phone       = (formData.get('phone') as string)?.trim()
+  const shippingAddress = (formData.get('shipping_address') as string)?.trim()
   const emailConsent = formData.get('email_consent') === 'on'
   const phoneConsent = formData.get('phone_consent') === 'on'
 
@@ -377,6 +381,7 @@ export async function createVaultForPayPalAction(
     status: 'pending_verification',
     product_type: isMemorial ? 'memorial_profile' : 'life_vault',
     vault_origin: isMemorial ? 'family' : 'self',
+    shipping_address: isMemorial && shippingAddress ? shippingAddress : null,
   }).select('id').single()
 
   if (vaultErr || !vault) return { error: 'Vault oluşturulamadı: ' + vaultErr?.message }

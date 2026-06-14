@@ -122,6 +122,20 @@ export default function AnmaFormClient({
         <input type="tel" name="phone" placeholder={f.form.phonePlaceholder} required className={inp} />
         <p className="text-xs text-slate-600 mt-1">{f.form.phoneHint}</p>
       </div>
+      <div>
+        <label className="block text-xs text-slate-400 mb-1.5 font-medium">
+          QR Kod Tabela Kargo Adresi <span className="text-amber-400">*</span>
+        </label>
+        <textarea
+          name="shipping_address"
+          placeholder={"Tam adres: sokak, mahalle, ilçe, şehir, posta kodu, ülke"}
+          required
+          rows={3}
+          className={`${inp} resize-none`}
+        />
+        <p className="text-xs text-slate-600 mt-1">QR kod içeren mezar tabelası bu adrese kargo ile gönderilecektir. Daha sonra admin panelinden güncelleyebilirsiniz.</p>
+      </div>
+
       <div className="grid sm:grid-cols-2 gap-3">
         <div>
           <label className="block text-xs text-slate-400 mb-1.5 font-medium">

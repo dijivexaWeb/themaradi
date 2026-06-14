@@ -5,6 +5,7 @@ import StatusBadge from '../../_components/StatusBadge'
 import VaultStatusForm from './_VaultStatusForm'
 import NotableForm from './_NotableForm'
 import ObjectionToggleForm from './_ObjectionToggleForm'
+import ShippingAddressForm from './_ShippingAddressForm'
 import Link from 'next/link'
 
 export default async function VaultDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -105,6 +106,27 @@ export default async function VaultDetailPage({ params }: { params: Promise<{ id
             {(heirs ?? []).length === 0 && <tr><td colSpan={4} className="px-4 py-4 text-center text-slate-400">Varis yok</td></tr>}
           </tbody>
         </table>
+      </div>
+
+      {/* Shipping Address */}
+      <div className="bg-white border border-amber-200 rounded-xl shadow-sm mb-6">
+        <div className="px-5 py-4 border-b border-amber-100 flex items-center gap-2">
+          <span>📦</span>
+          <h2 className="font-semibold text-slate-800">QR Tabela Kargo Adresi</h2>
+          {vault.shipping_address ? (
+            <span className="ml-auto rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-bold text-emerald-700 uppercase tracking-wide">Adres Var</span>
+          ) : (
+            <span className="ml-auto rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-700 uppercase tracking-wide">Adres Yok</span>
+          )}
+        </div>
+        <div className="p-5">
+          {vault.shipping_address && (
+            <div className="mb-4 rounded-lg border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-700 whitespace-pre-wrap leading-6 font-mono">
+              {vault.shipping_address}
+            </div>
+          )}
+          <ShippingAddressForm vaultId={vault.id} currentAddress={vault.shipping_address ?? null} />
+        </div>
       </div>
 
       {/* Objection Toggle */}

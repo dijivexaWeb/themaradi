@@ -780,3 +780,34 @@ export async function saveHideObjection(vaultId: string, hide: boolean): Promise
   if (vault?.slug) revalidatePath(`/memorial/${vault.slug}`)
   return { success: true }
 }
+
+
+// ─── Shipping Address ─────────────────────────────────────────────────────────
+
+export async function updateShippingAddressAction(_prev: unknown, formData: FormData) {
+  const { user, profile } = await requireAdmin()
+  const vaultId = (formData.get('vault_id') as string)?.trim()
+  const shippingAddress = (formData.get('shipping_address') as string)?.trim()
+
+  if (!z.string().uuid().safeParse(vaultId).success) return { error: 'Geçersiz vault ID' }
+
+  const supabase = await createServiceClient()
+  const { error } = await supabase
+    .from('vaults')
+    .update({ shipping_address: shippingAddress || null, updated_at: new Date().toISOString() })
+    .eq('id', vaultId)
+
+  if (error) return { error: error.message }
+
+  await logAdminAction({
+    adminId: user.id,
+    adminEmail: user.email ?? profile.email ?? '',
+    action: 'shipping_address_updated',
+    entityType: 'vault',
+    entityId: vaultId,
+    newValue: { shipping_address: shippingAddress },
+  })
+
+  revalidatePath(`/admin/memorials/${vaultId}`)
+  return { success: true }
+}
