@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { addMemorialAudioAction } from '../actions'
 
 interface Props {
@@ -9,6 +10,7 @@ interface Props {
 }
 
 export default function AudioUploadForm({ vaultId, isLocked }: Props) {
+  const router = useRouter()
   const [file, setFile] = useState<File | null>(null)
   const [url, setUrl] = useState('')
   const [title, setTitle] = useState('')
@@ -42,7 +44,7 @@ export default function AudioUploadForm({ vaultId, isLocked }: Props) {
     setFile(selected)
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.SyntheticEvent<HTMLFormElement>) => {
     e.preventDefault()
     if (!title.trim()) {
       setError('Başlık zorunludur.')
@@ -129,15 +131,19 @@ export default function AudioUploadForm({ vaultId, isLocked }: Props) {
         throw new Error('Lütfen bir ses dosyası seçin veya geçerli bir URL girin.')
       }
 
-      await addMemorialAudioAction(vaultId, formData)
+      const result = await addMemorialAudioAction(vaultId, formData)
+      if (result?.error === 'auth') {
+        router.push('/login')
+        return
+      }
 
-      // Reset
       setFile(null)
       setUrl('')
       setTitle('')
       setAuthor('')
       const formEl = e.target as HTMLFormElement
       formEl.reset()
+      router.refresh()
     } catch (err: any) {
       console.error(err)
       setError(err.message || 'Ses kaydı kaydedilirken hata oluştu.')

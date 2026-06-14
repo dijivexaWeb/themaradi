@@ -3,6 +3,36 @@
 > Her oturum sonunda Claude bu dosyayı günceller.
 > Format: tarih → ne yapıldı → nerede kalındı → sıradaki adım.
 
+## 2026-06-14 — Oturum 104: Ses Kaydı "Yetkisiz Erişim" Fix (middleware.ts eksikti)
+
+### Yapılanlar
+- **`src/middleware.ts` oluşturuldu**: Proje boyunca hiç olmayan kök Next.js middleware dosyası eklendi. `updateSession()` helper'ı her request'te çağrılıyor — `/api/r2/presign` dahil. Bu olmadan Supabase, süresi dolmuş JWT token'ları yenileyemiyordu; API route `supabase.auth.getUser()` → `null` döndürüyordu → ses kaydı presign 401 "Yetkisiz erişim" hatası.
+- **i18n MemoryBookClient**: Anı Defteri bölümünün tüm metinleri 4 dile çevrildi (önceki oturumda yapıldı, bu oturumda devam eden sorun yoktu)
+
+### Proje Durumu
+- [x] `src/middleware.ts` oluşturuldu — Supabase SSR session refresh aktif
+- [x] Ses kaydı yükleme "Yetkisiz erişim" hatası giderildi (deploy sonrası doğrulanacak)
+- [x] Çoklu fotoğraf yükleme
+- [x] Kronoloji tab'da kalma
+- [x] Slayt gösterisi animasyonlu çalışıyor
+- [x] Notable sort_order landing sayfasına yansıyor
+- [x] MemoryBookClient 4 dil i18n
+
+### Kritik Kararlar / Notlar
+- Supabase SSR'ın `@supabase/ssr` paketi için kök `middleware.ts` **zorunludur** — olmadığında JWT süresi dolan kullanıcılar API route'larda 401 alır, sayfa render'larında (ISR cache'li veya taze token) 401 almayabilir.
+- Matcher: `/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)` — statik dosyalar hariç her şey
+
+### Nerede Kaldık
+`src/middleware.ts` oluşturuldu ve commit edilmesi bekleniyor. Deploy sonrası ses kaydı upload test edilecek.
+
+### Sıradaki Adım
+1. Commit + deploy: `src/middleware.ts` push et
+2. Ses kaydı yükle — "Yetkisiz erişim" hatası artık olmamalı
+3. Admin create memorial form test
+4. GA4 Realtime kontrol
+
+---
+
 ## 2026-06-14 — Oturum 103: Çoklu Fotoğraf + Kronoloji Slayt + Tab Fix
 
 ### Yapılanlar

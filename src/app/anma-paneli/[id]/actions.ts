@@ -281,10 +281,10 @@ export async function addMemorialVideoAction(vaultId: string, formData: FormData
   }
 }
 
-export async function addMemorialAudioAction(vaultId: string, formData: FormData): Promise<void> {
+export async function addMemorialAudioAction(vaultId: string, formData: FormData): Promise<{ error?: string } | void> {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
+  if (!user) return { error: 'auth' }
 
   const { data: vault } = await supabase
     .from('vaults')
@@ -321,7 +321,6 @@ export async function addMemorialAudioAction(vaultId: string, formData: FormData
 
   revalidatePath(`/anma-paneli/${vaultId}/ses-kayitlari`)
   revalidatePath(`/anma-paneli/${vaultId}`)
-  redirect(`/anma-paneli/${vaultId}/ses-kayitlari`)
 }
 
 export async function updateMemorialAudioAction(recordingId: string, vaultId: string, formData: FormData): Promise<void> {
