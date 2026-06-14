@@ -15,6 +15,7 @@ import PhotoGallery from './PhotoGallery'
 import { getTurnstileSiteKey } from '@/lib/turnstile'
 import { getTranslation } from '@/i18n/server'
 import NotableProfilePhoto from './NotableProfilePhoto'
+import LangSwitcher from './LangSwitcher'
 
 interface VaultRow {
   id: string
@@ -209,7 +210,10 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
       <nav className="sticky top-0 z-40 border-b border-[#e6dccb]/50 bg-[#fbf8f1]/96 shadow-sm backdrop-blur">
         <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5 sm:px-8">
           <BrandLogo />
-          <div className="text-xs text-[#8a7a64]">{t.memorial.digitalMemorialProfile}</div>
+          <div className="flex items-center gap-3">
+            <LangSwitcher currentLang={lang} />
+            <div className="hidden text-xs text-[#8a7a64] sm:block">{t.memorial.digitalMemorialProfile}</div>
+          </div>
         </div>
       </nav>
 
