@@ -3,6 +3,75 @@
 > Her oturum sonunda Claude bu dosyayı günceller.
 > Format: tarih → ne yapıldı → nerede kalındı → sıradaki adım.
 
+## 2026-06-14 — Oturum 101: Admin Memorial Oluşturma + Analitik + Notable Pinning
+
+### Yapılanlar
+- **Google Analytics GA4** (`G-LX3BRV79MJ`) root layout'a eklendi — `afterInteractive` strategy
+- **Notable profiller landing'de üstte** sabitlendi:
+  - Migration 017: `notable_sort_order INT` kolonu
+  - `memorial/page.tsx`: iki ayrı sorgu — notable pinned + regular paginated
+  - `_MemorialsClient.tsx`: "Ulusal Miras Profilleri" section, gold kenarlık, bayrak, sıra no badge
+  - Admin `_NotableForm.tsx`: Sıra No alanı eklendi
+- **`published_at` sıralaması**: Migration 018 + `changeVaultStatus`/`approveVault` action güncellendi, landing `updated_at` yerine `published_at` kullanıyor
+- **İtiraz bölümü toggle**: Migration 016 `hide_objection`, `_ObjectionToggleForm.tsx`, admin memorial sayfasına kart eklendi
+- **Admin: Yeni Memorial Oluştur** (`/admin/memorials/create`):
+  - `createAdminMemorial()` server action: auth user oluştur → profile insert → vault insert, hata durumunda rollback
+  - `_CreateMemorialForm.tsx`: hesap + profil + ulusal miras toggle
+  - Admin memorials listesine "+ Yeni Memorial" butonu
+- **Tagline karakter sayacı**: 0/200, 180+ kırmızı
+- **Signout fix**: `request.nextUrl.origin` kullanılıyor, `themaradi.vercel.app`'e yönlendirme sorunu giderildi
+- **revalidatePath fix**: notable kayıt sonrası slug bazlı invalidation
+
+### Proje Durumu
+- [x] Google Analytics GA4 entegrasyonu
+- [x] Notable profiller landing'de her zaman üstte
+- [x] Admin'den sıra numarası yönetimi
+- [x] published_at bazlı sıralama (update sorunu giderildi)
+- [x] İtiraz bölümü toggle (admin kontrolü)
+- [x] Admin'den direkt memorial + kullanıcı oluşturma
+- [ ] Notable profil public sayfasında bayrak görünmüyor (revalidatePath sorunu — admin'den tekrar kaydet)
+- [ ] Biyografi 404 (TypeScript temiz, büyük olasılıkla eski build, yeni deploy ile çözülür)
+
+### Kritik Kararlar / Notlar
+- Admin memorial oluştururken: auth.users → profiles → vaults sırası; vault hata verirse auth user silinir (rollback)
+- `owner_id = null` yerine yeni user oluşturma tercih edildi — tüm kod değişmeden çalışır
+- Notable profiller `is_notable=true` ise `hide_objection` otomatik true set edilir
+
+### Nerede Kaldık
+Admin memorials create sayfası (`/admin/memorials/create`) push edildi. Vercel deploy bekleniyor.
+
+### Sıradaki Adım
+1. Deploy sonrası `/admin/memorials/create` ile test profili oluştur
+2. Notable profiller için admin'den "Kaydet" → public sayfada bayrak çıkıyor mu kontrol et
+3. `NEXT_PUBLIC_APP_URL` Vercel env'de `https://theeternalmemory.com` olarak güncelle
+4. GA4 Realtime panelde ziyaret görünüyor mu kontrol et
+
+## 2026-06-13 — Oturum 100: Signout Domain Fix
+
+### Yapılanlar
+- **`src/app/auth/signout/route.ts`** düzeltildi:
+  - `NEXT_PUBLIC_APP_URL` env değişkeni yerine `request.nextUrl.origin` kullanılıyor
+  - Çıkış yaparken her zaman kullanıcının bulunduğu domain'de kalınıyor (`theeternalmemory.com` → `theeternalmemory.com/`)
+  - Önceki davranış: `themaradi.vercel.app`'e yönlendiriyordu, Turnstile orada çalışmıyor
+
+### Proje Durumu
+- [x] Signout redirect domain sorunu giderildi
+- [x] Auth callback zaten `request.url` origin kullanıyor — sorunsuz
+- [x] Login actions.ts relative path döndürüyor — sorunsuz
+- [ ] Biyografi 404 sorusu (TypeScript temiz görünüyor, muhtemelen eski bir build'den kalan)
+
+### Kritik Kararlar / Notlar
+- Sorun: `NEXT_PUBLIC_APP_URL=https://themaradi.vercel.app` set edilmiş. Çıkış yapınca yanlış domain'e gidiyordu, Cloudflare Turnstile orada domain whitelist dışı olduğu için login çalışmıyordu.
+- Çözüm: Request origin'i kullan, env var'a bağımlı olma.
+
+### Nerede Kaldık
+`auth/signout` fix push edildi (commit `f1798f5`). Vercel deploy otomatik başlayacak.
+
+### Sıradaki Adım
+1. Deploy tamamlanınca `theeternalmemory.com`'da çıkış yap → doğru domain'de kalıyor mu kontrol et
+2. `NEXT_PUBLIC_APP_URL` Vercel env'de `https://theeternalmemory.com` olarak güncellenmeli (diğer yerler için)
+3. Ulusal Miras Profili: admin panelden Ilia Chavchavadze'ye `is_notable=true` set et, public sayfa test et
+
 ## 2026-06-13 — Oturum 99: Ulusal Miras Profili
 
 ### Yapılanlar
