@@ -22,12 +22,14 @@ import {
   Menu,
   X,
   ChevronRight,
+  Package,
 } from 'lucide-react'
 
 const NAV_ITEMS = [
   { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
   { href: '/admin/verifications', label: 'Doğrulama', icon: ShieldCheck },
   { href: '/admin/kasa', label: 'Kasa / Ödemeler', icon: Wallet },
+  { href: '/admin/kargo', label: 'Kargo Takibi', icon: Package },
   { href: '/admin/memorials', label: 'Memoriallar', icon: BookOpen },
   { href: '/admin/objections', label: 'İtirazlar', icon: AlertTriangle },
   { href: '/admin/guestbook', label: 'Ziyaretçi Defteri', icon: MessageSquare },

@@ -2,7 +2,18 @@
   "permissions": {
     "allow": [
       "Bash(cat next.config.*)",
-      "Bash(ls *.config.*)"
+      "Bash(ls *.config.*)",
+      "PowerShell(cd \"c:\\\\Users\\\\Akif-MaccBook\\\\Documents\\\\themaradi\"; npx tsc --noEmit 2>&1 | Where-Object { $_ -match \"anilar|memories\" } | Select-Object -First 15)",
+      "PowerShell(cd \"c:\\\\Users\\\\Akif-MaccBook\\\\Documents\\\\themaradi\"; npx tsc --noEmit 2>&1 | Where-Object { $_ -notmatch \"validator\\\\.ts\" } | Select-Object -First 20)",
+      "PowerShell(cd \"c:\\\\Users\\\\Akif-MaccBook\\\\Documents\\\\themaradi\"; npx tsc --noEmit 2>&1 | Where-Object { $_ -notmatch \"validator\\\\.ts\" -and $_ -notmatch \"^$\" } | Where-Object { $_ -match \"biyografi|RealMemorial|NotableProfile|i18n\" } | Select-Object -First 20)",
+      "PowerShell(cd \"c:\\\\Users\\\\Akif-MaccBook\\\\Documents\\\\themaradi\"; npx tsc --noEmit 2>&1 | Where-Object { $_ -notmatch \"validator\\\\.ts\" -and $_ -match \"admin|biyografi|NotableForm|actions\" } | Select-Object -First 15)",
+      "PowerShell(cd \"c:\\\\Users\\\\Akif-MaccBook\\\\Documents\\\\themaradi\"; npx tsc --noEmit 2>&1 | Where-Object { $_ -notmatch \"validator\\\\.ts\" -and $_ -ne \"\" } | Select-Object -First 30)",
+      "mcp__claude_ai_Vercel__list_deployments",
+      "Bash(xargs grep -l \"presign\\\\|ALLOWED_CATEGORIES\\\\|audio_recording\")",
+      "Bash(git -C \"c:/Users/Akif-MaccBook/Documents/themaradi\" status --short)",
+      "Bash(git -C \"c:/Users/Akif-MaccBook/Documents/themaradi\" diff --stat HEAD)",
+      "Bash(git -C \"c:/Users/Akif-MaccBook/Documents/themaradi\" add src/app/memorial/[slug]/LangSwitcher.tsx src/app/memorial/[slug]/MemorialInteractions.tsx \"src/app/memorial/[slug]/RealMemorialPage.tsx\" devlog.md)",
+      "Bash(git -C c:/Users/Akif-MaccBook/Documents/themaradi commit -m ' *)"
     ]
   }
 }

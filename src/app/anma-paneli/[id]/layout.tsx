@@ -8,7 +8,7 @@ import Link from 'next/link'
 import {
   BookOpen, Camera, Users, MapPin, MessageCircle,
   Settings, LogOut, Eye, Headphones, Home,
-  Video, Mic, Heart, Palette, Sparkles, QrCode, BookHeart,
+  Video, Mic, Heart, Palette, Sparkles, QrCode, BookHeart, Package,
 } from 'lucide-react'
 
 export default async function AnmaPaneliLayout({
@@ -26,7 +26,7 @@ export default async function AnmaPaneliLayout({
 
   const { data: vault } = await supabase
     .from('vaults')
-    .select('id, display_name, status, slug, product_type')
+    .select('id, display_name, status, slug, product_type, shipping_address, shipping_status')
     .eq('id', id)
     .eq('owner_id', user.id)
     .eq('product_type', 'memorial_profile')
@@ -75,6 +75,7 @@ export default async function AnmaPaneliLayout({
     { href: `/anma-paneli/${id}/anma-tarzi`,   label: m.sidebar.memorialStyle,   icon: Sparkles,        badge: 0 },
     { href: `/anma-paneli/${id}/link-ayari`,   label: m.sidebar.linkAndQr,       icon: QrCode,          badge: 0 },
     { href: `/anma-paneli/${id}/dogrulama`,     label: m.sidebar.verification,    icon: Settings,        badge: 0 },
+    ...(vault.shipping_address ? [{ href: `/anma-paneli/${id}/kargo`, label: '📦 QR Tabela Kargo', icon: Package, badge: vault.shipping_status === 'delivered' ? 1 : 0 }] : []),
   ]
 
   return (

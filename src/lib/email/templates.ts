@@ -332,3 +332,137 @@ export function testEmail(toName: string): string {
     </p>
   `)
 }
+
+// ─── Shipping / Kargo Email Templates ───────────────────────────────────────
+
+export function shippingPreparingEmail(params: {
+  recipientName: string
+  vaultName: string
+  shippingAddress: string
+}): string {
+  return wrap(`
+    <h2 style="margin:0 0 8px;font-size:22px;color:#0c3327;">📦 Tabelanız Hazırlanıyor</h2>
+    <p style="margin:0 0 24px;font-size:14px;color:#788177;font-family:-apple-system,sans-serif;">
+      Merhaba <strong>${params.recipientName}</strong>, <strong>${params.vaultName}</strong> için sipariş ettiğiniz QR kod tabelası hazırlanmaya başlandı.
+    </p>
+
+    <div style="background:#fbf8f1;border:1px solid #e6dccb;border-radius:12px;padding:20px;margin-bottom:24px;">
+      <p style="margin:0 0 8px;font-size:12px;color:#c7a76f;font-family:-apple-system,sans-serif;text-transform:uppercase;letter-spacing:0.1em;">Kargo Adresi</p>
+      <p style="margin:0;font-size:14px;color:#1f2d27;font-family:-apple-system,sans-serif;line-height:1.7;white-space:pre-wrap;">${params.shippingAddress}</p>
+    </div>
+
+    <div style="background:#f0f9f4;border:1px solid #b8e0c8;border-radius:10px;padding:16px;margin-bottom:24px;">
+      <p style="margin:0;font-size:13px;color:#1a6640;font-family:-apple-system,sans-serif;line-height:1.6;">
+        ✅ Sipariş alındı<br>
+        🔄 <strong>Hazırlanıyor</strong><br>
+        📦 Kargoya verilecek<br>
+        🏠 Teslim edilecek
+      </p>
+    </div>
+
+    <p style="margin:0;font-size:13px;color:#788177;font-family:-apple-system,sans-serif;line-height:1.7;">
+      Tabelanız kargoya verildiğinde takip numaranızı içeren bir email daha alacaksınız.
+    </p>
+  `)
+}
+
+export function shippingShippedEmail(params: {
+  recipientName: string
+  vaultName: string
+  trackingNumber: string
+  trackingCarrier: string
+  shippingAddress: string
+}): string {
+  return wrap(`
+    <h2 style="margin:0 0 8px;font-size:22px;color:#0c3327;">🚚 Tabelanız Kargoya Verildi</h2>
+    <p style="margin:0 0 24px;font-size:14px;color:#788177;font-family:-apple-system,sans-serif;">
+      Merhaba <strong>${params.recipientName}</strong>, <strong>${params.vaultName}</strong> için sipariş ettiğiniz QR kod tabelası kargoya verildi.
+    </p>
+
+    <div style="background:#fbf8f1;border:1px solid #e6dccb;border-radius:12px;padding:20px;margin-bottom:24px;">
+      <p style="margin:0 0 12px;font-size:12px;color:#c7a76f;font-family:-apple-system,sans-serif;text-transform:uppercase;letter-spacing:0.1em;">Kargo Bilgileri</p>
+      <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+        <span style="font-size:13px;color:#788177;font-family:-apple-system,sans-serif;">Kargo Firması</span>
+        <span style="font-size:13px;color:#1f2d27;font-family:-apple-system,sans-serif;font-weight:600;">${params.trackingCarrier}</span>
+      </div>
+      <div style="display:flex;justify-content:space-between;">
+        <span style="font-size:13px;color:#788177;font-family:-apple-system,sans-serif;">Takip Numarası</span>
+        <span style="font-size:15px;color:#174f35;font-family:monospace;font-weight:700;letter-spacing:0.05em;">${params.trackingNumber}</span>
+      </div>
+    </div>
+
+    <div style="background:#fbf8f1;border:1px solid #e6dccb;border-radius:12px;padding:20px;margin-bottom:24px;">
+      <p style="margin:0 0 8px;font-size:12px;color:#c7a76f;font-family:-apple-system,sans-serif;text-transform:uppercase;letter-spacing:0.1em;">Teslimat Adresi</p>
+      <p style="margin:0;font-size:14px;color:#1f2d27;font-family:-apple-system,sans-serif;line-height:1.7;white-space:pre-wrap;">${params.shippingAddress}</p>
+    </div>
+
+    <div style="background:#f0f9f4;border:1px solid #b8e0c8;border-radius:10px;padding:16px;margin-bottom:24px;">
+      <p style="margin:0;font-size:13px;color:#1a6640;font-family:-apple-system,sans-serif;line-height:1.6;">
+        ✅ Sipariş alındı<br>
+        ✅ Hazırlandı<br>
+        🚚 <strong>Kargoda</strong><br>
+        🏠 Teslim edilecek
+      </p>
+    </div>
+
+    <p style="margin:0;font-size:13px;color:#788177;font-family:-apple-system,sans-serif;line-height:1.7;">
+      Tabelanız teslim edildiğinde lütfen <strong>panelinizdeki "Teslim Aldım"</strong> butonuna basın.
+    </p>
+  `)
+}
+
+export function shippingDeliveredEmail(params: {
+  recipientName: string
+  vaultName: string
+  confirmUrl: string
+}): string {
+  return wrap(`
+    <h2 style="margin:0 0 8px;font-size:22px;color:#0c3327;">🏠 Tabelanız Teslim Edildi</h2>
+    <p style="margin:0 0 24px;font-size:14px;color:#788177;font-family:-apple-system,sans-serif;">
+      Merhaba <strong>${params.recipientName}</strong>, <strong>${params.vaultName}</strong> için sipariş ettiğiniz QR kod tabelası teslim edildi olarak işaretlendi.
+    </p>
+
+    <p style="margin:0 0 20px;font-size:15px;color:#1f2d27;line-height:1.7;">
+      Tabelanızı teslim aldıysanız aşağıdaki butona basarak onaylayın.
+    </p>
+
+    <a href="${params.confirmUrl}" style="
+      display:inline-block;
+      background:#174f35;
+      color:#ffffff;
+      text-decoration:none;
+      padding:14px 32px;
+      border-radius:10px;
+      font-size:15px;
+      font-weight:600;
+      font-family:-apple-system,sans-serif;
+      margin-bottom:24px;
+    ">✅ Teslim Aldım</a>
+
+    <p style="margin:0;font-size:12px;color:#788177;font-family:-apple-system,sans-serif;line-height:1.7;">
+      Tabelanızı almadıysanız kargo firmasıyla iletişime geçin ve bize bildirin.
+    </p>
+  `)
+}
+
+export function shippingConfirmedEmail(params: {
+  recipientName: string
+  vaultName: string
+}): string {
+  return wrap(`
+    <h2 style="margin:0 0 8px;font-size:22px;color:#0c3327;">✅ Teslimat Onaylandı</h2>
+    <p style="margin:0 0 24px;font-size:14px;color:#788177;font-family:-apple-system,sans-serif;">
+      Merhaba <strong>${params.recipientName}</strong>, <strong>${params.vaultName}</strong> QR kod tabelasının teslim alındığını onayladığınız için teşekkür ederiz.
+    </p>
+
+    <p style="margin:0 0 20px;font-size:15px;color:#1f2d27;line-height:1.7;">
+      QR kodu mezar taşına yerleştirdiğinizde, ziyaretçiler telefonlarıyla okutarak <strong>${params.vaultName}</strong> anma sayfasına ulaşabilecek.
+    </p>
+
+    <div style="background:#f0f9f4;border:1px solid #b8e0c8;border-radius:10px;padding:16px;">
+      <p style="margin:0;font-size:13px;color:#1a6640;font-family:-apple-system,sans-serif;line-height:1.6;">
+        ✅ Sipariş alındı · ✅ Hazırlandı · ✅ Kargoya verildi · ✅ <strong>Teslim alındı</strong>
+      </p>
+    </div>
+  `)
+}

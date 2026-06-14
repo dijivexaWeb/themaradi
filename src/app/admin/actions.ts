@@ -5,6 +5,15 @@ import { logAdminAction } from '@/lib/admin/audit'
 import { createServiceClient } from '@/lib/supabase/server'
 import { z } from 'zod'
 import { revalidatePath } from 'next/cache'
+import { sendEmail } from '@/lib/email'
+import {
+  shippingPreparingEmail,
+  shippingShippedEmail,
+  shippingDeliveredEmail,
+  shippingConfirmedEmail,
+} from '@/lib/email/templates'
+
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://theeternalmemory.com'
 
 const ALLOWED_VAULT_STATUSES = [
   'hidden_vault',
@@ -809,5 +818,153 @@ export async function updateShippingAddressAction(_prev: unknown, formData: Form
   })
 
   revalidatePath(`/admin/memorials/${vaultId}`)
+  return { success: true }
+}
+
+// ─── Shipping Status Update ───────────────────────────────────────────────────
+
+const SHIPPING_STATUSES = ['pending', 'preparing', 'ready', 'shipped', 'delivered', 'confirmed'] as const
+type ShippingStatus = typeof SHIPPING_STATUSES[number]
+
+export async function updateShippingStatusAction(_prev: unknown, formData: FormData) {
+  const { user, profile } = await requireAdmin()
+  const vaultId = (formData.get('vault_id') as string)?.trim()
+  const newStatus = (formData.get('status') as string)?.trim() as ShippingStatus
+  const trackingNumber = (formData.get('tracking_number') as string)?.trim() || null
+  const trackingCarrier = (formData.get('tracking_carrier') as string)?.trim() || null
+
+  if (!z.string().uuid().safeParse(vaultId).success) return { error: 'Geçersiz vault ID' }
+  if (!SHIPPING_STATUSES.includes(newStatus)) return { error: 'Geçersiz status' }
+  if (newStatus === 'shipped' && !trackingNumber) return { error: 'Kargo numarası zorunludur' }
+
+  const supabase = await createServiceClient()
+
+  // Vault + owner bilgisi
+  const { data: vault, error: vaultErr } = await supabase
+    .from('vaults')
+    .select('id, display_name, shipping_address, shipping_status, owner_id')
+    .eq('id', vaultId)
+    .single()
+
+  if (vaultErr || !vault) return { error: 'Vault bulunamadı' }
+
+  const { data: ownerProfile } = await supabase
+    .from('profiles')
+    .select('full_name, email')
+    .eq('id', vault.owner_id)
+    .single()
+
+  const updates: Record<string, unknown> = {
+    shipping_status: newStatus,
+    updated_at: new Date().toISOString(),
+  }
+  if (newStatus === 'shipped') {
+    updates.tracking_number = trackingNumber
+    updates.tracking_carrier = trackingCarrier
+    updates.shipped_at = new Date().toISOString()
+  }
+  if (newStatus === 'delivered') {
+    updates.delivered_at = new Date().toISOString()
+  }
+  if (newStatus === 'confirmed') {
+    updates.shipping_confirmed_at = new Date().toISOString()
+  }
+
+  const { error } = await supabase.from('vaults').update(updates).eq('id', vaultId)
+  if (error) return { error: error.message }
+
+  await logAdminAction({
+    adminId: user.id,
+    adminEmail: user.email ?? profile.email ?? '',
+    action: 'shipping_status_updated',
+    entityType: 'vault',
+    entityId: vaultId,
+    newValue: { shipping_status: newStatus, tracking_number: trackingNumber },
+  })
+
+  // Email gönder
+  if (ownerProfile?.email) {
+    const recipientName = ownerProfile.full_name ?? 'Müşteri'
+    const vaultName = vault.display_name ?? ''
+    const shippingAddress = vault.shipping_address ?? ''
+
+    try {
+      if (newStatus === 'preparing') {
+        await sendEmail({
+          to: ownerProfile.email,
+          subject: `📦 Tabelanız hazırlanıyor — ${vaultName}`,
+          html: shippingPreparingEmail({ recipientName, vaultName, shippingAddress }),
+        })
+      } else if (newStatus === 'shipped') {
+        await sendEmail({
+          to: ownerProfile.email,
+          subject: `🚚 Tabelanız kargoya verildi — ${vaultName}`,
+          html: shippingShippedEmail({
+            recipientName,
+            vaultName,
+            trackingNumber: trackingNumber!,
+            trackingCarrier: trackingCarrier ?? 'Kargo firması',
+            shippingAddress,
+          }),
+        })
+      } else if (newStatus === 'delivered') {
+        const confirmUrl = `${SITE_URL}/anma-paneli/${vaultId}/kargo?confirm=1`
+        await sendEmail({
+          to: ownerProfile.email,
+          subject: `🏠 Tabelanız teslim edildi — ${vaultName}`,
+          html: shippingDeliveredEmail({ recipientName, vaultName, confirmUrl }),
+        })
+      }
+    } catch (e) {
+      console.error('[updateShippingStatusAction] email error:', e)
+    }
+  }
+
+  revalidatePath('/admin/kargo')
+  revalidatePath(`/admin/memorials/${vaultId}`)
+  return { success: true }
+}
+
+export async function confirmDeliveryAction(vaultId: string) {
+  const supabase = await createServiceClient()
+
+  const { data: vault, error: fetchErr } = await supabase
+    .from('vaults')
+    .select('display_name, shipping_status, owner_id')
+    .eq('id', vaultId)
+    .single()
+
+  if (fetchErr || !vault) return { error: 'Vault bulunamadı' }
+  if (vault.shipping_status !== 'delivered') return { error: 'Bu işlem şu anda yapılamaz' }
+
+  const { error } = await supabase
+    .from('vaults')
+    .update({ shipping_status: 'confirmed', shipping_confirmed_at: new Date().toISOString(), updated_at: new Date().toISOString() })
+    .eq('id', vaultId)
+
+  if (error) return { error: error.message }
+
+  const { data: ownerProfile } = await supabase
+    .from('profiles')
+    .select('full_name, email')
+    .eq('id', vault.owner_id)
+    .single()
+
+  if (ownerProfile?.email) {
+    try {
+      await sendEmail({
+        to: ownerProfile.email,
+        subject: `✅ Teslimat onaylandı — ${vault.display_name}`,
+        html: shippingConfirmedEmail({
+          recipientName: ownerProfile.full_name ?? 'Müşteri',
+          vaultName: vault.display_name ?? '',
+        }),
+      })
+    } catch (e) {
+      console.error('[confirmDeliveryAction] email error:', e)
+    }
+  }
+
+  revalidatePath(`/anma-paneli/${vaultId}/kargo`)
   return { success: true }
 }
