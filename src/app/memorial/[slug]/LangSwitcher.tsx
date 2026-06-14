@@ -2,10 +2,19 @@
 
 import { saveLang, langs } from '@/i18n'
 import { useRouter } from 'next/navigation'
+import { useEffect } from 'react'
 import type { Lang } from '@/i18n'
 
 export default function LangSwitcher({ currentLang }: { currentLang: Lang }) {
   const router = useRouter()
+
+  useEffect(() => {
+    if (document.cookie.includes('googtrans')) {
+      document.cookie = 'googtrans=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC'
+      document.cookie = 'googtrans=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC; domain=.' + window.location.hostname
+    }
+  }, [])
+
   function switchLang(code: Lang) {
     if (code === currentLang) return
     saveLang(code)
