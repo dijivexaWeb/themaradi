@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { addMemorialPhotoAction } from '../actions'
 
 interface Props {
@@ -9,6 +10,7 @@ interface Props {
 }
 
 export default function PhotoUploadForm({ vaultId, todayMax }: Props) {
+  const router = useRouter()
   const [files, setFiles] = useState<File[]>([])
   const [url, setUrl] = useState('')
   const [title, setTitle] = useState('')
@@ -78,7 +80,8 @@ export default function PhotoUploadForm({ vaultId, todayMax }: Props) {
     formData.set('file_name', file.name)
     formData.set('file_size', file.size.toString())
     formData.set('mime_type', file.type || 'image/jpeg')
-    await addMemorialPhotoAction(vaultId, formData)
+    const result = await addMemorialPhotoAction(vaultId, formData)
+    if (result?.error === 'auth') { router.push('/login'); return }
   }
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -104,7 +107,8 @@ export default function PhotoUploadForm({ vaultId, todayMax }: Props) {
         formData.set('visibility', visibility)
         formData.set('caption', caption)
         formData.set('url', url)
-        await addMemorialPhotoAction(vaultId, formData)
+        const result = await addMemorialPhotoAction(vaultId, formData)
+        if (result?.error === 'auth') { router.push('/login'); return }
       }
 
       setFiles([])
@@ -113,6 +117,7 @@ export default function PhotoUploadForm({ vaultId, todayMax }: Props) {
       setTakenAt('')
       setCaption('')
       setDone(true)
+      router.refresh()
       const formEl = e.target as HTMLFormElement
       formEl.reset()
     } catch (err: any) {

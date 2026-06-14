@@ -21,10 +21,10 @@ function cleanFilename(name: string) {
   return cleaned || 'photo'
 }
 
-export async function addMemorialPhotoAction(vaultId: string, formData: FormData): Promise<void> {
+export async function addMemorialPhotoAction(vaultId: string, formData: FormData): Promise<{ error?: string } | void> {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
-  if (!user) redirect('/login')
+  if (!user) return { error: 'auth' }
 
   const { data: vault } = await supabase
     .from('vaults')
@@ -106,7 +106,6 @@ export async function addMemorialPhotoAction(vaultId: string, formData: FormData
   if (vault?.slug) {
     revalidatePath(`/memorial/${vault.slug}`)
   }
-  redirect(`/anma-paneli/${vaultId}/fotolar`)
 }
 
 export async function updateMemorialFamilyMemberAction(
