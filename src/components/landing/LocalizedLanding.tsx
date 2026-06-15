@@ -433,87 +433,87 @@ export default function LocalizedLanding({ pricing, notableMemorials, recentMemo
           <h2 className="font-serif text-4xl text-[#173d31] sm:text-5xl">{p.heading}</h2>
           <p className="mt-4 leading-7 text-[#665d50]">{p.sub}</p>
         </div>
-        <div className="mx-auto grid max-w-4xl gap-6 md:grid-cols-2">
-          {/* Memorial Profile */}
-          <div className="flex flex-col rounded-2xl border border-[#e1d5c3] bg-[#fffdf8] p-7 shadow-sm">
-            <p className="text-xs font-semibold uppercase tracking-widest text-[#8a7a64]">{p.memorialBadge}</p>
-            <h3 className="mt-1 font-serif text-2xl text-[#173d31]">{p.memorialTitle}</h3>
-            <div className="my-5 flex items-end gap-2">
-              {pricing.campaignActive && cur.campaignMemorial ? (
-                <>
-                  <span className="font-serif text-3xl text-[#8a7a64] line-through">{cur.memorial}</span>
-                  <span className="font-serif text-5xl text-[#173d31]">{cur.campaignMemorial}</span>
-                </>
-              ) : (
-                <span className="font-serif text-5xl text-[#173d31]">{cur.memorial}</span>
-              )}
-              <div className="mb-1.5">
-                <span className="text-xl font-semibold text-[#b08340]">{cur.symbol}</span>
-                <p className="text-sm text-[#8a7a64]">{p.memorialPriceLabel}</p>
-              </div>
-            </div>
-            <ul className="flex-1 space-y-2.5">
-              {p.memorialFeatures.map((f) => (
-                <li key={f} className="flex items-center gap-2.5 text-sm text-[#4c463c]">
-                  <Check className="h-4 w-4 shrink-0 text-[#b08340]" /> {f}
-                </li>
-              ))}
-            </ul>
-            <p className="mt-4 rounded-lg border border-[#d4e8dc] bg-[#edf7f1] px-3 py-2.5 text-xs leading-5 text-[#2d5c3e]">
-              {p.memorialTrustNote}
-            </p>
-            <Link href="/satin-al/anma" className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl border border-[#c7a76f] px-5 py-3 text-sm font-semibold text-[#173d31] transition hover:bg-[#f4eee3]">
-              {p.memorialCta} <ArrowRight className="h-4 w-4" />
-            </Link>
-          </div>
 
-          {/* Life Vault */}
-          <div className="relative flex flex-col rounded-2xl border-2 border-[#b08340] bg-[#fffdf8] p-7 pt-11 shadow-lg ring-4 ring-[#b08340]/8">
-            <div className="absolute -top-4 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-full bg-[#b08340] px-5 py-1.5 text-xs font-semibold text-white shadow">
-              {p.vaultBadgeTop}
-            </div>
-            <p className="text-xs font-semibold uppercase tracking-widest text-[#8a7a64]">{p.vaultBadge}</p>
-            <h3 className="mt-1 font-serif text-2xl text-[#173d31]">{p.vaultTitle}</h3>
-            <div className="my-5">
-              <div className="flex items-end gap-2">
-                {pricing.campaignActive && cur.campaignVaultMonthly ? (
-                  <>
-                    <span className="font-serif text-3xl text-[#8a7a64] line-through">{cur.vaultMonthly}</span>
-                    <span className="font-serif text-5xl text-[#173d31]">{cur.campaignVaultMonthly}</span>
-                  </>
-                ) : (
-                  <span className="font-serif text-5xl text-[#173d31]">{cur.vaultMonthly}</span>
-                )}
-                <div className="mb-1.5">
-                  <span className="text-xl font-semibold text-[#b08340]">{p.vaultPriceMonthly}</span>
-                  <p className="text-sm text-[#8a7a64]">{p.vaultPriceAlt}</p>
+        <div className="mx-auto max-w-5xl overflow-hidden rounded-2xl shadow-xl ring-1 ring-black/10">
+          <div className="flex flex-col lg:flex-row">
+
+            {/* LEFT — dark green price panel */}
+            <div className="flex flex-col justify-between bg-[#103b2c] px-8 py-10 lg:w-72 lg:shrink-0 xl:w-80">
+              <div>
+                <span className="inline-block rounded-full border border-[#2d7a4f]/50 bg-[#0b2b20] px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-[#7ecf9e]">
+                  {p.memorialBadge}
+                </span>
+                <h3 className="mt-3 font-serif text-2xl text-white">{p.memorialTitle}</h3>
+
+                <div className="mt-6 flex items-end gap-2">
+                  {pricing.campaignActive && cur.campaignMemorial ? (
+                    <>
+                      <span className="font-serif text-3xl text-white/40 line-through">{cur.memorial}</span>
+                      <span className="font-serif text-5xl font-bold text-white">{cur.campaignMemorial}</span>
+                    </>
+                  ) : (
+                    <span className="font-serif text-5xl font-bold text-white">{cur.memorial}</span>
+                  )}
+                  <div className="mb-1.5">
+                    <span className="text-xl font-semibold text-[#a3c9b1]">{cur.symbol}</span>
+                    <p className="text-xs text-[#a3c9b1]">{p.memorialPriceLabel}</p>
+                  </div>
                 </div>
               </div>
-              <p className="text-sm text-[#8a7a64]">{p.vaultSetup.replace('49', cur.vaultSetup)}</p>
+
+              <div className="mt-8">
+                {/* Guarantee */}
+                <div className="rounded-xl border border-[#2d7a4f]/40 bg-[#0b2b20] px-4 py-3.5">
+                  <div className="flex items-start gap-2.5">
+                    <ShieldCheck className="mt-0.5 h-5 w-5 shrink-0 text-[#7ecf9e]" />
+                    <div>
+                      <p className="text-sm font-semibold text-[#7ecf9e]">{p.memorialGuaranteeBadge}</p>
+                      <p className="mt-0.5 text-xs leading-5 text-[#a3c9b1]">{p.memorialGuarantee}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* CTA */}
+                <Link
+                  href="/satin-al/anma"
+                  className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-[#e8c97e] py-3.5 text-sm font-bold text-[#1a1208] shadow-lg transition hover:bg-[#d4b56a]"
+                >
+                  {p.memorialCta} <ArrowRight className="h-4 w-4" />
+                </Link>
+
+                {/* Demo link */}
+                <Link
+                  href="/memorial/demo"
+                  className="mt-3 block text-center text-xs text-[#7ecf9e]/70 underline-offset-2 transition hover:text-[#7ecf9e] hover:underline"
+                >
+                  {p.demoProfileCta}
+                </Link>
+              </div>
             </div>
-            <ul className="space-y-2.5">
-              {p.vaultFeatures.map((f) => (
-                <li key={f} className="flex items-center gap-2.5 text-sm text-[#4c463c]">
-                  <Check className="h-4 w-4 shrink-0 text-[#b08340]" /> {f}
-                </li>
-              ))}
-            </ul>
-            <div className="mt-5 rounded-xl border border-[#b08340]/30 bg-[#fdf7eb] px-4 py-3.5">
-              <p className="flex items-start gap-2.5 text-sm leading-5 text-[#7a5a1e]">
-                <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-[#b08340]" />
-                <span>{p.vaultIncludesMemorial}</span>
-              </p>
+
+            {/* RIGHT — features panel */}
+            <div className="flex-1 bg-white px-8 py-10">
+              <p className="mb-5 text-xs font-bold uppercase tracking-wider text-[#8a7a64]">{p.memorialFeaturesHeading}</p>
+              <ul className="grid grid-cols-1 gap-x-6 gap-y-3 sm:grid-cols-2">
+                {p.memorialFeatures.map((f, i) => (
+                  <li key={i} className="flex items-start gap-2.5 text-sm text-[#4c463c]">
+                    <Check className="mt-0.5 h-4 w-4 shrink-0 text-[#2d7a4f]" />
+                    <span>{f}</span>
+                  </li>
+                ))}
+              </ul>
+              <p className="mt-4 text-[11px] text-[#8a7a64]">{p.memorialCustomDesignNote}</p>
+
+              {/* Trust note */}
+              <div className="mt-6 rounded-xl border border-[#d4e8dc] bg-[#edf7f1] px-4 py-3.5">
+                <p className="text-xs leading-5 text-[#2d5c3e]">
+                  🔒 {p.memorialTrustNote}
+                </p>
+              </div>
             </div>
-            <Link href="/satin-al/kasa" className="mt-7 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#103b2c] px-5 py-3 text-sm font-semibold text-white shadow-lg transition hover:bg-[#0b2b20]">
-              {p.vaultCta} <ArrowRight className="h-4 w-4" />
-            </Link>
+
           </div>
         </div>
-        <p className="mt-6 text-center text-sm text-[#8a7a64]">
-          <Link href="/memorial/demo" className="font-semibold text-[#9a7132] underline-offset-2 hover:underline">
-            {p.demoProfileCta}
-          </Link>
-        </p>
       </section>
 
       {/* FAQ ACCORDION */}
