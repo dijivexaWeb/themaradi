@@ -482,13 +482,15 @@ export default function LocalizedLanding({ pricing, notableMemorials, recentMemo
                 </Link>
 
                 {/* Demo link */}
-                <Link
+                <a
                   href="/memorial/demo"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-[#2d7a4f]/50 bg-[#0b2b20] py-3 text-sm font-semibold text-[#7ecf9e] transition hover:border-[#7ecf9e]/60 hover:bg-[#0e3322]"
                 >
                   <Play className="h-3.5 w-3.5 fill-current" />
                   {p.demoProfileCta}
-                </Link>
+                </a>
               </div>
             </div>
 
