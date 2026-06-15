@@ -484,8 +484,9 @@ export default function LocalizedLanding({ pricing, notableMemorials, recentMemo
                 {/* Demo link */}
                 <Link
                   href="/memorial/demo"
-                  className="mt-3 block text-center text-xs text-[#7ecf9e]/70 underline-offset-2 transition hover:text-[#7ecf9e] hover:underline"
+                  className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl border border-[#2d7a4f]/50 bg-[#0b2b20] py-3 text-sm font-semibold text-[#7ecf9e] transition hover:border-[#7ecf9e]/60 hover:bg-[#0e3322]"
                 >
+                  <Play className="h-3.5 w-3.5 fill-current" />
                   {p.demoProfileCta}
                 </Link>
               </div>
