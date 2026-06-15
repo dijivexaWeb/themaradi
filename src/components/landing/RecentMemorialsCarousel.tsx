@@ -123,7 +123,7 @@ export default function RecentMemorialsCarousel({
                   return (
                     <div
                       key={m.id}
-                      className="w-[210px] shrink-0 overflow-hidden rounded-xl bg-white shadow-lg ring-1 ring-black/5 transition-all duration-300 hover:-translate-y-1 hover:scale-[1.02] hover:shadow-2xl sm:w-[220px]"
+                      className="w-[210px] shrink-0 overflow-hidden rounded-xl bg-white shadow-lg ring-1 ring-black/5 transition-all duration-300 hover:-translate-y-1 hover:scale-[1.02] hover:ring-1 hover:ring-[#c7a76f]/60 hover:shadow-[0_4px_24px_rgba(199,167,111,0.22)] sm:w-[220px]"
                     >
                       {/* Photo */}
                       <div className="relative h-[180px] w-full overflow-hidden bg-[#ede8df]">

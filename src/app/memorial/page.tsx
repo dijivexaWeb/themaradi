@@ -20,14 +20,22 @@ export default async function MemorialsIndexPage({ searchParams }: Props) {
 
   const SELECT_FIELDS = 'id, display_name, slug, tagline, birth_date, death_date, cover_photo_url, birth_place, is_notable, nationality, notable_sort_order'
 
-  // Notable profiles — always pinned at top, ordered by sort_order then name
-  const { data: notableMemorials } = await supabase
+  // Notable profiles — always pinned at top, filtered by search/letter when active
+  let notableQuery = supabase
     .from('vaults')
     .select(SELECT_FIELDS)
     .eq('status', 'public_memorial')
     .eq('is_notable', true)
     .order('notable_sort_order', { ascending: true, nullsFirst: false })
     .order('display_name', { ascending: true })
+
+  if (searchTerm) {
+    notableQuery = notableQuery.ilike('display_name', `%${searchTerm}%`)
+  } else if (letter) {
+    notableQuery = notableQuery.ilike('display_name', `${letter}%`)
+  }
+
+  const { data: notableMemorials } = await notableQuery
 
   // Regular profiles — exclude notables, apply filters, paginate
   let query = supabase

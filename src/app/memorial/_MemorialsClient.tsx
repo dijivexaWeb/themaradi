@@ -82,7 +82,7 @@ export default function MemorialsClient({
           <div className="min-w-0 flex-1">
 
             {/* NOTABLE / PINNED SECTION */}
-            {notableMemorials.length > 0 && !searchTerm && !letter && (
+            {notableMemorials.length > 0 && (
               <div className="mb-8">
                 <div className="mb-4 flex items-center gap-2">
                   <span className="text-base">🏛</span>
