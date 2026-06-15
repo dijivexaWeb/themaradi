@@ -50,6 +50,11 @@ const en = {
         title: 'Memories are passed to generations',
         text: 'When a visitor scans the QR code, the gravestone becomes more than just a name. That person\'s life, loved ones, memories and traces they left behind become visible again. A condolence message left today can become a treasured memory for grandchildren years from now.',
       },
+      {
+        title: '30-day money-back guarantee',
+        text: 'Not satisfied with our service? We\'ll refund the full amount within 30 days, no questions asked. There\'s no risk to get started.',
+        cta: 'Create Profile Now',
+      },
     ],
 
     values: [

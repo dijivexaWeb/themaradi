@@ -3,6 +3,125 @@
 > Her oturum sonunda Claude bu dosyayı günceller.
 > Format: tarih → ne yapıldı → nerede kalındı → sıradaki adım.
 
+## 2026-06-15 — Oturum 118: themaradi quickSteps 4. Madde + İkon Renkleri
+
+### Yapılanlar (themaradi)
+- `src/components/landing/LocalizedLanding.tsx` — `QUICK 3 STEPS` bölümü güncellendi:
+  - Grid: `md:grid-cols-3` → `sm:grid-cols-2 lg:grid-cols-4`
+  - `stepIcons` dizisi: 4. ikon olarak `ShieldCheck` eklendi
+  - `stepColors` dizisi eklendi: her kart farklı renk (emerald/blue/violet/amber)
+  - 4. kartta CTA butonu eklendi → `https://theeternalmemory.com/satin-al/anma`
+- `src/i18n/tr.ts` — `quickSteps` 4. madde eklendi: "30 gün para iadesi garantisi" + `cta` alanı
+- `src/i18n/en.ts` — "30-day money-back guarantee" + cta: "Create Profile Now"
+- `src/i18n/ka.ts` — Gürcüce karşılığı eklendi
+- `src/i18n/ru.ts` — Rusça karşılığı eklendi
+
+### Değiştirilen Dosyalar
+- `src/components/landing/LocalizedLanding.tsx`
+- `src/i18n/tr.ts`
+- `src/i18n/en.ts`
+- `src/i18n/ka.ts`
+- `src/i18n/ru.ts`
+
+### Proje Durumu
+- [x] quickSteps 4. madde (30 gün garantisi)
+- [x] İkon renkleri (emerald/blue/violet/amber)
+- [x] CTA butonu → satın al sayfası
+- [ ] Inbox XSS (DOMPurify)
+- [ ] Admin brute force koruması
+- [ ] Bucket listing policy
+
+### Nerede Kaldık
+themaradi hero altındaki `quickSteps` bölümüne 4. madde eklendi, ikonlar renklendirildi, 4. karta profil oluşturma butonu bağlandı.
+
+### Sıradaki Adım
+1. Değişiklikleri local'de test et
+2. Commit + deploy
+3. Dijivexa bekleyen görevler: Header, Footer, TwoPillarsSection
+
+---
+
+## 2026-06-15 — Oturum 117: Dijivexa Anasayfa Tasarım Sistemi
+
+### Yapılanlar (Dijivexa — `C:\Users\Akif-MaccBook\Documents\dijivexa\web`)
+- `/design-consultation` skill çalıştırıldı — Dijivexa için tam tasarım sistemi kuruldu
+- **Memorable thing:** "Batumi'deki tek ciddi teknoloji firması"
+- **Tasarım tonu:** Stripe/Notion — ciddi ama erişilebilir, hem yazılımcıya hem işletme sahibine hitap eder
+- **Risk A seçildi:** Batumi kimliği birinci sırada — hero'da şehir grid'i, koordinatlar, konumlama
+- `DESIGN.md` oluşturuldu — renk sistemi, tipografi, layout, motion, component stiller
+- `app/globals.css` güncellendi — `--batumi` (#22D3EE) token, font-display/mono, section utility sınıfları
+- `app/[locale]/layout.tsx` — `Plus_Jakarta_Sans` eklendi (heading font), metadata yenilendi
+- `components/sections/HeroClient.tsx` — **tamamen yeniden yazıldı:** Batumi city grid SVG, koordinat badge, iki pillar footer (Yazılım/Ajans), güncellenen floating cards (iki pillardan örnek)
+- `components/sections/HeroSection.tsx` — yeni default içerik: "Üretiyoruz. Tasarlarız. Batumi'den."
+- `messages/tr.json` — yeni nav/hero/pillars/footer yapısı
+- Push edildi: `dijivexaWeb/dijivexaweb` main branch (commit `60035c7`)
+
+### Değiştirilen Dosyalar (Dijivexa)
+- `DESIGN.md` — yeni (tasarım kaynak gerçeği)
+- `app/globals.css`
+- `app/[locale]/layout.tsx`
+- `components/sections/HeroClient.tsx`
+- `components/sections/HeroSection.tsx`
+- `messages/tr.json`
+
+### Kritik Kararlar
+- themaradi = gold/luxury paleti → Dijivexa = dark navy + Batumi cyan (#22D3EE)
+- Hero sağ tarafı: artık SaaS dashboard değil, SVG Batumi şehir silueti
+- İki kol: Software (#3B82F6 mavi) vs Agency (#14B8A6 teal) — aynı renkler ama farklı sıcaklık
+
+### Bekleyen Görevler (Dijivexa)
+- [ ] Header.tsx — sticky, blur backdrop, Batumi badge, dil seçici
+- [ ] Footer.tsx
+- [ ] İki Kol (TwoPillarsSection) yeni bileşen
+- [ ] AgencyServicesSection yeniden yazılması
+- [ ] "Neden Batumi?" section
+- [ ] GSAP ScrollTrigger animasyonlar (gsap-scrolltrigger agent)
+- [ ] en.json / ka.json / ru.json güncelleme
+
+### Bekleyen Görevler (themaradi — önceki oturumdan)
+1. **Inbox XSS** — `_InboxClient.tsx` dangerouslySetInnerHTML → DOMPurify
+2. **Admin login brute force** — rate limit yok
+3. **Bucket listing** — Storage policy daralt
+4. **Reaction rate limit** — bot koruması
+
+### Nerede Kaldık
+Dijivexa anasayfasının tasarım temeli atıldı. Hero Batumi-first yaklaşımıyla yeniden yazıldı. Design system (DESIGN.md) hazır. Sıra navigation ve yeni section'larda.
+
+### Sıradaki Adım
+1. `components/layout/Header.tsx` — yeni navigation, Batumi badge, dil seçici
+2. `components/layout/Footer.tsx`
+3. `TwoPillarsSection` — iki kollu yeni section (Software vs Agency)
+4. `messages/en.json`, `ka.json`, `ru.json` güncelleme (hero copy)
+5. GSAP ScrollTrigger reveal animasyonları
+
+---
+
+## 2026-06-14 — Oturum 116: Sistem Denetimi + PayPal Fix
+
+### Yapılanlar
+- Kapsamlı sistem denetimi: satın alma, auth, upload'lar, admin, QR, harita
+- **KRİTİK BUG bulundu ve düzeltildi:** `capture-order/route.ts` — `service` değişkeni kullanımdan sonra tanımlanıyordu (ReferenceError) → ödeme capture her zaman crash oluyordu. Düzeltildi, push edildi (commit 9f5ff87)
+- Diğer tüm özellikler sağlıklı: R2 upload'lar, Cloudflare Stream, vault_memories, geocode, QR, contact form
+
+### Değiştirilen Dosyalar
+- `src/app/api/paypal/capture-order/route.ts` — service tanımı yukarı taşındı
+
+### Bekleyen Görevler (Yarına Bırakıldı)
+1. **Inbox XSS** — `_InboxClient.tsx` dangerouslySetInnerHTML → DOMPurify kurulumu (Orta risk)
+2. **Admin login brute force** — rate limit yok (Orta risk, Redis/Cloudflare WAF gerekiyor)
+3. **Bucket listing** — Supabase Dashboard → Storage → media + vault-media SELECT policy daralt (Düşük risk)
+4. **Reaction rate limit** — bot sayaç şişirebilir (Düşük risk)
+
+### Nerede Kaldık
+Tüm kritik güvenlik açıkları ve PayPal bug kapatıldı. Sistem production'da güvenle çalışıyor.
+
+### Sıradaki Adım
+1. `_InboxClient.tsx` → DOMPurify ile sanitize
+2. Supabase Storage dashboard'dan bucket policy daralt
+3. Admin login için rate limiting çözümü araştır
+
+---
+
 ## 2026-06-14 — Oturum 115: RLS Sertleştirme + Penetrasyon Testi
 
 ### Yapılanlar

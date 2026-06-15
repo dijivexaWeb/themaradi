@@ -30,7 +30,13 @@ import { BrandMark } from '@/components/BrandLogo'
 import RecentMemorialsCarousel, { type RecentMemorial } from './RecentMemorialsCarousel'
 import NotableProfilesSection, { type NotableMemorial } from './NotableProfilesSection'
 
-const stepIcons = [QrCode, BookOpen, Users] as const
+const stepIcons = [QrCode, BookOpen, Users, ShieldCheck] as const
+const stepColors = [
+  { bg: 'bg-emerald-50', border: 'border-emerald-200', text: 'text-emerald-600' },
+  { bg: 'bg-blue-50', border: 'border-blue-200', text: 'text-blue-600' },
+  { bg: 'bg-violet-50', border: 'border-violet-200', text: 'text-violet-600' },
+  { bg: 'bg-amber-50', border: 'border-amber-200', text: 'text-amber-600' },
+]
 const securityIcons = [LockKeyhole, Database, Server, Key, QrCode, ShieldCheck] as const
 const valueIcons = [ShieldCheck, Sparkles, QrCode, Users] as const
 const whyIcons = [BookOpen, QrCode, Users, Heart, ShieldCheck, Clock] as const
@@ -146,21 +152,30 @@ export default function LocalizedLanding({ pricing, notableMemorials, recentMemo
 
       {/* QUICK 3 STEPS */}
       <section id="nasil-calisir" className="border-b border-[#e6dccb] bg-[#fbf8f1] px-5 py-8 sm:px-8">
-        <div className="mx-auto grid max-w-7xl gap-5 md:grid-cols-3">
+        <div className="mx-auto grid max-w-7xl gap-5 sm:grid-cols-2 lg:grid-cols-4">
           {quickSteps.map((item, index) => {
             const Icon = stepIcons[index]
+            const color = stepColors[index]
             return (
-              <div key={index} className="rounded-lg border border-[#e1d5c3] bg-[#fffdf8] p-6 shadow-sm">
-                <div className="flex items-start gap-4">
-                  <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full border border-[#e1d5c3] bg-[#f4eee3] text-[#9a7132]">
+              <div key={index} className="rounded-lg border border-[#e1d5c3] bg-[#fffdf8] p-6 shadow-sm flex flex-col">
+                <div className="flex items-start gap-4 flex-1">
+                  <div className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-full border ${color.border} ${color.bg} ${color.text}`}>
                     <Icon className="h-7 w-7" />
                   </div>
-                  <div>
+                  <div className="flex-1">
                     <div className="text-xs font-semibold text-[#b08340]">{String(index + 1).padStart(2, '0')}</div>
                     <h3 className="mt-1 font-serif text-xl text-[#173d31]">{item.title}</h3>
                     <p className="mt-2 text-sm leading-6 text-[#665d50]">{item.text}</p>
                   </div>
                 </div>
+                {'cta' in item && item.cta && (
+                  <a
+                    href="https://theeternalmemory.com/satin-al/anma"
+                    className="mt-4 block w-full rounded-lg bg-[#173d31] py-2.5 text-center text-sm font-semibold text-white hover:bg-[#1f5040] transition-colors"
+                  >
+                    {item.cta}
+                  </a>
+                )}
               </div>
             )
           })}

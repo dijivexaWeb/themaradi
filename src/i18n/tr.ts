@@ -52,6 +52,11 @@ const tr: LangDict = {
         title: 'Anılar nesillere aktarılır',
         text: 'Bir ziyaretçi QR kodu okuttuğunda, mezar taşı sadece bir isim olmaktan çıkar. O kişinin hayatı, sevdikleri, anıları ve geride bıraktığı izler yeniden görünür olur. Bugün bırakılan bir taziye mesajı, yıllar sonra torunları için çok değerli bir hatıraya dönüşebilir.',
       },
+      {
+        title: '30 gün para iadesi garantisi',
+        text: 'Hizmetimizi beğenmediniz mi? 30 gün içinde hiçbir soru sormadan ücretin tamamını iade ediyoruz. Başlamak için hiçbir risk yok.',
+        cta: 'Hemen Profil Oluştur',
+      },
     ],
 
     values: [
