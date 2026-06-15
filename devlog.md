@@ -3,6 +3,29 @@
 > Her oturum sonunda Claude bu dosyayı günceller.
 > Format: tarih → ne yapıldı → nerede kalındı → sıradaki adım.
 
+## 2026-06-15 — Oturum 119: RecentMemorialsCarousel Yenileme
+
+### Yapılanlar
+- `src/components/landing/RecentMemorialsCarousel.tsx` tamamen yenilendi:
+  - Sol panel: `ShieldCheck` + "Aile Onaylı" badge eklendi
+  - Sağ panel zemin: `#173d31` → `#0d1f15`, dot pattern opacity artırıldı, radial glow + üst/alt fade
+  - Kart hover: `scale-[1.02] -translate-y-1 shadow-2xl` animasyonu
+  - Fotoğraf üstüne gradient overlay + sağ alt köşe "Onaylı" verified badge
+  - Dış sarmalayıcı: `ring-1 ring-[#d9cebd] shadow-md` ile çerçeveli görünüm
+  - Sol panel bg: `#fbf8f1` → `#fffdf8` (biraz daha temiz)
+
+### Değiştirilen Dosyalar
+- `src/components/landing/RecentMemorialsCarousel.tsx`
+
+### Nerede Kaldık
+Son yayınlanan profiller alanı güven sinyali ve rafine görünümle yenilendi. Commit: 32fe242
+
+### Sıradaki Adım
+1. Sayfayı local'de test et
+2. Dijivexa bekleyen: Header, Footer, TwoPillarsSection
+
+---
+
 ## 2026-06-15 — Oturum 118: themaradi quickSteps 4. Madde + İkon Renkleri
 
 ### Yapılanlar (themaradi)
