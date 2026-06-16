@@ -400,7 +400,7 @@ export default function LocalizedLanding({ pricing, notableMemorials, recentMemo
               {s.security.body}
             </p>
             <div className="mt-6 rounded-xl border border-[#d4e8dc] bg-[#edf7f1] p-4 text-sm text-[#2d5c3e]">
-              <strong>Ömür boyu açık kalma taahhüdü.</strong> {s.security.commitment}
+              <strong>{s.footer.commitment}</strong> {s.security.commitment}
             </div>
             <Link href="/privacy" className="mt-5 inline-flex items-center gap-2 text-sm font-semibold text-[#9a7132]">
               {s.security.readPrivacy} <ArrowRight className="h-4 w-4" />

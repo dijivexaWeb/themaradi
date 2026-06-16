@@ -94,6 +94,23 @@ const authCopy: Record<Lang, {
     and: 'and',
     tos: 'Terms of Service',
   },
+  hy: {
+    login: 'Մուտք գործել',
+    email: 'Էլ. փոստի հասցե',
+    password: 'Գաղտնաբառ',
+    submitLogin: 'Մուտք գործել',
+    resetPassword: 'Սահմանել / մոռացել եմ գաղտնաբառը',
+    resetSent: 'Գաղտնաբառի սահմանման հղումն ուղարկվել է ձեր էլ. փոստին:',
+    resetNeedsEmail: 'Նախ մուտքագրեք ձեր էլ. փոստի հասցեն:',
+    loading: 'Բեռնվում է...',
+    error: 'Էլ. փոստը կամ գաղտնաբառը սխալ է:',
+    errorUnconfirmed: 'Ձեր էլ. փոստը դեռ հաստատված չէ: Ստուգեք մուտքային և spam թղթապանակը:',
+    errorCaptcha: 'CAPTCHA ստուգումը ձախողվեց: Թարմացրեք էջը և կրկին փորձեք:',
+    terms: 'Շարունակելով՝ դուք ընդունում եք',
+    privacy: 'Գաղտնիության քաղաքականությունը',
+    and: 'և',
+    tos: 'Օգտագործման պայմանները',
+  },
 }
 
 export default function LoginPageClient({ siteKey }: { siteKey: string }) {

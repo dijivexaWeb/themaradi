@@ -101,6 +101,10 @@ const interactionCopy: Record<Lang, InteractionCopy> = {
     title: 'Поделитесь', titleAccent: 'своими чувствами.', candle: 'Зажечь свечу', candleDone: 'Свеча зажжена', flower: 'Оставить цветок', flowerDone: 'Цветок оставлен', prayer: 'Помолиться', prayerDone: 'Молитва отправлена', candleUnit: 'свечей', flowerUnit: 'цветов', prayerUnit: 'молитв', ctaTitle: 'Хотите оставить сообщение с соболезнованием?', notableCtaTitle: 'Вы можете написать несколько слов уважения.', ctaText: 'Ваше сообщение будет опубликовано после одобрения наследником.', notableCtaText: 'Оставьте короткое сообщение уважения.', messageButton: 'Оставить сообщение', formTitle: 'Ваше сообщение с соболезнованием', formText: 'После одобрения оно появится на странице.', name: 'Ваше имя', namePlaceholder: 'Имя и фамилия', relation: 'Связь', relationPlaceholder: 'Сосед, ученик, ...', message: 'Сообщение', messagePlaceholder: 'Напишите соболезнование здесь...', send: 'Отправить', cancel: 'Отмена', optional: 'необязательно', contact: 'Контакт', contactOptional: 'необязательно · передается семье', contactPlaceholder: 'Email или телефон', contactHelp: 'Контактная информация передается только семье и не отображается на странице.', anonymous: 'Продолжить анонимно',
     actions: { candle: { emoji: '🕯️', title: 'Вы зажигаете свечу', desc: 'Каждая свеча освещает одно воспоминание.', confirmLabel: 'Зажечь свечу', color: 'amber' }, flower: { emoji: '🌹', title: 'Вы оставляете цветок', desc: 'Каждый цветок выражает глубокое уважение.', confirmLabel: 'Оставить цветок', color: 'rose' }, prayer: { emoji: '🤲', title: 'Вы молитесь', desc: 'Каждая молитва звучит любовью и тоской.', confirmLabel: 'Помолиться', color: 'gold' } }
   },
+  hy: {
+    title: 'Կիսվեք', titleAccent: 'ձեր զգացմունքներով:', candle: 'Վառել մոմ', candleDone: 'Մոմը վառվեց', flower: 'Թողնել ծաղիկ', flowerDone: 'Ծաղիկը թողնված է', prayer: 'Աղոթել', prayerDone: 'Աղոթքն ուղարկվեց', candleUnit: 'մոմ', flowerUnit: 'ծաղիկ', prayerUnit: 'աղոթք', ctaTitle: 'Ցանկանում եք թողնել ցավակցության մեսիջ?', notableCtaTitle: 'Կարող եք կիսվել հարգանքի մի քանի խոսքով:', ctaText: 'Ձեր մեսիջը կհրապարակվի ժառանգորդի հաստատումից հետո:', notableCtaText: 'Թողեք հարգանքի կարճ մեսիջ:', messageButton: 'Թողնել մեսիջ', formTitle: 'Ձեր ցավակցության մեսիջը', formText: 'Հաստատումից հետո կերևա էջում:', name: 'Ձեր անունը', namePlaceholder: 'Ձեր անուն ազգանունը', relation: 'Կապ', relationPlaceholder: 'Հարևան, աշակերտ, ...', message: 'Ձեր մեսիջը', messagePlaceholder: 'Գրեք ձեր ցավակցության մեսիջն այստեղ...', send: 'Ուղարկել', cancel: 'Չեղարկել', optional: 'կամընտիր', contact: 'Կապ', contactOptional: 'կամընտիր · փոխանցվում է ընտանիքին', contactPlaceholder: 'Էլ. փոստ կամ հեռախոս', contactHelp: 'Կոնտակտային տվյալները փոխանցվում են միայն ընտանիքին և չեն երևում էջում:', anonymous: 'Շարունակել անանուն',
+    actions: { candle: { emoji: '🕯️', title: 'Դուք վառում եք մոմ', desc: 'Յուրաքանչյուր մոմ լուսավորում է մի հիշողություն:', confirmLabel: 'Վառել մոմը', color: 'amber' }, flower: { emoji: '🌹', title: 'Դուք թողնում եք ծաղիկ', desc: 'Յուրաքանչյուր ծաղիկ խորին հարգանքի արտահայտություն է:', confirmLabel: 'Թողնել ծաղիկը', color: 'rose' }, prayer: { emoji: '🤲', title: 'Դուք աղոթում եք', desc: 'Յուրաքանչյուր աղոթք սերի և կարոտի արձագանք է:', confirmLabel: 'Աղոթել', color: 'gold' } }
+  },
 }
 interface InitialCounts { candle: number; flower: number; prayer: number }
 
@@ -218,21 +222,21 @@ export default function MemorialInteractions({ condolences, vaultId, initialCoun
               <span className="h-px w-10 bg-[#c7a76f]" />
               <span className="text-xs tracking-[0.2em] uppercase">
                 {isNotable
-                  ? (lang === 'tr' ? 'Saygı Defteri' : lang === 'ka' ? 'პატივისცემის წიგნი' : lang === 'ru' ? 'Книга Уважения' : 'Book of Tribute')
-                  : (lang === 'tr' ? 'Taziye Defteri' : lang === 'ka' ? 'სამძიმრის წიგნი' : lang === 'ru' ? 'Книга соболезнований' : 'Condolence Book')
+                  ? (lang === 'tr' ? 'Saygı Defteri' : lang === 'ka' ? 'პატივისცემის წიგნი' : lang === 'ru' ? 'Книга Уважения' : lang === 'hy' ? 'Հարգանքի գիրք' : 'Book of Tribute')
+                  : (lang === 'tr' ? 'Taziye Defteri' : lang === 'ka' ? 'სამძიმრის წიგნი' : lang === 'ru' ? 'Книга соболезнований' : lang === 'hy' ? 'Ցավակցության գիրք' : 'Condolence Book')
                 }
               </span>
               <span className="h-px w-10 bg-[#c7a76f]" />
             </div>
             <h2 className="mt-3 font-serif text-4xl text-white sm:text-5xl">
               {isNotable
-                ? (lang === 'tr' ? 'Saygı ve' : lang === 'ka' ? 'პატივისცემისა და' : lang === 'ru' ? 'Пространство' : 'A space of')
-                : (lang === 'tr' ? 'Sevenlerinin' : lang === 'ka' ? 'საყვარელი ადამიანების' : lang === 'ru' ? 'Словами' : 'With words of')
+                ? (lang === 'tr' ? 'Saygı ve' : lang === 'ka' ? 'პატივისცემისა და' : lang === 'ru' ? 'Пространство' : lang === 'hy' ? 'Հարգանքի և' : 'A space of')
+                : (lang === 'tr' ? 'Sevenlerinin' : lang === 'ka' ? 'საყვარელი ადამიანების' : lang === 'ru' ? 'Словами' : lang === 'hy' ? 'Սիրելիների' : 'With words of')
               }<br />
               <span className="text-[#c7a76f]">
                 {isNotable
-                  ? (lang === 'tr' ? 'minnettarlığınızı.' : lang === 'ka' ? 'მადლიერების სივრცე.' : lang === 'ru' ? 'уважения и благодарности.' : 'respect and gratitude.')
-                  : (lang === 'tr' ? 'sözleriyle.' : lang === 'ka' ? 'სიტყვებით.' : lang === 'ru' ? 'любящих.' : 'loved ones.')
+                  ? (lang === 'tr' ? 'minnettarlığınızı.' : lang === 'ka' ? 'მადლიერების სივრცე.' : lang === 'ru' ? 'уважения и благодарности.' : lang === 'hy' ? 'երախտագիտության տարածք:' : 'respect and gratitude.')
+                  : (lang === 'tr' ? 'sözleriyle.' : lang === 'ka' ? 'სიტყვებით.' : lang === 'ru' ? 'любящих.' : lang === 'hy' ? 'խոսքերով:' : 'loved ones.')
                 }
               </span>
             </h2>
@@ -324,8 +328,8 @@ export default function MemorialInteractions({ condolences, vaultId, initialCoun
             <div className="overflow-hidden rounded-2xl border border-white/10 bg-[#0d1412] shadow-2xl shadow-black/25">
               <div className="border-b border-white/10 bg-white/[0.03] px-4 py-3 text-xs font-semibold text-[#cfc3ad]">
                 {isNotable
-                  ? (lang === 'tr' ? 'Saygı mesajları.' : lang === 'ka' ? 'პატივისცემის შეტყობინებები.' : lang === 'ru' ? 'Сообщения уважения.' : 'Messages of tribute.')
-                  : (lang === 'tr' ? 'Sevenlerinin sözleriyle.' : lang === 'ka' ? 'საყვარელი ადამიანების სიტყვებით.' : lang === 'ru' ? 'Словами любящих.' : 'With words of loved ones.')}
+                  ? (lang === 'tr' ? 'Saygı mesajları.' : lang === 'ka' ? 'პატივისცემის შეტყობინებები.' : lang === 'ru' ? 'Сообщения уважения.' : lang === 'hy' ? 'Հարգանքի մեսիջներ:' : 'Messages of tribute.')
+                  : (lang === 'tr' ? 'Sevenlerinin sözleriyle.' : lang === 'ka' ? 'საყვარელი ადამიანების სიტყვებით.' : lang === 'ru' ? 'Словами любящих.' : lang === 'hy' ? 'Սիրելիների խոսքերով:' : 'With words of loved ones.')}
               </div>
 
               <div className="divide-y divide-white/8">
@@ -622,7 +626,7 @@ function InteractionButton({
     >
       <div className="flex h-10 items-end justify-center sm:h-16">{icon}</div>
       <div>
-        <div className="font-serif text-xl text-white sm:text-2xl">{count.toLocaleString(lang === 'ka' ? 'ka-GE' : lang === 'ru' ? 'ru-RU' : lang === 'en' ? 'en-US' : 'tr-TR')}</div>
+        <div className="font-serif text-xl text-white sm:text-2xl">{count.toLocaleString(lang === 'ka' ? 'ka-GE' : lang === 'ru' ? 'ru-RU' : lang === 'en' ? 'en-US' : lang === 'hy' ? 'hy-AM' : 'tr-TR')}</div>
         <div className="mt-0.5 text-xs text-[#b8aa93] sm:mt-1">{label}</div>
       </div>
     </button>
