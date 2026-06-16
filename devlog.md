@@ -3,6 +3,40 @@
 > Her oturum sonunda Claude bu dosyayı günceller.
 > Format: tarih → ne yapıldı → nerede kalındı → sıradaki adım.
 
+## 2026-06-16 — Oturum 120: Ermenice (hy) Dil Desteği
+
+### Yapılanlar
+- `src/i18n/hy.ts` oluşturuldu — Doğu Ermenicesi, `LangDict` ile birebir tip uyumlu, tüm site metinleri (landing, pricing, contact, legal/privacy/terms/kvkk/cookies/verification, memorial panel, dashboard, memorial profil sayfası, satın alma akışı, hakkımızda) çevrildi
+- `src/i18n/index.ts` — `Lang` tipine `'hy'` eklendi, `langs` dizisine `{ code: 'hy', label: 'Հայերեն', flag: 'AM' }` eklendi, tarayıcı dili algılamaya `hy` branch'i eklendi
+- `GoogleTranslate.tsx` — `includedLanguages`'e `hy` eklendi
+- Lang tipinin genişlemesiyle ortaya çıkan 6 dosyadaki yerel `Record<Lang,...>` çeviri objelerine `hy` girdisi eklendi: `_LoginPageClient.tsx`, `NotableIntroPopup.tsx`, `NotableShareButton.tsx`, `MemorialInteractions.tsx`, `MemorialPageClient.tsx` (demo profil — Ahmet Yılmaz biyografisi dahil, `journeyUi`/`familyUi` objeleri dahil), `RealMemorialPage.tsx`'teki ad-hoc ternary zincirleri
+- **Bug fix (tüm diller için):** `LocalizedLanding.tsx`'te hardcoded Türkçe "Ömür boyu açık kalma taahhüdü" metni `s.footer.commitment` i18n key'ine bağlandı — önceden TR olmayan dillerde de Türkçe görünüyordu
+- `npx tsc --noEmit` ve `npm run build` ile doğrulandı — temiz geçti
+- `/browse` skill ile localhost:3010'da canlı test edildi: dil seçiciden Armenian (AM/Հայերեն) seçildi, console hatası yok, tüm bölümler doğru Ermenice render oluyor
+
+### Kritik Kararlar / Notlar
+- Doğu Ermenicesi seçildi (Ermenistan resmi dili), Batı Ermenicesi değil — kullanıcı onayıyla
+- `MemorialPageClient.tsx`'teki demo profil (Ahmet Yılmaz biyografisi) ka/ru'nun izlediği `...memorialCopyBase.en` spread + override pattern'i ile tam çevrildi (kısayol alınmadı)
+- Ermenice metinlerde `ֆ` harfini yazarken modelin tutarlı bir Unicode karıştırma sorunu (`֖` ile karışıyor) yaşandı — placeholder tekniğiyle (`FFF` → `ֆ`, `PROFILE` → `պրոֆիլ`) çözüldü, sonda tek seferlik global replace yapıldı
+
+### Proje Durumu
+- [x] Ermenice dil desteği — tüm site
+- [x] TypeScript + build doğrulaması
+- [x] Tarayıcı testi (browse skill)
+- [ ] Inbox XSS (DOMPurify)
+- [ ] Admin brute force koruması
+- [ ] Bucket listing policy
+
+### Nerede Kaldık
+Ermenice dil desteği uçtan uca tamamlandı, test edildi, push edildi (commit `ab905ed`). Dev server kapatıldı.
+
+### Sıradaki Adım
+1. Üretimde (Vercel) Ermenice'yi gerçek bir kullanıcıyla/ana dili konuşan biriyle doğrulamak iyi olur (AI çevirisi, native review yapılmadı)
+2. Bekleyen güvenlik görevleri: Inbox XSS, admin brute force, bucket listing policy
+3. Dijivexa bekleyen: Header, Footer, TwoPillarsSection
+
+---
+
 ## 2026-06-15 — Oturum 119: RecentMemorialsCarousel Yenileme
 
 ### Yapılanlar
