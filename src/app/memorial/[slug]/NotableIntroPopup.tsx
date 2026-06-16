@@ -9,6 +9,7 @@ const CLOSE_LABELS: Record<Lang, string> = {
   ru: 'Продолжить',
   en: 'Continue',
   hy: 'Շարունակել',
+  az: 'Davam Et',
 }
 
 const BADGE_LABELS: Record<Lang, string> = {
@@ -17,6 +18,7 @@ const BADGE_LABELS: Record<Lang, string> = {
   ru: 'Профиль Национального Наследия',
   en: 'National Heritage Profile',
   hy: 'Ազգային ժառանգության պրոֆիլ',
+  az: 'Milli İrs Profili',
 }
 
 interface Props {

@@ -3,8 +3,9 @@ import tr from './tr'
 import ka from './ka'
 import ru from './ru'
 import hy from './hy'
+import az from './az'
 
-export type Lang = 'tr' | 'ka' | 'ru' | 'en' | 'hy'
+export type Lang = 'tr' | 'ka' | 'ru' | 'en' | 'hy' | 'az'
 
 export const langs: { code: Lang; label: string; flag: string }[] = [
   { code: 'ka', label: 'ქართული', flag: 'KA' },
@@ -12,9 +13,10 @@ export const langs: { code: Lang; label: string; flag: string }[] = [
   { code: 'ru', label: 'Русский', flag: 'RU' },
   { code: 'en', label: 'English', flag: 'EN' },
   { code: 'hy', label: 'Հայերեն', flag: 'AM' },
+  { code: 'az', label: 'Azərbaycanca', flag: 'AZ' },
 ]
 
-export const dictionaries: Record<Lang, LangDict> = { en, tr, ka, ru, hy }
+export const dictionaries: Record<Lang, LangDict> = { en, tr, ka, ru, hy, az }
 
 function getCookieLang(): Lang | null {
   if (typeof document === 'undefined') return null
@@ -42,6 +44,7 @@ export function detectLang(): Lang {
   if (browser === 'tr') return 'tr'
   if (browser === 'ru') return 'ru'
   if (browser === 'hy') return 'hy'
+  if (browser === 'az') return 'az'
   return 'en'
 }
 

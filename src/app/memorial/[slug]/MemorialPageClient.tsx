@@ -37,6 +37,7 @@ const localeByLang: Record<Lang, string> = {
   ru: 'ru-RU',
   en: 'en-US',
   hy: 'hy-AM',
+  az: 'az-AZ',
 }
 
 const memorialCopyBase = {
@@ -501,6 +502,76 @@ const memorialCopy: Record<Lang, typeof memorialCopyBase.tr> = {
     demoBanner: { text: 'Սա ցուցադրական պրոֆիլ է:', cta: 'Ստեղծել պրոֆիլ', home: 'Գլխավոր' },
     bottomCta: { heading: 'Դուք նույնպես կարող եք այսպես հարգել ձեր սիրելիների հիշատակը:', sub: 'Այսպիսի պրոֆիլ ստեղծվում է ընդամենը մի քանի րոպեում:', primaryBtn: 'Տեսնել գները', secondaryBtn: 'Գլխավոր էջ' },
   },
+  az: {
+    ...memorialCopyBase.en,
+    nav: { home: 'Ana Səhifə', how: 'Necə İşləyir', memorials: 'Rəqəmsal Abidələr', contact: 'Əlaqə', start: 'Başla' },
+    hero: { imageAlt: 'Xatirə sahəsi', portraitAlt: 'Əhməd Yılmaz', qr: 'QR ilə çıxış', badge: 'Rəqəmsal Xatirə Profili', motto: 'Sevgi ilə yaşadı, sevgi ilə xatırlanır.', familyTitle: 'Ailəsindən', familyNote: 'Hörmətlə xatırlayırıq onu. Bizə qoyduğu səbir, xeyirxahlıq və sevgi bu gün də yolumuzu işıqlandırır. O, hər duada, hər süfrədə və hər isti xatirədə bizimlədir.', messageTitle: 'Onun sözləri', messageNote: 'Öyrəndim ki, həyatda ən qiymətli şey sevgidir. Bir-birinizə xeyirxah olun, incitmədən danışın və xeyirə tərəf gedin.', sinceLabel: 'Əbədiyyətə qovuşandan', sinceSuffix: 'gün oldu', book: 'Xatirə Dəftəri', explore: 'Xatirələrə Bax', scroll: 'Sürüşdür', yearsLine: 'illik dolu və bərəkətli həyat' },
+    stats: [
+      { suffix: 'il', label: 'Bərəkətli həyat' },
+      { number: '55', suffix: 'il', label: 'Evlilik' },
+      { number: '3 övlad', suffix: '7 nəvə', label: 'Qoyduğu nəsil' },
+      { number: '2 700+', suffix: 'tələbə', label: 'Tərbiyə etdiyi insanlar' },
+    ],
+    tabs: ['Həyat Hekayəsi', 'Xronologiya', 'Videolar', 'Fotolar', 'Son Mesaj', 'Başsağlığı', 'Ziyarət'],
+    story: {
+      label: 'Həyat Hekayəsi',
+      titleA: 'Müəllimin',
+      titleB: 'dolu həyatı.',
+      paragraphs: [
+        'Əhməd Yılmaz 1940-cı ildə Konyanın tarixi mühitində, sadə bir ailədə dünyaya gəldi. Uşaqlığından kitablara və öyrənməyə olan sevgisi onu yaşıdlarından fərqləndirirdi. Məhəllə məktəbində aldığı ilk dərslər onda ömürlük bir işıq yandırdı.',
+        'Ankarada müəllimlik məktəbini bitirib işə başlayanda yalnız on səkkiz yaşında idi. Sıx siniflərdə, köhnə partaların yanında və kömür sobasının kənarında dərs deyərkən heç vaxt şikayətlənmədi. Deyirdi: "İnsan nə qədər çox versə, bir o qədər varlanır." Və həqiqətən belə yaşadı.',
+        '1965-ci ildə Fatma ilə qurduğu ailə onun üçün hər şeyin mərkəzi idi. Üç övlad və yeddi nəvə dünyaya qoyduğu ən gözəl irs oldu. Təqaüdə çıxdıqdan sonra illərini bağda, nəvələri və kitablarla keçirdi. Hər səhər dua ilə başlayır, hər axşam minnətdarlıqla tamamlanırdı.',
+      ],
+      quote: 'Onun səhər duası heç vaxt dəyişmədi. Əlli il eyni dua, eyni səs, eyni sakitlik. O səssiz səhərləri bu günə qədər doldura bilmirəm.',
+      relation: 'Həyat yoldaşı — 55 il birlikdə',
+      books: 'Oxuduğu kitab',
+      teaching: 'İl müəllimlik',
+    },
+    timelineLabel: 'Həyat Xronologiyası',
+    timelineTitleA: 'Mühüm anlara',
+    timelineTitleB: 'bir səyahət.',
+    timelineEvents: [
+      { year: '1940', title: 'Doğuldu', desc: 'Konyanın tarixi mühitində, sadə bir ailədə doğuldu. Uşaqlığından kitablara və biliyə olan sevgisi ilə seçilirdi.' },
+      { year: '1958', title: 'Müəllimlik yoluna başladı', desc: 'Ankaraya köçdü və ən yaxşı nəticə ilə müəllimlik imtahanını keçdi. Deyirdi: "İnsanlara öyrətmək, onlara işıq verməkdir."' },
+      { year: '1965', title: 'Həyatını Fatmaya bağladı', desc: 'Birlikdə 55 il keçirəcəkləri yola çıxdılar. Ankarada sadə bir toy ilə başlayan bu səyahət ömür boyu davam etdi.' },
+      { year: '1967', title: 'Ata oldu', desc: 'İlk övladı Həsən doğuldu. Sonrakı illərdə ailəyə Zeynəb və Əli də qatıldı. Üç övlad və yeddi nəvə onun ən böyük irsi oldu.' },
+      { year: '1985', title: 'Təqaüdə çıxdı', desc: '27 il ərzində minlərlə tələbə tərbiyə etdi. Son gün bütün məktəb vidalaşmaq üçün toplaşdı. Heç kim göz yaşlarını saxlaya bilmədi.' },
+      { year: '2020', title: 'Əbədiyyətə qovuşdu', desc: 'Səksən illik bərəkətli həyatdan sonra sevdikləri əhatəsində sakitcə vidalaşdı. Saysız xatirə və dərin sevgi qoyub getdi.' },
+    ],
+    videos: { label: 'Video Xatirələr', titleA: 'Hərəkət edən', titleB: 'anlar.', featured: 'Seçilmiş', demo: 'Bu videolar nümunə məqsədlidir.' },
+    videoMemories: ['70 yaş gününün qeyd olunması', 'Nəvələrlə son bayram', 'Gürcüstana səyahət', 'Təqaüd mərasimi'],
+    photos: { label: 'Foto Arxivi', titleA: 'Donmuş anlar,', titleB: 'canlı xatirələr.', count: 'foto' },
+    photoTitles: ['İlk ailə fotosu', 'Bayram süfrəsi', 'Gürcüstana səyahət', 'Son ailə fotosu', 'Bağda günorta', 'Təqaüd illəri'],
+    finalMessage: {
+      label: 'Son Mesaj',
+      titleA: 'Sağ ikən qoyduğu',
+      titleB: 'sözlər sevdikləri üçün.',
+      lines: ['Əzizlərim,', 'Öyrəndim ki, həyatda ən qiymətli şey sevgidir. Nəyə sahib olduğunuza baxmayın; yanınızdaki insanlara baxın. Həqiqi sərvət onlardadır.', 'Həmişə bir-birinizə xeyirxah olun. İncitmədən danışın və əlinizdən gəldikcə kömək edin. Kiçik bir xeyirxahlıq belə böyük bir qaranlığı işıqlandırar.', 'Yadda saxlayın, mən həmişə sizinləyəm. Hər duada, hər ətirdə və hər bölüşülən süfrədə yanınızda olacağam.', 'Sevgi ilə qalın.'],
+      placeDate: 'Konya, 12 mart 2020',
+    },
+    voices: { label: 'Səs Xatirələri', titleA: 'Onun səsi', titleB: 'hələ də buradadır.', demo: 'Nümunə səs yazısı' },
+    voiceMemories: [
+      { title: 'Səhər duası', author: 'Əhməd bəyin səsi ilə' },
+      { title: 'Nəvələrimə vəsiyyətim', author: 'Əhməd bəyin səsi ilə' },
+      { title: 'Atam həmişə bizimlə idi', author: 'Qızı Zeynəb danışır' },
+    ],
+    featured: { label: 'Seçilmiş Xatirələr', titleA: 'Sevdiklərinin', titleB: 'sözləri ilə.' },
+    featuredMemories: [
+      { quote: 'Hər səhər tez qalxır və qəhvə içərkən duasını heç vaxt buraxmırdı. O səssiz səhərləri bu gün də darıxıram.', author: 'Zeynəb Yılmaz', relation: 'Qızı' },
+      { quote: 'O bizə yalnız dərsi deyil, həyatı öyrətdi. Lövhəyə yazdığı hər cümlə bir həyat dərsi idi. Onu heç vaxt unutmayacağıq.', author: 'Mehmet Arslan', relation: 'Keçmiş tələbə' },
+      { quote: 'Əlimdən tutanda dünya dayanırmış kimi olurdu. Belə bir etibar başqa yerdə yox idi. Əlli beş il belə davam etdi.', author: 'Fatma Yılmaz', relation: 'Həyat yoldaşı' },
+    ],
+    condolences: [
+      { name: 'Ayşe Demir', date: '20 may 2024', relation: 'Qonşu', text: 'Allah müəllimimiz Əhmədə rəhmət eləsin. Ruhu şad olsun. O insanlığın bir nümunəsi idi və hamı onu sevirdi.' },
+      { name: 'Mehmet Arslan', date: '18 may 2024', relation: 'Tələbə', text: 'Əziz müəllim, sizin tələbələrinizdən biri olaraq sizi heç vaxt unutmayacağam. İşıqda yatın.' },
+      { name: 'Fatma Kaya', date: '16 may 2024', relation: 'Qonşu', text: 'Sizin nəzakətiniz və xeyirxahlığınız həmişə xatırlanacaq. Bizə gözəl xatirələr qoydunuz.' },
+      { name: 'Selim Yıldız', date: '15 may 2024', relation: 'Qohum', text: 'Allah Əhməd dayıya rəhmət eləsin, yaxınlarına səbir və güc diləyirəm.' },
+    ],
+    visit: { label: 'Ziyarət Məlumatı', titleA: 'Qəbirdə', titleB: 'bir ziyarət.', imageAlt: 'Əhməd Yılmazın qəbri', cemeteryLine: '1940 - 2020 · Üçlər Qəbiristanlığı, Konya', infoTitle: 'Qəbir Məlumatları', cemetery: 'Qəbiristanlıq', plot: 'Ada / Sahə', row: 'Sıra / Nömrə', hours: 'Ziyarət Saatları', cemeteryValue: 'Üçlər Qəbiristanlığı, Konya', plotValue: 'Ada: 245 · Sahə: 18', rowValue: 'Sıra: C · Qəbir No: 7', hoursValue: 'Hər gün 08:00 - 19:00', noteLabel: 'Qeyd:', note: 'Ziyarətçilər üçün rahat gəzinti yolları mövcuddur. Əsas qapıdan D qapısına tərəf hərəkət edin; C sırası 50 metr məsafədədir.', mapTitle: 'Qəbiristanlığın mövqeyi' },
+    footer: { motto: 'Xatirələr yaşayır, böyük sevgi sonsuzdur.', platform: 'Platforma', corporate: 'Korporativ', documents: 'Sənədlər', home: 'Ana Səhifə', demo: 'Nümunə Profil', pricing: 'Qiymətlər', about: 'Haqqımızda', contact: 'Əlaqə', privacy: 'Məxfilik', terms: 'İstifadə Şərtləri', kvkk: 'KVKK', rights: '© 2026 The Eternal Memory. Bütün hüquqlar qorunur.' },
+    demoBanner: { text: 'Bu nümayiş profilidir.', cta: 'Profil Yarat', home: 'Ana Səhifə' },
+    bottomCta: { heading: 'Siz də sevdiklərinizi belə əbədiləşdirə bilərsiniz.', sub: 'Bunun kimi bir profil bir neçə dəqiqədə yaradılır.', primaryBtn: 'Qiymətlərə Bax', secondaryBtn: 'Ana Səhifəyə' },
+  },
 }
 const voiceMemoryBars = [
   {
@@ -559,6 +630,7 @@ export default function MemorialPage() {
     ka: { title: 'დროის მოგზაურობა', timeline: 'დროის ხაზი', slideshow: 'სლაიდები', age: 'ასაკის არჩევა', years: 'წლის ისტორია', chapter: 'მნიშვნელოვანი ეტაპი', cta: 'მოგონებების ნახვა' },
     ru: { title: 'Путешествие во времени', timeline: 'Линия времени', slideshow: 'Слайд-шоу', age: 'Выбор возраста', years: 'лет истории', chapter: 'Важный этап', cta: 'Открыть воспоминания' },
     hy: { title: 'Ժամանակային ուղևորություն', timeline: 'Ժամանակացույց', slideshow: 'Սլայդ ցուցադրություն', age: 'Տարիքի ընտրություն', years: 'տարվա պատմություն', chapter: 'Շրջադարձային պահ', cta: 'Բացել հիշողությունները' },
+    az: { title: 'Zaman Səyahəti', timeline: 'Zaman Xətti', slideshow: 'Slayd Şousu', age: 'Yaş Seçimi', years: 'illik hekayə', chapter: 'Dönüm Nöqtəsi', cta: 'Xatirələri Aç' },
   }[lang]
   const familyUi = {
     tr: {
@@ -654,6 +726,25 @@ export default function MemorialPage() {
         { name: 'Զեյնեփ Յըլմազ', relation: 'Դուստր', years: '1968 -', initials: 'ZY', image: '/images/landing/profile-georgia.png', position: '58% 26%' },
         { name: 'Էլիֆ Յըլմազ', relation: 'Թոռնուհի', years: '1995 -', initials: 'EY', image: '/images/landing/profile-family-main.png', position: '34% 30%' },
         { name: 'Քերեմ Յըլմազ', relation: 'Թոռ', years: '1998 -', initials: 'KY', image: '/images/landing/profile-georgia.png', position: '42% 28%' },
+      ],
+    },
+    az: {
+      label: 'Ailə Bağları',
+      titleA: 'Köklərdən',
+      titleB: 'yeni nəsillərə.',
+      tabTree: 'Ailə Ağacı',
+      tabClose: 'Yaxın Ailə',
+      generation: 'nəsil',
+      protected: 'Bu ailə bağı The Eternal Memory ilə qorunur.',
+      people: [
+        { name: 'Mehmet Yılmaz', relation: 'Atası', years: '1915 - 1988', initials: 'MY', image: '/images/landing/profile-family-old.png', position: '35% 32%' },
+        { name: 'Ayşe Yılmaz', relation: 'Anası', years: '1918 - 1995', initials: 'AY', image: '/images/landing/profile-family-old.png', position: '68% 34%' },
+        { name: 'Əhməd Yılmaz', relation: 'Profil', years: '1940 - 2020', initials: 'AY', image: '/images/landing/memorial-ahmet.png', position: '50% 18%', featured: true },
+        { name: 'Fatma Yılmaz', relation: 'Həyat yoldaşı', years: '1945 -', initials: 'FY', image: '/images/landing/profile-family-main.png', position: '62% 28%' },
+        { name: 'Həsən Yılmaz', relation: 'Oğlu', years: '1966 -', initials: 'HY', image: '/images/landing/profile-family-dinner.png', position: '35% 28%' },
+        { name: 'Zeynəb Yılmaz', relation: 'Qızı', years: '1968 -', initials: 'ZY', image: '/images/landing/profile-georgia.png', position: '58% 26%' },
+        { name: 'Elif Yılmaz', relation: 'Nəvəsi', years: '1995 -', initials: 'EY', image: '/images/landing/profile-family-main.png', position: '34% 30%' },
+        { name: 'Kerem Yılmaz', relation: 'Nəvəsi', years: '1998 -', initials: 'KY', image: '/images/landing/profile-georgia.png', position: '42% 28%' },
       ],
     },
   }[lang]

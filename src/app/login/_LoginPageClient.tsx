@@ -111,6 +111,23 @@ const authCopy: Record<Lang, {
     and: 'և',
     tos: 'Օգտագործման պայմանները',
   },
+  az: {
+    login: 'Giriş',
+    email: 'E-poçt ünvanı',
+    password: 'Şifrə',
+    submitLogin: 'Giriş',
+    resetPassword: 'Şifrəni təyin et / unutdum',
+    resetSent: 'Şifrə təyin etmə bağlantısı e-poçt ünvanınıza göndərildi.',
+    resetNeedsEmail: 'Əvvəlcə e-poçt ünvanınızı yazın.',
+    loading: 'Yüklənir...',
+    error: 'E-poçt və ya şifrə yanlışdır.',
+    errorUnconfirmed: 'E-poçtunuzu hələ təsdiqləməmisiniz. Gələnlər qutunuzu və spam qovluğunu yoxlayın.',
+    errorCaptcha: 'CAPTCHA təsdiqi uğursuz oldu. Səhifəni yeniləyib yenidən cəhd edin.',
+    terms: 'Davam edərək',
+    privacy: 'Məxfilik Siyasətini',
+    and: 'və',
+    tos: 'İstifadə Şərtlərini qəbul edirsiniz',
+  },
 }
 
 export default function LoginPageClient({ siteKey }: { siteKey: string }) {

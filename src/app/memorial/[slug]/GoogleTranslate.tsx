@@ -29,7 +29,7 @@ export default function GoogleTranslate() {
     window.googleTranslateElementInit = () => {
       new window.google!.translate!.TranslateElement!({
         pageLanguage: 'tr',
-        includedLanguages: 'tr,ka,ru,en,hy',
+        includedLanguages: 'tr,ka,ru,en,hy,az',
         autoDisplay: false,
       }, 'google_translate_element')
     }
