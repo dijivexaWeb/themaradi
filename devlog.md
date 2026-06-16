@@ -3,6 +3,40 @@
 > Her oturum sonunda Claude bu dosyayı günceller.
 > Format: tarih → ne yapıldı → nerede kalındı → sıradaki adım.
 
+## 2026-06-16 — Oturum 121: Azerbaycan Dili (az) Desteği
+
+### Yapılanlar
+- `src/i18n/az.ts` oluşturuldu — tam Azerbaycan dili (Latin alfabe) çevirisi, `LangDict` ile tip uyumlu, Ermenice oturumundakiyle aynı kapsam (landing, pricing, contact, legal, memorial panel, dashboard, memorial profil, satın alma, hakkımızda)
+- `src/i18n/index.ts` — `Lang` tipine `'az'` eklendi, `langs` dizisine `{ code: 'az', label: 'Azərbaycanca', flag: 'AZ' }` eklendi, tarayıcı algılamaya `az` branch'i eklendi
+- `GoogleTranslate.tsx` — `includedLanguages`'e `az` eklendi
+- Lang tipinin genişlemesiyle ortaya çıkan 6 dosyadaki yerel `Record<Lang,...>` objelerine + ad-hoc ternary zincirlerine `az` girdisi eklendi: `_LoginPageClient.tsx`, `NotableIntroPopup.tsx`, `NotableShareButton.tsx`, `MemorialInteractions.tsx`, `MemorialPageClient.tsx` (demo profil — Ahmet Yılmaz biyografisi + `journeyUi`/`familyUi`), `RealMemorialPage.tsx`
+- `npx tsc --noEmit` ve `npm run build` temiz geçti
+- `/browse` skill ile localhost:3010'da canlı test: ana sayfa + `/memorial/demo` sayfası tamamen Azerice render oluyor, console hatası yok, layout sağlam
+
+### Kritik Kararlar / Notlar
+- Azerice Latin alfabe kullandığı için Ermenice'deki Unicode karışma sorunu (ֆ/֖) hiç yaşanmadı — çeviri çok daha hızlı tamamlandı
+- Demo profildeki Türkçe kişi adları (Mehmet Yılmaz, Ayşe Yılmaz vb.) transliterasyon yapılmadan bırakıldı — Azerice Latin alfabesi Türkçe ile neredeyse aynı olduğu için doğal görünüyor (ka/ru'da olduğu gibi transliterasyon gerekmedi)
+- Artık desteklenen diller: TR, EN, KA, RU, HY (Ermenice), AZ (Azerbaycanca) — 6 dil
+
+### Proje Durumu
+- [x] Ermenice dil desteği (önceki oturum)
+- [x] Azerbaycan dili desteği — tüm site
+- [x] TypeScript + build doğrulaması
+- [x] Tarayıcı testi (browse skill) — ana sayfa + demo profil
+- [ ] Inbox XSS (DOMPurify)
+- [ ] Admin brute force koruması
+- [ ] Bucket listing policy
+
+### Nerede Kaldık
+Azerbaycan dili desteği uçtan uca tamamlandı, test edildi, push edildi (commit `dbdff05`). Dev server kapatıldı (port 3010 PID hedeflenerek, toplu node.exe kill'i yapılmadı).
+
+### Sıradaki Adım
+1. Hem Ermenice hem Azerice çevirileri üretime almadan önce anadili konuşan birine doğrulatmak iyi olur (AI çevirisi, native review yapılmadı)
+2. Bekleyen güvenlik görevleri: Inbox XSS, admin brute force, bucket listing policy
+3. Dijivexa bekleyen: Header, Footer, TwoPillarsSection
+
+---
+
 ## 2026-06-16 — Oturum 120: Ermenice (hy) Dil Desteği
 
 ### Yapılanlar
