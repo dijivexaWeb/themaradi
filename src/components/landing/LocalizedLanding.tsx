@@ -58,7 +58,7 @@ function buildCurrencyView(pricing: PricingConfig, lang: string): CurrencyView {
       campaignVaultMonthly: pricing.campaignVaultMonthlyTry,
     }
   }
-  if (lang === 'en' && pricing.memorialUsd) {
+  if ((lang === 'en' || lang === 'he') && pricing.memorialUsd) {
     return {
       symbol: '$',
       memorial: pricing.memorialUsd,
