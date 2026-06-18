@@ -782,7 +782,7 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
           photoCount={photos!.length}
           photoArchiveLabel={t.memorial.photoArchive}
           tracesLabel={isNotable
-            ? (lang === 'tr' ? 'Hayatından önemli anlar.' : lang === 'ka' ? 'მნიშვნელოვანი მომენტები.' : lang === 'ru' ? 'Важные моменты.' : lang === 'hy' ? 'Կարևոր պահեր նրա կյանքից:' : lang === 'az' ? 'Həyatından mühüm anlar.' : 'Important moments.')
+            ? (lang === 'tr' ? 'Hayatından önemli anlar.' : lang === 'ka' ? 'მნიშვნელოვანი მომენტები.' : lang === 'ru' ? 'Важные моменты.' : lang === 'hy' ? 'Կարևոր պահեր նրա կյանքից:' : lang === 'az' ? 'Həyatından mühüm anlar.' : lang === 'he' ? 'רגעים חשובים מחייו.' : 'Important moments.')
             : t.memorial.tracesLeftByLovedOnes}
           photosLabel={t.memorial.photos}
         />
@@ -891,7 +891,7 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
             </div>
             <h2 className="mb-8 font-serif text-4xl text-[#173d31] sm:text-5xl">
               {isNotable
-                ? (lang === 'tr' ? 'Hayatından önemli anlar.' : lang === 'ka' ? 'მნიშვნელოვანი მომენტები.' : lang === 'ru' ? 'Важные моменты.' : lang === 'hy' ? 'Կարևոր պահեր նրա կյանքից:' : lang === 'az' ? 'Həyatından mühüm anlar.' : 'Important moments.')
+                ? (lang === 'tr' ? 'Hayatından önemli anlar.' : lang === 'ka' ? 'მნიშვნელოვანი მომენტები.' : lang === 'ru' ? 'Важные моменты.' : lang === 'hy' ? 'Կարևոր պահեր նրա կյանքից:' : lang === 'az' ? 'Həyatından mühüm anlar.' : lang === 'he' ? 'רגעים חשובים מחייו.' : 'Important moments.')
                 : t.memorial.tracesLeftByLovedOnes}
             </h2>
             <MemoriesAccordion

@@ -5,7 +5,10 @@ import { updateSession } from '@/lib/supabase/middleware'
 const COUNTRY_LANG: Record<string, string> = {
   GE: 'ka',
   TR: 'tr',
-  RU: 'ru', AZ: 'ru', UA: 'ru', AM: 'ru', BY: 'ru',
+  IL: 'he',
+  AM: 'hy',
+  AZ: 'az',
+  RU: 'ru', UA: 'ru', BY: 'ru',
   KZ: 'ru', UZ: 'ru', KG: 'ru', TJ: 'ru', TM: 'ru', MD: 'ru',
 }
 
@@ -20,6 +23,9 @@ function detectLangFromRequest(request: NextRequest): string | null {
   if (primary === 'ka') return 'ka'
   if (primary === 'tr') return 'tr'
   if (primary === 'ru') return 'ru'
+  if (primary === 'hy') return 'hy'
+  if (primary === 'az') return 'az'
+  if (primary === 'he') return 'he'
 
   return null
 }

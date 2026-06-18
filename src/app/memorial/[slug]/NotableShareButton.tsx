@@ -11,6 +11,7 @@ const LABELS: Record<Lang, { share: string; copied: string; text: string }> = {
   ru: { share: 'Поделиться наследием', copied: 'Ссылка скопирована!', text: 'Делюсь этим важным наследием' },
   hy: { share: 'Կիսվել այս ժառանգությամբ', copied: 'Հղումը պատճենվել է!', text: 'Կիսվում եմ ձեզ հետ այս կարևոր ժառանգությամբ' },
   az: { share: 'Bu irsi paylaş', copied: 'Link kopyalandı!', text: 'Bu mühüm irsi sizinlə paylaşıram' },
+  he: { share: 'שתף את המורשת הזו', copied: 'הקישור הועתק!', text: 'משתף איתכם את המורשת החשובה הזו' },
 }
 
 export default function NotableShareButton({ displayName, lang }: { displayName: string; lang: Lang }) {

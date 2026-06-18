@@ -3,6 +3,50 @@
 > Her oturum sonunda Claude bu dosyayı günceller.
 > Format: tarih → ne yapıldı → nerede kalındı → sıradaki adım.
 
+## 2026-06-18 — Oturum 122: İbranice (he) Dil Desteği + Coğrafi Dil Algılama
+
+### Yapılanlar
+- `src/i18n/he.ts` oluşturuldu — tam Modern İbranice çevirisi (~600 satır), tüm `LangDict` anahtarları (landing, pricing, contact, legal, memorial_panel, dashboard, memorial, about vb.)
+- `src/i18n/index.ts` — `Lang` tipine `'he'` eklendi, `langs` dizisine `{ code: 'he', label: 'עברית', flag: 'IL' }` eklendi, tarayıcı algılamaya `he` branch'i eklendi
+- `GoogleTranslate.tsx` — `includedLanguages`'e `he` eklendi
+- `_LoginPageClient.tsx` — `authCopy`'e İbranice girdi eklendi
+- `NotableIntroPopup.tsx` — `CLOSE_LABELS` ve `BADGE_LABELS`'a İbranice eklendi
+- `NotableShareButton.tsx` — `LABELS`'a İbranice eklendi
+- `MemorialInteractions.tsx` — `interactionCopy`'e tam İbranice girdi eklendi (nər/çiçek/dua etiketleri, form alanları, modal metinleri)
+- `MemorialPageClient.tsx` — `localeByLang`'a `he: 'he-IL'` eklendi; `memorialCopy`'e tam İbranice Ahmet Yılmaz biyografisi eklendi; `journeyUi` ve `familyUi`'a İbranice girdi eklendi
+- `RealMemorialPage.tsx` — 2 adet ternary zincirine `lang === 'he' ? 'רגעים חשובים מחייו.'` eklendi
+- **`src/middleware.ts` oluşturuldu** — Vercel `x-vercel-ip-country` header'ı okunarak ülkeye göre otomatik dil ayarı: IL→he, GE→ka, RU→ru, AM→hy, AZ→az, TR→tr; kullanıcı manuel dil seçmişse (tm_lang cookie) geo algılama devre dışı
+- `npx tsc --noEmit` temiz geçti (sıfır hata)
+- RTL layout değişikliği yapılmadı (İbranice metinler LTR düzende gösterilir — tam RTL desteği kapsamlı CSS refactoru gerektirir)
+
+### Proje Durumu
+- [x] Ermenice dil desteği
+- [x] Azerbaycan dili desteği
+- [x] İbranice (Modern Hebrew) dil desteği — tüm site
+- [x] Coğrafi dil algılama middleware (Vercel geo header)
+- [x] TypeScript doğrulaması — temiz
+- [ ] Inbox XSS (DOMPurify)
+- [ ] Admin brute force koruması
+- [ ] Bucket listing policy
+- [ ] Reaksiyon bot koruması
+
+### Kritik Kararlar / Notlar
+- İbranice RTL'dir ama layout değişikliği yapılmadı — tam RTL çok fazla CSS değişikliği gerektirir, kullanıcı kabul etti
+- Middleware yaklaşımı: cookie yoksa coğrafi algılama; varsa kullanıcı tercihine saygı. 30 günlük cookie, sameSite=lax
+- Desteklenen ülkeler: TR, GE, RU, AM, AZ, IL — bu ülkeden giren ziyaretçiler ilk açılışta doğrudan kendi dilinde görür
+- Artık 7 dil destekleniyor: TR, EN, KA, RU, HY, AZ, HE
+
+### Nerede Kaldık
+`src/middleware.ts` oluşturuldu ve tüm İbranice dil entegrasyonu tamamlandı. TypeScript temiz. Bir sonraki adımda `npm run build` yapılıp Vercel'e deploy edilmesi gerekiyor.
+
+### Sıradaki Adım
+1. `npm run build` çalıştır — production build doğrulaması
+2. `git commit` + Vercel deploy
+3. İsrail IP'sinden test et veya `x-vercel-ip-country: IL` header'ı ile local test
+4. Inbox XSS güvenlik düzeltmesi (DOMPurify)
+5. Admin brute force koruması
+6. Native speaker İbranice çeviri kontrolü (opsiyonel)
+
 ## 2026-06-16 — Oturum 121: Azerbaycan Dili (az) Desteği
 
 ### Yapılanlar

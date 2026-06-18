@@ -128,6 +128,23 @@ const authCopy: Record<Lang, {
     and: 'və',
     tos: 'İstifadə Şərtlərini qəbul edirsiniz',
   },
+  he: {
+    login: 'כניסה',
+    email: 'כתובת דוא"ל',
+    password: 'סיסמה',
+    submitLogin: 'כניסה',
+    resetPassword: 'הגדר / שכחתי סיסמה',
+    resetSent: 'קישור להגדרת סיסמה נשלח לכתובת הדוא"ל שלך.',
+    resetNeedsEmail: 'הזן תחילה את כתובת הדוא"ל שלך.',
+    loading: 'טוען...',
+    error: 'כתובת דוא"ל או סיסמה שגויה.',
+    errorUnconfirmed: 'הדוא"ל שלך טרם אושר. בדוק את תיבת הדואר הנכנס ותיקיית הספאם.',
+    errorCaptcha: 'אימות CAPTCHA נכשל. רענן את הדף ונסה שוב.',
+    terms: 'בהמשך, אתה מקבל את',
+    privacy: 'מדיניות הפרטיות',
+    and: 'ו',
+    tos: 'תנאי השירות',
+  },
 }
 
 export default function LoginPageClient({ siteKey }: { siteKey: string }) {

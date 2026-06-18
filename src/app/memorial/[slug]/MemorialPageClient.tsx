@@ -38,6 +38,7 @@ const localeByLang: Record<Lang, string> = {
   en: 'en-US',
   hy: 'hy-AM',
   az: 'az-AZ',
+  he: 'he-IL',
 }
 
 const memorialCopyBase = {
@@ -572,6 +573,76 @@ const memorialCopy: Record<Lang, typeof memorialCopyBase.tr> = {
     demoBanner: { text: 'Bu nümayiş profilidir.', cta: 'Profil Yarat', home: 'Ana Səhifə' },
     bottomCta: { heading: 'Siz də sevdiklərinizi belə əbədiləşdirə bilərsiniz.', sub: 'Bunun kimi bir profil bir neçə dəqiqədə yaradılır.', primaryBtn: 'Qiymətlərə Bax', secondaryBtn: 'Ana Səhifəyə' },
   },
+  he: {
+    ...memorialCopyBase.en,
+    nav: { home: 'דף הבית', how: 'איך זה עובד', memorials: 'אנדרטאות דיגיטליות', contact: 'צרו קשר', start: 'התחל' },
+    hero: { imageAlt: 'אזור הנצחה', portraitAlt: 'אחמד ילמאז', qr: 'יציאה עם QR', badge: 'פרופיל זיכרון דיגיטלי', motto: 'חי באהבה, נזכר באהבה.', familyTitle: 'ממשפחתו', familyNote: 'אנו זוכרים אותו בכבוד. הסבלנות, הטוב לב והאהבה שהשאיר מאירים את דרכנו עד היום. הוא איתנו בכל תפילה, בכל שולחן ובכל זיכרון חם.', messageTitle: 'דבריו', messageNote: 'למדתי שהדבר היקר ביותר בחיים הוא אהבה. היו טובים זה לזה, דברו בלי לפגוע ולכו לעבר הטוב.', sinceLabel: 'מאז שנפרדנו', sinceSuffix: 'ימים עברו', book: 'ספר זיכרונות', explore: 'גלה זיכרונות', scroll: 'גלול', yearsLine: 'שנות חיים מלאות ומבורכות' },
+    stats: [
+      { suffix: 'שנים', label: 'חיים מבורכים' },
+      { number: '55', suffix: 'שנים', label: 'נישואין' },
+      { number: '3 ילדים', suffix: '7 נכדים', label: 'המורשת שהשאיר' },
+      { number: '2,700+', suffix: 'תלמידים', label: 'אנשים שחינך' },
+    ],
+    tabs: ['סיפור חיים', 'כרונולוגיה', 'סרטונים', 'תמונות', 'הודעה אחרונה', 'תנחומים', 'ביקור'],
+    story: {
+      label: 'סיפור חיים',
+      titleA: 'חייו',
+      titleB: 'המלאים של המורה.',
+      paragraphs: [
+        'אחמד ילמאז נולד ב-1940 בקוניה ההיסטורית, במשפחה פשוטה. מילדותו, אהבתו לספרים וללמידה הבדילה אותו מבני גילו. השיעורים הראשונים בבית הספר השכונתי הדליקו בו אור שנמשך כל חייו.',
+        'כשעזב לאנקרה וסיים את בית הספר למורים, היה בן שמונה-עשרה בלבד. לא התלונן מעולם כשלימד בכיתות צפופות, ליד ספסלים ישנים ותנור פחם. אמר: "ככל שתיתן יותר, כך תתעשר יותר." וכך אכן חי.',
+        'ב-1965, המשפחה שבנה עם פאטמה הייתה מרכז כל דבר עבורו. שלושה ילדים ושבעה נכדים היו מורשתו היפה ביותר. לאחר הפרישה בילה שנים בגינה, עם נכדיו וספריו. כל בוקר התחיל בתפילה, כל ערב הסתיים בהכרת תודה.',
+      ],
+      quote: 'תפילת הבוקר שלו לא השתנתה מעולם. חמישים שנה אותה תפילה, אותו קול, אותה שלווה. את אותם בקרים שקטים אני לא יכולה למלא עד היום.',
+      relation: 'אשתו — 55 שנים יחד',
+      books: 'ספרים שקרא',
+      teaching: 'שנות הוראה',
+    },
+    timelineLabel: 'ציר זמן של החיים',
+    timelineTitleA: 'מסע אל',
+    timelineTitleB: 'הרגעים המשמעותיים.',
+    timelineEvents: [
+      { year: '1940', title: 'נולד', desc: 'נולד בקוניה ההיסטורית, במשפחה פשוטה. מילדותו נבדל באהבתו לספרים ולידע.' },
+      { year: '1958', title: 'החל דרך ההוראה', desc: 'עבר לאנקרה ועבר את בחינת ההוראה בציון מעולה. אמר: "ללמד אנשים זה להאיר אותם."' },
+      { year: '1965', title: 'התחתן עם פאטמה', desc: 'יצאו יחד לדרך של 55 שנים. מסע שהחל בחתונה צנועה באנקרה נמשך כל החיים.' },
+      { year: '1967', title: 'נעשה לאב', desc: 'בנו הראשון חסן נולד. בשנים שלאחר מכן הצטרפו לינב ועלי. שלושה ילדים ושבעה נכדים היו מורשתו הגדולה.' },
+      { year: '1985', title: 'פרש', desc: 'במשך 27 שנים חינך אלפי תלמידים. ביום האחרון כל בית הספר התאסף להיפרד. אף אחד לא יכול היה לעצור את דמעותיו.' },
+      { year: '2020', title: 'עלה לעולם האמת', desc: 'לאחר שמונים שנות חיים מבורכים נפרד בשקט מוקף באהוביו. השאיר זיכרונות אינסופיים ואהבה עמוקה.' },
+    ],
+    videos: { label: 'זיכרונות בווידאו', titleA: 'רגעים', titleB: 'בתנועה.', featured: 'נבחרים', demo: 'סרטונים אלה הם לצורך הדגמה.' },
+    videoMemories: ['חגיגת יום הולדת 70', 'החג האחרון עם הנכדים', 'טיול לגיאורגיה', 'טקס הפרישה'],
+    photos: { label: 'ארכיון תמונות', titleA: 'רגעים קפואים,', titleB: 'זיכרונות חיים.', count: 'תמונות' },
+    photoTitles: ['תמונת המשפחה הראשונה', 'שולחן החג', 'טיול לגיאורגיה', 'תמונת המשפחה האחרונה', 'צהריים בגינה', 'שנות הפרישה'],
+    finalMessage: {
+      label: 'הודעה אחרונה',
+      titleA: 'המילים שהשאיר',
+      titleB: 'לאהוביו בחייו.',
+      lines: ['אהוביי,', 'למדתי שהדבר היקר ביותר בחיים הוא אהבה. אל תסתכלו על מה שיש לכם; הסתכלו על האנשים שלידכם. העושר האמיתי הוא בהם.', 'היו תמיד טובים זה לזה. דברו בלי לפגוע ועזרו ככל יכולתכם. אפילו טובת לב קטנה יכולה להאיר חשכה גדולה.', 'זכרו, אני תמיד איתכם. אהיה לידכם בכל תפילה, בכל ריח ובכל שולחן משותף.', 'בהרבה אהבה.'],
+      placeDate: 'קוניה, 12 במרץ 2020',
+    },
+    voices: { label: 'זיכרונות קוליים', titleA: 'קולו', titleB: 'עדיין כאן.', demo: 'הקלטה לדוגמה' },
+    voiceMemories: [
+      { title: 'תפילת הבוקר', author: 'בקולו של אחמד ביי' },
+      { title: 'צוואתי לנכדיי', author: 'בקולו של אחמד ביי' },
+      { title: 'אבא תמיד היה איתנו', author: 'בתו לינב מספרת' },
+    ],
+    featured: { label: 'זיכרונות נבחרים', titleA: 'במילים', titleB: 'של אהוביו.' },
+    featuredMemories: [
+      { quote: 'קם כל בוקר מוקדם ולא ויתר על תפילתו לעולם בזמן שתה קפה. את אותם בקרות שקטות אני מתגעגעת אליהם עד היום.', author: 'לינב ילמאז', relation: 'בתו' },
+      { quote: 'הוא לימד אותנו לא רק שיעורים אלא את החיים עצמם. כל משפט שכתב על הלוח היה שיעור חיים. לעולם לא נשכח אותו.', author: 'מהמת ארסלאן', relation: 'תלמיד לשעבר' },
+      { quote: 'כשאחז בידי נדמה היה שהעולם עומד. אמון כזה לא מצאתי בשום מקום אחר. חמישים וחמש שנים כך.', author: 'פאטמה ילמאז', relation: 'אשתו' },
+    ],
+    condolences: [
+      { name: 'איישה דמיר', date: '20 במאי 2024', relation: 'שכנה', text: 'יהי זכרו של מורנו אחמד ברוך. נשמתו תנוח בשלום. הוא היה דוגמה לאנושיות וכולם אהבו אותו.' },
+      { name: 'מהמת ארסלאן', date: '18 במאי 2024', relation: 'תלמיד', text: 'מורה יקר, כאחד מתלמידיך לעולם לא אשכח אותך. ישכב בשלום.' },
+      { name: 'פאטמה קאיא', date: '16 במאי 2024', relation: 'שכנה', text: 'נימוסיך וטובת ליבך תמיד יזכרו. השארת לנו זיכרונות יפים.' },
+      { name: 'סלים ילדיז', date: '15 במאי 2024', relation: 'קרוב משפחה', text: 'יהי זכרו של דוד אחמד ברוך, מאחל לקרוביו כוח וסבלנות.' },
+    ],
+    visit: { label: 'פרטי ביקור', titleA: 'ביקור', titleB: 'בקבר.', imageAlt: 'קברו של אחמד ילמאז', cemeteryLine: '1940 - 2020 · בית הקברות אוצ׳לר, קוניה', infoTitle: 'פרטי הקבר', cemetery: 'בית קברות', plot: 'מגרש / חלקה', row: 'שורה / מספר', hours: 'שעות ביקור', cemeteryValue: 'בית הקברות אוצ׳לר, קוניה', plotValue: 'מגרש: 245 · חלקה: 18', rowValue: 'שורה: C · קבר מס\': 7', hoursValue: 'כל יום 08:00 - 19:00', noteLabel: 'הערה:', note: 'ישנן שבילי הליכה נוחים למבקרים. מהשער הראשי לכיוון שער D; שורה C נמצאת במרחק 50 מטר.', mapTitle: 'מיקום בית הקברות' },
+    footer: { motto: 'הזיכרונות חיים, האהבה הגדולה נצחית.', platform: 'פלטפורמה', corporate: 'קורפורייט', documents: 'מסמכים', home: 'דף הבית', demo: 'פרופיל לדוגמה', pricing: 'מחירים', about: 'אודות', contact: 'צרו קשר', privacy: 'פרטיות', terms: 'תנאי שירות', kvkk: 'KVKK', rights: '© 2026 The Eternal Memory. כל הזכויות שמורות.' },
+    demoBanner: { text: 'זהו פרופיל הדגמה.', cta: 'צור פרופיל', home: 'דף הבית' },
+    bottomCta: { heading: 'גם אתם יכולים להנציח את יקיריכם כך.', sub: 'פרופיל כזה נוצר תוך מספר דקות.', primaryBtn: 'ראה מחירים', secondaryBtn: 'לדף הבית' },
+  },
 }
 const voiceMemoryBars = [
   {
@@ -631,6 +702,7 @@ export default function MemorialPage() {
     ru: { title: 'Путешествие во времени', timeline: 'Линия времени', slideshow: 'Слайд-шоу', age: 'Выбор возраста', years: 'лет истории', chapter: 'Важный этап', cta: 'Открыть воспоминания' },
     hy: { title: 'Ժամանակային ուղևորություն', timeline: 'Ժամանակացույց', slideshow: 'Սլայդ ցուցադրություն', age: 'Տարիքի ընտրություն', years: 'տարվա պատմություն', chapter: 'Շրջադարձային պահ', cta: 'Բացել հիշողությունները' },
     az: { title: 'Zaman Səyahəti', timeline: 'Zaman Xətti', slideshow: 'Slayd Şousu', age: 'Yaş Seçimi', years: 'illik hekayə', chapter: 'Dönüm Nöqtəsi', cta: 'Xatirələri Aç' },
+    he: { title: 'מסע בזמן', timeline: 'ציר זמן', slideshow: 'מצגת שקופיות', age: 'בחירת גיל', years: 'שנות סיפור', chapter: 'אבן דרך', cta: 'פתח זיכרונות' },
   }[lang]
   const familyUi = {
     tr: {
@@ -745,6 +817,25 @@ export default function MemorialPage() {
         { name: 'Zeynəb Yılmaz', relation: 'Qızı', years: '1968 -', initials: 'ZY', image: '/images/landing/profile-georgia.png', position: '58% 26%' },
         { name: 'Elif Yılmaz', relation: 'Nəvəsi', years: '1995 -', initials: 'EY', image: '/images/landing/profile-family-main.png', position: '34% 30%' },
         { name: 'Kerem Yılmaz', relation: 'Nəvəsi', years: '1998 -', initials: 'KY', image: '/images/landing/profile-georgia.png', position: '42% 28%' },
+      ],
+    },
+    he: {
+      label: 'קשרי משפחה',
+      titleA: 'משורשים',
+      titleB: 'לדורות חדשים.',
+      tabTree: 'עץ משפחה',
+      tabClose: 'משפחה קרובה',
+      generation: 'דורות',
+      protected: 'קשר משפחה זה נשמר עם The Eternal Memory.',
+      people: [
+        { name: 'מהמט ילמאז', relation: 'אביו', years: '1915 - 1988', initials: 'MY', image: '/images/landing/profile-family-old.png', position: '35% 32%' },
+        { name: 'איישה ילמאז', relation: 'אמו', years: '1918 - 1995', initials: 'AY', image: '/images/landing/profile-family-old.png', position: '68% 34%' },
+        { name: 'אחמד ילמאז', relation: 'הפרופיל', years: '1940 - 2020', initials: 'AY', image: '/images/landing/memorial-ahmet.png', position: '50% 18%', featured: true },
+        { name: 'פאטמה ילמאז', relation: 'אשתו', years: '1945 -', initials: 'FY', image: '/images/landing/profile-family-main.png', position: '62% 28%' },
+        { name: 'חסן ילמאז', relation: 'בנו', years: '1966 -', initials: 'HY', image: '/images/landing/profile-family-dinner.png', position: '35% 28%' },
+        { name: 'לינב ילמאז', relation: 'בתו', years: '1968 -', initials: 'ZY', image: '/images/landing/profile-georgia.png', position: '58% 26%' },
+        { name: 'אליף ילמאז', relation: 'נכדתו', years: '1995 -', initials: 'EY', image: '/images/landing/profile-family-main.png', position: '34% 30%' },
+        { name: 'כרם ילמאז', relation: 'נכדו', years: '1998 -', initials: 'KY', image: '/images/landing/profile-georgia.png', position: '42% 28%' },
       ],
     },
   }[lang]
