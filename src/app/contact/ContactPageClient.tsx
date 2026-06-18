@@ -16,7 +16,6 @@ export default function ContactPageClient({ siteKey }: { siteKey: string }) {
       label: c.info.phone,
       lines: [
         { text: '+995 555 51 18 84', href: 'tel:+995555511884', tag: c.info.phoneTag },
-        { text: '+90 537 882 67 47', href: 'tel:+905378826747', tag: c.info.phoneTagTurkey },
       ],
     },
     {

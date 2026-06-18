@@ -605,8 +605,6 @@ export default function LocalizedLanding({ pricing, notableMemorials, recentMemo
               <div className="flex items-center gap-2"><MessageCircle className="h-4 w-4" /> support@theeternalmemory.com</div>
               <div className="flex items-center gap-2"><MapPin className="h-4 w-4" /> Georgia</div>
               <div className="flex items-center gap-2"><Phone className="h-4 w-4" /> +995 555 51 18 84</div>
-              <div className="flex items-center gap-2"><MapPin className="h-4 w-4" /> Türkiye</div>
-              <div className="flex items-center gap-2"><Phone className="h-4 w-4" /> +90 537 882 67 47</div>
             </div>
           </div>
         </div>
