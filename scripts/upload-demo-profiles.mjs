@@ -5,16 +5,24 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 import { randomUUID } from 'crypto'
 
+// Load .env.local
+const envPath = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../.env.local')
+const envVars = fs.readFileSync(envPath, 'utf8').split('\n').reduce((acc, line) => {
+  const m = line.match(/^([^#=]+)=(.*)$/)
+  if (m) acc[m[1].trim()] = m[2].trim()
+  return acc
+}, {})
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const PHOTOS_DIR = path.join(__dirname, 'demo-photos')
 
-const R2_ENDPOINT = 'https://d193c5c0be7d8a63c6e703d51d1929be.r2.cloudflarestorage.com'
-const R2_ACCESS_KEY = 'd8f19660f3852b0394ceba52d6cc4d54'
-const R2_SECRET_KEY = '8f5a7ca14b537d11caa2adbfe8482e6c09509edd12acb767fec7d9e50375c27d'
-const R2_BUCKET = 'tem-public-media'
-const R2_PUBLIC_URL = 'https://pub-4e99edb14c604383a844cb7f05d69b9b.r2.dev'
-const SUPABASE_URL = 'https://qcxsqirqlepjebkezgud.supabase.co'
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFjeHNxaXJxbGVwamVia2V6Z3VkIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc4MDc2MDA1NCwiZXhwIjoyMDk2MzM2MDU0fQ.JnemTLKrD7AjhHsBXwjSmKTfA-6n2dhRmKmWLDaKYes'
+const R2_ENDPOINT = envVars.R2_ENDPOINT
+const R2_ACCESS_KEY = envVars.R2_ACCESS_KEY_ID
+const R2_SECRET_KEY = envVars.R2_SECRET_ACCESS_KEY
+const R2_BUCKET = envVars.R2_PUBLIC_BUCKET
+const R2_PUBLIC_URL = envVars.R2_PUBLIC_URL
+const SUPABASE_URL = envVars.NEXT_PUBLIC_SUPABASE_URL
+const SUPABASE_KEY = envVars.SUPABASE_SERVICE_ROLE_KEY
 const ADMIN_ID = 'd91c6055-196a-43c4-bfc2-c14076bb1127'
 
 const r2 = new S3Client({
