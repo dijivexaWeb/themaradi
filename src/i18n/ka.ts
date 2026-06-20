@@ -36,7 +36,7 @@ const ka: LangDict = {
       statLifeStory: 'ცხოვრების ისტორია',
       statPhotos: 'ფოტოები',
       statVideos: 'ვიდეოები',
-      statMemories: '66 მოგონება',
+      statMemories: 'მოგონება',
     },
 
     quickSteps: [
@@ -1366,6 +1366,11 @@ const ka: LangDict = {
       body: 'გაქვთ შეკითხვები სამახსოვრო პროფილის, სიცოცხლის კასრის ან QR ფილის შესახებ? ჩვენი გუნდი აქ არის.',
       btn: 'დაკავშირება',
     },
+  },
+  whatsapp: {
+    tooltip: 'დაგვიკავშირდით WhatsApp-ით',
+    message: 'გამარჯობა, მსურს მივიღო ინფორმაცია The Eternal Memory-ის შესახებ.',
+    bubble: 'გაქვთ შეკითხვა? მოგვწერეთ WhatsApp-ში',
   },
 }
 

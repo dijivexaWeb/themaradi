@@ -36,7 +36,7 @@ const tr: LangDict = {
       statLifeStory: 'Hayat Hikayesi',
       statPhotos: 'Fotoğraflar',
       statVideos: 'Videolar',
-      statMemories: '66 Anı',
+      statMemories: 'Anı',
     },
 
     quickSteps: [
@@ -1366,6 +1366,11 @@ const tr: LangDict = {
       body: 'Anma Profili, Yaşam Kasası veya QR plaka hakkında sorularınız için ekibimiz burada.',
       btn: 'İletişime Geç',
     },
+  },
+  whatsapp: {
+    tooltip: 'WhatsApp ile İletişime Geçin',
+    message: 'Merhaba, The Eternal Memory hakkında bilgi almak istiyorum.',
+    bubble: "Bir sorunuz mu var? WhatsApp'tan yazın",
   },
 }
 

@@ -36,7 +36,7 @@ const az: LangDict = {
       statLifeStory: 'Həyat Hekayəsi',
       statPhotos: 'Fotolar',
       statVideos: 'Videolar',
-      statMemories: '66 Xatirə',
+      statMemories: 'Xatirə',
     },
 
     quickSteps: [
@@ -1369,6 +1369,11 @@ const az: LangDict = {
       body: 'Xatirə Profili, Həyat Anbarı və ya QR lövhə haqqında suallarınız üçün komandamız buradadır.',
       btn: 'Əlaqə Saxla',
     },
+  },
+  whatsapp: {
+    tooltip: 'WhatsApp ilə Əlaqə',
+    message: 'Salam, The Eternal Memory haqqında məlumat almaq istəyirəm.',
+    bubble: 'Bir sualınız var? WhatsApp-dan yazın',
   },
 }
 

@@ -1,11 +1,10 @@
 'use client'
 
 import Link from 'next/link'
-import { ArrowRight, ChevronDown, Menu, X } from 'lucide-react'
+import { ChevronDown, Globe, Menu, X } from 'lucide-react'
 import { useState, useRef, useEffect } from 'react'
 import { useLang } from '@/i18n/context'
 import { langs } from '@/i18n/index'
-import BrandLogo from '@/components/BrandLogo'
 
 export default function Nav() {
   const { t, lang, setLang } = useLang()
@@ -24,121 +23,257 @@ export default function Nav() {
   }, [])
 
   const links = [
-    { href: '/', label: t.nav.home },
     { href: '#nasil-calisir', label: t.nav.howItWorks },
-    { href: '#ozellikler', label: t.nav.features },
+    { href: '#ozellikler',    label: t.nav.features    },
     { href: '/memorial/demo', label: t.nav.demoProfile },
-    { href: '/#fiyatlar', label: t.nav.pricing },
-    { href: '#sss', label: t.nav.faq },
+    { href: '/#fiyatlar',     label: t.nav.pricing     },
+    { href: '#sss',           label: t.nav.faq         },
   ]
 
   const currentLang = langs.find(l => l.code === lang)
 
   return (
-    <nav className="fixed inset-x-0 top-0 z-50 border-b border-[#e6dccb] bg-[#fbf8f1]/92 shadow-sm backdrop-blur">
-      <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-5 sm:px-8">
+    <nav
+      style={{
+        position: 'sticky',
+        top: 0,
+        zIndex: 50,
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '20px clamp(20px,4vw,60px)',
+        background: 'rgba(7,7,13,.72)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        borderBottom: '1px solid rgba(201,169,110,.12)',
+      }}
+    >
+      {/* LOGO */}
+      <Link href="/" style={{ display: 'flex', alignItems: 'center', gap: 10, textDecoration: 'none' }}>
+        <div style={{
+          width: 46, height: 46, flexShrink: 0, overflow: 'hidden',
+          borderRadius: '50%',
+          backgroundImage: 'url(/images/logo-mark.png)',
+          backgroundSize: 'auto 82px',
+          backgroundPosition: 'center top',
+          backgroundRepeat: 'no-repeat',
+        }} />
+        <span style={{
+          fontFamily: 'var(--font-cormorant), Georgia, serif',
+          fontSize: 22, fontWeight: 500, letterSpacing: '.02em', color: '#EDE8DD',
+        }}>
+          The Eternal Memory
+        </span>
+      </Link>
 
-        {/* LOGO */}
-        <BrandLogo />
-
-        {/* DESKTOP LINKS */}
-        <div className="hidden items-center gap-8 text-sm font-medium text-[#4c463c] lg:flex">
-          {links.map((link) => (
-            <Link key={link.href + link.label} href={link.href} className="transition hover:text-[#9a7132]">
-              {link.label}
-            </Link>
-          ))}
-        </div>
-
-        {/* RIGHT AREA */}
-        <div className="flex items-center gap-3">
-          {/* LANGUAGE SWITCHER */}
-          <div ref={langRef} className="relative">
-            <button
-              onClick={() => setLangOpen(!langOpen)}
-              className="flex items-center gap-1.5 rounded-lg border border-[#e1d5c3] bg-[#f4eee3] px-3 py-2 text-xs font-semibold text-[#173d31] transition hover:bg-[#ede5d8]"
-            >
-              <span>{currentLang?.flag ?? lang.toUpperCase()}</span>
-              <ChevronDown className={`h-3 w-3 text-[#9a7132] transition-transform ${langOpen ? 'rotate-180' : ''}`} />
-            </button>
-            {langOpen && (
-              <div className="absolute right-0 top-full mt-1.5 w-36 overflow-hidden rounded-xl border border-[#e1d5c3] bg-[#fbf8f1] shadow-lg">
-                {langs.map((l) => (
-                  <button
-                    key={l.code}
-                    onClick={() => { setLang(l.code); setLangOpen(false) }}
-                    className={`flex w-full items-center gap-2.5 px-4 py-2.5 text-left text-sm transition hover:bg-[#f4eee3] ${lang === l.code ? 'font-semibold text-[#9a7132]' : 'text-[#4c463c]'}`}
-                  >
-                    <span className="text-xs font-bold text-[#b08340]">{l.flag}</span>
-                    <span>{l.label}</span>
-                  </button>
-                ))}
-              </div>
-            )}
-          </div>
-
+      {/* DESKTOP LINKS */}
+      <div className="hidden lg:flex" style={{ alignItems: 'center', gap: 32 }}>
+        {links.map(link => (
           <Link
-            href="/login"
-            className="hidden items-center gap-1.5 rounded-md border border-[#c7a76f] px-4 py-2.5 text-sm font-semibold text-[#173d31] transition hover:bg-[#f4eee3] sm:inline-flex"
+            key={link.href + link.label}
+            href={link.href}
+            style={{
+              color: 'rgba(237,232,221,.6)', textDecoration: 'none',
+              fontSize: 14.5, fontWeight: 300,
+              transition: 'color .3s',
+              fontFamily: 'var(--font-outfit), system-ui, sans-serif',
+            }}
+            onMouseEnter={e => (e.currentTarget.style.color = '#D8BE8A')}
+            onMouseLeave={e => (e.currentTarget.style.color = 'rgba(237,232,221,.6)')}
           >
-            {t.nav.login}
+            {link.label}
           </Link>
+        ))}
+      </div>
 
-          <Link
-            href="/#fiyatlar"
-            className="hidden items-center gap-2 rounded-md bg-[#103b2c] px-5 py-2.5 text-sm font-semibold text-white shadow-lg shadow-[#103b2c]/15 transition hover:bg-[#0b2b20] sm:inline-flex"
-          >
-            {t.nav.cta}
-            <ArrowRight className="h-4 w-4" />
-          </Link>
+      {/* RIGHT AREA */}
+      <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
 
-          {/* MOBILE HAMBURGER */}
+        {/* LANGUAGE SWITCHER */}
+        <div ref={langRef} style={{ position: 'relative' }}>
           <button
-            onClick={() => setOpen(!open)}
-            className="flex h-10 w-10 items-center justify-center rounded-lg border border-[#e1d5c3] bg-[#f4eee3] text-[#173d31] transition hover:bg-[#ede5d8] lg:hidden"
-            aria-label={t.nav.openMenu}
+            onClick={() => setLangOpen(!langOpen)}
+            style={{
+              display: 'flex', alignItems: 'center', gap: 7,
+              background: 'none',
+              border: '1px solid rgba(237,232,221,.14)',
+              borderRadius: 999, color: 'rgba(237,232,221,.75)',
+              padding: '8px 13px', cursor: 'pointer',
+              fontFamily: 'var(--font-outfit), system-ui, sans-serif',
+              fontSize: 12.5, fontWeight: 300, letterSpacing: '.05em',
+            }}
           >
-            {open ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            <Globe style={{ width: 13, height: 13, stroke: '#C9A96E', strokeWidth: 1.3 }} />
+            {currentLang?.flag ?? lang.toUpperCase()}
+            <ChevronDown style={{
+              width: 10, height: 10, opacity: .5,
+              transform: langOpen ? 'rotate(180deg)' : 'rotate(0deg)',
+              transition: 'transform .3s',
+            }} />
           </button>
+
+          {langOpen && (
+            <div style={{
+              position: 'absolute', right: 0, top: 46,
+              background: 'rgba(13,14,22,.97)',
+              backdropFilter: 'blur(20px)',
+              border: '1px solid rgba(201,169,110,.18)',
+              borderRadius: 14, padding: 8, minWidth: 168,
+              boxShadow: '0 24px 50px rgba(0,0,0,.55)',
+              zIndex: 100,
+            }}>
+              <div style={{
+                fontSize: 9.5, letterSpacing: '.2em',
+                textTransform: 'uppercase', color: 'rgba(201,169,110,.65)',
+                padding: '8px 12px 6px',
+                fontFamily: 'var(--font-outfit), system-ui, sans-serif',
+              }}>
+                {langs.length} dil mevcut
+              </div>
+              {langs.map(l => (
+                <button
+                  key={l.code}
+                  onClick={() => { setLang(l.code); setLangOpen(false) }}
+                  style={{
+                    display: 'flex', alignItems: 'center', gap: 10,
+                    width: '100%', padding: '9px 12px', borderRadius: 8,
+                    fontSize: 14, fontWeight: 300,
+                    color: lang === l.code ? '#D8BE8A' : 'rgba(237,232,221,.78)',
+                    cursor: 'pointer', background: 'none', border: 'none',
+                    textAlign: 'left',
+                    fontFamily: 'var(--font-outfit), system-ui, sans-serif',
+                  }}
+                >
+                  <span style={{ fontSize: 12, fontWeight: 600, color: '#C9A96E' }}>{l.flag}</span>
+                  {l.label}
+                </button>
+              ))}
+            </div>
+          )}
         </div>
+
+        {/* LOGIN */}
+        <Link
+          href="/login"
+          className="hidden sm:block"
+          style={{
+            color: 'rgba(237,232,221,.6)', textDecoration: 'none',
+            fontSize: 14.5, fontWeight: 300, whiteSpace: 'nowrap',
+            fontFamily: 'var(--font-outfit), system-ui, sans-serif',
+            transition: 'color .3s',
+          }}
+          onMouseEnter={e => (e.currentTarget.style.color = '#D8BE8A')}
+          onMouseLeave={e => (e.currentTarget.style.color = 'rgba(237,232,221,.6)')}
+        >
+          {t.nav.login}
+        </Link>
+
+        {/* CTA */}
+        <Link
+          href="/#fiyatlar"
+          className="tem-goldbtn hidden sm:block"
+          style={{
+            textDecoration: 'none',
+            background: 'linear-gradient(135deg, #E2C885, #C39E63)',
+            color: '#14110a', fontWeight: 500, fontSize: 14,
+            padding: '11px 22px', borderRadius: 999,
+            boxShadow: '0 8px 26px rgba(201,169,110,.22)',
+            whiteSpace: 'nowrap',
+            fontFamily: 'var(--font-outfit), system-ui, sans-serif',
+          }}
+        >
+          {t.nav.cta}
+        </Link>
+
+        {/* MOBILE HAMBURGER */}
+        <button
+          onClick={() => setOpen(!open)}
+          className="lg:hidden"
+          style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            width: 40, height: 40, borderRadius: 10,
+            border: '1px solid rgba(201,169,110,.2)',
+            background: 'rgba(201,169,110,.06)',
+            color: '#EDE8DD', cursor: 'pointer',
+          }}
+          aria-label={t.nav.openMenu}
+        >
+          {open ? <X style={{ width: 18, height: 18 }} /> : <Menu style={{ width: 18, height: 18 }} />}
+        </button>
       </div>
 
       {/* MOBILE MENU */}
       {open && (
-        <div className="border-t border-[#e6dccb] bg-[#fbf8f1] px-5 pb-5 pt-3 lg:hidden">
-          <div className="flex flex-col gap-1">
-            {links.map((link) => (
+        <div style={{
+          position: 'absolute', top: '100%', left: 0, right: 0,
+          background: 'rgba(7,7,13,.97)',
+          backdropFilter: 'blur(20px)',
+          borderBottom: '1px solid rgba(201,169,110,.12)',
+          padding: '16px clamp(20px,4vw,60px) 24px',
+        }}>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+            {links.map(link => (
               <Link
                 key={link.href + link.label}
                 href={link.href}
                 onClick={() => setOpen(false)}
-                className="rounded-lg px-4 py-3 text-sm font-medium text-[#4c463c] transition hover:bg-[#f4eee3] hover:text-[#173d31]"
+                style={{
+                  padding: '12px 16px', borderRadius: 10,
+                  color: 'rgba(237,232,221,.72)', textDecoration: 'none',
+                  fontSize: 15, fontWeight: 300,
+                  fontFamily: 'var(--font-outfit), system-ui, sans-serif',
+                  transition: 'background .2s, color .2s',
+                }}
+                onMouseEnter={e => { e.currentTarget.style.background = 'rgba(201,169,110,.06)'; e.currentTarget.style.color = '#D8BE8A' }}
+                onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = 'rgba(237,232,221,.72)' }}
               >
                 {link.label}
               </Link>
             ))}
-            <Link
-              href="/login"
-              onClick={() => setOpen(false)}
-              className="mt-2 inline-flex items-center justify-center rounded-md border border-[#c7a76f] px-5 py-3 text-sm font-semibold text-[#173d31] transition hover:bg-[#f4eee3]"
-            >
-              {t.nav.login}
-            </Link>
-            <Link
-              href="/#fiyatlar"
-              onClick={() => setOpen(false)}
-              className="mt-1 inline-flex items-center justify-center gap-2 rounded-md bg-[#103b2c] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#0b2b20]"
-            >
-              {t.nav.cta}
-              <ArrowRight className="h-4 w-4" />
-            </Link>
-            {/* Mobile lang switcher */}
-            <div className="mt-3 flex gap-2 border-t border-[#e6dccb] pt-3">
-              {langs.map((l) => (
+            <div style={{ borderTop: '1px solid rgba(201,169,110,.12)', marginTop: 12, paddingTop: 12, display: 'flex', gap: 10 }}>
+              <Link
+                href="/login"
+                onClick={() => setOpen(false)}
+                style={{
+                  flex: 1, textAlign: 'center', padding: '12px',
+                  borderRadius: 12, border: '1px solid rgba(237,232,221,.16)',
+                  color: 'rgba(237,232,221,.78)', textDecoration: 'none',
+                  fontSize: 14, fontWeight: 300,
+                  fontFamily: 'var(--font-outfit), system-ui, sans-serif',
+                }}
+              >
+                {t.nav.login}
+              </Link>
+              <Link
+                href="/#fiyatlar"
+                onClick={() => setOpen(false)}
+                style={{
+                  flex: 1, textAlign: 'center', padding: '12px',
+                  borderRadius: 12,
+                  background: 'linear-gradient(135deg, #E2C885, #C39E63)',
+                  color: '#14110a', textDecoration: 'none',
+                  fontSize: 14, fontWeight: 500,
+                  fontFamily: 'var(--font-outfit), system-ui, sans-serif',
+                }}
+              >
+                {t.nav.cta}
+              </Link>
+            </div>
+            {/* Mobile lang */}
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 4 }}>
+              {langs.map(l => (
                 <button
                   key={l.code}
                   onClick={() => { setLang(l.code); setOpen(false) }}
-                  className={`rounded-lg border px-3 py-1.5 text-xs font-semibold transition ${lang === l.code ? 'border-[#b08340] bg-[#f4eee3] text-[#9a7132]' : 'border-[#e1d5c3] text-[#4c463c] hover:bg-[#f4eee3]'}`}
+                  style={{
+                    padding: '6px 12px', borderRadius: 8,
+                    border: lang === l.code
+                      ? '1px solid rgba(201,169,110,.5)'
+                      : '1px solid rgba(237,232,221,.14)',
+                    background: lang === l.code ? 'rgba(201,169,110,.1)' : 'none',
+                    color: lang === l.code ? '#D8BE8A' : 'rgba(237,232,221,.55)',
+                    fontSize: 12, cursor: 'pointer',
+                  }}
                 >
                   {l.flag}
                 </button>

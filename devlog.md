@@ -3,6 +3,91 @@
 > Her oturum sonunda Claude bu dosyayı günceller.
 > Format: tarih → ne yapıldı → nerede kalındı → sıradaki adım.
 
+## 2026-06-20 — Oturum 124: Profil Preview Stats Düzeltme + Yeni Sekmeler
+
+### Yapılanlar
+- **`src/components/landing/LocalizedLanding.tsx`** — Profil Preview bölümü güncellendi:
+  - **Stats düzeltildi**: Sahte `66 Anı / 14 Fotoğraf / 3 Video` yerine önizlemede gerçekten gösterilen `6 Fotoğraf / 3 Video / 3 Taziye` yazıyor
+  - **3 yeni sekme eklendi**: Biyografi, Kronoloji, Taziyeler (eski: Fotoğraflar / Videolar / Anılar → yeni: Fotoğraflar / Videolar / Biyografi / Kronoloji / Taziyeler)
+  - **Biyografi sekmesi**: İtalik alıntı + biyografi metni + meslek/doğum yeri/ikametgah bilgileri
+  - **Kronoloji sekmesi**: Yıl bazlı timeline (1948-2023), altın nokta + dikey çizgi tasarımı
+  - **Taziyeler sekmesi**: 3 kart — isim, rol, mesaj, kaç gün önce paylaşıldığı
+  - Tab bar yatay kaydırmalı yapıldı (`overflowX: auto, scrollbarWidth: none`)
+- TypeScript: sıfır hata (`npx tsc --noEmit` temiz)
+- Build: başarılı
+
+### Proje Durumu
+- [x] Profil preview stats gerçekçi sayılar
+- [x] Biyografi sekmesi
+- [x] Kronoloji sekmesi
+- [x] Taziyeler sekmesi
+- [ ] Git push (kullanıcı onayı bekleniyor)
+
+### Kritik Kararlar / Notlar
+- 5 sekme oldu ama tab bar yatay kaydırmalı olduğu için mobilde sorun çıkmaz
+- Sahte yüksek rakamlar (66, 14) kaldırıldı; preview'da gerçekte ne gösteriliyorsa o sayılar kullanılıyor
+
+### Nerede Kaldık
+Profil Preview sekmeler ve stats güncellendi, build temiz. Git push henüz yapılmadı.
+
+### Sıradaki Adım
+1. Lokal test: http://localhost:3010 açıp 5 sekmeyi tek tek kontrol et
+2. Onay sonrası `git push` → Vercel deploy
+
+## 2026-06-20 — Oturum 123: Anasayfa Komple Dark Luxury Redesign
+
+### Yapılanlar
+- **`src/app/globals.css`** — Dark luxury animasyon sistemi (önceki oturumda tamamlanmıştı): `tem-wordRise`, `tem-floatY`, `tem-driftA/B`, `tem-haloPulse`, `tem-flameFlicker`, `tem-dash`, `tem-draw`, `.tem-goldbtn`, `.tem-ghostbtn`, `.tem-card`, `.tem-scard`, `.tem-reveal` sistemi
+- **`src/hooks/useReveal.ts`** oluşturuldu — IntersectionObserver ile scroll-reveal; `prefers-reduced-motion` desteği; `.tem-reveal`, `.tem-step`, `.tem-word` class'larını gözlemler
+- **`src/components/landing/ParticleCanvas.tsx`** oluşturuldu — Canvas-tabanlı altın parçacık sistemi (56 parçacık varsayılan), DPR-aware, iki altın ton (#C9A96E ve #E8C97A)
+- **`src/components/landing/PhoneMockup3D.tsx`** oluşturuldu — Mouse-tracking 3D tilt (perspective 1200px, ±14 derece), altın gradient çerçeve, gerçek fotoğraflar (profile-ahmet.png, aile fotoğrafları), glare efekti, floatY + haloPulse animasyonu
+- **`src/components/landing/LocalizedLanding.tsx`** KOMPLE YENİDEN YAZILDI — Tüm 14 section dark tema ile:
+  - Hero: ParticleCanvas + drift blob'lar + PhoneMockup3D + wordRise h1 + altın CTA butonlar
+  - QR Bridge Band: animasyonlu ok + QR→telefon geçiş görseli
+  - Nasıl Çalışır (4 hızlı adım): koyu glass kartlar + Lucide ikonlar
+  - Profil Preview: tab sistemi (fotoğraflar/videolar/anılar), sol panel istatistikler
+  - Neden The Eternal Memory: 6 kart grid + güvenlik rozetleri
+  - Nasıl Çalışır (detaylı 4 adım): görsel + açıklama
+  - QR Mezar Banner: parallax overlay
+  - Ara CTA Banner: alev animasyonu + altın gradient
+  - Güvenlik: 6 kart grid + taahhüt kutusu
+  - Fiyatlandırma: gradient border kart (v3 tasarımı), halo pulse
+  - SSS Accordion: koyu cam görünüm
+  - Final CTA: flame + yaprak arkaplan + iki CTA buton
+  - Footer: 4 sütun + iletişim bilgileri
+- **`public/images/logo-mark.png`** eklendi — Kullanıcının sağladığı yeni ChatGPT logosu (kalp+alev+yaprak simgesi)
+- **`src/components/BrandLogo.tsx`** güncellendi — BrandMark artık CSS background-image ile yeni logo PNG'sini kullanıyor, dairesel crop, sadece ikon kısmı görünür
+- **`src/components/landing/Nav.tsx`** güncellendi — Inline SVG logo kaldırıldı, yeni logo-mark.png ile dairesel kırpılmış görünüm
+- TypeScript: sıfır hata (`npx tsc --noEmit` temiz)
+- Build: başarılı (`npm run build`)
+
+### Proje Durumu
+- [x] CSS animasyon sistemi (globals.css)
+- [x] useReveal hook
+- [x] ParticleCanvas
+- [x] PhoneMockup3D
+- [x] LocalizedLanding.tsx dark tema (tüm 14 section)
+- [x] Nav dark tema (zaten hazırdı)
+- [x] NotableProfilesSection dark tema (zaten hazırdı)
+- [x] RecentMemorialsCarousel dark tema (zaten hazırdı)
+- [x] WhatsApp Button (zaten layout.tsx'e eklenmiş)
+- [x] Yeni logo (logo-mark.png) nav + footer + BrandMark
+- [ ] Git push (kullanıcı onayı bekleniyor)
+
+### Kritik Kararlar / Notlar
+- Logo PNG'nin krem arka planı CSS background-image + dairesel overflow:hidden ile gizleniyor; hem nav hem footer'da temiz görünüyor
+- LocalizedLanding artık NotableProfilesSection + RecentMemorialsCarousel'i içinde çağırıyor (bunlar zaten dark)
+- Tüm i18n key'leri mevcut (quickSteps, whyItems, securityItems, howItWorksDetailed, pricingSection, finalCta vb.)
+
+### Nerede Kaldık
+Dark luxury redesign tamamlandı ve lokal test edildi — build başarılı, TypeScript temiz, browserda görsel olarak onaylandı. Git push henüz yapılmadı (kullanıcı onayı bekleniyor).
+
+### Sıradaki Adım
+1. Kullanıcı lokal inceleme yapsın (http://localhost:3010)
+2. Onay sonrası: `git add -p` → commit → `git push` → Vercel deploy
+3. Vercel üzerinde canlı test — dil/para birimi algılama, mobil görünüm, animasyonlar
+4. İsteğe bağlı: mobil breakpoint ince ayarı, responsive testler
+
 ## 2026-06-18 — Oturum 122: İbranice (he) Dil Desteği + Coğrafi Dil Algılama
 
 ### Yapılanlar

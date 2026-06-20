@@ -36,7 +36,7 @@ const he: LangDict = {
       statLifeStory: 'סיפור חיים',
       statPhotos: 'תמונות',
       statVideos: 'סרטונים',
-      statMemories: '66 זיכרונות',
+      statMemories: 'זיכרונות',
     },
 
     quickSteps: [
@@ -1349,6 +1349,11 @@ const he: LangDict = {
       body: 'יש לכם שאלות לגבי פרופיל זיכרון, כספת חיים או לוחית QR? הצוות שלנו כאן עבורכם.',
       btn: 'צרו קשר',
     },
+  },
+  whatsapp: {
+    tooltip: 'צרו קשר ב-WhatsApp',
+    message: 'שלום, אני מעוניין לקבל מידע על The Eternal Memory.',
+    bubble: 'יש לכם שאלה? כתבו לנו ב-WhatsApp',
   },
 }
 

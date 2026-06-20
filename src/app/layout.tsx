@@ -1,11 +1,27 @@
 import type { Metadata } from "next";
-import { Geist } from "next/font/google";
+import { Geist, Cormorant_Garamond, Outfit } from "next/font/google";
 import { LangProvider } from "@/i18n/context";
 import CookieBanner from "@/components/CookieBanner";
+import WhatsAppButton from "@/components/WhatsAppButton";
 import Script from "next/script";
 import "./globals.css";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
+
+const cormorantGaramond = Cormorant_Garamond({
+  variable: "--font-cormorant",
+  subsets: ["latin"],
+  weight: ["300", "400", "500", "600"],
+  style: ["normal", "italic"],
+  display: "swap",
+});
+
+const outfit = Outfit({
+  variable: "--font-outfit",
+  subsets: ["latin"],
+  weight: ["200", "300", "400", "500", "600"],
+  display: "swap",
+});
 
 export const metadata: Metadata = {
   title: "The Eternal Memory — Where memories never fade.",
@@ -42,7 +58,7 @@ export default async function RootLayout({
   return (
     <html
       lang={lang}
-      className={`${geistSans.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${cormorantGaramond.variable} ${outfit.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-zinc-950 text-zinc-100">
         <Script
@@ -58,6 +74,7 @@ export default async function RootLayout({
         <LangProvider serverLang={lang}>
           {children}
           <CookieBanner />
+          <WhatsAppButton />
         </LangProvider>
       </body>
     </html>

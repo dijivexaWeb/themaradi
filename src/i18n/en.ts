@@ -34,7 +34,7 @@ const en = {
       statLifeStory: 'Life Story',
       statPhotos: 'Photos',
       statVideos: 'Videos',
-      statMemories: '66 Memories',
+      statMemories: 'Memories',
     },
 
     quickSteps: [
@@ -1364,6 +1364,11 @@ const en = {
       body: 'Have questions about the Memorial Profile, Life Vault or QR plate? Our team is here for you.',
       btn: 'Contact Us',
     },
+  },
+  whatsapp: {
+    tooltip: 'Contact us on WhatsApp',
+    message: 'Hello, I would like to get information about The Eternal Memory.',
+    bubble: 'Have a question? Text us on WhatsApp',
   },
 }
 

@@ -47,7 +47,7 @@ export default async function LandingPage() {
   }))
 
   return (
-    <div className="theme-corporate min-h-screen overflow-x-hidden bg-[#fbf8f1] text-[#173d31]">
+    <div className="min-h-screen overflow-x-hidden" style={{ background: '#07070d', color: '#EDE8DD' }}>
       <LandingNav />
       <LocalizedLanding
         pricing={pricing}

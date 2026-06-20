@@ -60,41 +60,41 @@ export default function RecentMemorialsCarousel({
   if (!memorials.length) return null
 
   return (
-    <section className="border-b border-[#e6dccb] bg-[#fbf8f1] px-5 py-8 sm:px-8">
-      <div className="mx-auto max-w-7xl overflow-hidden rounded-2xl shadow-md ring-1 ring-[#d9cebd]">
+    <section style={{ borderTop: '1px solid rgba(201,169,110,.1)', borderBottom: '1px solid rgba(201,169,110,.1)', padding: '32px clamp(20px,4vw,60px)' }}>
+      <div style={{ margin: '0 auto', maxWidth: 1240, overflow: 'hidden', borderRadius: 24, boxShadow: '0 0 0 1px rgba(201,169,110,.16)' }}>
         <div className="flex flex-col lg:flex-row">
 
           {/* LEFT — trust panel */}
-          <div className="bg-[#fffdf8] px-8 py-10 lg:flex lg:w-64 lg:shrink-0 lg:flex-col lg:justify-center xl:w-80">
+          <div style={{ background: 'rgba(255,255,255,.025)', padding: '40px 32px', display: 'flex', flexDirection: 'column', justifyContent: 'center' }} className="lg:w-64 xl:w-80 lg:shrink-0">
             {/* Verified badge */}
-            <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-[#c8dfd2] bg-[#eef7f2] px-3 py-1.5">
-              <ShieldCheck className="h-3.5 w-3.5 text-[#2d7a4f]" />
-              <span className="text-[11px] font-semibold tracking-wide text-[#2d7a4f]">Aile Onaylı</span>
+            <div style={{ marginBottom: 20, display: 'inline-flex', alignItems: 'center', gap: 8, borderRadius: 999, border: '1px solid rgba(143,184,158,.3)', background: 'rgba(143,184,158,.07)', padding: '6px 12px', width: 'fit-content' }}>
+              <ShieldCheck style={{ width: 14, height: 14, stroke: '#8FB89E', strokeWidth: 1.5 }} />
+              <span style={{ fontSize: 11, fontWeight: 600, letterSpacing: '.08em', color: '#8FB89E' }}>Aile Onaylı</span>
             </div>
 
-            <h2 className="font-serif text-xl leading-snug text-[#173d31] sm:text-2xl">
+            <h2 style={{ fontFamily: 'var(--font-cormorant), Georgia, serif', fontSize: 22, fontWeight: 400, lineHeight: 1.2, color: '#F4F0E6', margin: '0 0 12px' }}>
               {labels.heading}
             </h2>
-            <p className="mt-3 text-sm leading-6 text-[#665d50]">{labels.sub}</p>
+            <p style={{ fontSize: 13.5, fontWeight: 300, lineHeight: 1.6, color: 'rgba(237,232,221,.56)', margin: 0 }}>{labels.sub}</p>
 
             <Link
               href="/memorial"
-              className="mt-6 inline-flex w-fit items-center gap-1.5 rounded-lg border border-[#173d31] px-4 py-2.5 text-xs font-semibold text-[#173d31] transition hover:bg-[#e8f2ec]"
+              style={{ marginTop: 24, display: 'inline-flex', alignItems: 'center', gap: 6, borderRadius: 10, border: '1px solid rgba(201,169,110,.25)', padding: '10px 18px', fontSize: 13, fontWeight: 400, color: '#D8BE8A', textDecoration: 'none' }}
             >
               {labels.viewAll}
             </Link>
           </div>
 
           {/* RIGHT — dark refined panel */}
-          <div className="relative flex-1 overflow-hidden bg-[#0d1f15] px-6 py-10 sm:px-8">
+          <div className="relative flex-1 overflow-hidden px-6 py-10 sm:px-8" style={{ background: 'linear-gradient(135deg, #0a100c, #07070d)' }}>
             {/* Dot pattern */}
-            <div className="pointer-events-none absolute inset-0 opacity-[0.08] [background-image:radial-gradient(circle,#fff_1px,transparent_1px)] [background-size:20px_20px]" />
+            <div className="pointer-events-none absolute inset-0" style={{ opacity: .05, backgroundImage: 'radial-gradient(circle,rgba(201,169,110,1) 1px,transparent 1px)', backgroundSize: '20px 20px' }} />
             {/* Radial glow center */}
-            <div className="pointer-events-none absolute inset-0 [background:radial-gradient(ellipse_80%_60%_at_50%_50%,rgba(45,122,79,0.12)_0%,transparent_70%)]" />
+            <div className="pointer-events-none absolute inset-0" style={{ background: 'radial-gradient(ellipse 80% 60% at 50% 50%,rgba(201,169,110,0.07) 0%,transparent 70%)' }} />
             {/* Top fade */}
-            <div className="pointer-events-none absolute inset-x-0 top-0 h-12 bg-gradient-to-b from-[#0d1f15] to-transparent" />
+            <div className="pointer-events-none absolute inset-x-0 top-0 h-12" style={{ background: 'linear-gradient(180deg,#07070d,transparent)' }} />
             {/* Bottom fade */}
-            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-12 bg-gradient-to-t from-[#0d1f15] to-transparent" />
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-12" style={{ background: 'linear-gradient(0deg,#07070d,transparent)' }} />
 
             <div className="relative">
               {/* Left arrow */}
@@ -123,7 +123,8 @@ export default function RecentMemorialsCarousel({
                   return (
                     <div
                       key={m.id}
-                      className="w-[210px] shrink-0 overflow-hidden rounded-xl bg-white shadow-lg ring-1 ring-black/5 transition-all duration-300 hover:-translate-y-1 hover:scale-[1.02] hover:ring-1 hover:ring-[#c7a76f]/60 hover:shadow-[0_4px_24px_rgba(199,167,111,0.22)] sm:w-[220px]"
+                      className="w-[210px] shrink-0 overflow-hidden rounded-xl transition-all duration-300 hover:-translate-y-1 hover:scale-[1.02] sm:w-[220px]"
+                      style={{ background: 'rgba(255,255,255,.03)', border: '1px solid rgba(201,169,110,.14)', boxShadow: '0 4px 24px rgba(0,0,0,.3)' }}
                     >
                       {/* Photo */}
                       <div className="relative h-[180px] w-full overflow-hidden bg-[#ede8df]">
@@ -151,19 +152,19 @@ export default function RecentMemorialsCarousel({
 
                       {/* Info */}
                       <div className="p-3.5">
-                        <h3 className="font-serif text-sm font-semibold leading-snug text-[#173d31]">
+                        <h3 style={{ fontFamily: 'var(--font-cormorant),Georgia,serif', fontSize: 15, fontWeight: 500, lineHeight: 1.2, color: '#F4F0E6', margin: '0 0 4px' }}>
                           {m.display_name}
                         </h3>
                         {years && (
-                          <p className="mt-0.5 text-xs text-[#9a7132]">{years}</p>
+                          <p style={{ fontSize: 11, color: '#C9A96E', margin: '0 0 6px' }}>{years}</p>
                         )}
                         {m.tagline && (
-                          <p className="mt-1.5 line-clamp-2 text-xs italic leading-5 text-[#665d50]">
+                          <p style={{ fontSize: 11.5, fontStyle: 'italic', lineHeight: 1.5, color: 'rgba(237,232,221,.5)', margin: '0 0 6px', display: '-webkit-box', WebkitLineClamp: 2, WebkitBoxOrient: 'vertical', overflow: 'hidden' }}>
                             &ldquo;{m.tagline}&rdquo;
                           </p>
                         )}
                         {m.birth_place && (
-                          <p className="mt-1.5 flex items-center gap-1 text-[11px] text-[#9a7132]">
+                          <p style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 10.5, color: '#C9A96E', margin: '0 0 8px' }}>
                             <MapPin className="h-3 w-3 shrink-0" />
                             {m.birth_place}
                           </p>
@@ -171,13 +172,13 @@ export default function RecentMemorialsCarousel({
                         <div className="mt-3 flex flex-col gap-1.5">
                           <Link
                             href={`/memorial/${m.slug}`}
-                            className="flex items-center justify-center rounded-lg bg-[#173d31] py-2 text-xs font-semibold text-white transition hover:bg-[#0e2820]"
+                            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 10, background: 'linear-gradient(135deg,#E2C885,#C39E63)', padding: '9px', fontSize: 11.5, fontWeight: 500, color: '#14110a', textDecoration: 'none' }}
                           >
                             {labels.viewMemories}
                           </Link>
                           <Link
                             href={`/memorial/${m.slug}#taziye`}
-                            className="flex items-center justify-center rounded-lg border border-[#c8dfd2] py-2 text-xs font-semibold text-[#2d5c3e] transition hover:bg-[#eef7f2]"
+                            style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: 10, border: '1px solid rgba(201,169,110,.2)', padding: '8px', fontSize: 11.5, fontWeight: 300, color: '#D8BE8A', textDecoration: 'none' }}
                           >
                             {labels.leaveTribute}
                           </Link>

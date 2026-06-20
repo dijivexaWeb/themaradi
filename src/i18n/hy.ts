@@ -36,7 +36,7 @@ const hy: LangDict = {
       statLifeStory: 'Կյանքի պատմություն',
       statPhotos: 'Լուսանկարներ',
       statVideos: 'Տեսանյութեր',
-      statMemories: '66 հիշողություն',
+      statMemories: 'Հուշ',
     },
 
     quickSteps: [
@@ -1369,6 +1369,11 @@ const hy: LangDict = {
       body: 'Հիշատակի Պրոֆիլի, Կյանքի Պահարանի կամ QR ցուցանակի հարցերի համար մեր թիմը այստեղ է:',
       btn: 'Կապվել',
     },
+  },
+  whatsapp: {
+    tooltip: 'Կապվեք մեզ հետ WhatsApp-ով',
+    message: 'Բարև ձեզ, ես ցանկանում եմ տեղեկություն ստանալ The Eternal Memory-ի մասին:',
+    bubble: 'Հարց ունե՞ք: Գրեք մեզ WhatsApp-ով',
   },
 }
 

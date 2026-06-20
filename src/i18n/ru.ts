@@ -36,7 +36,7 @@ const ru: LangDict = {
       statLifeStory: 'История жизни',
       statPhotos: 'Фотографии',
       statVideos: 'Видео',
-      statMemories: '66 Воспоминаний',
+      statMemories: 'Воспоминания',
     },
 
     quickSteps: [
@@ -1366,6 +1366,11 @@ const ru: LangDict = {
       body: 'Есть вопросы о Мемориальном профиле, Жизненном хранилище или QR-пластине? Наша команда здесь для вас.',
       btn: 'Написать нам',
     },
+  },
+  whatsapp: {
+    tooltip: 'Связаться в WhatsApp',
+    message: 'Здравствуйте, я бы хотел получить информацию о The Eternal Memory.',
+    bubble: 'Есть вопрос? Напишите нам в WhatsApp',
   },
 }
 
