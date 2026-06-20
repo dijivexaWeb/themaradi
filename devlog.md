@@ -30,10 +30,8 @@
 5 demo profil başarıyla DB'ye ve R2'ye yüklendi. Carousel ve profil sayfaları bu kayıtları otomatik çekecek (`status: 'public_memorial'`).
 
 ### Sıradaki Adım
-1. Site üzerinde profillerin görünüp görünmediğini test et (`/memorial/nino-kvaratskhelia` vb.)
-2. Carousel'de 6 profil (Osman + 5 yeni) göründüğünü doğrula
-3. Galeri fotoğraflarının profil sayfasında yüklendiğini kontrol et
-4. Gerekirse `RealMemorialPage` bileşeninde media fetch mantığını gözden geçir
+1. Akşam 2-3 profil daha eklenecek — fotoları `scripts/demo-photos/` klasörüne at, `scripts/upload-demo-profiles.mjs` içine yeni profil bloğu ekle, script'i çalıştır
+2. Kronoloji section değerinin `'kronoloji'` olması gerektiğini not et (kod `section === 'kronoloji'` filtresi kullanıyor)
 
 ## 2026-06-20 — Oturum 124: Profil Preview Stats Düzeltme + Yeni Sekmeler
 
