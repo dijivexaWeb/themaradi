@@ -3,6 +3,38 @@
 > Her oturum sonunda Claude bu dosyayı günceller.
 > Format: tarih → ne yapıldı → nerede kalındı → sıradaki adım.
 
+## 2026-06-20 — Oturum 125: 5 Demo Profil Eklendi (Gerçekçi Gürcü/Türk Aileleri)
+
+### Yapılanlar
+- **5 demo profil** Supabase + R2'ye yüklendi: Nino Kvaratskhelia, Giorgi Beridze, Tamar Chikvanaia, Hüseyin Kara, Marina Lomidze
+- **19 fotoğraf** Cloudflare R2'ye yüklendi (`tem-public-media` bucket, `profiles/{id}/` yolları)
+- Her profil için: vault kaydı, galeri media kayıtları, 2 anı, 3 ziyaretçi defteri girdisi
+- **`scripts/upload-demo-profiles.mjs`** yazıldı — tekrar çalıştırılabilir admin scripti
+- Media tablosu schema keşfi: `original_url`, `r2_file_key`, `media_type: 'image'`, `status: 'ready'`
+- Fotoğraf dağılımı: her fotoğraf sadece bir profilde kullanıldı, tekrar yok
+
+### Proje Durumu
+[x] Landing page dark luxury tasarım
+[x] Osman İstanbullu profili (gerçek DB kaydı)
+[x] 5 demo profil eklendi — site dolu görünüyor
+[x] RecentMemorialsCarousel — bu profiller siteye yansıyacak
+[ ] Gerçek kullanıcı kaydı / ödeme akışı
+[ ] Email bildirimleri (Resend)
+
+### Kritik Kararlar / Notlar
+- Media tablosunda `category` kolonu yok; `status` değeri `'ready'`, `media_type` `'image'` olmalı
+- Vault `owner_id` ve `verified_by` admin ID: `d91c6055-196a-43c4-bfc2-c14076bb1127`
+- Demo profil slugları: `nino-kvaratskhelia`, `giorgi-beridze-imereti`, `tamar-chikvanaia`, `huseyin-kara-tbilisi`, `marina-lomidze-tbilisi`
+
+### Nerede Kaldık
+5 demo profil başarıyla DB'ye ve R2'ye yüklendi. Carousel ve profil sayfaları bu kayıtları otomatik çekecek (`status: 'public_memorial'`).
+
+### Sıradaki Adım
+1. Site üzerinde profillerin görünüp görünmediğini test et (`/memorial/nino-kvaratskhelia` vb.)
+2. Carousel'de 6 profil (Osman + 5 yeni) göründüğünü doğrula
+3. Galeri fotoğraflarının profil sayfasında yüklendiğini kontrol et
+4. Gerekirse `RealMemorialPage` bileşeninde media fetch mantığını gözden geçir
+
 ## 2026-06-20 — Oturum 124: Profil Preview Stats Düzeltme + Yeni Sekmeler
 
 ### Yapılanlar
