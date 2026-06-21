@@ -25,6 +25,7 @@ interface VaultRow {
   display_name: string
   tagline: string | null
   cover_photo_url: string | null
+  cover_video_url: string | null
   birth_date: string | null
   death_date: string | null
   birth_place: string | null
@@ -299,6 +300,17 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
                 alt={vault.display_name}
                 initial={vaultInitial}
               />
+            ) : vault.cover_video_url ? (
+              <div className="relative mx-auto h-36 w-36 sm:h-44 sm:w-44 overflow-hidden rounded-full border-4 border-[#c7a76f]/60 shadow-[0_0_0_6px_rgba(199,167,111,0.12)]">
+                <video
+                  src={vault.cover_video_url}
+                  autoPlay
+                  muted
+                  loop
+                  playsInline
+                  className="h-full w-full object-cover"
+                />
+              </div>
             ) : (
               <ProfilePhotoCircle
                 src={vault.cover_photo_url ?? ''}

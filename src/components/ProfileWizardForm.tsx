@@ -22,6 +22,7 @@ interface Props {
     birth_place: string | null
     death_place: string | null
     cover_photo_url: string | null
+    cover_video_url: string | null
     hero_bg_url: string | null
     favorite_song_title: string | null
     favorite_song_url: string | null
@@ -300,6 +301,47 @@ export default function ProfileWizardForm({ vault, saveProfileAction, isLocked }
                     <label className={labelCls}>veya fotoğraf URL</label>
                     <input type="url" name="cover_photo_url" defaultValue={vault.cover_photo_url ?? ''} placeholder="https://..." disabled={isLocked} className={inputCls} />
                   </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Cover Video */}
+            <div className="space-y-3 pt-2">
+              <label className={labelCls}>Profil Videosu <span className="font-normal text-[#9aaa99]">(isteğe bağlı — en fazla 3 saniye)</span></label>
+              <div className="flex gap-5 items-start">
+                <div className="relative h-24 w-24 shrink-0 overflow-hidden rounded-2xl border border-[#e5dccb] bg-[#f5efdf] flex items-center justify-center">
+                  {vault.cover_video_url ? (
+                    <video src={vault.cover_video_url} muted playsInline loop autoPlay className="h-full w-full object-cover" />
+                  ) : (
+                    <span className="text-3xl text-[#c8bfb0]">🎥</span>
+                  )}
+                </div>
+                <div className="flex-1 space-y-2">
+                  <p className="text-xs text-[#9aaa99] leading-relaxed">MP4, MOV veya WEBM — profil fotoğrafı yerine bu video oynatılır. Kısa tutun, ziyaretçiler anında görür.</p>
+                  <input
+                    type="file"
+                    name="cover_video_file"
+                    accept="video/mp4,video/quicktime,video/webm"
+                    disabled={isLocked}
+                    onChange={(e) => {
+                      const file = e.target.files?.[0]
+                      if (!file) return
+                      const vid = document.createElement('video')
+                      vid.preload = 'metadata'
+                      vid.onloadedmetadata = () => {
+                        URL.revokeObjectURL(vid.src)
+                        if (vid.duration > 3.5) {
+                          alert('Video en fazla 3 saniye olabilir. Lütfen daha kısa bir video seçin.')
+                          e.target.value = ''
+                        }
+                      }
+                      vid.src = URL.createObjectURL(file)
+                    }}
+                    className="w-full cursor-pointer rounded-xl border border-[#e5dccb] bg-white px-3 py-2.5 text-sm text-[#1f2d27] file:mr-3 file:rounded-lg file:border-0 file:bg-[#174f35]/10 file:px-3 file:py-1.5 file:text-[#174f35] file:font-medium outline-none disabled:opacity-40"
+                  />
+                  {vault.cover_video_url && (
+                    <input type="hidden" name="cover_video_url" value={vault.cover_video_url} />
+                  )}
                 </div>
               </div>
             </div>

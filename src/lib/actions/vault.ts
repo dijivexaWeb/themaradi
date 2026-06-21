@@ -119,7 +119,7 @@ export async function saveVaultProfileAction(vaultId: string, formData: FormData
 
   const { data: vault } = await supabase
     .from('vaults')
-    .select('id, display_name, status, cover_photo_url, hero_bg_url, favorite_song_url, theme')
+    .select('id, display_name, status, cover_photo_url, cover_video_url, hero_bg_url, favorite_song_url, theme')
     .eq('id', vaultId)
     .eq('owner_id', user.id)
     .single()
@@ -140,6 +140,20 @@ export async function saveVaultProfileAction(vaultId: string, formData: FormData
     } catch (e: any) {
       console.error('[saveVaultProfileAction] cover upload error:', e)
       redirectToProfileError(vaultId, `Profil fotoğrafı yüklenemedi: ${e.message}`)
+    }
+  }
+
+  let coverVideoUrl = (formData.get('cover_video_url') as string)?.trim() || vault.cover_video_url || null
+  const coverVideoFile = formData.get('cover_video_file')
+  if (coverVideoFile instanceof File && coverVideoFile.size > 0) {
+    try {
+      const key = generateFileKey('profile_cover_video', vaultId, coverVideoFile.name)
+      const buffer = Buffer.from(await coverVideoFile.arrayBuffer())
+      await uploadR2Object(bucket, key, buffer, coverVideoFile.type)
+      coverVideoUrl = getPublicUrl(key)
+    } catch (e: any) {
+      console.error('[saveVaultProfileAction] cover video upload error:', e)
+      redirectToProfileError(vaultId, `Profil videosu yüklenemedi: ${e.message}`)
     }
   }
 
@@ -190,6 +204,7 @@ export async function saveVaultProfileAction(vaultId: string, formData: FormData
       birth_place: (formData.get('birth_place') as string)?.trim() || null,
       death_place: (formData.get('death_place') as string)?.trim() || null,
       cover_photo_url: coverPhotoUrl || null,
+      cover_video_url: coverVideoUrl || null,
       hero_bg_url: heroBgUrl || null,
       last_message: (formData.get('last_message') as string)?.trim() || null,
       cemetery_name: (formData.get('cemetery_name') as string)?.trim() || null,

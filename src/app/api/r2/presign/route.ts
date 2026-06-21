@@ -5,6 +5,7 @@ import type { NextRequest } from 'next/server'
 const MAX_IMAGE_BYTES = 8 * 1024 * 1024       // 8 MB
 const MAX_AUDIO_BYTES = 30 * 1024 * 1024     // 30 MB
 const MAX_DOCUMENT_BYTES = 15 * 1024 * 1024  // 15 MB
+const MAX_COVER_VIDEO_BYTES = 50 * 1024 * 1024 // 50 MB
 
 const ALLOWED_IMAGES = new Set(['image/jpeg', 'image/jpg', 'image/png', 'image/webp'])
 const ALLOWED_AUDIOS = new Set(['audio/mpeg', 'audio/mp3', 'audio/wav', 'audio/x-wav', 'audio/webm', 'audio/mp4', 'audio/m4a', 'audio/x-m4a'])
@@ -67,6 +68,9 @@ export async function POST(request: NextRequest) {
     if (['gallery_image', 'profile_cover', 'profile_photo', 'hero_bg'].includes(category)) {
       isAllowed = ALLOWED_IMAGES.has(mimeType)
       sizeLimit = MAX_IMAGE_BYTES
+    } else if (category === 'profile_cover_video') {
+      isAllowed = ['video/mp4', 'video/quicktime', 'video/webm'].includes(mimeType)
+      sizeLimit = MAX_COVER_VIDEO_BYTES
     } else if (category === 'audio_recording') {
       isAllowed = ALLOWED_AUDIOS.has(mimeType)
       sizeLimit = MAX_AUDIO_BYTES
