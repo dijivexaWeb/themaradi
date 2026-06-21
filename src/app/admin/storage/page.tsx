@@ -577,7 +577,7 @@ function UsageCard({
   total: number
   usedLabel: string
   limitLabel: string
-  color: 'orange' | 'rose' | 'blue'
+  color: 'orange' | 'rose' | 'blue' | 'emerald'
   detail: string
 }) {
   const pct = Math.min(100, (used / total) * 100)
@@ -585,6 +585,7 @@ function UsageCard({
     orange: pct > 80 ? '#ef4444' : '#f97316',
     rose: pct > 80 ? '#ef4444' : '#f43f5e',
     blue: pct > 80 ? '#ef4444' : '#3b82f6',
+    emerald: pct > 80 ? '#ef4444' : '#10b981',
   }[color]
 
   return (
