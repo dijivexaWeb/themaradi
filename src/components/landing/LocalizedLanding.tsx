@@ -73,24 +73,39 @@ function SectionHeading({ children, style }: { children: React.ReactNode; style?
 function SectionDivider({ delay = 0 }: { delay?: number }) {
   return (
     <div style={{ position: 'relative', height: 1, overflow: 'visible', pointerEvents: 'none', zIndex: 10 }}>
-      {/* Base line */}
-      <div style={{
-        position: 'absolute', inset: 0,
-        background: 'linear-gradient(90deg, transparent 0%, rgba(201,169,110,.18) 20%, rgba(201,169,110,.32) 50%, rgba(201,169,110,.18) 80%, transparent 100%)',
-      }} />
-      {/* Travelling orb */}
+      {/* Yukarı yükselen ışık hüzmesi — tüm genişlik */}
       <div
-        className="tem-divider-orb"
+        className="tem-divider-beam"
         style={{
           position: 'absolute',
-          top: -3, left: 0,
-          width: 140, height: 7,
-          borderRadius: 9999,
-          background: 'linear-gradient(90deg, transparent, #dfbd72, #fffbee, #dfbd72, transparent)',
-          boxShadow: '0 0 12px 3px rgba(223,189,114,.45), 0 0 28px 6px rgba(223,189,114,.18)',
+          bottom: 0,
+          left: 0,
+          right: 0,
+          height: 72,
+          background: 'linear-gradient(to top, rgba(223,189,114,.55) 0%, rgba(223,189,114,.18) 40%, rgba(223,189,114,.04) 75%, transparent 100%)',
           animationDelay: `${delay}s`,
         }}
       />
+      {/* Merkez yoğun hüzme */}
+      <div
+        className="tem-divider-beam"
+        style={{
+          position: 'absolute',
+          bottom: 0,
+          left: '20%',
+          right: '20%',
+          height: 50,
+          background: 'linear-gradient(to top, rgba(255,248,220,.5) 0%, rgba(255,248,220,.12) 50%, transparent 100%)',
+          filter: 'blur(6px)',
+          animationDelay: `${delay + 0.15}s`,
+        }}
+      />
+      {/* Çizginin kendisi */}
+      <div style={{
+        position: 'absolute', inset: 0,
+        background: 'linear-gradient(90deg, transparent 0%, rgba(201,169,110,.35) 15%, rgba(255,248,220,.85) 50%, rgba(201,169,110,.35) 85%, transparent 100%)',
+        boxShadow: '0 0 6px 1px rgba(223,189,114,.35)',
+      }} />
     </div>
   )
 }
