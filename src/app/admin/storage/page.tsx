@@ -74,7 +74,7 @@ export default async function StoragePage() {
   const [publicObjs, privateObjs, { data: vaults }, { count: totalVaultCount }] = await Promise.all([
     listAllObjects(r2Client, publicBucket),
     listAllObjects(r2Client, privateBucket).catch(() => [] as { key: string; size: number }[]),
-    supabase.from('vaults').select('id, display_name, slug, owner_id').eq('status', 'public_memorial'),
+    supabase.from('vaults').select('id, display_name, slug, owner_id, status'), // ALL statuses
     supabase.from('vaults').select('id', { count: 'exact', head: true }),
   ])
 
@@ -96,11 +96,16 @@ export default async function StoragePage() {
   let totalPublicBytes = 0
   let totalPrivateBytes = 0
   let orphanBytes = 0
+  const orphanFiles: { key: string; size: number }[] = []
 
   for (const obj of publicObjs) {
     totalPublicBytes += obj.size
     const vId = extractVaultId(obj.key)
-    if (!vId) { orphanBytes += obj.size; continue }
+    if (!vId) {
+      orphanBytes += obj.size
+      orphanFiles.push(obj)
+      continue
+    }
     const meta = vaultMap.get(vId)
     if (!vaultStats.has(vId)) {
       vaultStats.set(vId, {
@@ -230,9 +235,9 @@ export default async function StoragePage() {
           <span>%{r2UsagePercent.toFixed(2)} kullanımda</span>
           <span>{formatBytes(r2FreeLimitBytes - totalBucketBytes)} kaldı</span>
         </div>
-        {orphanBytes > 0 && (
+        {orphanFiles.length > 0 && (
           <p className="mt-2 text-xs text-amber-600">
-            ⚠ Sahipsiz dosyalar: {formatBytes(orphanBytes)} ({publicObjs.filter(o => !extractVaultId(o.key)).length} dosya)
+            ⚠ Sahipsiz dosyalar: {formatBytes(orphanBytes)} ({orphanFiles.length} dosya) — aşağıda listelendi
           </p>
         )}
       </div>
@@ -336,6 +341,62 @@ export default async function StoragePage() {
           </table>
         </div>
       </div>
+
+      {/* ORPHAN FILES */}
+      {orphanFiles.length > 0 && (
+        <div className="rounded-xl border border-amber-200 bg-amber-50 shadow-sm overflow-hidden">
+          <div className="px-5 py-4 border-b border-amber-100 flex items-center justify-between">
+            <p className="text-sm font-semibold text-amber-800">
+              ⚠ Sahipsiz Dosyalar ({orphanFiles.length} adet — {formatBytes(orphanBytes)})
+            </p>
+            <p className="text-xs text-amber-600">Vault prefix&apos;i olmayan dosyalar</p>
+          </div>
+          <div className="overflow-x-auto max-h-64 overflow-y-auto">
+            <table className="w-full text-xs">
+              <thead className="sticky top-0 bg-amber-50">
+                <tr className="text-left text-amber-700 font-medium">
+                  <th className="px-4 py-2">Dosya Path</th>
+                  <th className="px-4 py-2 text-right">Boyut</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-amber-100">
+                {orphanFiles.map((f) => (
+                  <tr key={f.key} className="hover:bg-amber-100">
+                    <td className="px-4 py-1.5 font-mono text-[10px] text-amber-900 break-all">{f.key}</td>
+                    <td className="px-4 py-1.5 text-right text-amber-700 whitespace-nowrap">{formatBytes(f.size)}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {/* DELETED VAULT FOLDERS */}
+      {(() => {
+        const deletedVaults = sortedVaults.filter(v => !vaultMap.has(v.vaultId))
+        if (!deletedVaults.length) return null
+        return (
+          <div className="rounded-xl border border-red-200 bg-red-50 shadow-sm overflow-hidden">
+            <div className="px-5 py-4 border-b border-red-100">
+              <p className="text-sm font-semibold text-red-800">
+                🗑 Silinmiş Vault Klasörleri ({deletedVaults.length} adet)
+              </p>
+              <p className="text-xs text-red-600 mt-0.5">
+                DB&apos;de kaydı olmayan vault ID&apos;leri — R2&apos;de dosyaları hâlâ duruyor
+              </p>
+            </div>
+            <div className="divide-y divide-red-100">
+              {deletedVaults.map(v => (
+                <div key={v.vaultId} className="px-4 py-2 flex items-center justify-between">
+                  <code className="text-[10px] text-red-800 font-mono">{v.vaultId}</code>
+                  <span className="text-xs text-red-700 font-semibold">{formatBytes(v.totalBytes)}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )
+      })()}
     </div>
   )
 }
