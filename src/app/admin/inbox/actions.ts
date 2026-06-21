@@ -98,6 +98,43 @@ export async function sendInboxReplyAction(
   return { success: true }
 }
 
+export async function deleteEmailAction(id: string): Promise<{ error?: string }> {
+  await requireAdmin()
+  const supabase = await createServiceClient()
+  const { error } = await supabase.from('inbound_emails').delete().eq('id', id)
+  if (error) return { error: error.message }
+  revalidatePath('/admin/inbox')
+  return {}
+}
+
+export async function deleteAllEmailsAction(
+  filter: 'all' | 'archived' | 'read'
+): Promise<{ deleted: number; error?: string }> {
+  await requireAdmin()
+  const supabase = await createServiceClient()
+
+  let query = supabase.from('inbound_emails').delete()
+  if (filter === 'archived') query = (query as any).eq('status', 'archived')
+  else if (filter === 'read') query = (query as any).eq('status', 'read')
+  // 'all' → tümünü sil, filtre yok (neq ile hepsini yakala)
+  else query = (query as any).neq('id', '00000000-0000-0000-0000-000000000000')
+
+  const { error, count } = await (query as any).select('id', { count: 'exact', head: true })
+  if (error) return { deleted: 0, error: error.message }
+
+  // Gerçek delete
+  let delQuery = supabase.from('inbound_emails').delete()
+  if (filter === 'archived') delQuery = (delQuery as any).eq('status', 'archived')
+  else if (filter === 'read') delQuery = (delQuery as any).eq('status', 'read')
+  else delQuery = (delQuery as any).neq('id', '00000000-0000-0000-0000-000000000000')
+
+  const { error: delError } = await delQuery
+  if (delError) return { deleted: 0, error: delError.message }
+
+  revalidatePath('/admin/inbox')
+  return { deleted: count ?? 0 }
+}
+
 export async function regenerateWebhookSecretAction(): Promise<{ error?: string; secret?: string }> {
   await requireAdmin()
   const supabase = await createServiceClient()

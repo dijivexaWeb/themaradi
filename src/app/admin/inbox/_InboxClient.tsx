@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useTransition, useOptimistic } from 'react'
-import { markEmailStatusAction, sendInboxReplyAction, toggleFlagAction, setFollowUpAction } from './actions'
+import { markEmailStatusAction, sendInboxReplyAction, toggleFlagAction, setFollowUpAction, deleteEmailAction, deleteAllEmailsAction } from './actions'
 
 export type AttachmentMeta = {
   filename: string
@@ -69,6 +69,69 @@ function formatDate(iso: string) {
 function InboxBadge({ inbox }: { inbox: string }) {
   const m = INBOX_META[inbox] ?? INBOX_META.other
   return <span className={`text-xs px-2 py-0.5 rounded-full border font-medium shrink-0 ${m.bg} ${m.color}`}>{m.label}</span>
+}
+
+// ─── Sil butonu ────────────────────────────────────────────────────────────
+
+function DeleteEmailButton({ id, compact = false }: { id: string; compact?: boolean }) {
+  const [isPending, start] = useTransition()
+  function handle(e: React.MouseEvent) {
+    e.stopPropagation()
+    if (!confirm('Bu mail kalıcı olarak silinecek. Emin misin?')) return
+    start(async () => { await deleteEmailAction(id) })
+  }
+  return (
+    <button
+      onClick={handle}
+      disabled={isPending}
+      title="Maili sil"
+      className={`shrink-0 transition-colors rounded disabled:opacity-40 ${
+        compact
+          ? 'p-1 text-slate-300 hover:text-red-500'
+          : 'text-xs text-slate-400 hover:text-red-600 px-3 py-1.5 rounded-lg hover:bg-red-50 transition-colors'
+      }`}
+    >
+      {compact ? (
+        <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+        </svg>
+      ) : (
+        isPending ? 'Siliniyor...' : 'Sil'
+      )}
+    </button>
+  )
+}
+
+// ─── Toplu sil butonu ──────────────────────────────────────────────────────
+
+function BulkDeleteButton({ label, filter, count }: { label: string; filter: 'all' | 'archived' | 'read'; count: number }) {
+  const [isPending, start] = useTransition()
+  const [result, setResult] = useState('')
+
+  function handle() {
+    if (!confirm(`${count} mail kalıcı silinecek. Emin misin?`)) return
+    start(async () => {
+      const r = await deleteAllEmailsAction(filter)
+      if (r.error) setResult(`Hata: ${r.error}`)
+      else setResult(`${r.deleted} mail silindi`)
+    })
+  }
+
+  return (
+    <div className="flex items-center gap-2">
+      <button
+        onClick={handle}
+        disabled={isPending || count === 0}
+        className="flex items-center gap-1.5 text-xs text-red-600 hover:text-red-700 border border-red-200 hover:border-red-400 hover:bg-red-50 px-3 py-1.5 rounded-lg transition-colors disabled:opacity-40"
+      >
+        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" strokeWidth={2} viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+        </svg>
+        {isPending ? 'Siliniyor...' : `${label} (${count})`}
+      </button>
+      {result && <span className="text-xs text-slate-500">{result}</span>}
+    </div>
+  )
 }
 
 // ─── Bayrak butonu ─────────────────────────────────────────────────────────
@@ -356,6 +419,7 @@ function ThreadView({ thread, allEmails }: { thread: InboxEmail; allEmails: Inbo
                 Yanıtla
               </button>
               <FollowUpButton email={latest} />
+              <DeleteEmailButton id={thread.id} />
             </div>
           ) : (
             <ReplyForm email={latest} onDone={() => setReplying(false)} />
@@ -462,6 +526,7 @@ function EmailCard({ email }: { email: InboxEmail }) {
                 Arşivle
               </button>
             )}
+            <DeleteEmailButton id={email.id} />
           </div>
         ) : (
           <ReplyForm email={email} onDone={() => setReplying(false)} />
@@ -614,11 +679,27 @@ export default function InboxClient({ tab, inboxFilter, allEmails }: Props) {
   const unread = filtered.filter((e) => e.status === 'unread').length
   const grouped = groupThreads(filtered)
 
+  const readCount = filtered.filter((e) => e.status === 'read').length
+  const archivedCount = allEmails.filter((e) => e.status === 'archived').length
+
   return filtered.length === 0
     ? <EmptyState message="Mesaj yok." sub="Resend webhook kurulumu için Email Ayarları sayfasını kontrol edin." />
     : (
       <div>
-        {unread > 0 && <p className="text-xs text-blue-600 font-medium mb-3">{unread} okunmamış</p>}
+        <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
+          <div className="flex items-center gap-1.5">
+            {unread > 0 && <span className="text-xs text-blue-600 font-medium">{unread} okunmamış</span>}
+          </div>
+          <div className="flex items-center gap-2 flex-wrap">
+            {readCount > 0 && (
+              <BulkDeleteButton label="Okunanları Sil" filter="read" count={readCount} />
+            )}
+            {archivedCount > 0 && (
+              <BulkDeleteButton label="Arşivi Temizle" filter="archived" count={archivedCount} />
+            )}
+            <BulkDeleteButton label="Tümünü Sil" filter="all" count={allEmails.length} />
+          </div>
+        </div>
         <div className="space-y-2">
           {grouped.map(({ type, email }) =>
             type === 'thread'
