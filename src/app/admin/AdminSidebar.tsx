@@ -23,10 +23,12 @@ import {
   X,
   ChevronRight,
   Package,
+  HardDrive,
 } from 'lucide-react'
 
 const NAV_ITEMS = [
   { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/admin/storage', label: 'Depolama', icon: HardDrive },
   { href: '/admin/verifications', label: 'Doğrulama', icon: ShieldCheck },
   { href: '/admin/kasa', label: 'Kasa / Ödemeler', icon: Wallet },
   { href: '/admin/kargo', label: 'Kargo Takibi', icon: Package },

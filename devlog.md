@@ -3,6 +3,45 @@
 > Her oturum sonunda Claude bu dosyayı günceller.
 > Format: tarih → ne yapıldı → nerede kalındı → sıradaki adım.
 
+## 2026-06-21 — Oturum 129: Admin Depolama Paneli + Listeleme Kartlarında Video
+
+### Yapılanlar
+- **`/admin/storage` sayfası** eklendi: R2 (public+private) her bucket'ta dosyaları listeler, vault başına boyut hesaplar, progress bar ile %kullanım gösterir; Supabase vault sayıları; Vercel için placeholder (token gerekiyor)
+- **`AdminSidebar.tsx`**: "Depolama" menü öğesi eklendi
+- **`/memorial` listeleme sayfası**: `cover_video_url` eklendi — video olan profillerin kartlarında foto yerine autoplay video oynar
+- **`RecentMemorialsCarousel.tsx`**: aynı mantık uygulandı (homepage son anmalar)
+- **`page.tsx`**: homepage sorgusuna `cover_video_url` eklendi
+- **გიორგი ბერიძე profil videosu**: R2'ye yüklendi, DB güncellendi
+- Script: `scripts/upload-cover-video.mjs` (demo profil için yeniden kullanılabilir)
+- Değiştirilen dosyalar: `AdminSidebar.tsx`, `admin/storage/page.tsx` (yeni), `memorial/_MemorialsClient.tsx`, `memorial/page.tsx`, `app/page.tsx`, `RecentMemorialsCarousel.tsx`, `devlog.md`
+
+### Proje Durumu
+[x] Landing page dark luxury tasarım
+[x] 5 demo profil eklendi
+[x] Mobil overflow sorunu çözüldü
+[x] Profil video özelliği (R2, 3 sn max)
+[x] /memorial ve anasayfa kartlarında video oynatma
+[x] Admin depolama paneli (/admin/storage)
+[x] გიორგი ბერიძე profil videosu yüklendi
+[ ] Vercel trafik istatistikleri (VERCEL_TOKEN gerekli)
+[ ] Gerçek kullanıcı kaydı / ödeme akışı
+[ ] Email bildirimleri (Resend)
+
+### Kritik Kararlar / Notlar
+- Admin storage page: R2 ListObjectsV2 ile tüm bucket'ı tarar, `profiles/{vaultId}/` ve `photos/{vaultId}/` prefix'lerini destekler; 5 dk cache
+- Vercel entegrasyonu için .env.local'e VERCEL_TOKEN ve VERCEL_TEAM_ID eklenecek
+- `upload-cover-video.mjs` script'i diğer demo profiller için de adapte edilebilir
+
+### Nerede Kaldık
+Admin storage sayfası hazır, deploy edildi. Giorgi'nin profil videosu R2'de ve DB'de.
+
+### Sıradaki Adım
+1. VERCEL_TOKEN ekleyip Vercel trafik istatistiklerini admin paneline entegre et
+2. Diğer demo profillerine video eklemek gerekirse upload-cover-video.mjs'yi adapte et
+3. Gerçek kullanıcı kayıt akışı
+
+---
+
 ## 2026-06-21 — Oturum 128: Profil Video Özelliği + Bug İncelemesi
 
 ### Yapılanlar
