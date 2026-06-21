@@ -16,6 +16,7 @@ export type MemorialItem = {
   birth_date: string | null
   death_date: string | null
   cover_photo_url: string | null
+  cover_video_url?: string | null
   birth_place: string | null
   is_notable?: boolean | null
   nationality?: string | null
@@ -188,7 +189,16 @@ export default function MemorialsClient({
                       className="group overflow-hidden rounded-xl border border-[#e6dccb] bg-white shadow-sm transition-all hover:border-[#c8b89a] hover:shadow-md"
                     >
                       <div className="relative h-[170px] w-full overflow-hidden bg-[#ede8df]">
-                        {m.cover_photo_url ? (
+                        {m.cover_video_url ? (
+                          <video
+                            src={m.cover_video_url}
+                            autoPlay
+                            muted
+                            loop
+                            playsInline
+                            className="h-full w-full object-cover"
+                          />
+                        ) : m.cover_photo_url ? (
                           <Image
                             src={m.cover_photo_url}
                             alt={m.display_name}

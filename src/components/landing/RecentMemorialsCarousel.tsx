@@ -13,6 +13,7 @@ export type RecentMemorial = {
   birth_date: string | null
   death_date: string | null
   cover_photo_url: string | null
+  cover_video_url?: string | null
   birth_place: string | null
 }
 
@@ -126,9 +127,18 @@ export default function RecentMemorialsCarousel({
                       className="w-[210px] shrink-0 overflow-hidden rounded-xl transition-all duration-300 hover:-translate-y-1 hover:scale-[1.02] sm:w-[220px]"
                       style={{ background: 'rgba(255,255,255,.03)', border: '1px solid rgba(201,169,110,.14)', boxShadow: '0 4px 24px rgba(0,0,0,.3)' }}
                     >
-                      {/* Photo */}
+                      {/* Photo / Video */}
                       <div className="relative h-[180px] w-full overflow-hidden bg-[#ede8df]">
-                        {m.cover_photo_url ? (
+                        {m.cover_video_url ? (
+                          <video
+                            src={m.cover_video_url}
+                            autoPlay
+                            muted
+                            loop
+                            playsInline
+                            className="h-full w-full object-cover"
+                          />
+                        ) : m.cover_photo_url ? (
                           <Image
                             src={m.cover_photo_url}
                             alt={m.display_name}

@@ -3,6 +3,45 @@
 > Her oturum sonunda Claude bu dosyayı günceller.
 > Format: tarih → ne yapıldı → nerede kalındı → sıradaki adım.
 
+## 2026-06-21 — Oturum 128: Profil Video Özelliği + Bug İncelemesi
+
+### Yapılanlar
+- **DB migration**: `vaults` tablosuna `cover_video_url text` kolonu eklendi
+- **R2 upload altyapısı**: `profile_cover_video` kategorisi eklendi (`r2.ts`, `presign/route.ts`)
+- **Server action güncellendi** (`vault.ts`): `cover_video_url` upload + DB kaydetme
+- **`ProfileWizardForm.tsx`**: "Profil Videosu" bölümü eklendi (3.5s süre limiti, client-side doğrulama)
+- **`RealMemorialPage.tsx`**: normal profiller için `cover_video_url` varsa profil dairesinde video oynatma
+- **`anma-paneli/[id]/biyografi/page.tsx`**: video upload Cloudflare Stream'den R2'ye taşındı, `profile_video_url` → `cover_video_url` alanı kullanılıyor, `<iframe>` önizleme → `<video>` önizleme
+- **Bug incelemesi**: Hüseyin Kara ve Nino fotoğrafları "kaybolmuş" gibi görünüyordu ama DB ve R2'de mevcut, memorial sayfasında görünüyor (yavaş yükleme gecikmesinden kaynaklanıyordu). "Anasayfa video" şikayeti: public homepage'de 0 video var, biyografi yönetim sayfasındaki önizleme videosu "anasayfa" sanılmış
+- Değiştirilen dosyalar: `r2.ts`, `presign/route.ts`, `vault.ts`, `ProfileWizardForm.tsx`, `RealMemorialPage.tsx`, `anma-paneli/[id]/biyografi/page.tsx`, `globals.css`, `LocalizedLanding.tsx`
+
+### Proje Durumu
+[x] Landing page dark luxury tasarım
+[x] 5 demo profil eklendi
+[x] Mobil overflow sorunu çözüldü
+[x] Mezarlık koordinatları gerçek verilerle doğrulandı
+[x] Paylaş butonu tüm profillerde
+[x] Anasayfa bölüm ayraçları (animasyonlu ışık hüzmesi)
+[x] Profil fotoğrafı yerine kısa video (max 3 sn) — kullanıcı yükler, R2'de saklanır
+[ ] Gerçek kullanıcı kaydı / ödeme akışı
+[ ] Email bildirimleri (Resend)
+
+### Kritik Kararlar / Notlar
+- Video upload: Cloudflare Stream (eski, uzun video için) yerine R2 presign kullanıldı (kısa klipler için uygun, sıfır ek maliyet)
+- `anma-paneli/biyografi` kullanıcının gerçekte edit yaptığı yer; `dashboard/vault/profil`'deki `ProfileWizardForm` ikincil
+- Hüseyin/Nino fotoğrafları DB ve R2'de var, memorial sayfasında görünüyor (fotoğraf silinmedi)
+- "Anasayfa video": public landing page'de `cover_video_url` hiç çekilmiyor, RecentMemorialsCarousel sadece `cover_photo_url` kullanır
+
+### Nerede Kaldık
+Video özelliği tamamlandı ve `osman-istanbollu` profili test edildi. İki şikayet incelendi ve bug olmadığı doğrulandı.
+
+### Sıradaki Adım
+1. Video upload'ın 3 saniye limitini server-side da doğrulamak (şu an sadece client-side kontrol var)
+2. Kullanıcı kayıt akışı / ödeme
+3. Email bildirimleri (Resend)
+
+---
+
 ## 2026-06-21 — Oturum 127: Anasayfa Bölüm Ayraçları + Mobil Fix'ler
 
 ### Yapılanlar
