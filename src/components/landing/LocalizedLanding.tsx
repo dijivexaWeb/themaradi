@@ -70,6 +70,31 @@ function SectionHeading({ children, style }: { children: React.ReactNode; style?
   )
 }
 
+function SectionDivider({ delay = 0 }: { delay?: number }) {
+  return (
+    <div style={{ position: 'relative', height: 1, overflow: 'visible', pointerEvents: 'none', zIndex: 10 }}>
+      {/* Base line */}
+      <div style={{
+        position: 'absolute', inset: 0,
+        background: 'linear-gradient(90deg, transparent 0%, rgba(201,169,110,.18) 20%, rgba(201,169,110,.32) 50%, rgba(201,169,110,.18) 80%, transparent 100%)',
+      }} />
+      {/* Travelling orb */}
+      <div
+        className="tem-divider-orb"
+        style={{
+          position: 'absolute',
+          top: -3, left: 0,
+          width: 140, height: 7,
+          borderRadius: 9999,
+          background: 'linear-gradient(90deg, transparent, #dfbd72, #fffbee, #dfbd72, transparent)',
+          boxShadow: '0 0 12px 3px rgba(223,189,114,.45), 0 0 28px 6px rgba(223,189,114,.18)',
+          animationDelay: `${delay}s`,
+        }}
+      />
+    </div>
+  )
+}
+
 function DriftBlobs() {
   return (
     <div style={{ position: 'fixed', inset: 0, zIndex: 0, overflow: 'hidden', pointerEvents: 'none' }}>
@@ -172,6 +197,8 @@ export default function LocalizedLanding({ pricing, notableMemorials, recentMemo
           </div>
         </section>
 
+        <SectionDivider delay={0} />
+
         {/* ═══ QR BRIDGE BAND ══════════════════════════════════════ */}
         <section style={{ padding: '0 clamp(20px,4vw,60px) clamp(20px,4vh,40px)' }}>
           <div className="tem-reveal" style={{ maxWidth: 1100, margin: '0 auto', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center', gap: 'clamp(18px,3vw,40px)', padding: '26px 32px', borderRadius: 18, background: S.card, border: `1px solid ${S.cardBorder}` }}>
@@ -195,6 +222,8 @@ export default function LocalizedLanding({ pricing, notableMemorials, recentMemo
             </div>
           </div>
         </section>
+
+        <SectionDivider delay={0.4} />
 
         {/* ═══ NASIL ÇALIŞIR — QUICK 4 STEPS ══════════════════════ */}
         <section id="nasil-calisir" style={{ padding: 'clamp(60px,10vh,120px) clamp(20px,4vw,60px)' }}>
@@ -231,6 +260,8 @@ export default function LocalizedLanding({ pricing, notableMemorials, recentMemo
             </div>
           </div>
         </section>
+
+        <SectionDivider delay={0.8} />
 
         {/* ═══ PROFİL PREVİEW ══════════════════════════════════════ */}
         <section id="profil" style={{ padding: 'clamp(60px,10vh,120px) clamp(20px,4vw,60px)' }}>
@@ -389,11 +420,17 @@ export default function LocalizedLanding({ pricing, notableMemorials, recentMemo
           </div>
         </section>
 
+        <SectionDivider delay={1.2} />
+
         {/* ═══ ULUSAL MİRAS ════════════════════════════════════════ */}
         <NotableProfilesSection memorials={notableMemorials} />
 
+        <SectionDivider delay={1.6} />
+
         {/* ═══ SON ANMALAR ════════════════════════════════════════ */}
         <RecentMemorialsCarousel memorials={recentMemorials} labels={t.recentMemorials} />
+
+        <SectionDivider delay={2.0} />
 
         {/* ═══ NEDEN AILELER SEÇİYOR — 6 KART ════════════════════ */}
         <section id="ozellikler" style={{ padding: 'clamp(64px,11vh,140px) clamp(20px,4vw,60px)' }}>
@@ -437,6 +474,8 @@ export default function LocalizedLanding({ pricing, notableMemorials, recentMemo
           </div>
         </section>
 
+        <SectionDivider delay={2.4} />
+
         {/* ═══ NASIL ÇALIŞIR — DETAYLI 4 ADIM ════════════════════ */}
         <section style={{ padding: 'clamp(60px,10vh,120px) clamp(20px,4vw,60px)', borderTop: `1px solid ${S.cardBorder}`, borderBottom: `1px solid ${S.cardBorder}` }}>
           <div style={{ maxWidth: 1240, margin: '0 auto' }}>
@@ -468,6 +507,8 @@ export default function LocalizedLanding({ pricing, notableMemorials, recentMemo
           </div>
         </section>
 
+        <SectionDivider delay={2.8} />
+
         {/* ═══ QR MEZAR BANNER ════════════════════════════════════ */}
         <section style={{ padding: 'clamp(20px,4vh,50px) clamp(20px,4vw,60px)' }}>
           <div style={{ maxWidth: 1240, margin: '0 auto' }}>
@@ -491,6 +532,8 @@ export default function LocalizedLanding({ pricing, notableMemorials, recentMemo
           </div>
         </section>
 
+        <SectionDivider delay={3.2} />
+
         {/* ═══ ARA CTA BANNER ══════════════════════════════════════ */}
         <section style={{ padding: 'clamp(20px,4vh,50px) clamp(20px,4vw,60px)' }}>
           <div className="tem-reveal" style={{ position: 'relative', maxWidth: 1180, margin: '0 auto', borderRadius: 24, overflow: 'hidden', background: 'linear-gradient(120deg, #0e1c15 0%, #0a140e 100%)', border: '1px solid rgba(201,169,110,.18)', padding: 'clamp(40px,6vw,72px) clamp(24px,5vw,72px)', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 30 }}>
@@ -509,6 +552,8 @@ export default function LocalizedLanding({ pricing, notableMemorials, recentMemo
             </Link>
           </div>
         </section>
+
+        <SectionDivider delay={3.6} />
 
         {/* ═══ GÜVENLİK ════════════════════════════════════════════ */}
         <section style={{ padding: 'clamp(60px,10vh,130px) clamp(20px,4vw,60px)' }}>
@@ -548,6 +593,8 @@ export default function LocalizedLanding({ pricing, notableMemorials, recentMemo
             </div>
           </div>
         </section>
+
+        <SectionDivider delay={4.0} />
 
         {/* ═══ FİYATLAR ════════════════════════════════════════════ */}
         <section id="fiyatlar" style={{ padding: 'clamp(60px,10vh,130px) clamp(20px,4vw,60px)' }}>
@@ -624,6 +671,8 @@ export default function LocalizedLanding({ pricing, notableMemorials, recentMemo
           </div>
         </section>
 
+        <SectionDivider delay={4.4} />
+
         {/* ═══ SSS ════════════════════════════════════════════════ */}
         <section id="sss" style={{ padding: 'clamp(60px,10vh,120px) clamp(20px,4vw,60px)' }}>
           <div style={{ maxWidth: 820, margin: '0 auto' }}>
@@ -657,6 +706,8 @@ export default function LocalizedLanding({ pricing, notableMemorials, recentMemo
             </div>
           </div>
         </section>
+
+        <SectionDivider delay={4.8} />
 
         {/* ═══ FINAL CTA ══════════════════════════════════════════ */}
         <section style={{ padding: '0 clamp(16px,4vw,60px) clamp(72px,9vh,120px)' }}>
