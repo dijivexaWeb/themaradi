@@ -58,14 +58,6 @@ export default async function VideolarPage({ params, searchParams }: Props) {
   return (
     <div className="px-5 py-8 sm:px-8">
       <div className="max-w-4xl mx-auto">
-        <div className="flex items-center gap-2 text-sm mb-5">
-          <Link href="/dashboard" className="text-[#788177] hover:text-[#174f35] transition-colors">Anı Alanım</Link>
-          <span className="text-[#c8bfb0]">/</span>
-          <Link href={`/dashboard/vault/${id}`} className="text-[#788177] hover:text-[#174f35] transition-colors">{vault.display_name}</Link>
-          <span className="text-[#c8bfb0]">/</span>
-          <span className="font-semibold text-[#22362e]">Videolar</span>
-        </div>
-
         <PersonHeader vault={vault} sectionLabel="Videolar" sectionIcon="🎬" />
 
         {isLocked && (

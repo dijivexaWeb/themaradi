@@ -32,19 +32,6 @@ export default async function ProfilPage({ params, searchParams }: Props) {
   return (
     <div className="px-5 py-8 sm:px-8">
       <div className="mx-auto max-w-4xl">
-        {/* Breadcrumb */}
-        <div className="flex items-center gap-2 text-sm mb-5">
-          <Link href="/dashboard" className="text-[#788177] hover:text-[#174f35] transition-colors">
-            Anı Alanım
-          </Link>
-          <span className="text-[#c8bfb0]">/</span>
-          <Link href={`/dashboard/vault/${id}`} className="text-[#788177] hover:text-[#174f35] transition-colors">
-            {vault.display_name}
-          </Link>
-          <span className="text-[#c8bfb0]">/</span>
-          <span className="font-semibold text-[#22362e]">Kişisel Bilgiler</span>
-        </div>
-
         <PersonHeader vault={vault} sectionLabel="Kişisel Bilgiler" sectionIcon="🧍" />
 
         {saved === '1' && (

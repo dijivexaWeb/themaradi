@@ -47,14 +47,6 @@ export default async function HeirsPage({ params }: Props) {
   return (
     <div className="px-5 py-8 sm:px-8">
       <div className="max-w-3xl mx-auto">
-        <div className="flex items-center gap-2 text-sm mb-5">
-          <Link href="/dashboard" className="text-[#788177] hover:text-[#174f35] transition-colors">Anı Alanım</Link>
-          <span className="text-[#c8bfb0]">/</span>
-          <Link href={`/dashboard/vault/${id}`} className="text-[#788177] hover:text-[#174f35] transition-colors">{vault.display_name}</Link>
-          <span className="text-[#c8bfb0]">/</span>
-          <span className="font-semibold text-[#22362e]">Yetkili Kişiler</span>
-        </div>
-
         <PersonHeader vault={vault} sectionLabel="Yetkili Kişiler" sectionIcon="👥" />
 
         {isLocked && (

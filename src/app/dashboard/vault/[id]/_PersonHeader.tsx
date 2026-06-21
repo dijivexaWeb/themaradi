@@ -1,5 +1,6 @@
 import Image from 'next/image'
 import Link from 'next/link'
+import { ChevronLeft } from 'lucide-react'
 
 interface Props {
   vault: {
@@ -16,32 +17,52 @@ interface Props {
 export default function PersonHeader({ vault, sectionLabel, sectionIcon }: Props) {
   const birthYear = vault.birth_date ? new Date(vault.birth_date).getFullYear() : null
   const deathYear = vault.death_date ? new Date(vault.death_date).getFullYear() : null
-  const lifespan = birthYear || deathYear
-    ? `${birthYear ?? '?'} – ${deathYear ?? ''}`
-    : null
+  const lifespan = birthYear || deathYear ? `${birthYear ?? '?'} – ${deathYear ?? ''}` : null
 
   return (
-    <div className="mb-8 flex items-center gap-4 rounded-2xl border border-[#e5dccb] bg-white px-5 py-3.5 shadow-sm">
-      <Link href={`/dashboard/vault/${vault.id}`} className="relative h-11 w-11 shrink-0 overflow-hidden rounded-full border-2 border-[#e5dccb] bg-[#f5efdf] transition-opacity hover:opacity-80">
-        {vault.cover_photo_url ? (
-          <Image src={vault.cover_photo_url} alt={vault.display_name} fill className="object-cover" unoptimized />
-        ) : (
-          <div className="flex h-full w-full items-center justify-center text-lg text-[#c8bfb0]">👤</div>
-        )}
-      </Link>
+    <div className="relative overflow-hidden rounded-2xl bg-[#1c2e25] mb-7 shadow-lg">
+      {/* Arka plan — cover foto */}
+      {vault.cover_photo_url && (
+        <div className="absolute inset-0">
+          <Image src={vault.cover_photo_url} alt="" fill className="object-cover opacity-10" unoptimized />
+          <div className="absolute inset-0 bg-gradient-to-r from-[#1c2e25] to-[#1c2e25]/80" />
+        </div>
+      )}
 
-      <div className="min-w-0 flex-1">
-        <Link href={`/dashboard/vault/${vault.id}`} className="block truncate text-sm font-semibold text-[#1f2d27] transition-colors hover:text-[#174f35]">
-          {vault.display_name}
+      <div className="relative flex items-center gap-4 px-5 py-4">
+        {/* Geri butonu */}
+        <Link
+          href={`/dashboard/vault/${vault.id}`}
+          className="flex h-8 w-8 shrink-0 items-center justify-center rounded-xl border border-white/10 bg-white/5 text-white/60 hover:bg-white/15 hover:text-white transition-colors"
+        >
+          <ChevronLeft className="h-4 w-4" />
         </Link>
-        {lifespan && <p className="font-serif text-xs text-[#adb5ab]">{lifespan}</p>}
-      </div>
 
-      <div className="h-7 w-px shrink-0 bg-[#e5dccb]" />
+        {/* Avatar */}
+        <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-xl border border-white/20 bg-[#2a4035]">
+          {vault.cover_photo_url ? (
+            <Image src={vault.cover_photo_url} alt={vault.display_name} fill className="object-cover" unoptimized />
+          ) : (
+            <div className="flex h-full w-full items-center justify-center text-base text-[#dfbd72]">
+              {vault.display_name[0]}
+            </div>
+          )}
+        </div>
 
-      <div className="flex shrink-0 items-center gap-2">
-        <span className="text-lg leading-none">{sectionIcon}</span>
-        <span className="hidden text-sm font-semibold text-[#174f35] sm:block">{sectionLabel}</span>
+        {/* İsim + tarih */}
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-sm font-semibold text-white leading-tight">{vault.display_name}</p>
+          {lifespan && <p className="text-[11px] text-white/40">{lifespan}</p>}
+        </div>
+
+        {/* Divider */}
+        <div className="h-8 w-px shrink-0 bg-white/10" />
+
+        {/* Bölüm başlığı */}
+        <div className="flex shrink-0 items-center gap-2">
+          <span className="text-xl leading-none">{sectionIcon}</span>
+          <span className="text-sm font-semibold text-white/90">{sectionLabel}</span>
+        </div>
       </div>
     </div>
   )

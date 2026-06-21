@@ -45,15 +45,7 @@ export default async function AnilarPage({ params, searchParams }: Props) {
 
   return (
     <div className="px-5 py-8 sm:px-8">
-      <div className="max-w-3xl mx-auto">
-        <div className="flex items-center gap-2 text-sm mb-5">
-          <Link href="/dashboard" className="text-[#788177] hover:text-[#174f35] transition-colors">Anı Alanım</Link>
-          <span className="text-[#c8bfb0]">/</span>
-          <Link href={`/dashboard/vault/${id}`} className="text-[#788177] hover:text-[#174f35] transition-colors">{vault.display_name}</Link>
-          <span className="text-[#c8bfb0]">/</span>
-          <span className="font-semibold text-[#22362e]">Anılar</span>
-        </div>
-
+      <div className="max-w-5xl mx-auto">
         <PersonHeader vault={vault} sectionLabel="Anılar" sectionIcon="💭" />
 
         {isLocked && (
@@ -68,16 +60,13 @@ export default async function AnilarPage({ params, searchParams }: Props) {
           </div>
         )}
 
-        <div className="flex items-end justify-between mb-7">
-          <div>
-            <h1 className="font-serif text-3xl text-[#1f2d27]">Anılar</h1>
-            <p className="text-xs text-[#788177] mt-0.5">{memories?.length ?? 0} anı</p>
-          </div>
-        </div>
+        <div className="flex flex-col lg:flex-row gap-6">
 
-        {/* Add form */}
+        {/* SAĞ: Form — sticky */}
         {!isLocked && (
-          <div className="rounded-3xl border border-[#e5dccb] bg-[#fffdf8] p-6 shadow-[0_4px_24px_rgba(64,48,24,0.05)] mb-10">
+          <div className="w-full lg:w-80 shrink-0 lg:order-last">
+          <div className="sticky top-6">
+          <div className="rounded-2xl border border-[#e5dccb] bg-white p-5 shadow-sm">
             <div className="flex items-center gap-2 mb-4">
               <span className="text-lg">✍️</span>
               <h2 className="font-semibold text-[#1f2d27]">Yeni Anı Ekle</h2>
@@ -147,8 +136,15 @@ export default async function AnilarPage({ params, searchParams }: Props) {
               </button>
             </form>
           </div>
-        )}
+          </div>{/* /sticky */}
+          </div>
+        )}{/* /sag kolon */}
 
+        {/* SOL: Timeline */}
+        <div className="flex-1 min-w-0">
+        <div className="flex items-center justify-between mb-4">
+          <p className="text-sm font-medium text-[#788177]">{memories?.length ?? 0} anı</p>
+        </div>
         {/* Timeline */}
         {!memories?.length ? (
           <div className="rounded-3xl border border-dashed border-[#e5dccb] bg-[#fffdf8] py-20 text-center">
@@ -290,6 +286,9 @@ export default async function AnilarPage({ params, searchParams }: Props) {
             </div>
           </div>
         )}
+        </div>{/* /sol timeline */}
+
+        </div>{/* /2col */}
       </div>
     </div>
   )
