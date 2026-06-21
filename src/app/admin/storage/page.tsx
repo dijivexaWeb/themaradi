@@ -81,10 +81,16 @@ export default async function StoragePage() {
     supabase.from('vaults').select('id, display_name, slug, owner_id, status'),
     supabase.from('vaults').select('id', { count: 'exact', head: true }),
     vercelToken
-      ? fetch(
-          `https://api.vercel.com/v2/usage${vercelTeamId ? `?teamId=${vercelTeamId}` : ''}`,
-          { headers: { Authorization: `Bearer ${vercelToken}` }, next: { revalidate: 3600 } }
-        ).then(r => r.json()).catch(() => null)
+      ? Promise.all([
+          fetch(
+            `https://api.vercel.com/v9/projects${vercelTeamId ? `?teamId=${vercelTeamId}` : ''}&limit=10`,
+            { headers: { Authorization: `Bearer ${vercelToken}` }, next: { revalidate: 3600 } }
+          ).then(r => r.json()).catch(() => null),
+          fetch(
+            `https://api.vercel.com/v6/deployments${vercelTeamId ? `?teamId=${vercelTeamId}` : ''}&limit=5`,
+            { headers: { Authorization: `Bearer ${vercelToken}` }, next: { revalidate: 3600 } }
+          ).then(r => r.json()).catch(() => null),
+        ])
       : Promise.resolve(null),
   ])
 
@@ -252,74 +258,122 @@ export default async function StoragePage() {
         )}
       </div>
 
-      {/* VERCEL USAGE */}
-      {vercelUsage?.metrics ? (
-        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-          <div className="flex items-center gap-2 mb-4">
-            <Zap className="h-5 w-5 text-black" />
-            <p className="text-sm font-semibold text-slate-800">Vercel Kullanım (Son 30 Gün)</p>
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-            {Object.entries(vercelUsage.metrics as Record<string, { used: number; limit: number; unit?: string }>)
-              .slice(0, 6)
-              .map(([key, val]) => {
-                const pct = val.limit > 0 ? Math.min(100, (val.used / val.limit) * 100) : 0
-                const label = key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
-                return (
-                  <div key={key} className="rounded-lg border border-slate-100 bg-slate-50 p-3">
-                    <p className="text-[10px] text-slate-400 mb-1 truncate">{label}</p>
-                    <p className="text-sm font-bold text-slate-800">
-                      {val.used?.toLocaleString('tr-TR')}
-                      {val.unit ? ` ${val.unit}` : ''}
-                    </p>
-                    <div className="h-1 w-full rounded-full bg-slate-200 mt-1.5 overflow-hidden">
-                      <div
-                        className="h-full rounded-full"
-                        style={{ width: `${pct}%`, background: pct > 80 ? '#ef4444' : '#3b82f6' }}
-                      />
-                    </div>
-                    <p className="text-[9px] text-slate-400 mt-0.5">/ {val.limit?.toLocaleString('tr-TR')}{val.unit ? ` ${val.unit}` : ''}</p>
-                  </div>
-                )
-              })}
-          </div>
-        </div>
-      ) : vercelToken ? (
-        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-          <div className="flex items-center gap-2 mb-3">
-            <Activity className="h-5 w-5 text-slate-400" />
-            <p className="text-sm font-semibold text-slate-600">Vercel Kullanım (Son 30 Gün)</p>
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-            {[
-              { label: 'Function Invocations', used: null, limit: '1M' },
-              { label: 'Fast Data Transfer', used: null, limit: '100 GB' },
-              { label: 'Edge Requests', used: null, limit: '1M' },
-            ].map(item => (
-              <div key={item.label} className="rounded-lg border border-slate-100 bg-slate-50 p-3">
-                <p className="text-[10px] text-slate-400 mb-2">{item.label}</p>
-                <p className="text-xs text-slate-400 italic">Vercel API yanıt vermedi</p>
-                <p className="text-[9px] text-slate-300 mt-0.5">Limit: {item.limit}</p>
+      {/* VERCEL INFO */}
+      {(() => {
+        if (!vercelToken) {
+          return (
+            <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50 p-5">
+              <div className="flex items-center gap-2 mb-2">
+                <Zap className="h-4 w-4 text-slate-400" />
+                <p className="text-sm font-semibold text-slate-500">Vercel Trafik & Kullanım</p>
               </div>
-            ))}
+              <p className="text-xs text-slate-400">
+                <code className="bg-slate-200 px-1 rounded">VERCEL_TOKEN</code> ve{' '}
+                <code className="bg-slate-200 px-1 rounded">VERCEL_TEAM_ID</code> env değişkenlerini ekleyin.
+              </p>
+            </div>
+          )
+        }
+
+        const [projectsData, deploymentsData] = (vercelUsage as [any, any] | null) ?? [null, null]
+        const projects: any[] = projectsData?.projects ?? []
+        const deployments: any[] = deploymentsData?.deployments ?? []
+        const mainProject = projects.find((p: any) => p.name === 'themaradi') ?? projects[0]
+        const latestDeploy = deployments[0]
+
+        return (
+          <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <Zap className="h-5 w-5 text-black" />
+                <p className="text-sm font-semibold text-slate-800">Vercel Deployment</p>
+              </div>
+              <a
+                href="https://vercel.com/dashboard/usage"
+                target="_blank"
+                rel="noreferrer"
+                className="text-xs text-blue-500 hover:underline flex items-center gap-1"
+              >
+                Kullanım detayı ↗
+              </a>
+            </div>
+
+            {mainProject ? (
+              <div className="space-y-3">
+                {/* Project info */}
+                <div className="flex flex-wrap gap-3">
+                  <div className="rounded-lg border border-slate-100 bg-slate-50 p-3 flex-1 min-w-[140px]">
+                    <p className="text-[10px] text-slate-400 mb-1">Proje</p>
+                    <p className="text-xs font-semibold text-slate-800">{mainProject.name}</p>
+                    <p className="text-[10px] text-slate-400 mt-0.5">{mainProject.framework ?? 'nextjs'}</p>
+                  </div>
+                  <div className="rounded-lg border border-slate-100 bg-slate-50 p-3 flex-1 min-w-[140px]">
+                    <p className="text-[10px] text-slate-400 mb-1">Domain</p>
+                    <p className="text-xs font-semibold text-slate-800">
+                      {mainProject.alias?.[0]?.domain ?? 'theeternalmemory.com'}
+                    </p>
+                  </div>
+                  <div className="rounded-lg border border-slate-100 bg-slate-50 p-3 flex-1 min-w-[140px]">
+                    <p className="text-[10px] text-slate-400 mb-1">Toplam Proje</p>
+                    <p className="text-sm font-bold text-slate-800">{projects.length}</p>
+                  </div>
+                </div>
+
+                {/* Recent deployments */}
+                {deployments.length > 0 && (
+                  <div>
+                    <p className="text-xs font-medium text-slate-500 mb-2">Son Deployment&apos;lar</p>
+                    <div className="divide-y divide-slate-100 rounded-lg border border-slate-100 overflow-hidden">
+                      {deployments.slice(0, 5).map((d: any) => {
+                        const date = new Date(d.created).toLocaleString('tr-TR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' })
+                        const isReady = d.state === 'READY' || d.readyState === 'READY'
+                        const isError = d.state === 'ERROR' || d.readyState === 'ERROR'
+                        return (
+                          <div key={d.uid} className="flex items-center justify-between px-3 py-2 bg-white">
+                            <div className="flex items-center gap-2 min-w-0">
+                              <span className={`h-2 w-2 rounded-full shrink-0 ${isReady ? 'bg-green-400' : isError ? 'bg-red-400' : 'bg-yellow-400'}`} />
+                              <span className="text-[10px] text-slate-600 font-mono truncate max-w-[180px]">{d.url}</span>
+                            </div>
+                            <span className="text-[10px] text-slate-400 shrink-0 ml-2">{date}</span>
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* Free tier limits reminder */}
+                <div className="rounded-lg bg-blue-50 border border-blue-100 p-3">
+                  <p className="text-[10px] font-semibold text-blue-700 mb-1.5">Hobby Plan Limitleri (aylık)</p>
+                  <div className="grid grid-cols-2 gap-x-4 gap-y-0.5">
+                    {[
+                      ['Function Invocations', '1M'],
+                      ['Fast Data Transfer', '100 GB'],
+                      ['Edge Requests', '1M'],
+                      ['Build Dakikası', '6.000 dk'],
+                      ['Image Optimization', '5K'],
+                      ['Fluid CPU', '4 saat'],
+                    ].map(([label, limit]) => (
+                      <div key={label} className="flex justify-between text-[10px]">
+                        <span className="text-blue-600">{label}</span>
+                        <span className="text-blue-800 font-medium">{limit}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <p className="text-[9px] text-blue-500 mt-2">
+                    Gerçek kullanım rakamları için{' '}
+                    <a href="https://vercel.com/dashboard/usage" target="_blank" rel="noreferrer" className="underline">
+                      vercel.com/dashboard/usage
+                    </a>
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <p className="text-xs text-slate-400">Proje bilgisi alınamadı. Token veya Team ID&apos;yi kontrol edin.</p>
+            )}
           </div>
-          <p className="text-xs text-slate-400 mt-3">
-            Token tanımlandı ama API yanıt formatı beklenenden farklı. Vercel Dashboard → Usage sekmesinden manuel kontrol edin.
-          </p>
-        </div>
-      ) : (
-        <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50 p-5">
-          <div className="flex items-center gap-2 mb-2">
-            <Zap className="h-4 w-4 text-slate-400" />
-            <p className="text-sm font-semibold text-slate-500">Vercel Trafik & Kullanım</p>
-          </div>
-          <p className="text-xs text-slate-400">
-            <code className="bg-slate-200 px-1 rounded">VERCEL_TOKEN</code> ve{' '}
-            <code className="bg-slate-200 px-1 rounded">VERCEL_TEAM_ID</code>{' '}
-            env değişkenlerini ekleyin.
-          </p>
-        </div>
-      )}
+        )
+      })()}
 
       {/* PER-VAULT TABLE */}
       <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
