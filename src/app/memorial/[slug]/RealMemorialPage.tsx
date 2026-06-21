@@ -563,7 +563,7 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
 
       {/* ── YAPIŞKAN SEKMELER ── */}
       {tabs.length > 0 && (
-        <nav id="sekmeler" className="sticky top-16 z-30 border-b border-[#e6dccb] bg-[#fbf8f1]/96 shadow-sm backdrop-blur">
+        <nav id="sekmeler" className="sticky top-16 z-30 overflow-hidden border-b border-[#e6dccb] bg-[#fbf8f1]/96 shadow-sm backdrop-blur">
           <div className="mx-auto flex max-w-7xl overflow-x-auto px-5 sm:px-8">
             {tabs.map((tab) => (
               <a
@@ -589,7 +589,7 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
                   {vault.is_notable ? t.memorial.nationsMemory : t.memorial.lifeStory}
                 </span>
               </div>
-              <h2 className="mt-3 font-serif text-5xl leading-tight text-[#173d31]">
+              <h2 className="mt-3 font-serif text-3xl leading-tight text-[#173d31] sm:text-5xl">
                 {vault.is_notable ? t.memorial.nationsMemory : t.memorial.lifeStoryHeading}
               </h2>
               {vault.biography ? (
@@ -694,7 +694,7 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
                 <span className="h-px w-10 bg-[#c7a76f]" />
                 <span className="text-xs tracking-[0.2em] uppercase">{t.memorial.videoMemories}</span>
               </div>
-              <h2 className="mt-3 font-serif text-5xl text-white">
+              <h2 className="mt-3 font-serif text-3xl text-white sm:text-5xl">
                 {t.memorial.movingMoments}
               </h2>
             </div>
@@ -796,7 +796,7 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
               <span className="h-px w-10 bg-[#c7a76f]" />
               <span className="text-xs tracking-[0.2em] uppercase">{isNotable ? (lang === "ka" ? "დარჩენილი სიტყვა" : lang === "ru" ? "Оставленные слова" : lang === "en" ? "Remaining Words" : lang === "hy" ? "Մնացած խոսք" : lang === "az" ? "Qalan Söz" : "Geride Kalan Söz") : t.memorial.lastMessageTitle}</span>
             </div>
-            <h2 className="mt-3 font-serif text-5xl text-[#173d31]">
+            <h2 className="mt-3 font-serif text-3xl text-[#173d31] sm:text-5xl">
               {isNotable ? (lang === "ka" ? "სამშობლოს და თაობებისთვის დარჩენილი სიტყვები." : lang === "ru" ? "Слова, оставленные народу и поколениям." : lang === "en" ? "Words left for the nation and generations." : lang === "hy" ? "Իր ազգին և սերունդներին թողած տողերը:" : lang === "az" ? "Millətinə və nəsillərinə qoyduğu sətirlər." : "Milletine ve nesillere bıraktığı satırlar.") : t.memorial.linesLeftForLovedOnes}
             </h2>
           </div>
@@ -848,7 +848,7 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
                 <span className="h-px w-10 bg-[#c7a76f]" />
                 <span className="text-xs tracking-[0.2em] uppercase">{t.memorial.featuredMemories}</span>
               </div>
-              <h2 className="mt-3 font-serif text-5xl text-[#173d31]">
+              <h2 className="mt-3 font-serif text-3xl text-[#173d31] sm:text-5xl">
                 {t.memorial.withWordsOfLovedOnes}
               </h2>
             </div>
@@ -1009,7 +1009,7 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
                 <span className="h-px w-10 bg-[#c7a76f]" />
                 <span className="text-xs tracking-[0.2em] uppercase">{t.memorial.visitInfo}</span>
               </div>
-              <h2 className="mt-3 font-serif text-5xl text-[#173d31]">
+              <h2 className="mt-3 font-serif text-3xl text-[#173d31] sm:text-5xl">
                 {t.memorial.visitAtGrave}
               </h2>
             </div>

@@ -950,7 +950,7 @@ export default function MemorialPage() {
       </section>
 
       {/* â"€â"€ YAPIÅKAN SEKMELER â"€â"€ */}
-      <nav id="sekmeler" className="sticky top-[108px] z-40 border-b border-[#e6dccb] bg-[#fbf8f1]/96 shadow-sm backdrop-blur">
+      <nav id="sekmeler" className="sticky top-[108px] z-40 overflow-hidden border-b border-[#e6dccb] bg-[#fbf8f1]/96 shadow-sm backdrop-blur">
         <div className="mx-auto flex max-w-7xl overflow-x-auto px-5 text-sm text-[#665d50] sm:px-8">
           {['#hikaye', '#kronoloji', '#videolar', '#fotograflar', '#son-mesaj', '#taziye', '#ziyaret'].map((href, index) => (
             <TabLink key={href} href={href} label={copy.tabs[index]} />
@@ -963,7 +963,7 @@ export default function MemorialPage() {
         <div className="mx-auto grid max-w-7xl gap-10 lg:grid-cols-[1.1fr_0.9fr]">
           <div>
             <SectionLabel text={copy.story.label} />
-            <h2 className="mt-3 font-serif text-5xl leading-tight text-[#173d31]">
+            <h2 className="mt-3 font-serif text-3xl leading-tight text-[#173d31] sm:text-5xl">
               {copy.story.titleA}<br />
               <span className="text-[#b08340]">{copy.story.titleB}</span>
             </h2>
@@ -1011,7 +1011,7 @@ export default function MemorialPage() {
           <div className="mb-9 flex flex-col gap-6 lg:flex-row lg:items-end lg:justify-between">
             <div>
               <SectionLabel text={copy.timelineLabel} light />
-              <h2 className="mt-3 font-serif text-5xl text-white">{journeyUi.title}</h2>
+              <h2 className="mt-3 font-serif text-3xl text-white sm:text-5xl">{journeyUi.title}</h2>
               <p className="mt-4 max-w-xl text-sm leading-7 text-[#b8aa93]">
                 {copy.timelineTitleA} {copy.timelineTitleB} {yearsLived} {journeyUi.years}.
               </p>
@@ -1118,7 +1118,7 @@ export default function MemorialPage() {
         <div className="mx-auto max-w-7xl">
           <div className="mb-10">
             <SectionLabel text={copy.videos.label} light />
-            <h2 className="mt-3 font-serif text-5xl text-white">{copy.videos.titleA}<br /><span className="text-[#c7a76f]">{copy.videos.titleB}</span></h2>
+            <h2 className="mt-3 font-serif text-3xl text-white sm:text-5xl">{copy.videos.titleA}<br /><span className="text-[#c7a76f]">{copy.videos.titleB}</span></h2>
           </div>
 
           <div className="grid gap-4 lg:grid-cols-[1fr_320px]">
@@ -1180,7 +1180,7 @@ export default function MemorialPage() {
           <div className="mb-10 flex items-end justify-between">
             <div>
               <SectionLabel text={copy.photos.label} />
-              <h2 className="mt-3 font-serif text-5xl text-[#173d31]">{copy.photos.titleA}<br /><span className="text-[#b08340]">{copy.photos.titleB}</span></h2>
+              <h2 className="mt-3 font-serif text-3xl text-[#173d31] sm:text-5xl">{copy.photos.titleA}<br /><span className="text-[#b08340]">{copy.photos.titleB}</span></h2>
             </div>
             <span className="hidden text-sm text-[#8a7a64] sm:block">{photos.length} {copy.photos.count}</span>
           </div>
@@ -1212,7 +1212,7 @@ export default function MemorialPage() {
       <section id="son-mesaj" className="border-y border-[#e6dccb] bg-[#f7f2e9] px-5 py-20 sm:px-8">
         <div className="mx-auto max-w-4xl text-center">
           <SectionLabel text={copy.finalMessage.label} />
-          <h2 className="mt-3 font-serif text-5xl text-[#173d31]">{copy.finalMessage.titleA}<br />{copy.finalMessage.titleB}</h2>
+          <h2 className="mt-3 font-serif text-3xl text-[#173d31] sm:text-5xl">{copy.finalMessage.titleA}<br />{copy.finalMessage.titleB}</h2>
         </div>
 
         <div className="relative mx-auto mt-12 max-w-2xl">
@@ -1244,7 +1244,7 @@ export default function MemorialPage() {
         <div className="mx-auto max-w-7xl">
           <div className="mb-10">
             <SectionLabel text={copy.voices.label} light />
-            <h2 className="mt-3 font-serif text-5xl text-white">{copy.voices.titleA}<br /><span className="text-[#c7a76f]">{copy.voices.titleB}</span></h2>
+            <h2 className="mt-3 font-serif text-3xl text-white sm:text-5xl">{copy.voices.titleA}<br /><span className="text-[#c7a76f]">{copy.voices.titleB}</span></h2>
           </div>
 
           <div className="grid gap-5 md:grid-cols-3">
@@ -1290,7 +1290,7 @@ export default function MemorialPage() {
         <div className="mx-auto max-w-7xl">
           <div className="mb-12 text-center">
             <SectionLabel text={copy.featured.label} />
-            <h2 className="mt-3 font-serif text-5xl text-[#173d31]">{copy.featured.titleA}<br /><span className="text-[#b08340]">{copy.featured.titleB}</span></h2>
+            <h2 className="mt-3 font-serif text-3xl text-[#173d31] sm:text-5xl">{copy.featured.titleA}<br /><span className="text-[#b08340]">{copy.featured.titleB}</span></h2>
           </div>
 
           <div className="grid gap-6 lg:grid-cols-3">
@@ -1411,7 +1411,7 @@ export default function MemorialPage() {
         <div className="mx-auto max-w-7xl">
           <div className="mb-10">
             <SectionLabel text={copy.visit.label} />
-            <h2 className="mt-3 font-serif text-5xl text-[#173d31]">{copy.visit.titleA}<br /><span className="text-[#b08340]">{copy.visit.titleB}</span></h2>
+            <h2 className="mt-3 font-serif text-3xl text-[#173d31] sm:text-5xl">{copy.visit.titleA}<br /><span className="text-[#b08340]">{copy.visit.titleB}</span></h2>
           </div>
 
           <div className="overflow-hidden rounded-2xl border border-[#e1d5c3] shadow-xl shadow-[#4d3d26]/8">
