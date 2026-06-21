@@ -121,13 +121,7 @@ export default async function MemorialDogrulamaPage({ params }: Props) {
   return (
     <div className="px-5 py-8 sm:px-8">
       <div className="mx-auto max-w-2xl">
-        <div className="mb-5 flex items-center gap-2 text-sm">
-          <Link href={`/anma-paneli/${id}`} className="text-[#788177] transition-colors hover:text-[#174f35]">
-            {vault.display_name}
-          </Link>
-          <span className="text-[#c8bfb0]">/</span>
-          <span className="font-semibold text-[#22362e]">Doğrulama & Yayın</span>
-        </div>
+        
 
         <div className="mb-6">
           <h1 className="font-serif text-3xl text-[#1f2d27]">Doğrulama & Yayın</h1>

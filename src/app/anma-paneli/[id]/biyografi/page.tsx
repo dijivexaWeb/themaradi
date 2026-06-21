@@ -234,12 +234,13 @@ export default function BiyografiPage() {
   return (
     <div className="px-5 py-8 sm:px-8">
       <div className="mx-auto max-w-3xl">
-        <div className="mb-5 flex items-center gap-2 text-sm">
-          <Link href={`/anma-paneli/${id}`} className="text-[#788177] transition-colors hover:text-[#174f35]">
-            {vault?.display_name ?? '...'}
-          </Link>
-          <span className="text-[#c8bfb0]">/</span>
-          <span className="font-semibold text-[#22362e]">Biyografi</span>
+        <div className="mb-7 border-b border-[#e5dccb] pb-5">
+          <div className="flex items-center gap-3">
+            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#1c2e25] text-xl shadow-sm">📖</div>
+            <div>
+              <h1 className="font-serif text-2xl text-[#1f2d27]">Biyografi & Profil</h1>
+            </div>
+          </div>
         </div>
 
         {isLocked && (

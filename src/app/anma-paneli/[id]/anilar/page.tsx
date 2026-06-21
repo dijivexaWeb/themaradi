@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { addMemoryAction, updateMemoryAction, deleteMemoryAction } from '@/lib/actions/memories'
 import { ImageUploadInput } from '@/components/ImageUploadInput'
 import MemorySubmitButton from './_MemorySubmitButton'
+import SectionHeader from '../_SectionHeader'
 
 interface Props {
   params: Promise<{ id: string }>
@@ -67,14 +68,7 @@ export default async function MemorialAnilarPage({ params, searchParams }: Props
     <div className="px-5 py-8 sm:px-8">
       <div className="max-w-3xl mx-auto">
 
-        {/* Breadcrumb */}
-        <div className="flex items-center gap-2 text-sm mb-5">
-          <Link href={`/anma-paneli/${id}`} className="text-[#788177] hover:text-[#174f35] transition-colors">
-            {vault.display_name}
-          </Link>
-          <span className="text-[#c8bfb0]">/</span>
-          <span className="font-semibold text-[#22362e]">Anılar</span>
-        </div>
+        <SectionHeader title="Anılar" icon="💭" subtitle={`${memories?.length ?? 0} anı`} />
 
         {isLocked && (
           <div className="mb-5 rounded-2xl border border-[#dfbd72]/50 bg-[#fff7e6] px-5 py-4 text-sm text-[#725212]">

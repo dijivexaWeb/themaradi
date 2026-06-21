@@ -6,6 +6,7 @@ import { addMemorialPhotoAction } from '../actions'
 import { updateMediaAction, deleteMediaAction } from '@/lib/actions/media'
 import SubmitButton from '@/components/SubmitButton'
 import PhotoUploadForm from './PhotoUploadForm'
+import SectionHeader from '../_SectionHeader'
 
 interface Props {
   params: Promise<{ id: string }>
@@ -67,13 +68,7 @@ export default async function MemorialFotolarPage({ params, searchParams }: Prop
   return (
     <div className="px-5 py-8 sm:px-8">
       <div className="mx-auto max-w-5xl">
-        <div className="mb-5 flex items-center gap-2 text-sm">
-          <Link href={`/anma-paneli/${id}`} className="text-[#788177] transition-colors hover:text-[#174f35]">
-            {vault.display_name}
-          </Link>
-          <span className="text-[#c8bfb0]">/</span>
-          <span className="font-semibold text-[#22362e]">Fotoğraflar</span>
-        </div>
+        <SectionHeader title="Fotoğraflar" icon="📷" subtitle={`${photos?.length ?? 0} / ${PHOTO_LIMIT} fotoğraf`} />
 
         {isLocked && (
           <div className="mb-5 rounded-2xl border border-[#dfbd72]/50 bg-[#fff7e6] px-5 py-4 text-sm text-[#725212]">
@@ -81,14 +76,10 @@ export default async function MemorialFotolarPage({ params, searchParams }: Prop
           </div>
         )}
 
-        <div className="mb-7 flex items-end justify-between">
-          <div>
-            <h1 className="font-serif text-3xl text-[#1f2d27]">Fotoğraflar</h1>
-            <p className="mt-0.5 text-xs text-[#788177]">
-              {photos?.length ?? 0} / {PHOTO_LIMIT} fotoğraf
-            </p>
-          </div>
-        </div>
+        <div className="flex flex-col lg:flex-row gap-6">
+
+        {/* SOL: Galeri + edit formu */}
+        <div className="flex-1 min-w-0">
 
         {/* Düzenleme formu */}
         {editingPhoto && !isLocked && (
@@ -165,17 +156,6 @@ export default async function MemorialFotolarPage({ params, searchParams }: Prop
               </div>
               <SubmitButton pendingLabel="Yükleniyor...">Kaydet</SubmitButton>
             </form>
-          </div>
-        )}
-
-        {/* Yükleme formu */}
-        {!isLocked && !atLimit && !editingPhoto && (
-          <PhotoUploadForm vaultId={id} todayMax={todayMax} />
-        )}
-
-        {atLimit && !isLocked && (
-          <div className="mb-6 rounded-2xl border border-[#dfbd72]/50 bg-[#fff7e6] px-5 py-4 text-sm text-[#725212]">
-            Fotoğraf limitine ulaştınız ({PHOTO_LIMIT}/{PHOTO_LIMIT})
           </div>
         )}
 
@@ -262,6 +242,36 @@ export default async function MemorialFotolarPage({ params, searchParams }: Prop
             })}
           </div>
         )}
+        </div>{/* /SOL */}
+
+        {/* SAĞ: Upload + sayaç sticky */}
+        <div className="w-full lg:w-72 shrink-0">
+          <div className="sticky top-6 space-y-4">
+            <div className="rounded-2xl border border-[#e5dccb] bg-white px-5 py-4">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-xs font-semibold text-[#4a5e55]">Fotoğraf sayısı</span>
+                <span className="text-sm font-bold text-[#174f35]">{photos?.length ?? 0} / {PHOTO_LIMIT}</span>
+              </div>
+              <div className="h-1.5 w-full rounded-full bg-[#f0ebe0] overflow-hidden">
+                <div
+                  className="h-full rounded-full bg-[#174f35] transition-all"
+                  style={{ width: `${Math.min(100, ((photos?.length ?? 0) / PHOTO_LIMIT) * 100)}%` }}
+                />
+              </div>
+            </div>
+
+            {!isLocked && !atLimit && !editingPhoto && (
+              <PhotoUploadForm vaultId={id} todayMax={todayMax} />
+            )}
+            {atLimit && !isLocked && (
+              <div className="rounded-2xl border border-[#dfbd72]/50 bg-[#fff7e6] px-4 py-3 text-xs text-[#725212]">
+                Limite ulaştınız ({PHOTO_LIMIT}/{PHOTO_LIMIT})
+              </div>
+            )}
+          </div>
+        </div>
+
+        </div>{/* /2col */}
       </div>
     </div>
   )

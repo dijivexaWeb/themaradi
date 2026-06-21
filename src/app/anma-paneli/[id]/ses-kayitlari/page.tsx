@@ -41,11 +41,6 @@ export default async function MemorialSesKayitlariPage({ params, searchParams }:
   return (
     <div className="px-5 py-8 sm:px-8">
       <div className="mx-auto max-w-3xl">
-        <div className="flex items-center gap-2 text-sm mb-5">
-          <Link href={`/anma-paneli/${id}`} className="text-[#788177] hover:text-[#174f35] transition-colors">{vault.display_name}</Link>
-          <span className="text-[#c8bfb0]">/</span>
-          <span className="font-semibold text-[#22362e]">Ses Kayıtları</span>
-        </div>
 
         <div className="flex items-end justify-between mb-7">
           <div>

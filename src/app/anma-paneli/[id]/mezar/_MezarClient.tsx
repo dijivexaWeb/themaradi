@@ -78,13 +78,7 @@ export default function MezarClient({ id, displayName, isLocked, initialData }: 
   return (
     <div className="px-5 py-8 sm:px-8">
       <div className="mx-auto max-w-2xl">
-        <div className="mb-5 flex items-center gap-2 text-sm">
-          <Link href={`/anma-paneli/${id}`} className="text-[#788177] transition-colors hover:text-[#174f35]">
-            {displayName}
-          </Link>
-          <span className="text-[#c8bfb0]">/</span>
-          <span className="font-semibold text-[#22362e]">Defin Bilgileri</span>
-        </div>
+        
 
         <div className="mb-6">
           <h1 className="font-serif text-3xl text-[#1f2d27]">Defin Bilgileri</h1>

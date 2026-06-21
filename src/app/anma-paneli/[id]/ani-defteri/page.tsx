@@ -59,13 +59,7 @@ export default async function AniDefteri({ params }: Props) {
   return (
     <div className="px-5 py-8 sm:px-8">
       <div className="mx-auto max-w-4xl">
-        <div className="mb-5 flex items-center gap-2 text-sm">
-          <Link href={`/anma-paneli/${id}`} className="text-[#788177] transition-colors hover:text-[#174f35]">
-            {vault.display_name}
-          </Link>
-          <span className="text-[#c8bfb0]">/</span>
-          <span className="font-semibold text-[#22362e]">Anı Defteri</span>
-        </div>
+        
 
         <div className="mb-7">
           <h1 className="font-serif text-3xl text-[#1f2d27]">Anı Defteri</h1>

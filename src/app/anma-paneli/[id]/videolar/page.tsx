@@ -62,11 +62,6 @@ export default async function MemorialVideolarPage({ params, searchParams }: Pro
   return (
     <div className="px-5 py-8 sm:px-8">
       <div className="max-w-4xl mx-auto">
-        <div className="flex items-center gap-2 text-sm mb-5">
-          <Link href={`/anma-paneli/${id}`} className="text-[#788177] hover:text-[#174f35] transition-colors">{vault.display_name}</Link>
-          <span className="text-[#c8bfb0]">/</span>
-          <span className="font-semibold text-[#22362e]">Videolar</span>
-        </div>
 
         {isLocked && (
           <div className="mb-5 rounded-2xl border border-[#dfbd72]/50 bg-[#fff7e6] px-5 py-4 text-sm text-[#725212]">
