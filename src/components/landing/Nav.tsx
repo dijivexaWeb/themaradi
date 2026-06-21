@@ -24,7 +24,7 @@ export default function Nav() {
 
   const links = [
     { href: '#nasil-calisir', label: t.nav.howItWorks },
-    { href: '#ozellikler',    label: t.nav.features    },
+    { href: '/memorial',      label: t.nav.features    },
     { href: '/memorial/demo', label: t.nav.demoProfile },
     { href: '/#fiyatlar',     label: t.nav.pricing     },
     { href: '#sss',           label: t.nav.faq         },
