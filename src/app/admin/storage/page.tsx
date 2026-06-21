@@ -75,11 +75,12 @@ export default async function StoragePage() {
   const vercelTeamId = process.env.V_TEAM_ID
 
   // Parallel: R2 objects + Supabase + Vercel usage
-  const [publicObjs, privateObjs, { data: vaults }, { count: totalVaultCount }, vercelUsage] = await Promise.all([
+  const [publicObjs, privateObjs, { data: vaults }, { count: totalVaultCount }, dbStatsResult, vercelUsage] = await Promise.all([
     listAllObjects(r2Client, publicBucket),
     listAllObjects(r2Client, privateBucket).catch(() => [] as { key: string; size: number }[]),
     supabase.from('vaults').select('id, display_name, slug, owner_id, status'),
     supabase.from('vaults').select('id', { count: 'exact', head: true }),
+    supabase.rpc('get_db_stats').single().catch(() => ({ data: null })),
     vercelToken
       ? Promise.all([
           fetch(
@@ -164,6 +165,10 @@ export default async function StoragePage() {
 
   // Supabase free tier: 500 MB DB
   const supabaseFreeLimitBytes = 500 * 1024 * 1024
+  const dbStats = (dbStatsResult as any)?.data as { db_size_bytes: number; tables: { name: string; bytes: number }[] } | null
+  const dbSizeBytes = dbStats?.db_size_bytes ?? 0
+  const dbUsagePercent = Math.min(100, (dbSizeBytes / supabaseFreeLimitBytes) * 100)
+  const topTables = (dbStats?.tables ?? []).slice(0, 8)
 
   return (
     <div className="p-6 max-w-6xl mx-auto space-y-8">
@@ -199,32 +204,17 @@ export default async function StoragePage() {
           detail={`${privateObjs.length} dosya`}
         />
         {/* Supabase DB */}
-        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-          <div className="flex items-center gap-2 mb-3">
-            <Database className="h-5 w-5 text-emerald-600" />
-            <div>
-              <p className="text-sm font-semibold text-slate-800">Supabase DB</p>
-              <p className="text-xs text-slate-400">PostgreSQL — Free tier</p>
-            </div>
-          </div>
-          <div className="space-y-1.5">
-            <div className="flex justify-between text-xs text-slate-500">
-              <span>Toplam vault</span>
-              <span className="font-semibold text-slate-700">{totalVaultCount ?? 0}</span>
-            </div>
-            <div className="flex justify-between text-xs text-slate-500">
-              <span>Public memorial</span>
-              <span className="font-semibold text-slate-700">{vaults?.length ?? 0}</span>
-            </div>
-            <div className="flex justify-between text-xs text-slate-500">
-              <span>DB limiti</span>
-              <span className="font-semibold text-slate-700">500 MB</span>
-            </div>
-            <p className="text-[10px] text-slate-400 pt-1">
-              Gerçek DB boyutu için Supabase Dashboard → Settings → Usage
-            </p>
-          </div>
-        </div>
+        <UsageCard
+          icon={<Database className="h-5 w-5 text-emerald-600" />}
+          title="Supabase DB"
+          subtitle={`PostgreSQL — Free tier • ${totalVaultCount ?? 0} vault`}
+          used={dbSizeBytes}
+          total={supabaseFreeLimitBytes}
+          usedLabel={formatBytes(dbSizeBytes)}
+          limitLabel="500 MB ücretsiz"
+          color="emerald"
+          detail={`${(dbStats?.tables ?? []).length} tablo`}
+        />
       </div>
 
       {/* R2 COMBINED TOTAL BAR */}
@@ -257,6 +247,56 @@ export default async function StoragePage() {
           </p>
         )}
       </div>
+
+      {/* SUPABASE DB DETAIL */}
+      {dbSizeBytes > 0 && (
+        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <Database className="h-5 w-5 text-emerald-600" />
+              <p className="text-sm font-semibold text-slate-800">Supabase DB Kullanım Detayı</p>
+            </div>
+            <div className="flex items-center gap-3">
+              <span className={`text-xs font-bold ${dbUsagePercent > 80 ? 'text-red-600' : 'text-emerald-600'}`}>
+                {formatBytes(dbSizeBytes)} / 500 MB (%{dbUsagePercent.toFixed(1)})
+              </span>
+            </div>
+          </div>
+          <div className="h-2 w-full rounded-full bg-slate-100 overflow-hidden mb-4">
+            <div
+              className="h-full rounded-full transition-all"
+              style={{
+                width: `${dbUsagePercent.toFixed(2)}%`,
+                background: dbUsagePercent > 80 ? '#ef4444' : dbUsagePercent > 60 ? '#f97316' : '#10b981',
+              }}
+            />
+          </div>
+          {topTables.length > 0 && (
+            <div>
+              <p className="text-xs font-medium text-slate-500 mb-2">En büyük tablolar</p>
+              <div className="divide-y divide-slate-100 rounded-lg border border-slate-100 overflow-hidden">
+                {topTables.map((t) => {
+                  const pct = dbSizeBytes > 0 ? (t.bytes / dbSizeBytes) * 100 : 0
+                  return (
+                    <div key={t.name} className="flex items-center justify-between px-3 py-2 bg-white hover:bg-slate-50">
+                      <div className="flex items-center gap-3 min-w-0 flex-1">
+                        <span className="text-xs font-mono text-slate-600 truncate">{t.name}</span>
+                        <div className="flex-1 h-1 rounded-full bg-slate-100 overflow-hidden max-w-[120px]">
+                          <div className="h-full rounded-full bg-emerald-400" style={{ width: `${pct}%` }} />
+                        </div>
+                      </div>
+                      <span className="text-xs text-slate-500 shrink-0 ml-3 font-medium">{formatBytes(t.bytes)}</span>
+                    </div>
+                  )
+                })}
+              </div>
+              <p className="text-[10px] text-slate-400 mt-2">
+                {formatBytes(supabaseFreeLimitBytes - dbSizeBytes)} boş alan kaldı
+              </p>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* VERCEL INFO */}
       {(() => {
