@@ -3,6 +3,43 @@
 > Her oturum sonunda Claude bu dosyayı günceller.
 > Format: tarih → ne yapıldı → nerede kalındı → sıradaki adım.
 
+## 2026-06-21 — Oturum 126: Mobil Düzeltmeler, Mezarlık Koordinatları, Paylaş Butonu
+
+### Yapılanlar
+- **Mobil kayma düzeltildi**: sekme nav'ına `overflow-hidden` eklendi (tab linkleri 866px'e kadar genişleyip sayfayı itiyordu)
+- **H2 başlıkları responsive yapıldı**: `text-5xl` → `text-3xl sm:text-5xl` (hem `MemorialPageClient.tsx` hem `RealMemorialPage.tsx`)
+- **Mezarlık koordinatları gerçek verilerle güncellendi** (Google Maps doğrulaması):
+  - Nino + Marina: ვაკის სასაფლაო (Tbilisi Vake) — 41.710214, 44.737972
+  - Giorgi: საფიჩხიის სასაფლაო (Kutaisi) — 42.2595152, 42.7203494
+  - Tamar: ბათუმის სასაფლაო — 41.6179459, 41.6173596
+  - Hüseyin: **Trabzon Uğurlu Mezarlığı** — 40.9684741, 39.6507898 (onaylandı: gerçek, 4.1★)
+- **Paylaş butonu tüm profillere eklendi**: `isNotable` koşulu kaldırıldı, `MemorialPageClient.tsx`'e de eklendi
+- Değiştirilen dosyalar: `RealMemorialPage.tsx`, `MemorialPageClient.tsx`
+
+### Proje Durumu
+[x] Landing page dark luxury tasarım
+[x] 5 demo profil eklendi
+[x] Mobil overflow sorunu çözüldü
+[x] Mezarlık koordinatları gerçek verilerle doğrulandı
+[x] Paylaş butonu tüm profillerde (otomatik bundan sonrakilerde de)
+[ ] Gerçek kullanıcı kaydı / ödeme akışı
+[ ] Email bildirimleri (Resend)
+
+### Kritik Kararlar / Notlar
+- Trabzon Uğurlu Mezarlığı: gerçek bir mezarlık, Google Maps'te 4.1 yıldız, 11 yorum
+- Sekme nav overflow: `overflow-x-auto` child içeren `<nav>`'a `overflow-hidden` şart
+- Share button: `NotableShareButton` bileşeni generic, tüm profiller için uygun
+
+### Nerede Kaldık
+Mobil düzeltmeler ve mezarlık verileri deploy edildi. Demo profillerin hepsi doğru koordinatlara sahip, paylaş butonu tüm profillerde aktif.
+
+### Sıradaki Adım
+1. Gerçek kullanıcı kayıt akışını test et
+2. Email bildirimleri (Resend API key eksik)
+3. Ödeme entegrasyonu (Stripe/PayPal)
+
+---
+
 ## 2026-06-20 — Oturum 125: 5 Demo Profil Eklendi (Gerçekçi Gürcü/Türk Aileleri)
 
 ### Yapılanlar
