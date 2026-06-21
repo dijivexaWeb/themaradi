@@ -71,8 +71,8 @@ export default async function StoragePage() {
 
   const publicBucket = process.env.R2_PUBLIC_BUCKET || 'tem-public-media'
   const privateBucket = process.env.R2_PRIVATE_BUCKET || 'tem-private-documents'
-  const vercelToken = process.env.VERCEL_TOKEN
-  const vercelTeamId = process.env.VERCEL_TEAM_ID
+  const vercelToken = process.env.V_TOKEN
+  const vercelTeamId = process.env.V_TEAM_ID
 
   // Parallel: R2 objects + Supabase + Vercel usage
   const [publicObjs, privateObjs, { data: vaults }, { count: totalVaultCount }, vercelUsage] = await Promise.all([
