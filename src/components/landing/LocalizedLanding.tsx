@@ -73,7 +73,7 @@ function SectionHeading({ children, style }: { children: React.ReactNode; style?
 function SectionDivider({ delay = 0 }: { delay?: number }) {
   return (
     <div style={{ position: 'relative', height: 1, overflow: 'visible', pointerEvents: 'none', zIndex: 10 }}>
-      {/* Yukarı yükselen ışık hüzmesi — tüm genişlik */}
+      {/* Yukarı ışık hüzmesi — hafif */}
       <div
         className="tem-divider-beam"
         style={{
@@ -81,8 +81,8 @@ function SectionDivider({ delay = 0 }: { delay?: number }) {
           bottom: 0,
           left: 0,
           right: 0,
-          height: 72,
-          background: 'linear-gradient(to top, rgba(223,189,114,.55) 0%, rgba(223,189,114,.18) 40%, rgba(223,189,114,.04) 75%, transparent 100%)',
+          height: 28,
+          background: 'linear-gradient(to top, rgba(223,189,114,.38) 0%, rgba(223,189,114,.08) 60%, transparent 100%)',
           animationDelay: `${delay}s`,
         }}
       />
@@ -92,11 +92,11 @@ function SectionDivider({ delay = 0 }: { delay?: number }) {
         style={{
           position: 'absolute',
           bottom: 0,
-          left: '20%',
-          right: '20%',
-          height: 50,
-          background: 'linear-gradient(to top, rgba(255,248,220,.5) 0%, rgba(255,248,220,.12) 50%, transparent 100%)',
-          filter: 'blur(6px)',
+          left: '25%',
+          right: '25%',
+          height: 18,
+          background: 'linear-gradient(to top, rgba(255,248,220,.3) 0%, transparent 100%)',
+          filter: 'blur(4px)',
           animationDelay: `${delay + 0.15}s`,
         }}
       />
