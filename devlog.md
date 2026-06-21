@@ -3,6 +3,44 @@
 > Her oturum sonunda Claude bu dosyayı günceller.
 > Format: tarih → ne yapıldı → nerede kalındı → sıradaki adım.
 
+## 2026-06-21 — Oturum 130: Admin Storage Temizleme + Vercel Entegrasyonu
+
+### Yapılanlar
+- **Admin storage cleanup butonları**: sahipsiz dosyalar + silinmiş vault klasörleri için "Temizle" butonları eklendi (onay dialogu + batch delete)
+- **Server actions** (`admin/storage/actions.ts`): `cleanOrphanFilesAction`, `cleanDeletedVaultFoldersAction` — DB doğrulama sonrası güvenli siler
+- **Vercel bloğu**: Usage API formatı belirsiz olduğu için `/v9/projects` + `/v6/deployments` kullanıldı; son deploymentlar, proje bilgisi, plan limitleri gösteriliyor
+- **Vault sorgusu**: tüm statusler çekiliyor (önceki sürüm sadece public_memorial çekiyordu)
+- **Orphan file listesi**: sahipsiz dosyaların tam path listesi admin panelde gösteriliyor
+- **Silinmiş vault klasörleri**: kırmızı bölümde full UUID listesi + boyut gösterimi
+- Değiştirilen dosyalar: `admin/storage/page.tsx`, `admin/storage/actions.ts` (yeni), `admin/storage/_CleanupActions.tsx` (yeni)
+
+### Proje Durumu
+[x] Landing page dark luxury tasarım
+[x] 5 demo profil eklendi (2'sinde profil videosu)
+[x] Profil video özelliği (R2, 3 sn max)
+[x] /memorial ve anasayfa kartlarında video oynatma
+[x] Admin depolama paneli (/admin/storage)
+[x] R2 orphan + silinmiş vault temizleme butonları
+[x] Vercel deployment bilgisi admin panelde
+[ ] Vercel usage rakamları (API formatı belirsiz, dashboard'dan manuel)
+[ ] Gerçek kullanıcı kaydı / ödeme akışı
+[ ] Email bildirimleri (Resend)
+
+### Kritik Kararlar / Notlar
+- Vercel `/v2/usage` API'si `type`, `from`, `to` parametreleri gerektiriyor ama format belirsiz — projeler ve deploymentlar endpointi kullanıldı
+- Cleanup server action'ları vault ID'lerini DB'den çift kontrol ediyor, gerçekten yoksa siliyor
+- Batch delete: 1000'er obje chunk'lar halinde DeleteObjectsCommand kullanıyor
+
+### Nerede Kaldık
+Admin storage paneli tam işlevsel: R2 kullanım, vault başına depolama, temizleme butonları, Vercel deployment bilgisi.
+
+### Sıradaki Adım
+1. Deploy sonrası admin/storage sayfasını test et, temizleme butonlarını dene
+2. Gerçek kullanıcı kayıt akışı
+3. Email bildirimleri
+
+---
+
 ## 2026-06-21 — Oturum 129: Admin Depolama Paneli + Listeleme Kartlarında Video
 
 ### Yapılanlar
