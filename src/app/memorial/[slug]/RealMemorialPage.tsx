@@ -450,12 +450,10 @@ export default async function RealMemorialPage({ vault, isPreview = false }: Pro
         </div>
       )}
 
-      {/* ── Notable: Share button ── */}
-      {isNotable && (
-        <div className="bg-[#091712] border-b border-[#dfbd72]/10 px-5 py-4 sm:px-8 flex justify-center">
-          <NotableShareButton displayName={vault.display_name} lang={lang} />
-        </div>
-      )}
+      {/* ── Share button — all profiles ── */}
+      <div className="bg-[#091712] border-b border-[#dfbd72]/10 px-5 py-4 sm:px-8 flex justify-center">
+        <NotableShareButton displayName={vault.display_name} lang={lang} />
+      </div>
 
       <section className="bg-[#173d31] px-5 py-0 sm:px-8">
         {hasPersonalDetails && (

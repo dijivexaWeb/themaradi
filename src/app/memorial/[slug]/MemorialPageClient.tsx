@@ -16,6 +16,7 @@ import {
   Play,
 } from 'lucide-react'
 import MemorialInteractions from './MemorialInteractions'
+import NotableShareButton from './NotableShareButton'
 import { langs, type Lang } from '@/i18n'
 import { useLang } from '@/i18n/context'
 import BrandLogo, { BrandMark } from '@/components/BrandLogo'
@@ -938,6 +939,11 @@ export default function MemorialPage() {
           <div className="h-10 w-px bg-gradient-to-b from-[#c7a76f]/50 to-transparent" />
         </div>
       </section>
+
+      {/* ── Paylaş butonu ── */}
+      <div className="bg-[#091712] border-b border-[#dfbd72]/10 px-5 py-4 sm:px-8 flex justify-center">
+        <NotableShareButton displayName={copy.hero.portraitAlt} lang={lang} />
+      </div>
 
       {/* â"€â"€ YAÅAM RAKAMLARI â"€â"€ */}
       <section className="bg-[#173d31] px-5 py-0 sm:px-8">
