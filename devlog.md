@@ -3,6 +3,42 @@
 > Her oturum sonunda Claude bu dosyayı günceller.
 > Format: tarih → ne yapıldı → nerede kalındı → sıradaki adım.
 
+## 2026-06-21 — Oturum 131: anma-paneli Tasarım Yenileme (Doğru Panel)
+
+### Yapılanlar
+- **Ana sayfa** (`/anma-paneli/[id]/page.tsx`): koyu hero banner (`bg-[#1c2e25]`), cover foto arka plan opacity 10%, avatar rounded-2xl, isim+yıl+tagline, Preview/Verify butonları, stats bar (ziyaret + aksiyon sayıları), grid kartları premium görünüm (filled → yeşil ikon, empty → altın ikon)
+- **`_SectionHeader.tsx`** yeni bileşen: icon (koyu zemin) + başlık + alt başlık, tüm alt sayfalarda breadcrumb yerine kullanılıyor
+- **Fotolar** (`/anma-paneli/[id]/fotolar/page.tsx`): 2-kolon layout — galeri sol, sağda sticky upload paneli + sayaç progress bar
+- **Anılar** (`/anma-paneli/[id]/anilar/page.tsx`): SectionHeader eklendi, breadcrumb kaldırıldı
+- **Biyografi** (`/anma-paneli/[id]/biyografi/page.tsx`): client component olduğu için inline başlık div'i eklendi (SectionHeader import kullanılamaz), breadcrumb kaldırıldı
+- **Diğer alt sayfalar** (ses-kayitlari, videolar, taziye, ani-defteri, dogrulama, gorunum, mezar): breadcrumb blokları kaldırıldı
+- Aile sayfasına dokunulmadı (kullanıcı isteği)
+- **Hata**: İlk başta yanlışlıkla `/dashboard/vault/` panelini güncellemiştim; kullanıcı `/anma-paneli/` olduğunu belirtti, orası güncellendi
+
+### Proje Durumu
+- [x] Admin storage Vercel entegrasyonu (V_TOKEN env var fix)
+- [x] Admin storage Supabase DB stats (get_db_stats RPC)
+- [x] Admin inbox email silme (single + bulk)
+- [x] Nav #ozellikler → /memorial link fix
+- [x] Dashboard vault alt sayfaları (yanlış panel — rollback değil, bırakıldı)
+- [x] anma-paneli ana sayfa koyu hero tasarımı
+- [x] anma-paneli alt sayfalar SectionHeader + breadcrumb temizliği
+- [x] anma-paneli fotolar 2-kolon layout
+
+### Kritik Kararlar / Notlar
+- `/dashboard/vault/` ve `/anma-paneli/` iki ayrı panel. Asıl kullanıcı paneli `/anma-paneli/`.
+- anma-paneli'nin zaten bir sidebar layoutu var (`layout.tsx`), bu yüzden PersonHeader değil daha hafif SectionHeader kullanıldı.
+- Biyografi sayfası `'use client'` — server component import yapılamadığından inline başlık div'i tercih edildi.
+
+### Nerede Kaldık
+anma-paneli alt sayfalarında breadcrumb temizliği ve SectionHeader eklendi. Ana sayfa koyu hero'ya kavuştu. Fotolar 2-kolon aldı. Anilar breadcrumb kaldırıldı ama form/liste layout 2-kolona çevrilmedi (sadece header değişti).
+
+### Sıradaki Adım
+1. Deploy sonrası anma-paneli ekranlarını test et
+2. Anılar sayfasını tam 2-kolon yap (liste sol, form sağ sticky) — şu an sadece header değişti
+3. Ses kayıtları + videolar sayfaları da 2-kolon layout alabilir
+4. Vercel dashboard'da V_TOKEN ve V_TEAM_ID env var güncellenmesi gerekiyor (önceki oturumdan kalan)
+
 ## 2026-06-21 — Oturum 130: Admin Storage Temizleme + Vercel Entegrasyonu
 
 ### Yapılanlar
