@@ -80,7 +80,7 @@ export default async function StoragePage() {
     listAllObjects(r2Client, privateBucket).catch(() => [] as { key: string; size: number }[]),
     supabase.from('vaults').select('id, display_name, slug, owner_id, status'),
     supabase.from('vaults').select('id', { count: 'exact', head: true }),
-    supabase.rpc('get_db_stats').single().catch(() => ({ data: null })),
+    Promise.resolve(supabase.rpc('get_db_stats').single()).catch(() => ({ data: null })),
     vercelToken
       ? Promise.all([
           fetch(
