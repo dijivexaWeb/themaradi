@@ -1,7 +1,8 @@
 import { requireAdmin } from '@/lib/admin/auth'
 import { createServiceClient } from '@/lib/supabase/server'
 import { S3Client, ListObjectsV2Command } from '@aws-sdk/client-s3'
-import { HardDrive, Database, Cloud, User, FileVideo, Image, Music, FileText, ExternalLink } from 'lucide-react'
+import { HardDrive, Database, Cloud, User, FileVideo, Image, Music, FileText, Zap, Activity } from 'lucide-react'
+import { CleanOrphansButton, CleanDeletedVaultsButton } from './_CleanupActions'
 
 export const revalidate = 300 // 5 min cache
 
@@ -70,12 +71,21 @@ export default async function StoragePage() {
 
   const publicBucket = process.env.R2_PUBLIC_BUCKET || 'tem-public-media'
   const privateBucket = process.env.R2_PRIVATE_BUCKET || 'tem-private-documents'
-  // Parallel: list R2 objects in both buckets + Supabase data
-  const [publicObjs, privateObjs, { data: vaults }, { count: totalVaultCount }] = await Promise.all([
+  const vercelToken = process.env.VERCEL_TOKEN
+  const vercelTeamId = process.env.VERCEL_TEAM_ID
+
+  // Parallel: R2 objects + Supabase + Vercel usage
+  const [publicObjs, privateObjs, { data: vaults }, { count: totalVaultCount }, vercelUsage] = await Promise.all([
     listAllObjects(r2Client, publicBucket),
     listAllObjects(r2Client, privateBucket).catch(() => [] as { key: string; size: number }[]),
-    supabase.from('vaults').select('id, display_name, slug, owner_id, status'), // ALL statuses
+    supabase.from('vaults').select('id, display_name, slug, owner_id, status'),
     supabase.from('vaults').select('id', { count: 'exact', head: true }),
+    vercelToken
+      ? fetch(
+          `https://api.vercel.com/v2/usage${vercelTeamId ? `?teamId=${vercelTeamId}` : ''}`,
+          { headers: { Authorization: `Bearer ${vercelToken}` }, next: { revalidate: 3600 } }
+        ).then(r => r.json()).catch(() => null)
+      : Promise.resolve(null),
   ])
 
   // Vault id → name map
@@ -242,22 +252,74 @@ export default async function StoragePage() {
         )}
       </div>
 
-      {/* VERCEL PLACEHOLDER */}
-      <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50 p-5">
-        <div className="flex items-center gap-2 mb-2">
-          <ExternalLink className="h-4 w-4 text-slate-400" />
-          <p className="text-sm font-semibold text-slate-500">Vercel Trafik & Kullanım</p>
+      {/* VERCEL USAGE */}
+      {vercelUsage?.metrics ? (
+        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+          <div className="flex items-center gap-2 mb-4">
+            <Zap className="h-5 w-5 text-black" />
+            <p className="text-sm font-semibold text-slate-800">Vercel Kullanım (Son 30 Gün)</p>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            {Object.entries(vercelUsage.metrics as Record<string, { used: number; limit: number; unit?: string }>)
+              .slice(0, 6)
+              .map(([key, val]) => {
+                const pct = val.limit > 0 ? Math.min(100, (val.used / val.limit) * 100) : 0
+                const label = key.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
+                return (
+                  <div key={key} className="rounded-lg border border-slate-100 bg-slate-50 p-3">
+                    <p className="text-[10px] text-slate-400 mb-1 truncate">{label}</p>
+                    <p className="text-sm font-bold text-slate-800">
+                      {val.used?.toLocaleString('tr-TR')}
+                      {val.unit ? ` ${val.unit}` : ''}
+                    </p>
+                    <div className="h-1 w-full rounded-full bg-slate-200 mt-1.5 overflow-hidden">
+                      <div
+                        className="h-full rounded-full"
+                        style={{ width: `${pct}%`, background: pct > 80 ? '#ef4444' : '#3b82f6' }}
+                      />
+                    </div>
+                    <p className="text-[9px] text-slate-400 mt-0.5">/ {val.limit?.toLocaleString('tr-TR')}{val.unit ? ` ${val.unit}` : ''}</p>
+                  </div>
+                )
+              })}
+          </div>
         </div>
-        <p className="text-xs text-slate-400">
-          Vercel kullanım istatistikleri için{' '}
-          <code className="bg-slate-200 px-1 rounded">VERCEL_TOKEN</code> ve{' '}
-          <code className="bg-slate-200 px-1 rounded">VERCEL_TEAM_ID</code>{' '}
-          env değişkenlerini .env.local dosyasına ekleyin.
-        </p>
-        <p className="text-xs text-slate-400 mt-1">
-          Vercel Dashboard → Settings → Tokens → Create Token
-        </p>
-      </div>
+      ) : vercelToken ? (
+        <div className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+          <div className="flex items-center gap-2 mb-3">
+            <Activity className="h-5 w-5 text-slate-400" />
+            <p className="text-sm font-semibold text-slate-600">Vercel Kullanım (Son 30 Gün)</p>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+            {[
+              { label: 'Function Invocations', used: null, limit: '1M' },
+              { label: 'Fast Data Transfer', used: null, limit: '100 GB' },
+              { label: 'Edge Requests', used: null, limit: '1M' },
+            ].map(item => (
+              <div key={item.label} className="rounded-lg border border-slate-100 bg-slate-50 p-3">
+                <p className="text-[10px] text-slate-400 mb-2">{item.label}</p>
+                <p className="text-xs text-slate-400 italic">Vercel API yanıt vermedi</p>
+                <p className="text-[9px] text-slate-300 mt-0.5">Limit: {item.limit}</p>
+              </div>
+            ))}
+          </div>
+          <p className="text-xs text-slate-400 mt-3">
+            Token tanımlandı ama API yanıt formatı beklenenden farklı. Vercel Dashboard → Usage sekmesinden manuel kontrol edin.
+          </p>
+        </div>
+      ) : (
+        <div className="rounded-xl border border-dashed border-slate-300 bg-slate-50 p-5">
+          <div className="flex items-center gap-2 mb-2">
+            <Zap className="h-4 w-4 text-slate-400" />
+            <p className="text-sm font-semibold text-slate-500">Vercel Trafik & Kullanım</p>
+          </div>
+          <p className="text-xs text-slate-400">
+            <code className="bg-slate-200 px-1 rounded">VERCEL_TOKEN</code> ve{' '}
+            <code className="bg-slate-200 px-1 rounded">VERCEL_TEAM_ID</code>{' '}
+            env değişkenlerini ekleyin.
+          </p>
+        </div>
+      )}
 
       {/* PER-VAULT TABLE */}
       <div className="rounded-xl border border-slate-200 bg-white shadow-sm overflow-hidden">
@@ -345,11 +407,14 @@ export default async function StoragePage() {
       {/* ORPHAN FILES */}
       {orphanFiles.length > 0 && (
         <div className="rounded-xl border border-amber-200 bg-amber-50 shadow-sm overflow-hidden">
-          <div className="px-5 py-4 border-b border-amber-100 flex items-center justify-between">
-            <p className="text-sm font-semibold text-amber-800">
-              ⚠ Sahipsiz Dosyalar ({orphanFiles.length} adet — {formatBytes(orphanBytes)})
-            </p>
-            <p className="text-xs text-amber-600">Vault prefix&apos;i olmayan dosyalar</p>
+          <div className="px-5 py-4 border-b border-amber-100">
+            <div className="flex items-center justify-between flex-wrap gap-3">
+              <p className="text-sm font-semibold text-amber-800">
+                ⚠ Sahipsiz Dosyalar ({orphanFiles.length} adet — {formatBytes(orphanBytes)})
+              </p>
+              <CleanOrphansButton fileCount={orphanFiles.length} bytes={formatBytes(orphanBytes)} />
+            </div>
+            <p className="text-xs text-amber-600 mt-1">Vault prefix&apos;i olmayan dosyalar</p>
           </div>
           <div className="overflow-x-auto max-h-64 overflow-y-auto">
             <table className="w-full text-xs">
@@ -376,13 +441,20 @@ export default async function StoragePage() {
       {(() => {
         const deletedVaults = sortedVaults.filter(v => !vaultMap.has(v.vaultId))
         if (!deletedVaults.length) return null
+        const deletedTotalBytes = deletedVaults.reduce((s, v) => s + v.totalBytes, 0)
         return (
           <div className="rounded-xl border border-red-200 bg-red-50 shadow-sm overflow-hidden">
             <div className="px-5 py-4 border-b border-red-100">
-              <p className="text-sm font-semibold text-red-800">
-                🗑 Silinmiş Vault Klasörleri ({deletedVaults.length} adet)
-              </p>
-              <p className="text-xs text-red-600 mt-0.5">
+              <div className="flex items-center justify-between flex-wrap gap-3">
+                <p className="text-sm font-semibold text-red-800">
+                  🗑 Silinmiş Vault Klasörleri ({deletedVaults.length} adet — {formatBytes(deletedTotalBytes)})
+                </p>
+                <CleanDeletedVaultsButton
+                  vaultIds={deletedVaults.map(v => v.vaultId)}
+                  totalBytes={formatBytes(deletedTotalBytes)}
+                />
+              </div>
+              <p className="text-xs text-red-600 mt-1">
                 DB&apos;de kaydı olmayan vault ID&apos;leri — R2&apos;de dosyaları hâlâ duruyor
               </p>
             </div>
