@@ -3,6 +3,36 @@
 > Her oturum sonunda Claude bu dosyayı günceller.
 > Format: tarih → ne yapıldı → nerede kalındı → sıradaki adım.
 
+## 2026-06-21 — Oturum 127: Anasayfa Bölüm Ayraçları + Mobil Fix'ler
+
+### Yapılanlar
+- **Animasyonlu section divider** eklendi: çizgiden yukarı yükselen altın ışık hüzmesi (nefes alan pulse efekti, 3.5s döngü)
+- Hero'dan footer'a kadar 13 bölüm arası divider — staggered delay (0–4.8s)
+- `SectionDivider` bileşeni `LocalizedLanding.tsx`'e eklendi, `globals.css`'e `tem-beamPulse` keyframe eklendi
+- İlk iterasyonda yatay kayan orb → kullanıcı geri bildirimiyle yukarı ışık hüzmesine çevrildi
+- Işık yüksekliği 72px → 28px'e indirildi (kullanıcı "çok yukarı çıkıyor" dedi)
+- Değiştirilen dosyalar: `LocalizedLanding.tsx`, `globals.css`
+
+### Proje Durumu
+[x] Landing page dark luxury tasarım
+[x] 5 demo profil eklendi
+[x] Mobil overflow sorunu çözüldü
+[x] Mezarlık koordinatları gerçek verilerle doğrulandı
+[x] Paylaş butonu tüm profillerde
+[x] Anasayfa bölüm ayraçları (animasyonlu ışık hüzmesi)
+[ ] Gerçek kullanıcı kaydı / ödeme akışı
+[ ] Email bildirimleri (Resend)
+
+### Nerede Kaldık
+Anasayfa tüm bölüm geçişlerinde gold pulse divider var. Kullanıcı onayladı.
+
+### Sıradaki Adım
+1. Kullanıcının isteyeceği diğer UI/tasarım iyileştirmeleri
+2. Gerçek kullanıcı kayıt akışı
+3. Email bildirimleri (Resend API key gerekli)
+
+---
+
 ## 2026-06-21 — Oturum 126: Mobil Düzeltmeler, Mezarlık Koordinatları, Paylaş Butonu
 
 ### Yapılanlar
