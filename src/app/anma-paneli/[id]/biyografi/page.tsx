@@ -28,7 +28,7 @@ interface VaultData {
   donation_preference: string | null
   donation_url: string | null
   hero_bg_url: string | null
-  profile_video_url: string | null
+  cover_video_url: string | null
 }
 
 export default function BiyografiPage() {
@@ -96,7 +96,7 @@ export default function BiyografiPage() {
   useEffect(() => {
     supabase
       .from('vaults')
-      .select('display_name, biography, status, cover_photo_url, birth_date, birth_date_precision, death_date, death_date_precision, tagline, profession, hobbies, birth_place, death_place, favorite_song_title, favorite_song_url, last_message, donation_preference, donation_url, hero_bg_url, profile_video_url')
+      .select('display_name, biography, status, cover_photo_url, birth_date, birth_date_precision, death_date, death_date_precision, tagline, profession, hobbies, birth_place, death_place, favorite_song_title, favorite_song_url, last_message, donation_preference, donation_url, hero_bg_url, cover_video_url')
       .eq('id', id)
       .single()
       .then(({ data }) => {
@@ -120,7 +120,7 @@ export default function BiyografiPage() {
           setDonationUrl(v.donation_url ?? '')
           setFavSongTitle(v.favorite_song_title ?? '')
           setFavSongUrl(v.favorite_song_url ?? '')
-          setProfileVideoUrl(v.profile_video_url ?? '')
+          setProfileVideoUrl(v.cover_video_url ?? '')
           setBio(v.biography ?? '')
           setInitialBio(v.biography ?? '')
         }
@@ -174,9 +174,9 @@ export default function BiyografiPage() {
       tagline: tagline.trim() || null,
       cover_photo_url: coverPhotoUrl.trim() || null,
       hero_bg_url: heroBgUrl.trim() || null,
-      profile_video_url: profileVideoUrl.trim() || null,
+      cover_video_url: profileVideoUrl.trim() || null,
     }).eq('id', id)
-    setVault(prev => prev ? { ...prev, display_name: displayName, birth_date: birthDate || null, birth_date_precision: birthDatePrecision, death_date: deathDate || null, death_date_precision: deathDatePrecision, tagline: tagline || null, cover_photo_url: coverPhotoUrl || null, hero_bg_url: heroBgUrl || null, profile_video_url: profileVideoUrl || null } : prev)
+    setVault(prev => prev ? { ...prev, display_name: displayName, birth_date: birthDate || null, birth_date_precision: birthDatePrecision, death_date: deathDate || null, death_date_precision: deathDatePrecision, tagline: tagline || null, cover_photo_url: coverPhotoUrl || null, hero_bg_url: heroBgUrl || null, cover_video_url: profileVideoUrl || null } : prev)
     setProfileSaving(false)
     setProfileSaved(true)
     setTimeout(() => setProfileSaved(false), 2500)
@@ -455,11 +455,10 @@ export default function BiyografiPage() {
               )}
             </div>
 
-            {/* Video yükleme */}
+            {/* Profil videosu — kısa, max 3 sn, R2 */}
             <div>
-              <label className={labelCls}>Profil Videosu</label>
+              <label className={labelCls}>Profil Videosu <span className="font-normal text-[#9aaa99]">(isteğe bağlı — en fazla 3 saniye)</span></label>
               <label className={`block cursor-pointer overflow-hidden rounded-xl border-2 border-dashed border-[#e5dccb] bg-[#fdfaf5] transition hover:border-[#174f35]/40 hover:bg-[#f5f0e8] ${isLocked ? 'pointer-events-none opacity-40' : ''}`}>
-                {/* Yükleme satırı */}
                 <div className="flex items-center gap-3 px-4 py-4">
                   {videoUploading
                     ? <Loader2 className="h-5 w-5 shrink-0 animate-spin text-[#174f35]" />
@@ -469,86 +468,72 @@ export default function BiyografiPage() {
                     <p className="text-sm font-medium text-[#1f2d27]">
                       {videoUploading ? 'Video yükleniyor...' : 'Video seç veya buraya sürükle'}
                     </p>
-                    <p className="text-xs text-[#adb5ab]">MP4, MOV, WEBM — max 100 MB, 10 dakika</p>
+                    <p className="text-xs text-[#adb5ab]">MP4, MOV, WEBM — max 3 saniye, profil fotoğrafı yerine oynatılır</p>
                   </div>
-                </div>
-                {/* Tavsiye notu */}
-                <div className="border-t border-dashed border-[#e5dccb] bg-[#faf6ee] px-4 py-3 text-xs text-[#4a5e55]">
-                  🎥 <span className="font-semibold">Video Seçimi İçin Tavsiyeler</span><br />
-                  <span className="text-[#788177]">Mezarlık gibi açık alanlarda internet bağlantısı zayıf olabilir. Videoların ziyaretçilerde donmadan, anında açılabilmesi için süreyi <span className="font-semibold text-[#4a5e55]">2–3 dakika</span> aralığında tutmanızı öneririz.</span><br />
-                  <span className="mt-1 block text-[#adb5ab]">(Sistemimiz kalite standartları gereği en fazla 100 MB boyutunda ve 10 dakikalık videolara izin vermektedir.)</span>
                 </div>
                 <input
                   type="file"
-                  accept="video/*"
+                  accept="video/mp4,video/quicktime,video/webm"
                   className="sr-only"
                   disabled={isLocked ?? false}
                   onChange={async (e) => {
                     const file = e.target.files?.[0]
                     if (!file) return
-                    if (!file.type.startsWith('video/')) { setVideoUploadError('Sadece video dosyası yükleyebilirsiniz'); e.target.value = ''; return }
-                    if (file.size > 100 * 1024 * 1024) { setVideoUploadError('Video çok büyük (max 100 MB)'); e.target.value = ''; return }
-                    
+                    if (!['video/mp4', 'video/quicktime', 'video/webm'].includes(file.type)) {
+                      setVideoUploadError('MP4, MOV veya WEBM formatında bir video seçin.')
+                      e.target.value = ''
+                      return
+                    }
+                    if (file.size > 50 * 1024 * 1024) {
+                      setVideoUploadError('Video boyutu en fazla 50 MB olabilir.')
+                      e.target.value = ''
+                      return
+                    }
+
                     setVideoUploading(true)
                     setVideoUploadError(null)
-                    
+
                     try {
-                      // Check duration
+                      // Süre kontrolü
                       const duration = await new Promise<number>((resolve, reject) => {
-                        const video = document.createElement('video')
-                        video.preload = 'metadata'
-                        video.onloadedmetadata = () => {
-                          URL.revokeObjectURL(video.src)
-                          resolve(video.duration)
-                        }
-                        video.onerror = () => {
-                          URL.revokeObjectURL(video.src)
-                          reject(new Error('Video dosyası okunamadı.'))
-                        }
-                        video.src = URL.createObjectURL(file)
+                        const vid = document.createElement('video')
+                        vid.preload = 'metadata'
+                        vid.onloadedmetadata = () => { URL.revokeObjectURL(vid.src); resolve(vid.duration) }
+                        vid.onerror = () => { URL.revokeObjectURL(vid.src); reject(new Error('Video okunamadı.')) }
+                        vid.src = URL.createObjectURL(file)
                       })
 
-                      if (duration > 600) {
-                        throw new Error('Video süresi en fazla 10 dakika olabilir.')
+                      if (duration > 3.5) {
+                        throw new Error('Video en fazla 3 saniye olabilir. Lütfen daha kısa bir video seçin.')
                       }
 
-                      // Request Direct Creator Upload URL
-                      const uploadUrlRes = await fetch('/api/stream/upload-url', {
+                      // R2 presign URL al
+                      const presignRes = await fetch('/api/r2/presign', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
                         body: JSON.stringify({
                           fileName: file.name,
                           fileSize: file.size,
+                          mimeType: file.type,
+                          category: 'profile_cover_video',
                           profileId: id,
-                          duration,
                         }),
                       })
-
-                      if (!uploadUrlRes.ok) {
-                        const resJson = await uploadUrlRes.json()
-                        throw new Error(resJson.error || 'Video yükleme bağlantısı alınamadı.')
+                      if (!presignRes.ok) {
+                        const j = await presignRes.json()
+                        throw new Error(j.error || 'Yükleme bağlantısı alınamadı.')
                       }
+                      const { uploadUrl, publicUrl } = await presignRes.json()
 
-                      const { uploadUrl, uid } = await uploadUrlRes.json()
-
-                      // Upload to Cloudflare Stream
-                      await new Promise<void>((resolve, reject) => {
-                        const xhr = new XMLHttpRequest()
-                        xhr.open('POST', uploadUrl, true)
-                        xhr.onload = () => {
-                          if (xhr.status === 200 || xhr.status === 201 || xhr.status === 204) {
-                            resolve()
-                          } else {
-                            reject(new Error(`Videonuz yüklenemedi. Sunucu durum kodu: ${xhr.status}`))
-                          }
-                        }
-                        xhr.onerror = () => reject(new Error('Yükleme sırasında ağ hatası oluştu.'))
-                        const uploadForm = new FormData()
-                        uploadForm.append('file', file)
-                        xhr.send(uploadForm)
+                      // R2'ye yükle
+                      const putRes = await fetch(uploadUrl, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': file.type },
+                        body: file,
                       })
+                      if (!putRes.ok) throw new Error('Video yüklenemedi.')
 
-                      setProfileVideoUrl(`https://iframe.videodelivery.net/${uid}`)
+                      setProfileVideoUrl(publicUrl)
                     } catch (err: any) {
                       setVideoUploadError(err.message || 'Yükleme sırasında hata oluştu.')
                     } finally {
@@ -560,13 +545,7 @@ export default function BiyografiPage() {
               </label>
               {videoUploadError && <p className="mt-1 text-xs text-red-500">{videoUploadError}</p>}
               {profileVideoUrl && (
-                profileVideoUrl.includes('iframe.videodelivery.net') ? (
-                  <div className="mt-2 aspect-video overflow-hidden rounded-xl border border-[#e5dccb]">
-                    <iframe src={profileVideoUrl} className="h-full w-full border-0" allowFullScreen />
-                  </div>
-                ) : (
-                  <video controls src={profileVideoUrl} className="mt-2 w-full rounded-xl border border-[#e5dccb]" style={{ maxHeight: 220 }} />
-                )
+                <video src={profileVideoUrl} muted autoPlay loop playsInline className="mt-2 w-full rounded-xl border border-[#e5dccb]" style={{ maxHeight: 160 }} />
               )}
             </div>
 
