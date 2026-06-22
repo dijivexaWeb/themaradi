@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { getBankSettings } from '@/lib/bank-settings'
 import { fetchPricingConfig } from '@/lib/pricing'
+import { getTranslation } from '@/i18n/server'
 import AnmaFormClient from './_AnmaFormClient'
 
 export const metadata: Metadata = {
@@ -19,10 +20,31 @@ interface Props {
 
 export default async function AnmaSatinAlPage({ searchParams }: Props) {
   const params = await searchParams
-  const [bank, pricing] = await Promise.all([getBankSettings(), fetchPricingConfig()])
-  const amount = pricing.campaignActive && pricing.campaignMemorial
-    ? Number(pricing.campaignMemorial)
-    : Number(pricing.memorialPrice)
+  const { lang: cookieLang } = await getTranslation()
+  const effectiveLang = params.lang || cookieLang
 
-  return <AnmaFormClient bank={bank} amount={amount} forceLang={params.lang} />
+  const [bank, pricing] = await Promise.all([getBankSettings(), fetchPricingConfig()])
+
+  let amount: number
+  let currency: string
+
+  if (effectiveLang === 'tr') {
+    amount = pricing.campaignActive && pricing.campaignMemorialTry
+      ? Number(pricing.campaignMemorialTry)
+      : Number(pricing.memorialTry || pricing.memorialPrice)
+    currency = '₺'
+  } else if (effectiveLang === 'ka') {
+    amount = pricing.campaignActive && pricing.campaignMemorial
+      ? Number(pricing.campaignMemorial)
+      : Number(pricing.memorialPrice)
+    currency = '₾'
+  } else {
+    // he, en, ru, hy, az → USD
+    amount = pricing.campaignActive && pricing.campaignMemorialUsd
+      ? Number(pricing.campaignMemorialUsd)
+      : Number(pricing.memorialUsd || pricing.memorialPrice)
+    currency = '$'
+  }
+
+  return <AnmaFormClient bank={bank} amount={amount} currency={currency} forceLang={params.lang} />
 }

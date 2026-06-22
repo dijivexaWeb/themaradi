@@ -11,10 +11,12 @@ import BrandLogo from '@/components/BrandLogo'
 export default function AnmaFormClient({
   bank,
   amount,
+  currency,
   forceLang,
 }: {
   bank: BankSettings
   amount: number
+  currency: string
   forceLang?: string
 }) {
   const { t: contextT, setLang } = useLang()
@@ -68,7 +70,7 @@ export default function AnmaFormClient({
           <div className="w-20 h-20 bg-[#009cde]/15 rounded-full flex items-center justify-center mx-auto mb-6 text-4xl">🅿️</div>
           <h1 className="text-2xl font-bold text-white mb-2">Neredeyse tamam!</h1>
           <p className="text-slate-400 text-sm mb-6 leading-6">
-            Siparişiniz kaydedildi. Şimdi PayPal üzerinden <strong className="text-white">{ppState.amount} ₾</strong> tutarındaki ödemeyi tamamlayın.
+            Siparişiniz kaydedildi. Şimdi PayPal üzerinden <strong className="text-white">{ppState.amount} {currency}</strong> tutarındaki ödemeyi tamamlayın.
           </p>
 
           {paypalUrl ? (
@@ -79,7 +81,7 @@ export default function AnmaFormClient({
               className="inline-flex items-center justify-center gap-3 w-full bg-[#0070ba] hover:bg-[#005ea6] text-white font-bold py-4 rounded-xl transition-colors text-base mb-4"
             >
               <span className="text-xl">🅿️</span>
-              PayPal ile Öde — {ppState.amount} ₾
+              PayPal ile Öde — {ppState.amount} {currency}
             </a>
           ) : (
             <div className="bg-slate-800 border border-slate-700 rounded-xl p-4 mb-4 text-sm text-slate-400">
@@ -218,7 +220,7 @@ export default function AnmaFormClient({
               <div className="w-10 h-10 bg-amber-500/15 rounded-xl flex items-center justify-center text-xl">🕯️</div>
               <div>
                 <h1 className="font-bold text-xl text-white">{f.title}</h1>
-                <p className="text-xs text-slate-500">{amount} ₾ {f.priceLabel}</p>
+                <p className="text-xs text-slate-500">{amount} {currency} {f.priceLabel}</p>
               </div>
             </div>
 
@@ -263,7 +265,7 @@ export default function AnmaFormClient({
                     </div>
                     <div className="flex justify-between pt-2 border-t border-slate-700">
                       <span className="text-slate-400">{f.bankDetails.amountLabel}</span>
-                      <span className="text-white font-bold text-base">{amount} ₾</span>
+                      <span className="text-white font-bold text-base">{amount} {currency}</span>
                     </div>
                   </div>
                 </div>
