@@ -13,7 +13,7 @@ import { useLang } from '@/i18n/context'
 import { BrandMark } from '@/components/BrandLogo'
 import { useReveal } from '@/hooks/useReveal'
 import ParticleCanvas from './ParticleCanvas'
-import PhoneMockup3D from './PhoneMockup3D'
+import HeroPhoneShowcase from './HeroPhoneShowcase'
 import RecentMemorialsCarousel, { type RecentMemorial } from './RecentMemorialsCarousel'
 import NotableProfilesSection, { type NotableMemorial } from './NotableProfilesSection'
 import type { PricingConfig } from '@/lib/pricing'
@@ -237,9 +237,9 @@ export default function LocalizedLanding({ pricing, notableMemorials, recentMemo
               </div>
             </div>
 
-            {/* Right — 3D Phone */}
-            <div style={{ flex: '1 1 340px', minWidth: 300, display: 'flex', justifyContent: 'center' }}>
-              <PhoneMockup3D />
+            {/* Right — Hero Phone Showcase */}
+            <div style={{ flex: '1 1 340px', minWidth: 300, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <HeroPhoneShowcase memorials={notableMemorials.slice(0, 3)} />
             </div>
           </div>
         </section>
