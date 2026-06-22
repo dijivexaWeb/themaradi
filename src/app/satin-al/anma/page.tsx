@@ -13,11 +13,16 @@ export const metadata: Metadata = {
   },
 }
 
-export default async function AnmaSatinAlPage() {
+interface Props {
+  searchParams: Promise<{ lang?: string }>
+}
+
+export default async function AnmaSatinAlPage({ searchParams }: Props) {
+  const params = await searchParams
   const [bank, pricing] = await Promise.all([getBankSettings(), fetchPricingConfig()])
   const amount = pricing.campaignActive && pricing.campaignMemorial
     ? Number(pricing.campaignMemorial)
     : Number(pricing.memorialPrice)
 
-  return <AnmaFormClient bank={bank} amount={amount} />
+  return <AnmaFormClient bank={bank} amount={amount} forceLang={params.lang} />
 }

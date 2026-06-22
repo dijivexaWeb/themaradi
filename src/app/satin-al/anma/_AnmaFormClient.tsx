@@ -1,20 +1,31 @@
 'use client'
 
-import { useActionState, useState } from 'react'
+import { useActionState, useState, useEffect } from 'react'
 import { purchaseMemorialAction, createVaultForPayPalAction } from '../actions'
 import Link from 'next/link'
 import type { BankSettings } from '@/lib/bank-settings'
 import { useLang } from '@/i18n/context'
+import { dictionaries, type Lang } from '@/i18n'
 import BrandLogo from '@/components/BrandLogo'
 
 export default function AnmaFormClient({
   bank,
   amount,
+  forceLang,
 }: {
   bank: BankSettings
   amount: number
+  forceLang?: string
 }) {
-  const { t } = useLang()
+  const { t: contextT, setLang } = useLang()
+
+  useEffect(() => {
+    if (forceLang && forceLang in dictionaries) {
+      setLang(forceLang as Lang)
+    }
+  }, [forceLang])
+
+  const t = (forceLang && forceLang in dictionaries) ? dictionaries[forceLang as Lang] : contextT
   const f = t.purchasePage.anma
   const [bankState, bankAction, bankPending] = useActionState(purchaseMemorialAction, null)
   const [ppState, ppAction, ppPending] = useActionState(createVaultForPayPalAction, null)
