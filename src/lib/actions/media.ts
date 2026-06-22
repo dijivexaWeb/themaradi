@@ -261,17 +261,18 @@ export async function deleteMediaAction(vaultId: string, mediaId: string): Promi
   // Delete DB record first
   await supabase.from('media').delete().eq('id', mediaId).eq('vault_id', vaultId)
 
-  // Delete physical files
-  if (media.media_type === 'video' && media.cf_stream_id) {
-    // Delete from Cloudflare Stream
-    await deleteCloudflareStreamVideo(media.cf_stream_id)
-  } else if (media.r2_file_key && media.storage_bucket) {
-    // Delete from Cloudflare R2
-    await deleteR2Object(media.storage_bucket, media.r2_file_key)
-  } else if (media.storage_bucket && media.storage_path) {
-    // Fallback delete for legacy Supabase Storage files
-    const service = await createServiceClient()
-    await service.storage.from(media.storage_bucket).remove([media.storage_path])
+  // Delete physical files (errors are non-fatal — DB record is already gone)
+  try {
+    if (media.media_type === 'video' && media.cf_stream_id) {
+      await deleteCloudflareStreamVideo(media.cf_stream_id)
+    } else if (media.r2_file_key && media.storage_bucket) {
+      await deleteR2Object(media.storage_bucket, media.r2_file_key)
+    } else if (media.storage_bucket && media.storage_path) {
+      const service = await createServiceClient()
+      await service.storage.from(media.storage_bucket).remove([media.storage_path])
+    }
+  } catch (err) {
+    console.error('[deleteMediaAction] physical file delete failed (ignored):', err)
   }
 
   const route = media.media_type === 'video' ? 'videolar' : 'fotolar'
