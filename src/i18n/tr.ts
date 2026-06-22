@@ -16,12 +16,20 @@ const tr: LangDict = {
   landing: {
     hero: {
       eyebrow: '',
-      h1a: 'Sevdikleriniz sadece',
-      h1b: 'bir isim olarak kalmasın.',
-      p: 'Sevdiğiniz kişinin fotoğraflarını, sesini, hikâyelerini, taziye mesajlarını ve aile anılarını tek bir dijital anma profilinde toplayın. Özel paylaşım linki ve QR kod ile hatırası sadece bugün değil, gelecek nesiller için de yaşasın.',
+      h1a: 'Kaybettiğiniz sevdikleriniz',
+      h1b: 'için özel hazırladık.',
+      p: 'Vefat eden yakınınız için fotoğraf, video, yaşam hikâyesi ve aile anılarını QR kodlu özel bir dijital sayfada sonsuza kadar saklayın.',
+      promoLine1: 'İlk 1000 aileye özel tek seferlik {campaignPrice}.',
+      promoLine2: 'Sonraki normal fiyat {regularPrice}.',
+      ctaPrimary: '{campaignPrice} ile Başla',
+      ctaSecondary: 'Örnek Sayfayı Gör',
+      features: [
+        'Tek seferlik ödeme',
+        'QR kodlu anı sayfası',
+        'Fotoğraf, video ve taziye mesajları',
+        'Aileye özel paylaşım linki',
+      ],
       trustBadge: 'Hiçbir anı, fotoğraf veya taziye mesajı aile onayı olmadan yayınlanmaz.',
-      ctaPrimary: 'Nasıl çalışır?',
-      ctaSecondary: 'Örnek profili gör',
     },
 
     profilePreview: {

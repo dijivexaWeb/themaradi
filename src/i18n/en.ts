@@ -14,12 +14,20 @@ const en = {
   landing: {
     hero: {
       eyebrow: '',
-      h1a: 'Let your loved ones be',
-      h1b: 'more than just a name.',
-      p: 'Collect the photos, voice, stories, condolence messages and family memories of your loved one in a single digital memorial profile. With a dedicated sharing link and QR code, their memory lives not just today, but for generations to come.',
+      h1a: 'Specially prepared for the',
+      h1b: 'loved ones you lost.',
+      p: 'Keep photos, videos, life stories, and family memories of your departed loved ones forever on a custom digital page with a QR code.',
+      promoLine1: 'One-time {campaignPrice} special for the first 1,000 families.',
+      promoLine2: 'Subsequent regular price {regularPrice}.',
+      ctaPrimary: 'Start with {campaignPrice}',
+      ctaSecondary: 'See Sample Page',
+      features: [
+        'One-time payment',
+        'QR-coded memorial page',
+        'Photos, videos & condolences',
+        'Private family sharing link',
+      ],
       trustBadge: 'No memory, photo or condolence message is published without family approval.',
-      ctaPrimary: 'How it works?',
-      ctaSecondary: 'See demo profile',
     },
 
     profilePreview: {

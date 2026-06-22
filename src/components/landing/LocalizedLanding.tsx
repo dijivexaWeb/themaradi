@@ -150,6 +150,9 @@ export default function LocalizedLanding({ pricing, notableMemorials, recentMemo
   const [openFaq, setOpenFaq] = useState<number | null>(null)
   const [profileTab, setProfileTab] = useState<'photos' | 'videos' | 'bio' | 'timeline' | 'taziye'>('photos')
   const cur = buildCurrencyView(pricing, lang)
+  const formatPrice = (p: string) => (lang === 'en' || lang === 'he') ? `${cur.symbol}${p}` : `${p}${cur.symbol}`
+  const campaignPriceText = formatPrice(pricing.campaignActive && cur.campaignMemorial ? cur.campaignMemorial : cur.memorial)
+  const regularPriceText = formatPrice(cur.memorial)
 
   const quickSteps = t.landing.quickSteps
   const securityItems = t.landing.securityItems
@@ -187,23 +190,51 @@ export default function LocalizedLanding({ pricing, notableMemorials, recentMemo
                 </span>
               </h1>
 
-              <p style={{ fontSize: 'clamp(16px,1.25vw,18px)', fontWeight: 300, lineHeight: 1.75, color: S.textMuted, maxWidth: 540, margin: '0 0 32px', fontFamily: S.sans }}>
+              <p style={{ fontSize: 'clamp(16px,1.25vw,18px)', fontWeight: 300, lineHeight: 1.75, color: S.textMuted, maxWidth: 540, margin: '0 0 24px', fontFamily: S.sans }}>
                 {s.hero.p}
               </p>
 
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 14, marginBottom: 26 }}>
-                <Link href="/#fiyatlar" className="tem-goldbtn" style={{ textDecoration: 'none', background: S.goldGrad, color: '#14110a', fontWeight: 500, fontSize: 15.5, padding: '16px 32px', borderRadius: 999, boxShadow: '0 14px 36px rgba(201,169,110,.26)', fontFamily: S.sans }}>
-                  {s.hero.ctaPrimary}
+              {/* Promo badge container */}
+              {pricing.campaignActive && cur.campaignMemorial && (
+                <div style={{
+                  background: 'rgba(201, 169, 110, 0.05)',
+                  border: '1px solid rgba(201, 169, 110, 0.18)',
+                  borderRadius: 14,
+                  padding: '16px 20px',
+                  marginBottom: 28,
+                  maxWidth: 540,
+                  fontFamily: S.sans,
+                }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: S.goldBright, fontSize: 14, fontWeight: 600, marginBottom: 4 }}>
+                    <Sparkles style={{ width: 15, height: 15 }} />
+                    <span>{s.hero.promoLine1.replace('{campaignPrice}', campaignPriceText)}</span>
+                  </div>
+                  <div style={{ color: S.textMuted, fontSize: 13.5, fontWeight: 300 }}>
+                    {s.hero.promoLine2.replace('{regularPrice}', regularPriceText)}
+                  </div>
+                </div>
+              )}
+
+              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 14, marginBottom: 28 }}>
+                <Link href="/satin-al/anma" className="tem-goldbtn" style={{ textDecoration: 'none', background: S.goldGrad, color: '#14110a', fontWeight: 500, fontSize: 15.5, padding: '16px 32px', borderRadius: 999, boxShadow: '0 14px 36px rgba(201,169,110,.26)', fontFamily: S.sans }}>
+                  {s.hero.ctaPrimary.replace('{campaignPrice}', campaignPriceText)}
                 </Link>
                 <Link href="/memorial/demo" className="tem-ghostbtn" style={{ textDecoration: 'none', background: 'none', color: S.text, border: '1px solid rgba(237,232,221,.2)', fontWeight: 300, fontSize: 15.5, padding: '16px 32px', borderRadius: 999, fontFamily: S.sans }}>
                   {s.hero.ctaSecondary}
                 </Link>
               </div>
 
-              <p style={{ display: 'flex', alignItems: 'center', gap: 10, color: 'rgba(237,232,221,.4)', fontSize: 13.5, fontWeight: 300, fontFamily: S.sans }}>
-                <ShieldCheck style={{ width: 15, height: 15, stroke: '#8FB89E', strokeWidth: 1.5, flexShrink: 0 }} />
-                {s.hero.trustBadge}
-              </p>
+              {/* Checklist */}
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '12px 20px', maxWidth: 540, marginTop: 28, paddingTop: 24, borderTop: '1px solid rgba(237,232,221,.08)' }}>
+                {s.hero.features.map((feat, idx) => (
+                  <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: 10, color: S.text }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 20, height: 20, borderRadius: '50%', background: 'rgba(143,184,158,.15)', border: '1px solid rgba(143,184,158,.3)', flexShrink: 0 }}>
+                      <Check style={{ width: 11, height: 11, stroke: '#8FB89E', strokeWidth: 3 }} />
+                    </div>
+                    <span style={{ fontSize: 14.5, fontWeight: 300, fontFamily: S.sans }}>{feat}</span>
+                  </div>
+                ))}
+              </div>
             </div>
 
             {/* Right — 3D Phone */}

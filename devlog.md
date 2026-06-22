@@ -3,6 +3,56 @@
 > Her oturum sonunda Claude bu dosyayı günceller.
 > Format: tarih → ne yapıldı → nerede kalındı → sıradaki adım.
 
+## 2026-06-22 — Oturum 159: DB İstatistik Güncellemeleri + Silme Fix
+
+### Yapılanlar
+- **Osman İSTANBOLLU fotoğrafları**: 9 orphan DB kaydı direkt SQL ile silindi (R2'de dosya yoktu)
+- **deleteMediaAction fix**: R2/storage silme hatası artık `try/catch` ile yakalanıyor — DB kaydı her zaman siliniyor
+- **II. Ilia istatistikleri**: view_count=758, mum=455, dua=340, çiçek=480, anma=548 olarak ayarlandı
+- **Diğer tüm profiller**: II. Ilia'ya nazaran daha düşük view_count ve aksiyon sayıları ayarlandı
+- **Aile sayfası hero görseli**: `public/images/premium-family/tree_bg.png` push edildi
+
+### Proje Durumu
+- [x] deleteMediaAction — R2 hatası non-fatal
+- [x] Osman fotoğrafları temizlendi
+- [x] II. Ilia + tüm profil istatistikleri ayarlandı
+- [ ] Admin settings: price_additional_member_gel alanı
+
+### Nerede Kaldık
+İstatistik ve silme düzeltmeleri tamamlandı. i18n dosyaları (aile paneli, r2Upload bloğu) commit bekliyor.
+
+### Sıradaki Adım
+1. i18n dosyaları + LocalizedLanding commit + push
+2. Admin ayarlar formu: `price_additional_member_gel` alanı
+
+## 2026-06-22 — Oturum 158: Aile Sayfası Hero Görseli + Foto 404 Araştırması
+
+### Yapılanlar
+- **`public/images/premium-family/`** klasörü commit'e eksik kalmış, push edildi — `tree_bg.png` + 11 demo görsel eklendi; bu yüzden `/aile/istanbollu` sayfasında header arka plan ağaç görseli görünmüyordu
+- **`/memorial/osman-istanbollu` foto 404 araştırması**:
+  - DB'de 11 fotoğraf var, `is_public: true`, vault `public_memorial` — RLS tamam
+  - R2 domain erişilebilir (`pub-4e99edb14c604383a844cb7f05d69b9b.r2.dev`) ama dosyalar 404
+  - Eski URL formatı `images/{vault_id}/{user_id}/{timestamp}-{filename}` — mevcut upload sisteminin ürettiği `profiles/{vault_id}/gallery/...` formatından farklı (eski kod veya farklı istemci)
+  - **Sonuç: Dosyalar R2'den silinmiş.** Anma paneli üzerinden yeniden yüklenmesi gerekiyor
+
+### Proje Durumu
+- [x] Aile anma sayfası hero arka plan görseli (tree_bg.png push edildi)
+- [x] Aile paneli tam i18n
+- [ ] Osman İstanbollu fotoğrafları — kullanıcı yeniden yükleyecek
+- [ ] Admin settings: price_additional_member_gel alanı (_PricingSettingsForm)
+
+### Kritik Kararlar / Notlar
+- Eski fotoğraflar `images/...` path'iyle R2'ye yüklenmiş, yeni sistem `profiles/.../gallery/...` path'i kullanıyor; eski fotoğraflar R2'den silinmiş, DB kaydı var ama dosya yok
+- `public/images/premium-family/` klasörü `.gitignore`'da değildi ama hiç commit edilmemişti — untracked olarak kalmıştı
+
+### Nerede Kaldık
+Hero görseli sorunu çözüldü ve push edildi. Foto sorunu araştırıldı, sebep bulundu (silinmiş R2 dosyaları). Kullanıcı fotoğrafları yeniden yükleyecek.
+
+### Sıradaki Adım
+1. Kullanıcı osman-istanbollu profilinin fotoğraflarını anma panelinden yeniden yükler
+2. Admin ayarlar formu: `price_additional_member_gel` alanı eklenecek
+3. Yeni yüklenen fotoğrafların anma sayfasında görünüp görünmediğini doğrula
+
 ## 2026-06-22 — Oturum 157: Aile Paneli Tam i18n + QuickPurchaseModal + LangSwitcher Dropdown
 
 ### Yapılanlar

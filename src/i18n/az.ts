@@ -16,12 +16,20 @@ const az: LangDict = {
   landing: {
     hero: {
       eyebrow: '',
-      h1a: 'Sevdikləriniz sadəcə',
-      h1b: 'bir ad olaraq qalmasın.',
-      p: 'Sevdiyiniz insanın fotolarını, səsini, hekayələrini, başsağlığı mesajlarını və ailə xatirələrini bir rəqəmsal xatirə profilində toplayın. Xüsusi paylaşım linki və QR kodla onun xatirəsi yalnız bu gün deyil, gələcək nəsillər üçün də yaşasın.',
+      h1a: 'İtirdiyiniz sevdikləriniz',
+      h1b: 'üçün xüsusi hazırladıq.',
+      p: 'Vəfat etmiş yaxınınız üçün foto, video, həyat hekayəsi və ailə xatirələrini QR kodlu xüsusi rəqəmsal səhifədə sonsuza qədər saxlayın.',
+      promoLine1: 'İlk 1000 ailə üçün xüsusi birtəfəlik {campaignPrice}.',
+      promoLine2: 'Sonrakı normal qiymət {regularPrice}.',
+      ctaPrimary: '{campaignPrice} ilə Başla',
+      ctaSecondary: 'Nümunə Səhifəyə Bax',
+      features: [
+        'Birtəfəlik ödəniş',
+        'QR kodlu xatirə səhifəsi',
+        'Foto, video və başsağlığı mesajları',
+        'Ailəyə özəl paylaşım linki',
+      ],
       trustBadge: 'Heç bir xatirə, foto və ya başsağlığı mesajı ailənin təsdiqi olmadan dərc edilmir.',
-      ctaPrimary: 'Necə işləyir?',
-      ctaSecondary: 'Nümunə profili gör',
     },
 
     profilePreview: {
