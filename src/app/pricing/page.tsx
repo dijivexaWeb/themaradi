@@ -5,9 +5,14 @@ import { fetchPricingConfig } from '@/lib/pricing'
 export const revalidate = 3600
 
 export const metadata: Metadata = {
-  title: 'Pricing — The Eternal Memory',
+  title: 'Fiyatlar — Dijital Anma Profili',
   description:
-    'Memorial Profile or Life Vault — bring your loved ones\' memories into the digital realm. QR grave plate from Georgia included.',
+    'The Eternal Memory fiyatları: Anma Profili, Aile Paketi ve Yaşam Kasası. Tek seferlik ödeme, ömür boyu erişim. QR mezar taşı dahil. Gürcistan\'dan dünyaya hizmet.',
+  openGraph: {
+    title: 'Fiyatlar — The Eternal Memory',
+    description: 'Dijital anma profili fiyatları. Tek seferlik ödeme, ömür boyu erişim.',
+    type: 'website',
+  },
 }
 
 export default async function PricingPage() {

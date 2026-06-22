@@ -194,20 +194,31 @@ export default async function MemorialPage({ params, searchParams }: PropsWithSe
   }
 
   const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://theeternalmemory.com'
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'ProfilePage',
-    name: vault.display_name,
-    url: `${APP_URL}/memorial/${slug}`,
-    mainEntity: {
-      '@type': 'Person',
+  const jsonLd = [
+    {
+      '@context': 'https://schema.org',
+      '@type': 'ProfilePage',
       name: vault.display_name,
-      description: vault.tagline ?? undefined,
-      ...(vault.birth_date ? { birthDate: vault.birth_date } : {}),
-      ...(vault.death_date ? { deathDate: vault.death_date } : {}),
-      ...(vault.cover_photo_url ? { image: vault.cover_photo_url } : {}),
+      url: `${APP_URL}/memorial/${slug}`,
+      mainEntity: {
+        '@type': 'Person',
+        name: vault.display_name,
+        description: vault.tagline ?? undefined,
+        ...(vault.birth_date ? { birthDate: vault.birth_date } : {}),
+        ...(vault.death_date ? { deathDate: vault.death_date } : {}),
+        ...(vault.cover_photo_url ? { image: vault.cover_photo_url } : {}),
+      },
     },
-  }
+    {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: [
+        { '@type': 'ListItem', position: 1, name: 'Ana Sayfa', item: APP_URL },
+        { '@type': 'ListItem', position: 2, name: 'Anma Profilleri', item: `${APP_URL}/memorial` },
+        { '@type': 'ListItem', position: 3, name: vault.display_name, item: `${APP_URL}/memorial/${slug}` },
+      ],
+    },
+  ]
 
   return (
     <>

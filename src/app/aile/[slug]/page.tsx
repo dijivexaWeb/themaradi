@@ -93,18 +93,34 @@ export default async function PublicFamilyPage({ params }: Props) {
 
   const actions = (familyActions ?? []) as { action_type: 'candle' | 'flower' | 'prayer' | 'heart' | 'star' | 'silence'; count: number }[]
 
+  const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://theeternalmemory.com'
+  const breadcrumbLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Ana Sayfa', item: APP_URL },
+      { '@type': 'ListItem', position: 2, name: 'Aile Anma Sayfası', item: `${APP_URL}/aile/${slug}` },
+    ],
+  }
+
   return (
-    <div className="family-page-premium">
-      <PremiumFamilyPageClient
-        family={family}
-        memberVaults={memberVaults}
-        photos={photos}
-        memories={memories}
-        condolences={condolences}
-        actions={actions}
-        lang={lang}
-        translations={t}
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
       />
-    </div>
+      <div className="family-page-premium">
+        <PremiumFamilyPageClient
+          family={family}
+          memberVaults={memberVaults}
+          photos={photos}
+          memories={memories}
+          condolences={condolences}
+          actions={actions}
+          lang={lang}
+          translations={t}
+        />
+      </div>
+    </>
   )
 }

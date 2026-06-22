@@ -1,8 +1,19 @@
+import type { Metadata } from 'next'
 import LandingNav from '@/components/landing/Nav'
 import { createServiceClient } from '@/lib/supabase/server'
 import MemorialsClient, { type MemorialItem } from './_MemorialsClient'
 
 export const revalidate = 60
+
+export const metadata: Metadata = {
+  title: 'Anma Profilleri',
+  description: 'The Eternal Memory\'de yayınlanan dijital anma profillerini keşfedin. Ulusal miras sahipleri, aile büyükleri ve sevdikleriniz için oluşturulmuş profiller.',
+  openGraph: {
+    title: 'Anma Profilleri — The Eternal Memory',
+    description: 'Dijital anma profillerini keşfedin. Fotoğraflar, hayat hikayeleri, anılar.',
+    type: 'website',
+  },
+}
 
 const PAGE_SIZE = 20
 
