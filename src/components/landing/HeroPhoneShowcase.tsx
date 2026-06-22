@@ -30,13 +30,16 @@ function PhoneCard({ memorial, scale = 1, rotate = 0, zIndex = 1, translateY = 0
   const count = memorial.interaction_count ?? 0
 
   return (
-    <div style={{
+    <Link href={`/memorial/${memorial.slug}`} style={{ textDecoration: 'none', display: 'block',
       transform: `scale(${scale}) rotate(${rotate}deg) translateY(${translateY}px)`,
       transformOrigin: 'bottom center',
       zIndex,
       position: 'relative',
-      transition: 'transform .4s ease',
-    }}>
+      transition: 'transform .3s ease',
+    }}
+    onMouseEnter={e => { (e.currentTarget as HTMLElement).style.transform = `scale(${scale * 1.04}) rotate(${rotate * 0.5}deg) translateY(${translateY - 6}px)` }}
+    onMouseLeave={e => { (e.currentTarget as HTMLElement).style.transform = `scale(${scale}) rotate(${rotate}deg) translateY(${translateY}px)` }}
+    >
       {/* Phone shell */}
       <div style={{
         width: 200,
@@ -108,22 +111,19 @@ function PhoneCard({ memorial, scale = 1, rotate = 0, zIndex = 1, translateY = 0
               </div>
             </div>
 
-            {/* Visit link */}
-            <Link href={`/memorial/${memorial.slug}`}
-              style={{
-                display: 'block', marginTop: 8, textAlign: 'center',
-                background: S.goldGrad, color: '#14110a',
-                fontSize: 10, fontWeight: 600, padding: '7px 0',
-                borderRadius: 999, fontFamily: S.sans,
-                textDecoration: 'none',
-              }}
-            >
-              Sayfayı Ziyaret Et
-            </Link>
+            {/* Visit hint */}
+            <div style={{
+              marginTop: 8, textAlign: 'center',
+              background: S.goldGrad, color: '#14110a',
+              fontSize: 10, fontWeight: 600, padding: '7px 0',
+              borderRadius: 999, fontFamily: S.sans,
+            }}>
+              Sayfayı Ziyaret Et →
+            </div>
           </div>
         </div>
       </div>
-    </div>
+    </Link>
   )
 }
 
