@@ -320,6 +320,22 @@ const tr: LangDict = {
       },
     ],
 
+    team: {
+      label: 'Ekibimiz',
+      heading: 'Arkamızdaki İnsanlar',
+      intro: '2023\'teki bir kayıptan doğan platform. 5 kişilik bir ekip, nesiller boyu sürecek anılar için çalışıyor.',
+      quote: '"Taştaki bir isim yetmez. Tam olarak hatırlanmayı hak ediyoruz."',
+      quoteAuthor: '— Mehmet Akif Kabakcı, Kurucu',
+      readStory: 'Hikayemizi okuyun →',
+      members: [
+        { name: 'Mehmet Akif Kabakcı', role: 'Kurucu & CEO', photo: '/images/team/kurucu.png' },
+        { name: '[İsim 2]', role: '[Unvan]', photo: null },
+        { name: '[İsim 3]', role: '[Unvan]', photo: null },
+        { name: '[İsim 4]', role: '[Unvan]', photo: null },
+        { name: '[İsim 5]', role: '[Unvan]', photo: null },
+      ],
+    },
+
     finalCta: {
       heading: 'Bugün kaydedilen bir anı, yarın bir neslin mirası olabilir.',
       sub: 'Bugün sıradan görünen bir fotoğraf, yarın bir torunun ailesini tanıma yolu olabilir. Bugün yazılan birkaç cümle, gelecek nesillerin hiç tanıyamadığı bir kişiyi hissetmesini sağlayabilir. The Eternal Memory geçmişi sadece saklamaz; anıları yaşayan bir aile mirasına dönüştürür.',

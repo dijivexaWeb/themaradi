@@ -318,6 +318,22 @@ const en = {
       },
     ],
 
+    team: {
+      label: 'Our Team',
+      heading: 'The People Behind Us',
+      intro: 'A platform born from a loss in 2023. A team of 5, working for memories that will last generations.',
+      quote: '"A name on a stone is not enough. We fully deserve to be remembered."',
+      quoteAuthor: '— Mehmet Akif Kabakcı, Founder',
+      readStory: 'Read our story →',
+      members: [
+        { name: 'Mehmet Akif Kabakcı', role: 'Founder & CEO', photo: '/images/team/kurucu.png' },
+        { name: '[Name 2]', role: '[Title]', photo: null },
+        { name: '[Name 3]', role: '[Title]', photo: null },
+        { name: '[Name 4]', role: '[Title]', photo: null },
+        { name: '[Name 5]', role: '[Title]', photo: null },
+      ],
+    },
+
     finalCta: {
       heading: 'A memory recorded today can become a generation\'s legacy tomorrow.',
       sub: 'A photo that seems ordinary today can become a grandchild\'s way of knowing their family tomorrow. A few sentences written today can help future generations feel someone they never knew. The Eternal Memory doesn\'t just preserve the past — it transforms memories into a living family legacy.',

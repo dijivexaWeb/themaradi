@@ -308,6 +308,22 @@ const az: LangDict = {
       },
     ],
 
+    team: {
+      label: 'Komandamız',
+      heading: 'Arxamızdakı İnsanlar',
+      intro: '2023-cü ildəki bir itkidən doğan platforma. 5 nəfərlik komanda, nəsillər boyu davam edəcək xatirələr üçün çalışır.',
+      quote: '"Daşdakı bir ad yetmir. Tam olaraq xatırlanmağa layiqik."',
+      quoteAuthor: '— Mehmet Akif Kabakcı, Qurucu',
+      readStory: 'Hekayəmizi oxuyun →',
+      members: [
+        { name: 'Mehmet Akif Kabakcı', role: 'Qurucu & CEO', photo: '/images/team/kurucu.png' },
+        { name: '[Ad 2]', role: '[Vəzifə]', photo: null },
+        { name: '[Ad 3]', role: '[Vəzifə]', photo: null },
+        { name: '[Ad 4]', role: '[Vəzifə]', photo: null },
+        { name: '[Ad 5]', role: '[Vəzifə]', photo: null },
+      ],
+    },
+
     finalCta: {
       heading: 'Bu gün qeyd olunan bir xatirə, sabah bir nəslin irsinə çevrilə bilər.',
       sub: 'Bu gün adi görünən bir foto, sabah bir nəvənin ailəsini tanıma yolu ola bilər. Bu gün yazılan bir neçə cümlə, gələcək nəsillərin heç tanımadığı bir insanı hiss etməsini təmin edə bilər. The Eternal Memory keçmişi sadəcə saxlamır; xatirələri yaşayan bir ailə irsinə çevirir.',

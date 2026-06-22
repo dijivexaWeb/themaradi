@@ -14,6 +14,7 @@ import { BrandMark } from '@/components/BrandLogo'
 import { useReveal } from '@/hooks/useReveal'
 import ParticleCanvas from './ParticleCanvas'
 import HeroPhoneShowcase from './HeroPhoneShowcase'
+import TeamSection from './TeamSection'
 import RecentMemorialsCarousel, { type RecentMemorial } from './RecentMemorialsCarousel'
 import NotableProfilesSection, { type NotableMemorial } from './NotableProfilesSection'
 import type { PricingConfig } from '@/lib/pricing'
@@ -727,6 +728,11 @@ export default function LocalizedLanding({ pricing, notableMemorials, recentMemo
         </section>
 
         <SectionDivider delay={4.0} />
+
+        {/* ═══ EKİP ════════════════════════════════════════════════ */}
+        <TeamSection />
+
+        <SectionDivider delay={4.2} />
 
         {/* ═══ FİYATLAR ════════════════════════════════════════════ */}
         <section id="fiyatlar" style={{ padding: 'clamp(60px,10vh,130px) clamp(20px,4vw,60px)' }}>
