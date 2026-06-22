@@ -3,7 +3,7 @@
 import { type ReactNode } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { MapPin, Users } from 'lucide-react'
+import { MapPin, Users, Home } from 'lucide-react'
 import { useLang } from '@/i18n/context'
 import FilterBar from './_FilterBar'
 import MemorialsFooter from './_MemorialsFooter'
@@ -21,6 +21,7 @@ export type MemorialItem = {
   is_notable?: boolean | null
   nationality?: string | null
   notable_sort_order?: number | null
+  family?: { name: string; slug: string } | null
 }
 
 function nationalityFlag(code: string | null | undefined): string {
@@ -99,11 +100,12 @@ export default function MemorialsClient({
                     const order = m.notable_sort_order
 
                     return (
-                      <Link
+                      <div
                         key={m.id}
-                        href={`/memorial/${m.slug}`}
                         className="group relative overflow-hidden rounded-xl border border-[#dfbd72]/60 bg-gradient-to-b from-[#fdf8ee] to-white shadow-sm transition-all hover:border-[#dfbd72] hover:shadow-md"
                       >
+                        {/* Stretched main link */}
+                        <Link href={`/memorial/${m.slug}`} className="absolute inset-0 z-0" aria-label={m.display_name} />
                         {/* Sıra numarası */}
                         {order != null && (
                           <div className="absolute left-2 top-2 z-10 flex h-5 w-5 items-center justify-center rounded-full bg-[#dfbd72] text-[10px] font-bold text-[#1a1208]">
@@ -114,7 +116,7 @@ export default function MemorialsClient({
                         {flag && (
                           <div className="absolute right-2 top-2 z-10 text-base leading-none">{flag}</div>
                         )}
-                        <div className="relative h-[170px] w-full overflow-hidden bg-[#ede8df]">
+                        <div className="relative z-[1] h-[170px] w-full overflow-hidden bg-[#ede8df]">
                           {m.cover_photo_url ? (
                             <Image
                               src={m.cover_photo_url}
@@ -128,8 +130,18 @@ export default function MemorialsClient({
                               <Users className="h-12 w-12 text-[#c7b89a]" />
                             </div>
                           )}
+                          {m.family && (
+                            <Link
+                              href={`/aile/${m.family.slug}`}
+                              className="absolute bottom-2 left-2 z-[2] flex items-center gap-1 rounded-full px-2 py-0.5"
+                              style={{ background: 'rgba(143,184,158,.9)', backdropFilter: 'blur(4px)' }}
+                            >
+                              <Home className="h-2.5 w-2.5 text-[#0a120e]" />
+                              <span className="text-[9px] font-semibold text-[#0a120e] max-w-[80px] truncate">{m.family.name}</span>
+                            </Link>
+                          )}
                         </div>
-                        <div className="p-3.5">
+                        <div className="relative z-[1] p-3.5">
                           <div className="mb-1 inline-flex items-center gap-1 rounded-full bg-[#dfbd72]/20 px-2 py-0.5">
                             <span className="text-[9px] font-bold uppercase tracking-wide text-[#9a7132]">Ulusal Miras</span>
                           </div>
@@ -145,7 +157,7 @@ export default function MemorialsClient({
                             </p>
                           )}
                         </div>
-                      </Link>
+                      </div>
                     )
                   })}
                 </div>
@@ -183,12 +195,23 @@ export default function MemorialsClient({
                         : null
 
                   return (
-                    <Link
+                    <div
                       key={m.id}
-                      href={`/memorial/${m.slug}`}
-                      className="group overflow-hidden rounded-xl border border-[#e6dccb] bg-white shadow-sm transition-all hover:border-[#c8b89a] hover:shadow-md"
+                      className="group relative overflow-hidden rounded-xl border border-[#e6dccb] bg-white shadow-sm transition-all hover:border-[#c8b89a] hover:shadow-md"
                     >
-                      <div className="relative h-[170px] w-full overflow-hidden bg-[#ede8df]">
+                      {/* Stretched main link */}
+                      <Link href={`/memorial/${m.slug}`} className="absolute inset-0 z-0" aria-label={m.display_name} />
+                      <div className="relative z-[1] h-[170px] w-full overflow-hidden bg-[#ede8df]">
+                        {m.family && (
+                          <Link
+                            href={`/aile/${m.family.slug}`}
+                            className="absolute bottom-2 left-2 z-[2] flex items-center gap-1 rounded-full px-2 py-0.5"
+                            style={{ background: 'rgba(143,184,158,.9)', backdropFilter: 'blur(4px)' }}
+                          >
+                            <Home className="h-2.5 w-2.5 text-[#0a120e]" />
+                            <span className="text-[9px] font-semibold text-[#0a120e] max-w-[80px] truncate">{m.family.name}</span>
+                          </Link>
+                        )}
                         {m.cover_video_url ? (
                           <video
                             src={m.cover_video_url}
@@ -212,7 +235,7 @@ export default function MemorialsClient({
                           </div>
                         )}
                       </div>
-                      <div className="p-3.5">
+                      <div className="relative z-[1] p-3.5">
                         <h3 className="font-serif text-sm font-semibold leading-snug text-[#173d31] transition-colors group-hover:text-[#0b6b3a]">
                           {m.display_name}
                         </h3>
@@ -233,7 +256,7 @@ export default function MemorialsClient({
                           </p>
                         )}
                       </div>
-                    </Link>
+                    </div>
                   )
                 })}
               </div>

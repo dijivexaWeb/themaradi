@@ -57,12 +57,27 @@ export default async function MemorialsIndexPage({ searchParams }: Props) {
 
   const totalPages = Math.ceil((count ?? 0) / PAGE_SIZE)
 
+  // Attach family info to all memorials
+  const allIds = [...(notableMemorials ?? []), ...(memorials ?? [])].map(v => v.id)
+  const familyMap: Record<string, { name: string; slug: string }> = {}
+  if (allIds.length > 0) {
+    const { data: familyLinks } = await supabase
+      .from('family_members')
+      .select('vault_id, memorial_families(name, slug)')
+      .in('vault_id', allIds)
+    for (const link of familyLinks ?? []) {
+      const raw = link.memorial_families as { name: string; slug: string }[] | { name: string; slug: string } | null
+      const fam = Array.isArray(raw) ? raw[0] : raw
+      if (fam && link.vault_id) familyMap[link.vault_id] = fam
+    }
+  }
+
   return (
     <div className="min-h-screen bg-[#fbf8f1] text-[#173d31]">
       <LandingNav />
       <MemorialsClient
-        memorials={(memorials ?? []) as MemorialItem[]}
-        notableMemorials={(notableMemorials ?? []) as MemorialItem[]}
+        memorials={(memorials ?? []).map(m => ({ ...m, family: familyMap[m.id] ?? null })) as MemorialItem[]}
+        notableMemorials={(notableMemorials ?? []).map(m => ({ ...m, family: familyMap[m.id] ?? null })) as MemorialItem[]}
         count={count ?? 0}
         currentPage={currentPage}
         totalPages={totalPages}

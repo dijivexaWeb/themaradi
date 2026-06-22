@@ -2,6 +2,12 @@
 
 import { useState, useTransition, useOptimistic } from 'react'
 import { markEmailStatusAction, sendInboxReplyAction, toggleFlagAction, setFollowUpAction, deleteEmailAction, deleteAllEmailsAction } from './actions'
+import DOMPurify from 'isomorphic-dompurify'
+
+function safeHtml(html: string | null | undefined): string {
+  if (!html) return ''
+  return DOMPurify.sanitize(html, { USE_PROFILES: { html: true } })
+}
 
 export type AttachmentMeta = {
   filename: string
@@ -291,7 +297,7 @@ function ReplyForm({ email, onDone }: { email: InboxEmail; onDone: () => void })
         <details>
           <summary className="text-xs text-slate-400 cursor-pointer hover:text-slate-600 list-none">Önizleme ▼</summary>
           <div className="mt-2 rounded-xl border border-slate-200 bg-white p-4 text-sm prose prose-sm max-w-none"
-            dangerouslySetInnerHTML={{ __html: body }} />
+            dangerouslySetInnerHTML={{ __html: safeHtml(body) }} />
         </details>
         {result?.error && <p className="text-xs text-red-500 bg-red-50 border border-red-200 rounded-lg px-3 py-2">{result.error}</p>}
         {result?.success && <p className="text-xs text-emerald-600 bg-emerald-50 border border-emerald-200 rounded-lg px-3 py-2">Yanıt gönderildi!</p>}
@@ -374,7 +380,7 @@ function ThreadView({ thread, allEmails }: { thread: InboxEmail; allEmails: Inbo
                 </div>
                 <div className={`rounded-xl p-3 border ${i === members.length - 1 && !msg.replied_at ? 'bg-white border-slate-200' : 'bg-slate-50 border-slate-100'}`}>
                   {msg.body_html ? (
-                    <div className="text-sm prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: msg.body_html }} />
+                    <div className="text-sm prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: safeHtml(msg.body_html) }} />
                   ) : (
                     <pre className="text-sm text-slate-700 whitespace-pre-wrap font-sans">{msg.body_text ?? '(İçerik yok)'}</pre>
                   )}
@@ -397,7 +403,7 @@ function ThreadView({ thread, allEmails }: { thread: InboxEmail; allEmails: Inbo
                     <span className="text-[10px] text-emerald-600 font-medium">Gönderildi</span>
                   </div>
                   <div className="rounded-xl p-3 bg-emerald-50/60 border border-emerald-100">
-                    <div className="text-sm prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: msg.reply_body_html }} />
+                    <div className="text-sm prose prose-sm max-w-none" dangerouslySetInnerHTML={{ __html: safeHtml(msg.reply_body_html) }} />
                   </div>
                 </div>
               </div>
@@ -478,7 +484,7 @@ function EmailCard({ email }: { email: InboxEmail }) {
 
         {email.body_html ? (
           <div className="text-sm prose prose-sm max-w-none bg-slate-50 rounded-xl p-4 border border-slate-100"
-            dangerouslySetInnerHTML={{ __html: email.body_html }} />
+            dangerouslySetInnerHTML={{ __html: safeHtml(email.body_html) }} />
         ) : email.body_text ? (
           <pre className="text-sm text-slate-700 whitespace-pre-wrap bg-slate-50 rounded-xl p-4 border border-slate-100 font-sans">{email.body_text}</pre>
         ) : (
@@ -564,7 +570,7 @@ function SentCard({ email }: { email: InboxEmail }) {
         </div>
         {email.reply_body_html ? (
           <div className="text-sm prose prose-sm max-w-none bg-slate-50 rounded-xl p-4 border border-slate-100"
-            dangerouslySetInnerHTML={{ __html: email.reply_body_html }} />
+            dangerouslySetInnerHTML={{ __html: safeHtml(email.reply_body_html) }} />
         ) : (
           <p className="text-sm text-slate-400 italic">İçerik yok.</p>
         )}

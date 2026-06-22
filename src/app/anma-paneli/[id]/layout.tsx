@@ -84,8 +84,11 @@ export default async function AnmaPaneliLayout({
 
       {/* DESKTOP SIDEBAR */}
       <aside className="fixed left-0 top-0 z-40 hidden h-full w-72 flex-col border-r border-[#e5dccb] bg-[#fffdf7]/95 px-4 py-7 shadow-[18px_0_55px_rgba(64,48,24,0.06)] lg:flex">
-        <div className="px-4">
+        <div className="px-4 flex items-center justify-between">
           <BrandLogo href="/" className="text-[#173d31]" />
+          <Link href="/anma-paneli" className="text-[11px] font-medium text-[#788177] hover:text-[#174f35] transition-colors">
+            ← Profillerim
+          </Link>
         </div>
 
         {/* Anılan kişi kartı */}

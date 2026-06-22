@@ -6,6 +6,7 @@ import { addMemoryAction, updateMemoryAction, deleteMemoryAction } from '@/lib/a
 import { ImageUploadInput } from '@/components/ImageUploadInput'
 import MemorySubmitButton from './_MemorySubmitButton'
 import SectionHeader from '../_SectionHeader'
+import { getTranslation } from '@/i18n/server'
 
 interface Props {
   params: Promise<{ id: string }>
@@ -30,6 +31,7 @@ export default async function MemorialAnilarPage({ params, searchParams }: Props
   const { id } = await params
   const { edit: editId, tab, error, saved } = await searchParams
   const supabase = await createClient()
+  const { t } = await getTranslation()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
@@ -68,16 +70,16 @@ export default async function MemorialAnilarPage({ params, searchParams }: Props
     <div className="px-5 py-8 sm:px-8">
       <div className="max-w-3xl mx-auto">
 
-        <SectionHeader title="Anılar" icon="💭" subtitle={`${memories?.length ?? 0} anı`} />
+        <SectionHeader title={t.memorial_panel.pages.memories.title} icon="💭" subtitle={`${memories?.length ?? 0} ${t.memorial_panel.sidebar.memories.toLowerCase()}`} />
 
         {isLocked && (
           <div className="mb-5 rounded-2xl border border-[#dfbd72]/50 bg-[#fff7e6] px-5 py-4 text-sm text-[#725212]">
-            Ödeme doğrulandıktan sonra anı ekleyebilirsiniz.
+            {t.memorial_panel.pages.common.lockedMsg}
           </div>
         )}
         {saved === '1' && (
           <div className="mb-5 flex items-center gap-2 rounded-2xl border border-[#c7e4c7] bg-[#e9f5ec] px-5 py-4 text-sm font-medium text-[#174f35]">
-            <span>✓</span> {isKronoloji ? 'Kronoloji kaydı eklendi.' : 'Anı başarıyla kaydedildi.'}
+            <span>✓</span> {t.memorial_panel.pages.common.saved}
           </div>
         )}
         {error && (
@@ -86,7 +88,7 @@ export default async function MemorialAnilarPage({ params, searchParams }: Props
 
         {/* Başlık + Sekmeler */}
         <div className="mb-6">
-          <h1 className="font-serif text-3xl text-[#1f2d27] mb-4">Anılar</h1>
+          <h1 className="font-serif text-3xl text-[#1f2d27] mb-4">{t.memorial_panel.pages.memories.title}</h1>
 
           <div className="flex gap-1 rounded-2xl border border-[#e5dccb] bg-[#f9f5ee] p-1 w-fit">
             <Link
@@ -97,7 +99,7 @@ export default async function MemorialAnilarPage({ params, searchParams }: Props
                   : 'text-[#788177] hover:text-[#1f2d27]'
               }`}
             >
-              ✍️ Anılar
+              ✍️ {t.memorial_panel.pages.memories.tabMemories}
               <span className="ml-1.5 rounded-full bg-[#174f35]/10 px-1.5 py-0.5 text-[10px] font-bold text-[#174f35]">
                 {anilarItems.length}
               </span>
@@ -110,7 +112,7 @@ export default async function MemorialAnilarPage({ params, searchParams }: Props
                   : 'text-[#788177] hover:text-[#1f2d27]'
               }`}
             >
-              📅 Kronoloji
+              📅 {t.memorial_panel.pages.memories.tabTimeline}
               <span className="ml-1.5 rounded-full bg-[#174f35]/10 px-1.5 py-0.5 text-[10px] font-bold text-[#174f35]">
                 {kronolojItems.length}
               </span>
@@ -124,7 +126,7 @@ export default async function MemorialAnilarPage({ params, searchParams }: Props
             <div className="flex items-center gap-2 mb-4">
               <span className="text-lg">{isKronoloji ? '📅' : '✍️'}</span>
               <h2 className="font-semibold text-[#1f2d27]">
-                {isKronoloji ? 'Kronoloji Ekle' : 'Anı Ekle'}
+                {isKronoloji ? t.memorial_panel.pages.memories.addTimeline : t.memorial_panel.pages.memories.addMemory}
               </h2>
             </div>
             <form action={addAction} className="space-y-4">
@@ -183,12 +185,10 @@ export default async function MemorialAnilarPage({ params, searchParams }: Props
           <div className="rounded-3xl border border-dashed border-[#e5dccb] bg-[#fffdf8] py-16 text-center">
             <p className="text-5xl mb-3">{isKronoloji ? '📅' : '💭'}</p>
             <p className="font-serif text-xl text-[#1f2d27] mb-1">
-              {isKronoloji ? 'Henüz kronoloji yok' : 'Henüz anı yok'}
+              {t.memorial_panel.pages.memories.emptyTitle}
             </p>
             <p className="text-sm text-[#788177] max-w-xs mx-auto">
-              {isKronoloji
-                ? 'Doğum, evlilik, kariyer gibi önemli yaşam olaylarını ekleyin.'
-                : 'Paylaşmak istediğiniz bir hatıra, söz veya özel anı ekleyin.'}
+              {t.memorial_panel.pages.memories.emptyText}
             </p>
           </div>
         ) : isKronoloji ? (

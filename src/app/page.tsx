@@ -28,6 +28,21 @@ export default async function LandingPage() {
       .limit(10),
   ])
 
+  // Attach family info to recent memorials
+  const recentIds = (recentMemorials ?? []).map((v) => v.id)
+  const familyMap: Record<string, { name: string; slug: string }> = {}
+  if (recentIds.length > 0) {
+    const { data: familyLinks } = await supabase
+      .from('family_members')
+      .select('vault_id, memorial_families(name, slug)')
+      .in('vault_id', recentIds)
+    for (const link of familyLinks ?? []) {
+      const raw = link.memorial_families as { name: string; slug: string }[] | { name: string; slug: string } | null
+      const fam = Array.isArray(raw) ? raw[0] : raw
+      if (fam && link.vault_id) familyMap[link.vault_id] = fam
+    }
+  }
+
   const notableIds = (notableRaw ?? []).map((v) => v.id)
   const interactionTotals: Record<string, number> = {}
   if (notableIds.length > 0) {
@@ -52,7 +67,7 @@ export default async function LandingPage() {
       <LocalizedLanding
         pricing={pricing}
         notableMemorials={notableMemorials}
-        recentMemorials={(recentMemorials ?? []) as RecentMemorial[]}
+        recentMemorials={(recentMemorials ?? []).map(m => ({ ...m, family: familyMap[m.id] ?? null })) as RecentMemorial[]}
       />
     </div>
   )

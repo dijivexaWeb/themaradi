@@ -65,7 +65,7 @@ export async function POST(request: NextRequest) {
     let isAllowed = false
     let sizeLimit = 0
 
-    if (['gallery_image', 'profile_cover', 'profile_photo', 'hero_bg'].includes(category)) {
+    if (['gallery_image', 'profile_cover', 'profile_photo', 'hero_bg', 'family_photo'].includes(category)) {
       isAllowed = ALLOWED_IMAGES.has(mimeType)
       sizeLimit = MAX_IMAGE_BYTES
     } else if (category === 'profile_cover_video') {

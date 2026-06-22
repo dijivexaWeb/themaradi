@@ -6,6 +6,8 @@ import {
   rejectGuestbookEntryAction,
 } from '@/lib/actions/condolences'
 import { ACTION_ICON_MAP } from '@/lib/memorial-style-templates'
+import SectionHeader from '../_SectionHeader'
+import { getTranslation } from '@/i18n/server'
 
 interface Props {
   params: Promise<{ id: string }>
@@ -14,6 +16,7 @@ interface Props {
 export default async function MemorialTaziyePage({ params }: Props) {
   const { id } = await params
   const supabase = await createClient()
+  const { t } = await getTranslation()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
@@ -61,12 +64,7 @@ export default async function MemorialTaziyePage({ params }: Props) {
       <div className="mx-auto max-w-4xl">
         
 
-        <div className="mb-7">
-          <h1 className="font-serif text-3xl text-[#1f2d27]">Taziye Defteri</h1>
-          <p className="mt-1 text-sm text-[#788177]">
-            Gelen taziye mesajlarını onaylayın veya reddedin.
-          </p>
-        </div>
+        <SectionHeader title={t.memorial_panel.pages.guestbook.title} icon="📖" />
 
         {/* Anma aksiyonları */}
         {(actions?.length ?? 0) > 0 && (
@@ -135,7 +133,7 @@ export default async function MemorialTaziyePage({ params }: Props) {
                             type="submit"
                             className="rounded-lg bg-[#174f35] px-4 py-1.5 text-xs font-semibold text-white transition-colors hover:bg-[#123f2b]"
                           >
-                            Onayla
+                            {t.memorial_panel.pages.guestbook.approve}
                           </button>
                         </form>
                         <form action={reject}>
@@ -143,7 +141,7 @@ export default async function MemorialTaziyePage({ params }: Props) {
                             type="submit"
                             className="rounded-lg border border-red-200 px-4 py-1.5 text-xs font-semibold text-red-500 transition-colors hover:bg-red-50"
                           >
-                            Reddet
+                            {t.memorial_panel.pages.guestbook.reject}
                           </button>
                         </form>
                       </div>
@@ -158,7 +156,7 @@ export default async function MemorialTaziyePage({ params }: Props) {
         {/* Onaylanmış mesajlar */}
         <div>
           <h2 className="mb-4 font-semibold text-[#1f2d27]">
-            Onaylanmış Mesajlar
+            {t.memorial_panel.pages.guestbook.tabApproved}
             <span className="ml-2 text-sm font-normal text-[#788177]">
               ({approved?.length ?? 0})
             </span>
@@ -167,7 +165,7 @@ export default async function MemorialTaziyePage({ params }: Props) {
           {!approved?.length ? (
             <div className="rounded-2xl border border-dashed border-[#e5dccb] bg-[#fffdf8] py-10 text-center">
               <p className="mb-2 text-3xl">🕊️</p>
-              <p className="text-sm text-[#788177]">Henüz onaylanmış mesaj yok.</p>
+              <p className="text-sm text-[#788177]">{t.memorial_panel.pages.guestbook.emptyTitle}</p>
             </div>
           ) : (
             <div className="space-y-3">

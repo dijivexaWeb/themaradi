@@ -17,6 +17,14 @@ export type PricingConfig = {
   memorialRub: string
   vaultSetupRub: string
   vaultMonthlyRub: string
+  // Family — GEL
+  familyGel: string
+  familyTry: string
+  familyUsd: string
+  familyRub: string
+  // Additional member (sonradan eklenen üye indirimi)
+  additionalMemberGel: string
+  campaignAdditionalMemberGel: string
   // Campaign
   campaignActive: boolean
   campaignLabel: string
@@ -29,6 +37,10 @@ export type PricingConfig = {
   campaignVaultMonthlyUsd: string
   campaignMemorialRub: string
   campaignVaultMonthlyRub: string
+  campaignFamilyGel: string
+  campaignFamilyTry: string
+  campaignFamilyUsd: string
+  campaignFamilyRub: string
   campaignEndsAt: string
 }
 
@@ -45,6 +57,12 @@ const DEFAULTS: PricingConfig = {
   memorialRub: '',
   vaultSetupRub: '',
   vaultMonthlyRub: '',
+  familyGel: '399',
+  familyTry: '',
+  familyUsd: '',
+  familyRub: '',
+  additionalMemberGel: '129',
+  campaignAdditionalMemberGel: '',
   campaignActive: false,
   campaignLabel: '',
   campaignMemorial: '',
@@ -56,6 +74,10 @@ const DEFAULTS: PricingConfig = {
   campaignVaultMonthlyUsd: '',
   campaignMemorialRub: '',
   campaignVaultMonthlyRub: '',
+  campaignFamilyGel: '',
+  campaignFamilyTry: '',
+  campaignFamilyUsd: '',
+  campaignFamilyRub: '',
   campaignEndsAt: '',
 }
 
@@ -70,11 +92,15 @@ export async function fetchPricingConfig(): Promise<PricingConfig> {
         'price_memorial_try', 'price_vault_setup_try', 'price_vault_monthly_try',
         'price_memorial_usd', 'price_vault_setup_usd', 'price_vault_monthly_usd',
         'price_memorial_rub', 'price_vault_setup_rub', 'price_vault_monthly_rub',
+        'price_family_gel', 'price_family_try', 'price_family_usd', 'price_family_rub',
         'campaign_active', 'campaign_label',
         'campaign_price_memorial', 'campaign_price_vault_setup', 'campaign_price_vault_monthly',
         'campaign_price_memorial_try', 'campaign_price_vault_monthly_try',
         'campaign_price_memorial_usd', 'campaign_price_vault_monthly_usd',
         'campaign_price_memorial_rub', 'campaign_price_vault_monthly_rub',
+        'campaign_price_family_gel', 'campaign_price_family_try',
+        'campaign_price_family_usd', 'campaign_price_family_rub',
+        'price_additional_member_gel', 'campaign_price_additional_member_gel',
         'campaign_ends_at',
       ])
 
@@ -95,6 +121,10 @@ export async function fetchPricingConfig(): Promise<PricingConfig> {
       memorialRub: s.price_memorial_rub || '',
       vaultSetupRub: s.price_vault_setup_rub || '',
       vaultMonthlyRub: s.price_vault_monthly_rub || '',
+      familyGel: s.price_family_gel || DEFAULTS.familyGel,
+      familyTry: s.price_family_try || '',
+      familyUsd: s.price_family_usd || '',
+      familyRub: s.price_family_rub || '',
       campaignActive: s.campaign_active === 'true',
       campaignLabel: s.campaign_label || '',
       campaignMemorial: s.campaign_price_memorial || '',
@@ -106,6 +136,12 @@ export async function fetchPricingConfig(): Promise<PricingConfig> {
       campaignVaultMonthlyUsd: s.campaign_price_vault_monthly_usd || '',
       campaignMemorialRub: s.campaign_price_memorial_rub || '',
       campaignVaultMonthlyRub: s.campaign_price_vault_monthly_rub || '',
+      campaignFamilyGel: s.campaign_price_family_gel || '',
+      campaignFamilyTry: s.campaign_price_family_try || '',
+      campaignFamilyUsd: s.campaign_price_family_usd || '',
+      campaignFamilyRub: s.campaign_price_family_rub || '',
+      additionalMemberGel: s.price_additional_member_gel || DEFAULTS.additionalMemberGel,
+      campaignAdditionalMemberGel: s.campaign_price_additional_member_gel || '',
       campaignEndsAt: s.campaign_ends_at || '',
     }
   } catch {

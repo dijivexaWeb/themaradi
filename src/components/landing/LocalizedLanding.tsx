@@ -22,15 +22,16 @@ import type { PricingConfig } from '@/lib/pricing'
 type CurrencyView = {
   symbol: string; memorial: string; vaultSetup: string
   vaultMonthly: string; campaignMemorial: string; campaignVaultMonthly: string
+  family: string; campaignFamily: string
 }
 function buildCurrencyView(pricing: PricingConfig, lang: string): CurrencyView {
   if (lang === 'tr' && pricing.memorialTry)
-    return { symbol: '₺', memorial: pricing.memorialTry, vaultSetup: pricing.vaultSetupTry || pricing.vaultSetup, vaultMonthly: pricing.vaultMonthlyTry || pricing.vaultMonthly, campaignMemorial: pricing.campaignMemorialTry, campaignVaultMonthly: pricing.campaignVaultMonthlyTry }
+    return { symbol: '₺', memorial: pricing.memorialTry, vaultSetup: pricing.vaultSetupTry || pricing.vaultSetup, vaultMonthly: pricing.vaultMonthlyTry || pricing.vaultMonthly, campaignMemorial: pricing.campaignMemorialTry, campaignVaultMonthly: pricing.campaignVaultMonthlyTry, family: pricing.familyTry || pricing.familyGel, campaignFamily: pricing.campaignFamilyTry }
   if ((lang === 'en' || lang === 'he') && pricing.memorialUsd)
-    return { symbol: '$', memorial: pricing.memorialUsd, vaultSetup: pricing.vaultSetupUsd || pricing.vaultSetup, vaultMonthly: pricing.vaultMonthlyUsd || pricing.vaultMonthly, campaignMemorial: pricing.campaignMemorialUsd, campaignVaultMonthly: pricing.campaignVaultMonthlyUsd }
+    return { symbol: '$', memorial: pricing.memorialUsd, vaultSetup: pricing.vaultSetupUsd || pricing.vaultSetup, vaultMonthly: pricing.vaultMonthlyUsd || pricing.vaultMonthly, campaignMemorial: pricing.campaignMemorialUsd, campaignVaultMonthly: pricing.campaignVaultMonthlyUsd, family: pricing.familyUsd || pricing.familyGel, campaignFamily: pricing.campaignFamilyUsd }
   if (lang === 'ru' && pricing.memorialRub)
-    return { symbol: '₽', memorial: pricing.memorialRub, vaultSetup: pricing.vaultSetupRub || pricing.vaultSetup, vaultMonthly: pricing.vaultMonthlyRub || pricing.vaultMonthly, campaignMemorial: pricing.campaignMemorialRub, campaignVaultMonthly: pricing.campaignVaultMonthlyRub }
-  return { symbol: '₾', memorial: pricing.memorialPrice, vaultSetup: pricing.vaultSetup, vaultMonthly: pricing.vaultMonthly, campaignMemorial: pricing.campaignMemorial, campaignVaultMonthly: pricing.campaignVaultMonthly }
+    return { symbol: '₽', memorial: pricing.memorialRub, vaultSetup: pricing.vaultSetupRub || pricing.vaultSetup, vaultMonthly: pricing.vaultMonthlyRub || pricing.vaultMonthly, campaignMemorial: pricing.campaignMemorialRub, campaignVaultMonthly: pricing.campaignVaultMonthlyRub, family: pricing.familyRub || pricing.familyGel, campaignFamily: pricing.campaignFamilyRub }
+  return { symbol: '₾', memorial: pricing.memorialPrice, vaultSetup: pricing.vaultSetup, vaultMonthly: pricing.vaultMonthly, campaignMemorial: pricing.campaignMemorial, campaignVaultMonthly: pricing.campaignVaultMonthly, family: pricing.familyGel, campaignFamily: pricing.campaignFamilyGel }
 }
 
 const stepIcons = [QrCode, BookOpen, Users, ShieldCheck] as const
@@ -447,6 +448,91 @@ export default function LocalizedLanding({ pricing, notableMemorials, recentMemo
 
         <SectionDivider delay={2.0} />
 
+        {/* ═══ AİLE ANMA SAYFASI ═══════════════════════════════════ */}
+        <section id="aile-anma" style={{ padding: 'clamp(64px,11vh,140px) clamp(20px,4vw,60px)' }}>
+          <div style={{ maxWidth: 1240, margin: '0 auto', display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'clamp(48px,6vw,96px)' }}>
+
+            {/* Sol — Mockup */}
+            <div className="tem-reveal" style={{ flex: '1 1 340px', minWidth: 300 }}>
+              <Link href="/aile/istanbollu" style={{ textDecoration: 'none', display: 'block' }}>
+              <div style={{ borderRadius: 24, background: 'rgba(255,255,255,.03)', border: '1px solid rgba(201,169,110,.16)', overflow: 'hidden', transition: 'border-color .3s' }}
+                onMouseEnter={e => (e.currentTarget.style.borderColor = 'rgba(201,169,110,.45)')}
+                onMouseLeave={e => (e.currentTarget.style.borderColor = 'rgba(201,169,110,.16)')}
+              >
+                <div style={{ padding: '28px 28px 20px', background: 'linear-gradient(180deg, rgba(16,28,22,.6) 0%, rgba(10,12,18,.2) 100%)', borderBottom: '1px solid rgba(201,169,110,.1)' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+                    <div style={{ width: 48, height: 48, borderRadius: 14, background: S.goldGrad, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, fontSize: 20 }}>🏛️</div>
+                    <div>
+                      <div style={{ fontFamily: S.serif, fontSize: 20, color: S.textHead }}>{s.familyPage.mockupFamily}</div>
+                      <div style={{ fontSize: 11, letterSpacing: '.1em', textTransform: 'uppercase', color: S.gold, marginTop: 3, fontFamily: S.sans }}>{s.familyPage.mockupMembers}</div>
+                    </div>
+                  </div>
+                </div>
+                <div style={{ padding: '16px 28px 24px', display: 'flex', flexDirection: 'column', gap: 12 }}>
+                  {s.familyPage.mockupNames.map((name, i) => (
+                    <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 14, padding: '14px 16px', borderRadius: 14, background: i === 2 ? 'rgba(201,169,110,.07)' : 'rgba(255,255,255,.025)', border: `1px solid ${i === 2 ? 'rgba(201,169,110,.3)' : S.cardBorder}` }}>
+                      <div style={{ width: 38, height: 38, borderRadius: '50%', flexShrink: 0, overflow: 'hidden', position: 'relative', border: `1.5px solid ${i === 2 ? 'rgba(201,169,110,.5)' : 'rgba(201,169,110,.2)'}` }}>
+                        <Image
+                          src={['/images/landing/profile-family-old.png', '/images/landing/profile-ahmet.png', '/images/landing/profile-family-dinner.png'][i]}
+                          alt={name}
+                          fill
+                          sizes="38px"
+                          className="object-cover object-top"
+                        />
+                      </div>
+                      <div style={{ flex: 1 }}>
+                        <div style={{ fontFamily: S.serif, fontSize: 16, color: i === 2 ? S.textHead : S.text }}>{name}</div>
+                        <div style={{ fontSize: 11.5, color: S.textFaint, fontFamily: S.sans }}>{s.familyPage.mockupYears[i]}</div>
+                      </div>
+                      {i === 2 && (
+                        <div style={{ fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', color: S.gold, background: 'rgba(201,169,110,.12)', border: '1px solid rgba(201,169,110,.25)', borderRadius: 999, padding: '4px 10px', fontFamily: S.sans }}>Yeni</div>
+                      )}
+                    </div>
+                  ))}
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', borderRadius: 14, border: '1px dashed rgba(201,169,110,.25)', cursor: 'default' }}>
+                    <div style={{ width: 36, height: 36, borderRadius: '50%', border: '1px dashed rgba(201,169,110,.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'rgba(201,169,110,.5)', fontSize: 20 }}>+</div>
+                    <span style={{ color: 'rgba(201,169,110,.5)', fontSize: 14, fontFamily: S.sans }}>Yeni sayfa ekle…</span>
+                  </div>
+                </div>
+              </div>
+              </Link>
+              <div style={{ marginTop: 14, textAlign: 'center' }}>
+                <Link href="/aile/istanbollu" style={{ display: 'inline-flex', alignItems: 'center', gap: 6, color: S.gold, fontSize: 13.5, fontWeight: 300, textDecoration: 'none', fontFamily: S.sans }}>
+                  Örnek aile sayfasını gör <ArrowRight style={{ width: 13, height: 13 }} />
+                </Link>
+              </div>
+            </div>
+
+            {/* Sağ — Metin */}
+            <div className="tem-reveal" style={{ flex: '1 1 420px', minWidth: 320 }}>
+              <GoldLabel>{s.familyPage.label}</GoldLabel>
+              <SectionHeading style={{ marginBottom: 20 }}>{s.familyPage.heading}</SectionHeading>
+              <p style={{ fontSize: 16, fontWeight: 300, lineHeight: 1.75, color: S.textMuted, margin: '0 0 40px', fontFamily: S.sans, maxWidth: 520 }}>
+                {s.familyPage.sub}
+              </p>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 20, marginBottom: 40 }}>
+                {s.familyPage.features.map((feat, i) => (
+                  <div key={i} style={{ display: 'flex', gap: 16 }}>
+                    <div style={{ width: 44, height: 44, flexShrink: 0, borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(201,169,110,.09)', border: '1px solid rgba(201,169,110,.2)', fontSize: 18 }}>
+                      {(['🏛️', '📄', '⚙️', '🕊️'] as const)[i]}
+                    </div>
+                    <div>
+                      <div style={{ fontFamily: S.serif, fontSize: 18, color: S.text, marginBottom: 4 }}>{feat.title}</div>
+                      <div style={{ fontSize: 14, fontWeight: 300, lineHeight: 1.65, color: S.textMuted, fontFamily: S.sans }}>{feat.text}</div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              <Link href="/aile" className="tem-goldbtn" style={{ display: 'inline-flex', alignItems: 'center', gap: 10, textDecoration: 'none', background: S.goldGrad, color: '#14110a', fontWeight: 500, fontSize: 15.5, padding: '16px 32px', borderRadius: 999, boxShadow: '0 14px 36px rgba(201,169,110,.26)', fontFamily: S.sans }}>
+                {s.familyPage.cta} <ArrowRight style={{ width: 16, height: 16 }} />
+              </Link>
+            </div>
+
+          </div>
+        </section>
+
+        <SectionDivider delay={2.2} />
+
         {/* ═══ NEDEN AILELER SEÇİYOR — 6 KART ════════════════════ */}
         <section id="ozellikler" style={{ padding: 'clamp(64px,11vh,140px) clamp(20px,4vw,60px)' }}>
           <div style={{ maxWidth: 1240, margin: '0 auto' }}>
@@ -613,75 +699,156 @@ export default function LocalizedLanding({ pricing, notableMemorials, recentMemo
 
         {/* ═══ FİYATLAR ════════════════════════════════════════════ */}
         <section id="fiyatlar" style={{ padding: 'clamp(60px,10vh,130px) clamp(20px,4vw,60px)' }}>
-          <div style={{ maxWidth: 940, margin: '0 auto' }}>
+          <div style={{ maxWidth: 1280, margin: '0 auto' }}>
             <div className="tem-reveal" style={{ textAlign: 'center', marginBottom: 58 }}>
-              <GoldLabel>Tek anma planı</GoldLabel>
-              <SectionHeading style={{ margin: '0 0 18px' }}>{p.heading}</SectionHeading>
-              <p style={{ fontSize: 16.5, fontWeight: 300, color: S.textMuted, maxWidth: 560, margin: '0 auto', fontFamily: S.sans }}>{p.sub}</p>
+              <GoldLabel>{p.heading}</GoldLabel>
+              <SectionHeading style={{ margin: '0 0 18px' }}>{p.sub}</SectionHeading>
             </div>
 
-            {/* Gradient border card */}
-            <div className="tem-reveal" style={{ position: 'relative', borderRadius: 26, padding: 1.5, background: 'linear-gradient(135deg, rgba(226,200,133,.85), rgba(201,169,110,.2), rgba(226,200,133,.6))', boxShadow: '0 44px 100px -44px rgba(201,169,110,.4)' }}>
-              <div className="tem-animate-haloPulse" style={{ position: 'absolute', inset: -3, borderRadius: 28, background: 'linear-gradient(135deg, rgba(226,200,133,.4), transparent 62%)', filter: 'blur(24px)', zIndex: -1 }} />
-              <div style={{ borderRadius: 24, background: 'linear-gradient(165deg, #0d1611 0%, #0a0c11 100%)', padding: 'clamp(34px,4vw,54px)', display: 'flex', flexWrap: 'wrap', gap: 46 }}>
+            <div style={{ display: 'flex', gap: 24, flexWrap: 'wrap' }}>
 
-                {/* Left — price */}
-                <div style={{ flex: '1 1 260px', minWidth: 240 }}>
-                  <div style={{ display: 'inline-block', fontSize: 10.5, letterSpacing: '.2em', textTransform: 'uppercase', color: '#14110a', background: S.goldGrad, padding: '7px 14px', borderRadius: 999, marginBottom: 26, fontFamily: S.sans }}>
-                    {p.memorialBadge}
-                  </div>
+              {/* ── Kart 1: Tek Anma ─────────────────────────────── */}
+              <div className="tem-reveal" style={{ flex: '1 1 520px', position: 'relative', borderRadius: 26, padding: 1.5, background: 'linear-gradient(135deg, rgba(226,200,133,.85), rgba(201,169,110,.2), rgba(226,200,133,.6))', boxShadow: '0 44px 100px -44px rgba(201,169,110,.4)' }}>
+                <div className="tem-animate-haloPulse" style={{ position: 'absolute', inset: -3, borderRadius: 28, background: 'linear-gradient(135deg, rgba(226,200,133,.4), transparent 62%)', filter: 'blur(24px)', zIndex: -1 }} />
+                <div style={{ borderRadius: 24, background: 'linear-gradient(165deg, #0d1611 0%, #0a0c11 100%)', padding: 'clamp(34px,4vw,54px)', display: 'flex', flexWrap: 'wrap', gap: 46, height: '100%' }}>
 
-                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginBottom: 6 }}>
-                    {pricing.campaignActive && cur.campaignMemorial ? (
-                      <>
-                        <span style={{ fontFamily: S.serif, fontSize: 36, color: 'rgba(244,240,230,.38)', textDecoration: 'line-through' }}>{cur.memorial}</span>
-                        <span style={{ fontFamily: S.serif, fontSize: 60, fontWeight: 500, color: S.textHead, lineHeight: 1 }}>{cur.campaignMemorial}</span>
-                      </>
-                    ) : (
-                      <span style={{ fontFamily: S.serif, fontSize: 60, fontWeight: 500, color: S.textHead, lineHeight: 1 }}>{cur.memorial}</span>
-                    )}
-                    <div style={{ marginBottom: 2 }}>
-                      <span style={{ fontSize: 21, fontWeight: 600, color: 'rgba(163,201,177,.9)', fontFamily: S.sans }}>{cur.symbol}</span>
-                      <p style={{ fontSize: 13, color: 'rgba(163,201,177,.7)', margin: 0, fontFamily: S.sans }}>{p.memorialPriceLabel}</p>
+                  {/* Left — price */}
+                  <div style={{ flex: '1 1 260px', minWidth: 240 }}>
+                    <div style={{ display: 'inline-block', fontSize: 10.5, letterSpacing: '.2em', textTransform: 'uppercase', color: '#14110a', background: S.goldGrad, padding: '7px 14px', borderRadius: 999, marginBottom: 26, fontFamily: S.sans }}>
+                      {p.memorialBadge}
                     </div>
-                  </div>
-                  <div style={{ fontSize: 13.5, fontWeight: 300, color: 'rgba(201,169,110,.72)', marginBottom: 30, fontFamily: S.sans }}>tek seferlik · QR plaka dahil</div>
 
-                  {/* Guarantee */}
-                  <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, padding: 16, borderRadius: 14, background: 'rgba(143,184,158,.07)', border: '1px solid rgba(143,184,158,.2)', marginBottom: 26 }}>
-                    <ShieldCheck style={{ width: 20, height: 20, stroke: '#8FB89E', strokeWidth: 1.5, flexShrink: 0, marginTop: 1 }} />
-                    <div>
-                      <div style={{ fontSize: 13.5, fontWeight: 500, color: S.text, fontFamily: S.sans }}>{p.memorialGuaranteeBadge}</div>
-                      <div style={{ fontSize: 12.5, fontWeight: 300, color: 'rgba(237,232,221,.5)', lineHeight: 1.5, fontFamily: S.sans }}>{p.memorialGuarantee}</div>
-                    </div>
-                  </div>
-
-                  <Link href="/satin-al/anma" className="tem-goldbtn" style={{ display: 'block', textAlign: 'center', textDecoration: 'none', background: S.goldGrad, color: '#14110a', fontWeight: 500, fontSize: 15.5, padding: 17, borderRadius: 14, boxShadow: '0 14px 36px rgba(201,169,110,.28)', marginBottom: 12, fontFamily: S.sans }}>
-                    {p.memorialCta}
-                  </Link>
-                  <Link href="/memorial/demo" className="tem-ghostbtn" style={{ display: 'block', textAlign: 'center', textDecoration: 'none', background: 'none', color: 'rgba(237,232,221,.78)', border: '1px solid rgba(237,232,221,.16)', fontWeight: 300, fontSize: 14.5, padding: 14, borderRadius: 14, fontFamily: S.sans }}>
-                    {p.demoProfileCta}
-                  </Link>
-                </div>
-
-                {/* Right — features */}
-                <div style={{ flex: '1 1 280px', minWidth: 260, borderLeft: '1px solid rgba(201,169,110,.12)', paddingLeft: 46 }}>
-                  <div style={{ fontSize: 11, letterSpacing: '.2em', textTransform: 'uppercase', color: 'rgba(201,169,110,.72)', marginBottom: 24, fontFamily: S.sans }}>
-                    {p.memorialFeaturesHeading}
-                  </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 28px' }}>
-                    {p.memorialFeatures.map((f, i) => (
-                      <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 9, marginBottom: 15, fontSize: 13.5, fontWeight: 300, color: 'rgba(237,232,221,.7)', lineHeight: 1.4, fontFamily: S.sans }}>
-                        <span style={{ color: S.goldBright, flexShrink: 0 }}>✓</span> {f}
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginBottom: 6 }}>
+                      {pricing.campaignActive && cur.campaignMemorial ? (
+                        <>
+                          <span style={{ fontFamily: S.serif, fontSize: 36, color: 'rgba(244,240,230,.38)', textDecoration: 'line-through' }}>{cur.memorial}</span>
+                          <span style={{ fontFamily: S.serif, fontSize: 60, fontWeight: 500, color: S.textHead, lineHeight: 1 }}>{cur.campaignMemorial}</span>
+                        </>
+                      ) : (
+                        <span style={{ fontFamily: S.serif, fontSize: 60, fontWeight: 500, color: S.textHead, lineHeight: 1 }}>{cur.memorial}</span>
+                      )}
+                      <div style={{ marginBottom: 2 }}>
+                        <span style={{ fontSize: 21, fontWeight: 600, color: 'rgba(163,201,177,.9)', fontFamily: S.sans }}>{cur.symbol}</span>
+                        <p style={{ fontSize: 13, color: 'rgba(163,201,177,.7)', margin: 0, fontFamily: S.sans }}>{p.memorialPriceLabel}</p>
                       </div>
-                    ))}
+                    </div>
+                    <div style={{ fontSize: 13.5, fontWeight: 300, color: 'rgba(201,169,110,.72)', marginBottom: 30, fontFamily: S.sans }}>tek seferlik · QR plaka dahil</div>
+
+                    {/* Guarantee */}
+                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, padding: 16, borderRadius: 14, background: 'rgba(143,184,158,.07)', border: '1px solid rgba(143,184,158,.2)', marginBottom: 26 }}>
+                      <ShieldCheck style={{ width: 20, height: 20, stroke: '#8FB89E', strokeWidth: 1.5, flexShrink: 0, marginTop: 1 }} />
+                      <div>
+                        <div style={{ fontSize: 13.5, fontWeight: 500, color: S.text, fontFamily: S.sans }}>{p.memorialGuaranteeBadge}</div>
+                        <div style={{ fontSize: 12.5, fontWeight: 300, color: 'rgba(237,232,221,.5)', lineHeight: 1.5, fontFamily: S.sans }}>{p.memorialGuarantee}</div>
+                      </div>
+                    </div>
+
+                    <Link href="/satin-al/anma" className="tem-goldbtn" style={{ display: 'block', textAlign: 'center', textDecoration: 'none', background: S.goldGrad, color: '#14110a', fontWeight: 500, fontSize: 15.5, padding: 17, borderRadius: 14, boxShadow: '0 14px 36px rgba(201,169,110,.28)', marginBottom: 12, fontFamily: S.sans }}>
+                      {p.memorialCta}
+                    </Link>
+                    <Link href="/memorial/demo" className="tem-ghostbtn" style={{ display: 'block', textAlign: 'center', textDecoration: 'none', background: 'none', color: 'rgba(237,232,221,.78)', border: '1px solid rgba(237,232,221,.16)', fontWeight: 300, fontSize: 14.5, padding: 14, borderRadius: 14, fontFamily: S.sans }}>
+                      {p.demoProfileCta}
+                    </Link>
                   </div>
-                  <p style={{ marginTop: 16, fontSize: 12, fontWeight: 300, color: 'rgba(237,232,221,.4)', fontFamily: S.sans }}>{p.memorialCustomDesignNote}</p>
-                  <div style={{ marginTop: 16, paddingTop: 16, borderTop: '1px solid rgba(201,169,110,.1)', fontSize: 12.5, fontWeight: 300, color: 'rgba(237,232,221,.44)', lineHeight: 1.6, fontFamily: S.sans }}>
-                    🔒 {p.memorialTrustNote}
+
+                  {/* Right — features */}
+                  <div style={{ flex: '1 1 280px', minWidth: 260, borderLeft: '1px solid rgba(201,169,110,.12)', paddingLeft: 46 }}>
+                    <div style={{ fontSize: 11, letterSpacing: '.2em', textTransform: 'uppercase', color: 'rgba(201,169,110,.72)', marginBottom: 24, fontFamily: S.sans }}>
+                      {p.memorialFeaturesHeading}
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 28px' }}>
+                      {p.memorialFeatures.map((f, i) => (
+                        <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 9, marginBottom: 15, fontSize: 13.5, fontWeight: 300, color: 'rgba(237,232,221,.7)', lineHeight: 1.4, fontFamily: S.sans }}>
+                          <span style={{ color: S.goldBright, flexShrink: 0 }}>✓</span> {f}
+                        </div>
+                      ))}
+                    </div>
+                    <p style={{ marginTop: 16, fontSize: 12, fontWeight: 300, color: 'rgba(237,232,221,.4)', fontFamily: S.sans }}>{p.memorialCustomDesignNote}</p>
+                    <div style={{ marginTop: 16, paddingTop: 16, borderTop: '1px solid rgba(201,169,110,.1)', fontSize: 12.5, fontWeight: 300, color: 'rgba(237,232,221,.44)', lineHeight: 1.6, fontFamily: S.sans }}>
+                      🔒 {p.memorialTrustNote}
+                    </div>
                   </div>
                 </div>
               </div>
+
+              {/* ── Kart 2: Aile Paketi ──────────────────────────── */}
+              <div className="tem-reveal" style={{ flex: '1 1 520px', position: 'relative', borderRadius: 26, padding: 1.5, background: 'linear-gradient(135deg, rgba(226,200,133,.5), rgba(143,184,158,.35), rgba(226,200,133,.7))', boxShadow: '0 44px 100px -44px rgba(143,184,158,.35)' }}>
+                {/* "EN FAZLA TASARRUF" banner */}
+                <div style={{ position: 'absolute', top: -1, right: 28, zIndex: 10, fontSize: 9.5, letterSpacing: '.18em', textTransform: 'uppercase', color: '#0a0c0b', background: 'linear-gradient(90deg, #8FB89E, #a3d4b4)', padding: '6px 14px', borderRadius: '0 0 10px 10px', fontFamily: 'var(--font-sans)', fontWeight: 600 }}>
+                  {p.familyPopularBadge}
+                </div>
+                <div className="tem-animate-haloPulse" style={{ position: 'absolute', inset: -3, borderRadius: 28, background: 'linear-gradient(135deg, rgba(143,184,158,.3), transparent 62%)', filter: 'blur(24px)', zIndex: -1 }} />
+                <div style={{ borderRadius: 24, background: 'linear-gradient(165deg, #0b1610 0%, #0a0c11 100%)', padding: 'clamp(34px,4vw,54px)', display: 'flex', flexWrap: 'wrap', gap: 46 }}>
+
+                  {/* Left — price */}
+                  <div style={{ flex: '1 1 260px', minWidth: 240 }}>
+                    <div style={{ display: 'inline-block', fontSize: 10.5, letterSpacing: '.2em', textTransform: 'uppercase', color: '#0a0c0b', background: 'linear-gradient(90deg, #8FB89E, #a3d4b4)', padding: '7px 14px', borderRadius: 999, marginBottom: 26, fontFamily: S.sans }}>
+                      {p.familyBadge}
+                    </div>
+
+                    <div style={{ display: 'flex', alignItems: 'baseline', gap: 12, marginBottom: 6 }}>
+                      {pricing.campaignActive && cur.campaignFamily ? (
+                        <>
+                          <span style={{ fontFamily: S.serif, fontSize: 36, color: 'rgba(244,240,230,.38)', textDecoration: 'line-through' }}>{cur.family}</span>
+                          <span style={{ fontFamily: S.serif, fontSize: 60, fontWeight: 500, color: S.textHead, lineHeight: 1 }}>{cur.campaignFamily}</span>
+                        </>
+                      ) : (
+                        <span style={{ fontFamily: S.serif, fontSize: 60, fontWeight: 500, color: S.textHead, lineHeight: 1 }}>{cur.family}</span>
+                      )}
+                      <div style={{ marginBottom: 2 }}>
+                        <span style={{ fontSize: 21, fontWeight: 600, color: 'rgba(143,184,158,.9)', fontFamily: S.sans }}>{cur.symbol}</span>
+                        <p style={{ fontSize: 13, color: 'rgba(143,184,158,.7)', margin: 0, fontFamily: S.sans }}>{p.familyPriceLabel}</p>
+                      </div>
+                    </div>
+                    <div style={{ fontSize: 13, fontWeight: 300, color: 'rgba(143,184,158,.8)', marginBottom: 8, fontFamily: S.sans }}>{p.familyMembersLabel}</div>
+                    <div style={{ display: 'inline-block', fontSize: 12, fontWeight: 500, color: 'rgba(143,184,158,.9)', background: 'rgba(143,184,158,.1)', border: '1px solid rgba(143,184,158,.25)', padding: '5px 12px', borderRadius: 999, marginBottom: 26, fontFamily: S.sans }}>
+                      ✦ {p.familySavingsLabel}
+                    </div>
+
+                    {/* Guarantee */}
+                    <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, padding: 16, borderRadius: 14, background: 'rgba(143,184,158,.07)', border: '1px solid rgba(143,184,158,.2)', marginBottom: 26 }}>
+                      <ShieldCheck style={{ width: 20, height: 20, stroke: '#8FB89E', strokeWidth: 1.5, flexShrink: 0, marginTop: 1 }} />
+                      <div>
+                        <div style={{ fontSize: 13.5, fontWeight: 500, color: S.text, fontFamily: S.sans }}>{p.familyGuaranteeBadge}</div>
+                        <div style={{ fontSize: 12.5, fontWeight: 300, color: 'rgba(237,232,221,.5)', lineHeight: 1.5, fontFamily: S.sans }}>{p.familyGuarantee}</div>
+                      </div>
+                    </div>
+
+                    <Link href="/satin-al/aile" className="tem-goldbtn" style={{ display: 'block', textAlign: 'center', textDecoration: 'none', background: 'linear-gradient(90deg, #8FB89E, #a3d4b4)', color: '#0a120e', fontWeight: 500, fontSize: 15.5, padding: 17, borderRadius: 14, boxShadow: '0 14px 36px rgba(143,184,158,.28)', marginBottom: 12, fontFamily: S.sans }}>
+                      {p.familyCta}
+                    </Link>
+                    <Link href="/aile/istanbollu" className="tem-ghostbtn" style={{ display: 'block', textAlign: 'center', textDecoration: 'none', background: 'none', color: 'rgba(237,232,221,.78)', border: '1px solid rgba(237,232,221,.16)', fontWeight: 300, fontSize: 14.5, padding: 14, borderRadius: 14, fontFamily: S.sans }}>
+                      Örnek aile sayfasını gör →
+                    </Link>
+                  </div>
+
+                  {/* Right — features */}
+                  <div style={{ flex: '1 1 280px', minWidth: 260, borderLeft: '1px solid rgba(143,184,158,.15)', paddingLeft: 46 }}>
+                    <div style={{ fontSize: 11, letterSpacing: '.2em', textTransform: 'uppercase', color: 'rgba(143,184,158,.72)', marginBottom: 24, fontFamily: S.sans }}>
+                      {p.memorialFeaturesHeading}
+                    </div>
+                    <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 28px', marginBottom: 24 }}>
+                      {p.memorialFeatures.map((f, i) => (
+                        <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 9, marginBottom: 15, fontSize: 13.5, fontWeight: 300, color: 'rgba(237,232,221,.5)', lineHeight: 1.4, fontFamily: S.sans }}>
+                          <span style={{ color: 'rgba(143,184,158,.6)', flexShrink: 0 }}>✓</span> {f}
+                        </div>
+                      ))}
+                    </div>
+                    <div style={{ fontSize: 11, letterSpacing: '.2em', textTransform: 'uppercase', color: 'rgba(143,184,158,.72)', marginBottom: 14, fontFamily: S.sans }}>
+                      {p.familyFeaturesHeading}
+                    </div>
+                    {p.familyExtraFeatures.map((f, i) => (
+                      <div key={i} style={{ display: 'flex', alignItems: 'flex-start', gap: 9, marginBottom: 13, fontSize: 14, fontWeight: 400, color: 'rgba(237,232,221,.88)', lineHeight: 1.4, fontFamily: S.sans }}>
+                        <span style={{ color: '#8FB89E', flexShrink: 0 }}>✦</span> {f}
+                      </div>
+                    ))}
+                    <div style={{ marginTop: 16, paddingTop: 16, borderTop: '1px solid rgba(143,184,158,.12)', fontSize: 12.5, fontWeight: 300, color: 'rgba(237,232,221,.44)', lineHeight: 1.6, fontFamily: S.sans }}>
+                      🔒 {p.familyTrustNote}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
             </div>
           </div>
         </section>

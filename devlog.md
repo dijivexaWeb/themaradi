@@ -3,6 +3,766 @@
 > Her oturum sonunda Claude bu dosyayı günceller.
 > Format: tarih → ne yapıldı → nerede kalındı → sıradaki adım.
 
+## 2026-06-22 — Oturum 157: Aile Paneli Tam i18n + QuickPurchaseModal + LangSwitcher Dropdown
+
+### Yapılanlar
+- **`QuickPurchaseModal`**: `useLang()` entegrasyonu — 7 dil tam desteği (`t.quickPurchase.*`)
+- **`LangSwitcherDashboard`**: Her zaman açık görünen buton listesi → tek buton dropdown'a çevrildi (click to open, outside click to close)
+- **`/anma-paneli/aile/[familyId]/page.tsx`**: `getTranslation()` eklendi — tüm statik metinler (nav, editPanel, header, üyeler, fotoğraflar, anma türleri, anılar, misafir defteri, profil taziye mesajları) çevrildi
+- **`FamilyLinkQr.tsx`**: `useLang()` eklendi — "Sayfa Linki", "QR Kod", "Link kalıcı olarak belirlendi", "Vektörel SVG..." dahil tüm metinler çevrildi
+- **`R2ImageUploadLight.tsx`**: `useLang()` eklendi — "Fotoğraf Yükle", hata mesajları, "Yükleniyor..." çevrildi
+- **7 dil i18n** (tr, en, ru, az, he, hy, ka): `familyPanel` bloğu (nav/editPanel/header/linkQr/addMember/members/photos/actions/memories/guestbook/profileGuestbook/statusBadge) + `r2Upload` bloğu eklendi
+- **TypeScript**: Tüm değişiklikler sonrası sıfır hata
+
+### Proje Durumu
+- [x] Aile anma sayfası satın alma (/satin-al/aile)
+- [x] QuickPurchaseModal i18n + tiered pricing
+- [x] LangSwitcher dropdown
+- [x] Aile paneli tam i18n (page.tsx + FamilyLinkQr + R2Upload)
+- [ ] Admin settings: price_additional_member_gel alanı (_PricingSettingsForm)
+- [ ] Git push (kullanıcı onayı bekliyor)
+
+### Kritik Kararlar / Notlar
+- `R2ImageUploadLight` artık `useLang()` kullanıyor; bu bileşen hem profil panelinde hem de aile panelinde kullanılıyor, tek i18n kaynağı
+- `getStatusBadge()` fonksiyonu artık `fp.statusBadge` parametresi alıyor (server component içinde)
+
+### Nerede Kaldık
+Aile paneli `/anma-paneli/aile/[familyId]/page.tsx` ve ilgili bileşenler (FamilyLinkQr, R2ImageUploadLight, QuickPurchaseModal, LangSwitcherDashboard) tam olarak 7 dile çevrildi. TypeScript sıfır hata.
+
+### Sıradaki Adım
+1. Admin ayarlar formu: `price_additional_member_gel` ve `campaign_price_additional_member_gel` alanlarını `_PricingSettingsForm.tsx` + `admin/actions.ts`'e ekle
+2. Kullanıcı onayı alındıktan sonra git push
+
+## 2026-06-22 — Oturum 156: /satin-al/aile Satın Alma Sayfası
+
+### Yapılanlar
+- **`/satin-al/aile`** yeni sayfa oluşturuldu — DB'den fiyat çekiyor, sadece havale (PayPal yok), 7 dil i18n
+- **`purchaseFamilyAction`**: `memorial_families` kaydı + `payments` kaydı + admin email + email doğrulama akışı
+- **DB migration**: `payments.vault_id` nullable yapıldı + `family_id` kolonu eklendi
+- **7 dil i18n**: `purchasePage.aile` bloğu tr, en, ru, az, he, hy, ka dosyalarına eklendi
+- **`_AileFormClient.tsx`**: `useLang()` ile tam i18n desteği
+
+### Değiştirilen Dosyalar
+- `src/app/satin-al/aile/page.tsx` (yeni)
+- `src/app/satin-al/aile/_AileFormClient.tsx` (yeni)
+- `src/app/satin-al/actions.ts`
+- `src/i18n/tr.ts`, `en.ts`, `ru.ts`, `az.ts`, `he.ts`, `hy.ts`, `ka.ts`
+
+### Nerede Kaldık
+`/satin-al/aile` çalışıyor. Tüm aile paketi akışı tamamlandı.
+
+### Sıradaki Adım
+1. Onay sonrası git push
+
+## 2026-06-22 — Oturum 155: Aile Bağlantısı — Kartlar + Profil Widget
+
+### Yapılanlar
+- **Homepage + /memorial kartları**: `family_members` → `memorial_families` JOIN ile her vault'a aile bilgisi eklendi; kartların fotoğraf sol altına yeşil "🏠 Aile Adı" badge'i eklendi
+- **`/memorial` stretched-link fix**: `<a>` içinde `<a>` hydration hatası — outer `<Link>` → `<div>` + `absolute inset-0 z-0` stretched link pattern uygulandı (iki grid de)
+- **`FamilySiblingsBar`** (yeni bileşen): Profil sayfasının sol ortasında fixed floating widget; "Aile" + üye sayısı yazıyor, tıklayınca sibling profiller + aile sayfası linki açılıyor
+- **Cloudflare bypass**: `verifyTurnstile()` development ortamında `return true` döndürüyor — local admin girişi artık çalışıyor
+
+### Değiştirilen Dosyalar
+- `src/app/page.tsx`
+- `src/app/memorial/page.tsx`
+- `src/app/memorial/_MemorialsClient.tsx`
+- `src/components/landing/RecentMemorialsCarousel.tsx`
+- `src/app/memorial/[slug]/page.tsx`
+- `src/app/memorial/[slug]/FamilySiblingsBar.tsx` (yeni)
+- `src/lib/turnstile.ts`
+
+### Nerede Kaldık
+Tüm özellikler çalışıyor, görsel onay alındı.
+
+### Sıradaki Adım
+1. Onay sonrası git push
+2. `/satin-al/aile` satın alma sayfası oluşturulacak (henüz yok)
+
+## 2026-06-22 — Oturum 154: Aile Paketi Fiyat Kartı — İki Kolonlu Pricing
+
+### Yapılanlar
+- **`pricing.ts`**: `PricingConfig` tipine aile fiyat alanları eklendi (`familyGel/Try/Usd/Rub`, `campaignFamily*`)
+- **`LocalizedLanding.tsx`**: Pricing section iki kolona çevrildi — sol kart aynen kaldı, sağa aile paketi kartı eklendi (yeşil aksanlı, "EN FAZLA TASARRUF" banner)
+- **i18n (7 dil)**: `pricingSection`'a `familyBadge`, `familyCta`, `familyExtraFeatures`, `familySavingsLabel` vb. eklendi
+- **Admin panel `_PricingSettingsForm.tsx`**: Aile paketi fiyat alanları (GEL/TRY/USD/RUB + kampanya) eklendi
+- **`admin/actions.ts`**: `updatePricingSettings` key listesine aile fiyat key'leri eklendi
+- **Supabase DB**: `price_family_gel=399`, `price_family_try=6900`, `price_family_usd=149`, `price_family_rub=14900` insert edildi
+- **TypeScript**: `tsc --noEmit` temiz
+
+### Dosyalar
+src/lib/pricing.ts · src/components/landing/LocalizedLanding.tsx · src/i18n/tr+en+ru+az+he+hy+ka.ts · src/app/admin/settings/_PricingSettingsForm.tsx · src/app/admin/actions.ts
+
+### Nerede Kaldık
+Tüm değişiklikler tamamlandı, dev server'da görsel kontrol bekleniyor.
+
+### Sıradaki Adım
+1. `localhost:3010/#fiyatlar` adresinde iki kolonlu layout kontrol et
+2. Mobil görünümü kontrol et
+3. Onay sonrası git push
+
+## 2026-06-22 — Oturum 153: Aile Anma Section — Düzeltmeler & Fotoğraf
+
+### Yapılanlar
+- **"Sınırsız sayfa" → "4 sayfa dahil, sonrası ek ücretle"** — yanlış mesaj düzeltildi, 7 dil güncellendi
+- **Mockup isimleri** → "Yılmaz Ailesi" / Fatma, Ahmet, Zeynep Yılmaz — tüm dillerde Latin harfli
+- **Mockup kartı → Link** → `/aile/istanbollu` demo sayfasına hover efektiyle link eklendi
+- **"Örnek aile sayfasını gör →"** linki mockup altına eklendi
+- **Kişi fotoğrafları** → harf avatar yerine `profile-family-old.png`, `profile-ahmet.png`, `profile-family-dinner.png` kullanıldı
+
+### Nerede Kaldık
+Tüm değişiklikler tamamlandı, dev server'da görsel kontrol bekleniyor.
+
+### Sıradaki Adım
+1. `localhost:3010` homepage'de section'ı görsel kontrol et
+2. Onay sonrası git push
+
+## 2026-06-22 — Oturum 152: Homepage — Aile Anma Sayfası Section
+
+### Yapılanlar
+- **Yeni homepage section** eklendi: "Aile Anma Sayfası" — `LocalizedLanding.tsx`'e "Son Anmalar" carousel'inden hemen sonra
+- **Değer önerisi netleştirildi**: "Bir kez kurun, kaybettiğiniz her sevdiyiniz için sayfa açın" — bireysel profil değil, aile platformu
+- **i18n tam kapsamlı**: 7 dil dosyasına `landing.familyPage` key'i eklendi (tr, en, ru, az, he, hy, ka)
+- **Section tasarımı**: Sol mockup (aile üye listesi kartı + yeni sayfa ekle butonu), sağ metin (4 özellik + CTA)
+- **TypeScript hatasız** — `tsc --noEmit` temiz döndü
+
+### Proje Durumu
+- [x] Taziye formu yeniden tasarım
+- [x] Taziye/Anı tip seçimi
+- [x] Share dropdown (sosyal medya)
+- [x] Footer CTA
+- [x] Logo yenileme (BrandLogo)
+- [x] Favicon güncelleme
+- [x] Güvenlik denetimi (DOMPurify, RLS, QR allowlist)
+- [x] JWT güvenliği (cookie tabanlı, httpOnly)
+- [x] Homepage Aile Anma Sayfası section
+- [ ] git push (kullanıcı onayı bekleniyor)
+
+### Kritik Kararlar / Notlar
+- Aile Anma Sayfası'nın farkı: 1 aile kurulumu, sınırsız üye sayfası — bireysel memorial profile'dan farklı
+- CTA linki `/aile` — burası henüz landing sayfası değil, ileriye not
+- Delay değerleri sıralı korundu: 2.0 → 2.2 → 2.4 → 2.8
+
+### Nerede Kaldık
+`LocalizedLanding.tsx`'e yeni section eklendi, TypeScript temiz. Dev server'da görsel kontrol bekleniyor.
+
+### Sıradaki Adım
+1. Dev server'da `localhost:3010` açıp section'ı görsel kontrol et
+2. Mobil responsive kontrol et (flex wrap çalışıyor mu)
+3. Onay sonrası git push
+
+## 2026-06-22 — Oturum 151: Taziye Formu Yeniden Tasarım + Tip Seçimi (Taziye/Anı) + Share Dropdown
+
+### Yapılanlar
+- **Taziye formu tam yeniden tasarım** (`FamilyInteractions.tsx`): sol kol `quill.png` dekoratif görseli, 3 kolon input satırı (ad/e-posta/yakınlık), textarea, altın Gönder butonu — sayfanın premium karanlık estetiğiyle uyumlu
+- **Taziye/Anı tip seçimi eklendi**: Ziyaretçi "🕊️ Taziye Mesajı" veya "📖 Aile Anısı" seçmek zorunda; seçim boş başlar, seçmeden gönder butonuna izin verilmez (client + server tarafı validasyon)
+- **DB migration**: `family_guestbook` tablosuna `message_type text DEFAULT 'taziye' CHECK (message_type IN ('taziye', 'ani'))` eklendi (Supabase MCP ile)
+- **Server action güncelleme** (`family-public.ts`): `submitFamilyCondolenceAction` artık `message_type` alıyor ve kaydediyor
+- **Yönetim paneli ayrı bölümler** (`anma-paneli/aile/[familyId]/page.tsx`): "🕊️ Taziye Mesajları" ve "📖 Ziyaretçi Anıları" ayrı ayrı listeleniyor, bekleyen/yayında ayrımı her tür için ayrı
+- **Share buton desktop dropdown**: mobilde native share sheet; masaüstünde WhatsApp/Telegram/Facebook/X/E-posta + Linki Kopyala dropdown açılıyor
+- **Server component onClick hatası düzeltildi**: `deleteFamilyMemoryAction` butonundaki `onClick={e => e.stopPropagation()}` kaldırıldı
+
+### Proje Durumu
+- [x] R2 foto upload (CORS fix)
+- [x] Statik foto temizliği
+- [x] Taziye/anı formdan ayrı family_guestbook tablosuna kayıt
+- [x] Taziye formu premium tasarım
+- [x] Mesaj tipi seçimi (Taziye/Anı) — zorunlu
+- [x] Yönetim panelinde tip bazlı ayrı bölümler
+- [x] Share dropdown sosyal medya linkleri
+
+### Kritik Kararlar / Notlar
+- `family_guestbook.message_type` default 'taziye' — eski kayıtlar otomatik taziye sayılıyor
+- Yönetim panelinde `EntryCard` inline component olarak tanımlandı (server component içinde)
+
+### Nerede Kaldık
+Tüm değişiklikler tamamlandı, TypeScript hatasız. Lokal test bekleniyor.
+
+### Sıradaki Adım
+1. Lokal test: taziye/anı formu gönder, yönetim panelinde ayrı göründüğünü doğrula
+2. Share dropdown mobil/desktop davranışını test et
+3. Onay sonrası public sayfada taziye ve anı bölümleri ayrı gösterilecek mi? (şu an tek bölümde birlikte)
+4. git push (kullanıcı onayı gerekli)
+
+---
+
+## 2026-06-22 — Oturum 150: Aile Anma Sayfası — Foto Upload Fix, Statik Foto Temizliği, Taziye/Anı Ayrımı, Share Buton Güncelleme
+
+### Yapılanlar
+- **R2ImageUploadLight foto upload fix**: `presign + PUT` CORS hatası → `/api/r2/upload` proxy'sine geçirildi (aile paneli fotoğraf yükleme artık çalışıyor)
+- **Statik/demo fotolar kaldırıldı**: `DEFAULT_PHOTOS` (galeri) ve `fallbackImages` (hero ağaç) tamamen kaldırıldı; artık sadece DB'den gelen gerçek fotoğraflar gösteriliyor; anı kartı `house.png` fallback'ı da kaldırıldı
+- **Taziye ayrımı**: Public sayfada condolences sorgusu `guestbook_entries` (profil bazlı) → `family_guestbook` tablosuna taşındı; `CondolenceForm` bileşeni public sayfaya eklendi (her zaman gösteriliyor)
+- **Share buton güncelleme**: Dropdown (Linki Kopyala + QR) kaldırıldı → Share butonu native Web Share API kullanıyor; "Linki Kopyala" ve "QR İndir" butonları footer üstüne taşındı
+- **Anı edit**: `editFamilyMemoryAction` server action eklendi; management panelde her anı kartı `<details>` ile genişletilip düzenlenebilir hale getirildi
+- **Curly quote bug fix**: Tırnak karakteri (`"` U+201C) düz tırnakla değiştirildi (build hatası)
+
+### Proje Durumu
+- [x] R2 upload CORS fix (proxy)
+- [x] Statik foto temizliği
+- [x] Taziye family_guestbook ayrımı
+- [x] CondolenceForm public sayfaya eklendi
+- [x] Share buton → native + alt butonlar
+- [x] Anı düzenleme (edit)
+- [ ] Anı submission formu (ziyaretçi bazlı) — henüz yapılmadı
+
+### Kritik Kararlar / Notlar
+- `family_guestbook` tablosu zaten mevcuttu, sadece public sayfanın query'si değiştirildi
+- `family_memories` admin tarafından ekleniyor (approval flow yok), edit ekledik; ziyaretçi submission'u planlanmamış
+- `R2ImageUploadLight.tsx` güncellendi → tüm "light" yükleme bileşenleri artık proxy kullanıyor
+
+### Nerede Kaldık
+`src/app/aile/[slug]/page.tsx` (public) family_guestbook'tan condolence çekiyor ve CondolenceForm gösteriyor. Management panelde anılar düzenlenebilir. Share butonu native API'ye geçti. TypeScript hatası yok.
+
+### Sıradaki Adım
+1. Sayfayı tarayıcıda test et (taziye formu gönderim, management panelde anı edit)
+2. git push (kullanıcı onayından sonra)
+
+## 2026-06-22 — Oturum 149: 'The Eternal Memory' Statik Sayfa Tasarımı & Hero Revizyonu
+
+### Yapılanlar
+- **Proje Dosyalarının Korunması**: Mevcut Next.js proje koduna ve dosyalarına dokunulmadan, tamamen izole edilmiş bir `eternal-memory-static` klasöründe çalışma tamamlandı.
+- **Entegre Hero Tasarımı**:
+  - Hero alanındaki ayrı kutulu ağaç yapısı kaldırılarak; anıt ağacı arka planı (`.hero-tree-bg`) tüm hero alanına yayılacak şekilde entegre edildi.
+  - Açıklama paragrafı ağaç dallarının ortasına hizalanırken, etrafına dallara asılmış izlenimi veren 7 adet yatay/dikey dikdörtgen fotoğraf çerçevesi (`.tree-frame`) organik koordinatlarla yerleştirildi.
+  - Ağaç arka planının çok parlak olmaması ve metin okunabilirliğini artırmak amacıyla opaklığı `.25` değerine düşürüldü.
+- **Lüks Çift Altın Çerçeve Tasarımı**:
+  - Sayfadaki tüm kartlar (aile üyeleri, anılar, taziye, galeri, form) için lüks çift çerçeve (`.premium-border::after`) tasarımı uygulandı.
+  - İç içe geçen ince altın çizgiler ve köşelere tam oturan hareketli köşe süslemeleri (`.corners-decor`) eklendi.
+- **Video Elemanlarının Kaldırılması**:
+  - Kullanıcı talebi doğrultusunda sayfadaki tüm video bileşenleri arındırıldı. Üst menüdeki "Videolar" nav bağlantısı kaldırıldı.
+  - "Fotoğraflar ve Videolar" galeri bölümü "Fotoğraflar" olarak güncellendi ve içerideki 3 video ögesi oynatıcı butonları ve süre göstergeleri temizlenerek normal fotoğraf kartlarına dönüştürüldü.
+- **Tasarım Doğrulaması**: `browser_subagent` ile sayfa yerel olarak açıldı, scroll edilerek hem bütünleşik hero tasarımı, hem kartlardaki çift altın kenarlıklar, hem de videolardan arındırılmış fotoğraf galerisi görsel olarak test edildi. Opaklık güncellendikten sonra tarayıcı üzerinden son görsel çıktısı alındı.
+
+### Proje Durumu
+- [x] Statik sayfa kodlanması ve izole edilmesi (`eternal-memory-static/`)
+- [x] Tüm görsel varlıkların oluşturulması ve entegre edilmesi
+- [x] Entegre ağaç hero alanının revizyonu ve hanging frames tasarımı
+- [x] Lüks çift altın çerçeve ve köşe süslemelerinin kartlara uyarlanması
+- [x] Tasarım doğrulaması ve ekran görüntülerinin güncellenmesi
+
+### Kritik Kararlar / Notlar
+- Dallarda asılı duran eski fotoğraf efekti için CSS `transform: rotate` ile her çerçeveye hafif rastgele açılar verildi.
+- Köşedeki süslemeler çift çerçevenin iç çizgisine hizalanarak luxury premium hissiyat artırıldı.
+
+### Nerede Kaldık
+Statik HTML/CSS anma sayfası, tasarımı tamamlanmış ve görsel olarak doğrulanmış olarak `eternal-memory-static` altında yayına hazır durumdadır.
+
+### Sıradaki Adım
+1. Kullanıcıdan revize edilen bütünleşik hero ve kart tasarımlarına dair geri bildirim almak.
+
+---
+
+## 2026-06-21 — Oturum 145–148: Genel Oturum Özeti (Tüm İşlemler)
+
+### 1. Public Aile Sayfası `/aile/[slug]` — Tasarım & UX
+**Değiştirilen dosyalar**: `src/app/aile/[slug]/page.tsx`, `src/app/aile/[slug]/Tombstone3D.tsx`, `src/app/aile/[slug]/FamilyTopNav.tsx` (yeni), `src/app/aile/[slug]/FadeIn.tsx` (yeni), `src/app/aile/[slug]/StarField.tsx`
+
+- **Dil desteği**: `FamilyTopNav.tsx` yeni client component → fixed üst nav, sol BrandLogo, sağ KA/TR/RU/EN/AM/AZ/IL dil bayrakları. `saveLang()` + `router.refresh()` ile anlık dil değişimi
+- **Tam sayfa yıldız animasyonu**: `StarField` `position: fixed` olarak root div'e taşındı + hero'da kendi StarField'ı korundu (çift yoğunluk, `mix-blend-mode: screen`)
+- **Haç sembolü kaldırıldı**: `Tombstone3D.tsx` üstündeki haç → nötr yatay dekoratif çizgiler (dini sembol yok — Müslüman kullanıcı şikayeti üzerine)
+- **Tombstone grid ortalandı**: `grid grid-cols-2` → `flex flex-wrap justify-center` + her kart `w-[180px]` sabit genişlik; tek kart sayfanın ortasında duruyor
+- **"Ailenin Mesajı" section kaldırıldı**: `family.description` blockquote bloğu silindi
+- **Fotoğraflar öne alındı**: Section sırası → Hero → Tombstone → Fotoğraflar → Anılar → Taziye → Footer
+- **Footer güncellendi**: `BrandLogo light` + `t.pricing.footer` ile çevrilmiş gizlilik/koşullar/iletişim linkleri
+- **Section divider belirginleşti**: full-width çizgi + ✦ ornament ortada
+- **SectionLabel güncellendi**: `text-white/35` + bilateral gradient çizgiler
+
+### 2. Aile Yönetim Paneli `/anma-paneli/aile/[familyId]` — Profil Ekleme UX
+**Değiştirilen dosyalar**: `src/app/anma-paneli/aile/[familyId]/page.tsx`
+
+- **`+` Profil Ekle kartı**: Grid sonundaki `Link href="?addMember=1"` kartı → `<QuickPurchaseModal cardMode />` ile değiştirildi. Tıklayınca direkt "Yeni Profil Oluştur" modal açılıyor (isim → ödeme → banka/PayPal adımları)
+- **Boş durum UX**: "Mevcut Ekle" (`?addMember=1`) panelinde unlinked vault yoksa — eski inline "Yeni profil satın al →" linki kaldırıldı; yerine 🕊️ ikon + "Eklenebilecek profil bulunamadı" başlığı + açıklayıcı metin + `QuickPurchaseModal` yeşil butonu
+
+### 3. R2 Upload CORS Bug Fix
+**Yeni dosya**: `src/app/api/r2/upload/route.ts`  
+**Değiştirilen dosyalar**: `src/app/anma-paneli/[id]/biyografi/page.tsx`, `src/app/anma-paneli/[id]/fotolar/PhotoUploadForm.tsx`
+
+- **Kök neden**: R2 bucket'ında CORS kuralı tanımlı değildi → tarayıcıdan presigned URL'ye PUT atılırken R2 `localhost:3010` origin'ini reddediyordu → `Failed to fetch` (biyografi) / `Ağ hatası` (foto ekleme). Upload kodu yazıldığından beri var olan bir bug.
+- **Çözüm**: `/api/r2/upload` server-side proxy route oluşturuldu. Dosya artık `tarayıcı → Next.js sunucusu → R2` üzerinden gidiyor. CORS tamamen devre dışı.
+- **Güncellenen upload noktaları** (presign+PUT → `/api/r2/upload`):
+  - Biyografi: profil fotoğrafı, hero arka plan, ses dosyası, profil videosu
+  - Fotoğraflar: galeri yükleme (XHR ile progress bar korundu, `fileKey`+`bucket` server action'a iletiliyor)
+
+### 4. Vault Yayına Alma — Supabase MCP
+- **Hasan İSTANBOLLU** profili `hidden_vault` → `public_memorial` olarak güncellendi
+- **Slug**: `hasan-istanbollu-mqo645b8`
+- **URL**: `/memorial/hasan-istanbollu-mqo645b8`
+- Supabase MCP `execute_sql` ile direkt DB güncellemesi yapıldı (admin panel girişi olmaksızın)
+
+### Proje Durumu
+- [x] Public `/aile/[slug]` sayfası: hero + tombstone grid + dil desteği + footer
+- [x] Aile yönetim paneli: profil ekleme UX
+- [x] R2 upload CORS fix
+- [x] Hasan İSTANBOLLU yayına alındı
+- [ ] Diğer upload bileşenleri CORS fix bekliyor: `R2ImageUpload.tsx`, `AudioUploadForm.tsx`, `VideoUploadForm.tsx`, `VerificationDocUpload.tsx`
+- [ ] `git push` — kullanıcı onayı bekleniyor
+
+### Nerede Kaldık
+Tüm oturum işlemleri tamamlandı. TypeScript hatasız. Yerel test için hazır.
+
+### Sıradaki Adım
+1. Upload düzeltmelerini test et (biyografi foto, galeri foto)
+2. Kalan upload bileşenlerini CORS fix ile güncelle
+3. `git push` ile production'a gönder
+4. Diğer profilleri yayına almak gerekiyorsa admin panel veya Supabase MCP üzerinden yap
+
+---
+
+## 2026-06-21 — Oturum 144: Panel Profil Ekleme UX + Haç Kaldırma
+
+### Yapılanlar
+- **Haç sembolü kaldırıldı** — `Tombstone3D.tsx`'teki Hristiyan dini sembolü; yerine nötr yatay dekoratif çizgiler eklendi
+- **`+` Profil Ekle kartı** — Grid sonundaki `Link href="?addMember=1"` kartı `<QuickPurchaseModal cardMode />` ile değiştirildi — tıklayınca direkt satın al/oluştur modalı açılıyor
+- **Boş durum UX** — "Mevcut Ekle" panelinde unlinked vault yoksa: eski "Yeni profil satın al →" linki kaldırıldı; yerine 🕊️ ikon + açıklayıcı metin + `QuickPurchaseModal` standart butonu
+- Değiştirilen dosyalar: `src/app/anma-paneli/aile/[familyId]/page.tsx`, `src/app/aile/[slug]/Tombstone3D.tsx`
+
+### Nerede Kaldık
+Panel profil ekleme akışı tamamlandı. TypeScript hatasız.
+
+### Sıradaki Adım
+1. Kullanıcı yerel onayı → `git push`
+2. `QuickPurchaseModal` cardMode kart yüksekliği uyumunu gözden geçir
+
+## 2026-06-21 — Oturum 143: Dil Desteği, Yıldızlar, Tombstone Geliştirme
+
+### Yapılanlar
+- **`FamilyTopNav.tsx`** yeni client component:
+  - Sayfanın üstüne fixed nav: sol — BrandLogo (light), sağ — dil switcher (KA/TR/RU/EN/AM/AZ/IL)
+  - Dark tema: `bg: rgba(5,10,7,0.92)` + `backdropFilter: blur(6px)`
+  - `saveLang()` + `router.refresh()` ile dil değişimi — sayfa yeniden render ediliyor
+- **Full-page yıldız animasyonu**: `StarField` `position: fixed` olarak root div'e taşındı
+  - Hero'da ayrı StarField korundu (daha yoğun)
+  - Tüm sectionlarda `mix-blend-mode: screen` ile yıldızlar görünüyor
+- **Haç sembolü kaldırıldı**: `Tombstone3D.tsx`'teki haç ornament → nötr yatay dekoratif çizgilere dönüştürüldü (dini sembol yok)
+- **Tombstone grid ortalandı**: `grid grid-cols-2` → `flex flex-wrap justify-center`, her kart `w-[180px]` sabit genişlik — tek kart sayfanın ortasında
+- **Section yeniden sıralama**: "Ailenin Mesajı" section kaldırıldı; Fotoğraflar tombstone'dan hemen sonra geldi
+- **Footer güncellendi**: `BrandLogo light` + `t.pricing.footer` linkleri (Gizlilik, Koşullar, İletişim, Copyright)
+- **SectionLabel** görünürlük artırıldı: `text-white/35` + daha uzun çizgiler
+- **SectionDivider** güncellendi: full-width çizgi + `✦` ornament ortada
+
+### Section sıralaması (güncel)
+1. Hero (compact ~65vh, stars)
+2. Aile Üyeleri (tombstone kartlar — ortalanmış)
+3. Aile Fotoğrafları
+4. Aile Anıları (timeline)
+5. Taziye & Mesajlar
+6. Footer (BrandLogo + nav + copyright)
+
+### Nerede Kaldık
+Public `/aile/[slug]` sayfası tamamlandı ve test edildi. TypeScript hatasız.
+
+### Sıradaki Adım
+1. Kullanıcı onayı → `git push`
+2. Birden fazla üye ile tombstone grid testi
+3. Farklı dil geçişlerini test et (özellikle he/az RTL)
+
+---
+
+## 2026-06-21 — Oturum 142: Public Aile Sayfası Redesign — Dark Luxury + 3D Mezar Taşı
+
+### Yapılanlar
+- **`Tombstone3D.tsx`** yeni client component:
+  - CSS `border-radius: 50% 50% 8px 8px / 35% 35% 8px 8px` — arch mezar taşı şekli
+  - Mouse tracking → `rotateX` + `rotateY` ile gerçek zamanlı 3D perspective tilt (±18°)
+  - Stone gradient doku: `#1e2f23 → #111a14 → #1a2820 → #0d1610`
+  - Dairesel fotoğraf medallion (double ring border + inset shadow)
+  - Hover: yeşil radial glow, specular refraction, medallion ışıması
+  - Alt kaide (pedestal): gradient ile zemine karışıyor
+  - "VIEW MEMORIAL" CTA hover'da yeşil renk alıyor
+- **`FadeIn.tsx`** yeni client component:
+  - IntersectionObserver (threshold: 0.12) — scroll'da görününce fade-in
+  - `direction` prop: up/down/left/right/none
+  - `delay` prop: stagger animasyonlar için
+- **`page.tsx`** komple yeniden yazıldı:
+  - **Hero**: `min-h-[65vh]` (eski: 100svh) — kompakt
+  - **Sections**: Her biri ayrı `bg-gradient` tonu, `SectionDivider` (✦ ornament) ile ayrılmış
+  - **Tombstone grid**: `Tombstone3D` bileşeniyle
+  - **Memories**: Timeline layout (sol çizgi + dot)
+  - **Condolences**: Hover efektli kartlar
+  - **Footer**: Brand + nav links + copyright; `#050c07` arka plan
+- **i18n**: `footerHome` + `footerRights` tüm 7 dil dosyasına eklendi (tr/en/ka/ru/hy/az/he)
+
+### Proje Durumu
+- [x] DB migration tabloları
+- [x] i18n anahtarları (tüm diller)
+- [x] Profil yönetim sayfaları
+- [x] Aile paneli (yönetim)
+- [x] Link + QR Kod (vektörel, indirilebilir, kilitlenebilir)
+- [x] Public aile anma sayfası redesign
+
+### Nerede Kaldık
+`/aile/[slug]` sayfası tamamen yenilendi. Tarayıcıda test edildi, görünüm doğrulandı:
+- Hero kompakt (65vh), stars + serif başlık + action butonları
+- Tombstone kartı: arch şekli, dairesel foto, 1943–2023 tarihler, "VIEW MEMORIAL" CTA
+- Section dividerlar ✦ ornament ile
+- Footer: The Eternal Memory, Ana Sayfa, QR bağlantısı, copyright
+
+### Sıradaki Adım
+1. Kullanıcı onayı → `git push`
+2. Birden fazla üye için tombstone grid testi (2-4 kolon)
+3. Farklı dil testleri (özellikle İbranice RTL)
+
+---
+
+## 2026-06-21 — Oturum 141: QR Görüntü Fix + Link Kilitleme
+
+### Yapılanlar
+- **QR boş görüntü fix**: `dangerouslySetInnerHTML` + SVG viewBox eksikliği → `<img src={dataUrl}>` yaklaşımına geçildi (`encodeURIComponent` ile data URL)
+- **DB migration**: `memorial_families.slug_locked boolean DEFAULT false` eklendi
+- **`updateFamilySlugAction`**: kilitli ise hata döner; ilk kayıt sonrası `slug_locked: true` set eder
+- **`FamilyLinkQr.tsx`** 3 durum:
+  1. `slug_locked=false`, editing=false → "Linki Belirle" butonu
+  2. `slug_locked=false`, editing=true → input + amber uyarı "Kaydettikten sonra bir daha değiştirilemez"
+  3. `slug_locked=true` → amber info kutusu "Link kalıcı olarak belirlendi, QR geçerliliği korunuyor"
+- SVG indirme: orijinal SVG string (download için)
+- PNG indirme: 1200×1200 canvas rasterizasyon
+
+### Nerede Kaldık
+QR görüntü, link kilitleme tamamlandı. TypeScript hatasız.
+
+### Sıradaki Adım
+1. Sayfayı yenile — QR kutu görünür mü?
+2. "Linki Belirle" → kaydet → amber kilit mesajı çıkıyor mu?
+3. Onay sonrası `git push`
+
+---
+
+## 2026-06-21 — Oturum 140: Link Belirleme + QR Kod — Yönetim Sayfasına Eklendi
+
+### Yapılanlar
+- **`updateFamilySlugAction`** yeni server action (`actions.ts`):
+  - Slug validate (3-60 karakter, a-z 0-9 tire)
+  - Uniqueness check (başkası kullanıyor mu?)
+  - DB güncelle, her iki path revalidate
+- **`FamilyLinkQr.tsx`** yeni client component:
+  - Mevcut URL gösterge + kopyala + dış link butonu
+  - "Linki Düzenle" → `/aile/` prefix gösterir, sadece slug kısmı input
+  - Kaydet → server action → başarıda QR otomatik güncellenir (`/api/qr-generate` çağrısı)
+  - QR önizleme: koyu arka plan (yeşil #1c2e25) üstünde beyaz vektörel QR
+  - SVG indirme + PNG 1200px indirme (canvas rasterizasyon)
+- **`/api/qr-generate/route.ts`** yeni GET endpoint:
+  - `?url=` parametresi alır, SVG string döner
+  - Güvenlik: sadece kendi domain veya localhost kabul eder
+- **`page.tsx`** — "Link & QR Kod" bölümü eklendi:
+  - Aile başlığından hemen sonra, profil listesinden önce
+  - QR server-side generate edilip `FamilyLinkQr`'a prop olarak geçiyor
+
+### Nerede Kaldık
+Yönetim sayfası tam: Link & QR → Profiller → Fotoğraflar → Anma Türleri → Anılar → Taziyeler.
+
+### Sıradaki Adım
+1. `http://localhost:3010/anma-paneli/aile/<familyId>` aç — Link & QR bölümünü gör
+2. Linki düzenle → kaydet → QR'ın yenilendiğini kontrol et
+3. SVG + PNG indir — baskı kalitesini doğrula
+4. Onay sonrası `git push`
+
+---
+
+## 2026-06-21 — Oturum 139: Anma Türleri — Yönetim Sayfasına Taşındı
+
+### Yapılanlar
+- Anma türü toggle'ları `?edit=1` formundan çıkarıldı
+- `updateEnabledActionsAction` yeni server action eklendi (`actions.ts`)
+- Yönetim sayfasında bağımsız **"Anma Türleri"** bölümü oluşturuldu (Fotoğraflar / Anılar ile aynı seviyede)
+- Bölümün kendi `<form action={updateActions}>` ve `<SubmitButton>` var
+- Kaydet sonrası hem panel hem `/aile/[slug]` revalidate ediliyor (slug ile, ID değil)
+
+### Nerede Kaldık
+Yönetim sayfası: Aile Üyeleri → Fotoğraflar → **Anma Türleri** → Anılar → Taziyeler sırası.
+
+### Sıradaki Adım
+1. `http://localhost:3010/anma-paneli/aile/<familyId>` açıp "Anma Türleri" bölümünü test et
+2. Toggle seç/kaldır → Kaydet → public sayfada butonları doğrula
+3. Onay sonrası `git push`
+
+---
+
+## 2026-06-21 — Oturum 138: Hero Doluluğu + Anma Türleri Yapılandırması
+
+### Yapılanlar
+- **DB migration**: `memorial_families` tablosuna `enabled_actions text[] DEFAULT ARRAY['candle','flower','prayer']` eklendi
+- **`src/app/aile/[slug]/page.tsx`** — Hero zenginleştirildi:
+  - `description` alanı artık hero'da gösteriliyor (tagline altında, divider arasında)
+  - `enabled_actions` DB'den okunuyor, hardcoded liste kalktı
+- **`src/app/anma-paneli/aile/[familyId]/page.tsx`** — Edit formuna anma türü toggle'ları eklendi:
+  - 6 emoji buton (Mum, Çiçek, Dua, Kalp, Yıldız, Saygı)
+  - CSS `peer` trick ile checkbox görsel state yönetimi (hiç JS state yok)
+- **`src/app/anma-paneli/aile/[familyId]/actions.ts`** — `updateFamilyInfoAction` güncellendi:
+  - FormData'dan `action_*` checkbox değerleri okunuyor
+  - `enabled_actions` array olarak DB'ye yazılıyor
+
+### Kritik Kararlar / Notlar
+- Unchecked checkbox form'a değer göndermez (HTML spec) → `formData.get('action_X') === 'on'` sadece checked için true → boş seçimde fallback `['candle','flower','prayer']`
+- `peer sr-only` + `peer-checked:*` sibling span — saf CSS toggle, client JS yok
+- Hero'da description gösterimi aile "çok boş" şikayetini çözüyor
+
+### Nerede Kaldık
+`/aile/[slug]` hero artık tagline + description gösteriyor. Yönetim panelinden anma türleri seçilebiliyor. TypeScript hatasız.
+
+### Sıradaki Adım
+1. `http://localhost:3010/aile/<slug>` açıp hero'yu kontrol et
+2. Yönetim paneli → Sayfayı Düzenle → anma türü toggle'larını test et (seç/kaldır → kaydet → public sayfada değişiyor mu?)
+3. Onay sonrası `git push`
+
+---
+
+## 2026-06-21 — Oturum 137: Public Aile Anma Sayfası + QR Kod Sayfası
+
+### Yapılanlar
+- **`src/app/aile/[slug]/page.tsx`** komple yeniden yazıldı:
+  - 404 hatası giderildi: `hero_bg` → `hero_bg_url` düzeltmesi
+  - Bölüm sırası: Hero (yıldız animasyon) → Aile Üyeleri → Aile Mesajı → Anılar → Fotoğraflar → Taziyeler
+  - Mezar taşı grid (tombstone-style) aile üyeleri için
+  - `StarField` canvas animasyonu hero'da kullanılıyor
+  - Paylaş butonu (Web Share API + kopyala fallback + QR linki)
+  - Taziye formu + onaylı taziyeler listesi
+  - Tam i18n desteği (`t.family_page.*`)
+- **`src/app/aile/[slug]/FamilyInteractions.tsx`** yeniden yazıldı:
+  - `ShareButton` bileşeni: native share API, kopyala, QR linki
+  - `CondolenceForm` i18n destekli
+  - `FamilyActionButtons` i18n destekli
+- **`src/app/aile/[slug]/StarField.tsx`**: Mevcut canvas yıldız animasyonu doğrulandı
+- **`src/app/aile/[slug]/qr/page.tsx`**: Server-side SVG QR kod üretimi (`qrcode` npm)
+  - Saydam arka plan + beyaz noktalar
+  - StarField animasyonu arka planda
+- **`src/app/aile/[slug]/qr/QrDownload.tsx`**: Client component
+  - SVG indirme (vektörel)
+  - PNG indirme (1024px, canvas ile rasterize)
+  - Link kopyalama
+- **7 dil dosyasına `family_page` bölümü eklendi** (35 anahtar her biri):
+  `tr, ka, en, ru, hy, az, he`
+
+### Proje Durumu
+- [x] DB migration: memorial_families + family_members
+- [x] i18n: dashboard + pages + family_page keys (tüm dillerde)
+- [x] /anma-paneli dashboard sayfası i18n
+- [x] Public /aile/[slug] sayfası — 404 giderildi, tam tasarım
+- [x] QR kod sayfası /aile/[slug]/qr — vektörel SVG + PNG indirme
+- [ ] Aile paneli yönetim sayfası /anma-paneli/aile/[id]
+
+### Kritik Kararlar / Notlar
+- `family_page` i18n bölümü `en.ts`'te canonical type olarak tanımlandı → LangDict otomatik güncellendi
+- QR kod rengi: koyu arka plan üzerinde beyaz nokta + transparan arka plan (dark luxury tema uyumu)
+- `ShareButton`: `navigator.share` mevcutsa native share, değilse dropdown açılır
+- PNG indirme: SVG → Image → Canvas → Blob zinciriyle client-side rasterizasyon
+- `family_media` → `family_memories` tablo adları mevcut schema'ya uygun kullanıldı
+
+### Nerede Kaldık
+`/aile/[slug]` ve `/aile/[slug]/qr` sayfaları tamamlandı, TypeScript hatasız derleniyor. Yerel sunucuda test edilmeye hazır. Git push yapılmadı.
+
+### Sıradaki Adım
+1. `http://localhost:3010/aile/istanbullu-ailesi` adresini tarayıcıda test et
+2. Dil değiştir ve tüm metinlerin çevrildiğini doğrula
+3. QR sayfasını `/aile/istanbullu-ailesi/qr` test et — SVG/PNG indirme
+4. Aile paneli yönetim sayfası `/anma-paneli/aile/[id]` (taziye onaylama, üye ekleme)
+5. Onay sonrası `git push`
+
+---
+
+## 2026-06-21 — Oturum 136: i18n — Dashboard Sayfası Çeviri Desteği
+
+### Yapılanlar
+- **`/anma-paneli` dil desteği eklendi**:
+  - Tüm 7 dil dosyasına (`tr, ka, en, ru, hy, az, he`) `memorial_panel.dashboard` bölümü eklendi (30 anahtar)
+  - `page.tsx` hardcoded Türkçe metinler → `t.memorial_panel.dashboard.*` anahtarlarına çevrildi
+  - `getStatusBadge()` fonksiyonu çeviri desteğiyle güncellendi (parametre olarak `d` alıyor)
+  - `LangSwitcherDashboard` nav header'da doğru className ile render ediliyor
+- **TypeScript**: Tip tanımı `en.ts` `typeof` ile otomatik türetiliyor, hata yok
+
+### Proje Durumu
+- [x] Dashboard i18n (dil seçimi artık sayfayı etkiliyor)
+- [x] Aile paneli `/anma-paneli/aile/[id]`
+- [x] Public `/aile/[slug]` (build'de görünüyor)
+- [ ] devlog güncellendi ✓
+
+### Kritik Kararlar / Notlar
+- Dil seçiminin "çalışmaması" → sayfadaki tüm metinler hardcoded Türkçe olduğu için dil değişince görsel fark oluşmuyordu; çözüm 7 dil dosyasına `dashboard` bölümü eklemek
+
+### Nerede Kaldık
+`/anma-paneli/page.tsx` i18n güncellendi, TypeScript clean, dev server çalışıyor.
+
+### Sıradaki Adım
+1. Sayfayı tarayıcıda test et (dil değiştirince metinlerin değiştiğini doğrula)
+2. `QuickPurchaseModal` flow testi (banka bilgisi, PayPal görünümü)
+3. Public `/aile/[slug]` sayfası test
+
+---
+
+## 2026-06-21 — Oturum 135: Satın Alma Modal Düzeltmeleri + Dashboard Yeniden Düzenleme
+
+### Yapılanlar
+- **Dashboard (`/anma-paneli`) yeniden düzenlendi**:
+  - Aile Anma Sayfaları → üstte (her kart altında o aileye ait mezar taşları)
+  - Bireysel profiller (aileye bağlı olmayanlar) → altta
+  - Her aile kartı: aile başlığı + Önizle + Yönet butonları (iç içe Link/onClick hatası düzeltildi)
+  - Her aile kartının altındaki "Profil Ekle" → QuickPurchaseModal açıyor (sayfadan çıkmadan)
+- **Login redirect sadeleştirildi** (`src/lib/login-redirect.ts`):
+  - Her zaman `/anma-paneli`'ye yönlendir (life_vault hariç)
+  - Otomatik aile oluşturma kaldırıldı
+- **PayPal sorunu çözüldü**:
+  - `platform_settings` RLS sadece `service_role` izin veriyordu → authenticated kullanıcılar okuyamıyordu
+  - Migration: `authenticated_read_payment_settings` policy eklendi (bank_iban, bank_name, bank_recipient, paypal_link)
+- **Key hatası düzeltildi**: `bank_account_holder` → `bank_recipient` (form ve DB ile uyumlu)
+- **Banka adı düzeltildi**: DB'de "Georgian Bank" → "Bank of Georgia" olarak güncellendi
+- **Default fallback'ler düzeltildi**: `bankName` default "Bank of Georgia", `accountHolder` default "The Eternal Memory LLC"
+
+### Proje Durumu
+- [x] Dashboard layout (aile üstte, profiller altında)
+- [x] QuickPurchaseModal dashboard ve family panel'de
+- [x] PayPal seçeneği görünüyor (RLS fix)
+- [x] Login → /anma-paneli
+- [ ] Test: modal'dan satın alma akışı test edilmedi
+
+### Nerede Kaldık
+`/anma-paneli` dashboard + QuickPurchaseModal tümüyle çalışır durumda. Push yapılmadı.
+
+### Sıradaki Adım
+1. Local test: modal açılıyor mu, PayPal seçeneği görünüyor mu, havale bilgileri doğru mu?
+2. Push kararı kullanıcıya bırakıldı
+
+## 2026-06-21 — Oturum 134: R2 Foto Upload + Anma Türleri + Quick Purchase + Public Aile Sayfası
+
+### Yapılanlar
+- **DB Migration** (`family_actions_and_guestbook`):
+  - `family_actions` tablosu: `family_id + action_type + count`, UNIQUE(family_id, action_type)
+  - `family_guestbook.relation` kolonu eklendi
+  - RLS: public read/write family_actions, owner-only family_guestbook yönetimi
+  - RPC fonksiyonu: `increment_family_action(p_family_id, p_action_type)` — atomic upsert
+- **R2ImageUploadLight** (`src/components/R2ImageUploadLight.tsx`): Light tema R2 upload bileşeni
+  - Same presign + XHR upload + hidden file_key/bucket fields
+  - Light (krem) tema stilinde
+- **Aile paneli foto upload** — URL input → R2ImageUploadLight ile değiştirildi
+- **family_guestbook entegrasyonu** (`/anma-paneli/aile/[familyId]/page.tsx`):
+  - `family_guestbook` verileri ayrıca fetch edildi
+  - "Aile Sayfasına Gelenler" pending/approved bölümü panele eklendi
+  - `approveFamilyCondolenceAction` / `rejectFamilyCondolenceAction` actions bağlandı
+- **Quick Purchase Modal** (`src/components/QuickPurchaseModal.tsx`):
+  - 3-step modal: profil bilgisi → ödeme yöntemi → banka/PayPal detayları
+  - "Aile Üyeleri" section header'ına "Yeni Profil Ekle" butonu olarak eklendi
+  - Vault + family_members insert + admin email bildirimi
+  - `quickPurchaseMemorialAction` server action: giriş yapmış kullanıcı için simplified
+- **Public Aile Sayfası** (`src/app/aile/[slug]/page.tsx`):
+  - Hero: gradient + tagline + anma türleri butonları
+  - `FamilyActionButtons` client: candle/flower/prayer — atomic increment RPC ile
+  - Üye tombstone grid (sadece public_memorial status'lu vault'lar)
+  - Aile fotoğrafları grid
+  - Aile anıları listesi
+  - Taziye formu (`CondolenceForm`) → family_guestbook pending insert
+  - Onaylı taziyeler listesi
+- **`src/lib/actions/family-public.ts`**: public page server actions (submit condolence, increment action, owner approve/reject)
+
+### Proje Durumu
+- [x] DB migration (family_actions + family_guestbook relation)
+- [x] R2 foto upload admin panelde
+- [x] family_guestbook admin panel entegrasyonu
+- [x] Quick Purchase Modal (sayfadan çıkmadan yeni profil satın alma)
+- [x] Public /aile/[slug] sayfası (anma türleri + taziye formu)
+- [ ] Test: local'de açık mı çalışıyor
+
+### Kritik Kararlar / Notlar
+- `family_guestbook`: family-level taziye (public sayfaya gelenler)
+- `guestbook_entries`: individual profile taziye (bireysel profil sayfalarına gelenler)
+- Admin panelde her ikisi ayrı bölümde gösteriliyor
+- QuickPurchaseModal: mevcut `quickPurchaseMemorialAction` → vault insert + family_members link + admin email; ödeme onayı manuel
+- Public sayfada anma türleri sabit (candle/flower/prayer) — ileriki sürümde admin seçimi yapılabilir
+
+### Nerede Kaldık
+`/aile/[slug]` public sayfası + `/anma-paneli/aile/[familyId]` admin paneli tamamlandı. TypeScript hatasız. Local test yapılmadı (kullanıcı isteği doğrultusunda push yok).
+
+### Sıradaki Adım
+1. Local'de test: `/anma-paneli/aile/[id]` → R2 upload + quick purchase modal açılıyor mu?
+2. `/aile/[slug]` → anma türleri + taziye formu çalışıyor mu?
+3. Banka bilgileri admin settings'te dolu mu? (`platform_settings.bank_iban` vb.)
+4. Push kararı kullanıcıya bırakılacak
+
+## 2026-06-21 — Oturum 133: Aile Anma Paneli + Login Redirect
+
+### Yapılanlar
+- **`/anma-paneli/aile/[familyId]/page.tsx`** yeni sayfa: Aile Anma Sayfası yönetim paneli
+  - Üst nav: BrandLogo + "← Profillerim" + Önizle + Sayfayı Düzenle + çıkış
+  - Düzenleme modu (`?edit=1`): aile adı, kısa açıklama, uzun açıklama, görünürlük (public/private) — server action ile kaydediliyor
+  - Aile başlığı: isim, tagline, açıklama, üye sayısı, görünürlük badge
+  - Mezar taşı grid (tombstone): üye vault'ları aynı tasarımla gösterir — üzerine gelinince "X" ile aileden çıkar
+  - "Üye Ekle" modu (`?addMember=1`): kullanıcının bağlanmamış vault'larını dropdown ile seçme
+  - Hızlı linkler: Aile Fotoğrafları / Aile Anıları / Ziyaretçi Mesajları (sub-sayfalar)
+  - Boş durum: mezar taşı emoji + "İlk Üyeyi Ekle" CTA
+- **`/anma-paneli/aile/[familyId]/actions.ts`** server actions:
+  - `updateFamilyInfoAction`: ad, tagline, açıklama, public toggle güncelleme
+  - `addFamilyVaultMemberAction`: mevcut vault'u aileye ekleme (ownership kontrolü var)
+  - `removeFamilyVaultMemberAction`: vault'u aileden çıkarma
+  - `createFamilyAction`: yeni aile sayfası oluşturma (slug auto-generate + ilk vault bağlama)
+- **Login redirect güncellendi** (`src/app/login/actions.ts`):
+  - Önce `memorial_families` kontrol: bulursa → `/anma-paneli/aile/[familyId]`
+  - Yoksa bireysel vault: memorial_profile → `/anma-paneli/[vaultId]`, life_vault → dashboard
+  - Hiçbiri yoksa → `/anma-paneli` (Profillerim)
+- **Auth callback güncellendi** (`src/app/auth/callback/route.ts`): aynı öncelik mantığı
+- TypeScript: hatasız
+
+### Proje Durumu
+- [x] he.ts TypeScript hatası
+- [x] Alt sayfa çeviri entegrasyonu
+- [x] Profillerim sayfası (mezar taşı grid)
+- [x] Aile anma paneli (/anma-paneli/aile/[familyId])
+- [x] Login → aile sayfasına yönlendirme
+- [ ] Public /aile/[slug] sayfası (ziyaretçi görünümü)
+- [ ] Aile sub-sayfaları: fotolar, anilar, taziye
+
+### Kritik Kararlar / Notlar
+- Routing çakışması yok: `/anma-paneli/[id]/aile` (bireysel vault aile ağacı) vs `/anma-paneli/aile/[familyId]` (aile anma sayfası yönetimi)
+- Next.js'te statik segment `aile` dinamik `[id]`'den öncelikli; routing doğru çalışır
+- `family_members` tablosu: `family_id + vault_id` unique constraint ile çift eklemeye karşı korunuyor
+- GIT PUSH YAPILMADI
+
+### Nerede Kaldık
+Aile anma yönetim paneli ve login redirect tamamlandı. Public `/aile/[slug]` sayfası henüz yok.
+
+### Sıradaki Adım
+1. Public `/aile/[slug]` — ziyaretçi görünümü: hero + tombstone grid + aile bilgileri
+2. Aile sub-sayfaları: fotolar, anilar, taziye yönetimi
+3. `/satin-al` satın alma sayfası (aile paketi vs tekli)
+
+---
+
+## 2026-06-21 — Oturum 132: Çeviri Fix + Profillerim Mezar Taşı Grid
+
+### Yapılanlar
+- **he.ts TypeScript fix**: `dashboard.vault` bölümü eksik kalınca (önceki oturumda misplace edilen vault çevirisi silindi) geri eklendi. Tüm vault çevirileri (profile, edit, addProfile, lifeStory vb.) doğru yere (`dashboard.vault`) yerleştirildi.
+- **i18n sub-sayfa çevirileri** (önceki oturumdan devam): fotolar, anilar, ses-kayitlari, videolar, taziye sayfaları `getTranslation()` ile güncellendi; biyografi `useLang()` hook ile güncellendi.
+- **`/anma-paneli/page.tsx` yeni sayfa**: Kullanıcının tüm profillerini ve aile anma sayfalarını listeleyen Profillerim ana ekranı.
+  - Mezar taşı (tombstone) kartı tasarımı: üst yuvarlak kısım koyu yeşil (`#1c2e25`), orta avatar, isim, yıllar; alt kısım durum badge + "Düzenle →"
+  - İlk giriş durumu: 3 bölümlü karşılama ekranı + Tek Profil / Aile Paketi seçimi
+  - Aile anma sayfaları: ayrı kart grid'i, yatay banner tasarım
+  - Çapraz satış: aile sayfası yoksa karanlık banner ile Aile Paketi teklifi
+  - Kredi sayacı: `vault_credits` tablosundan toplam kredi gösterimi
+  - "Yeni Profil Ekle" dashed kart → satın alma yönlendirmesi
+- **layout.tsx güncellemesi**: sidebar'a "← Profillerim" geri linki eklendi (BrandLogo yanında)
+- TypeScript: tüm değişiklikler sonrası `npx tsc --noEmit` — hatasız.
+
+### Proje Durumu
+- [x] he.ts TypeScript hatası giderildi (dashboard.vault eksik)
+- [x] Alt sayfalar çeviri entegrasyonu (7 dil)
+- [x] Profillerim sayfası: mezar taşı grid
+- [x] Sidebar'a geri link eklendi
+- [ ] Aile paneli: /anma-paneli/aile/[id] (sonraki oturum)
+- [ ] Public /aile/[slug] sayfası (sonraki oturum)
+- [ ] Satın alma akışı: tekli vs aile-4 paketi
+
+### Kritik Kararlar / Notlar
+- Kullanıcı isteği: "ilk girişte kayıt sırasında girilen profil ismi ile ekranda mezar taşı gibi bir şey hazırlayalım, oraya tıklayıp doldurmaya başlasın — ekleme hissi doğar"
+- `vault_credits` tablosu zaten DB migration'ında var; kredi sayacı doğrudan buradan okunuyor.
+- `/satin-al` sayfası henüz yok — placeholder link. Bu sayfa sonraki sprint'te.
+- Çapraz satış banner'ı: bireysel profili olan ama aile sayfası olmayan kullanıcıya gösteriliyor.
+- GIT PUSH YAPILMADI — kullanıcı "localde kontrol edelim sonra push edelim" dedi.
+
+### Nerede Kaldık
+`/anma-paneli/page.tsx` yazıldı, layout.tsx güncellendi, TypeScript temiz. Sıradaki büyük adım: `/anma-paneli/aile/[id]/` aile yönetim paneli.
+
+### Sıradaki Adım
+1. `/anma-paneli/aile/[id]/` — aile paneli layout + alt sayfalar (üyeler, fotoğraflar, anılar, misafir defteri)
+2. Public `/aile/[slug]` sayfası: hero + istatistik bölümü + mezar taşı grid (aile üyeleri)
+3. `/satin-al` satın alma sayfası: Tekli ($29) ve Aile-4 ($99) paket seçimi
+
+---
+
 ## 2026-06-21 — Oturum 131: anma-paneli Tasarım Yenileme (Doğru Panel)
 
 ### Yapılanlar

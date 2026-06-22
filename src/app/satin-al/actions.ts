@@ -310,6 +310,128 @@ export async function purchaseVaultAction(_prev: unknown, formData: FormData) {
   redirect(`/dashboard/vault/${vault.id}?purchased=1`)
 }
 
+export async function purchaseFamilyAction(_prev: unknown, formData: FormData) {
+  const supabase = await createClient()
+  const service = await createServiceClient()
+
+  const familyName = (formData.get('family_name') as string)?.trim()
+  const senderName = (formData.get('sender_name') as string)?.trim()
+  const senderEmail = (formData.get('sender_email') as string)?.trim().toLowerCase()
+  const phone = (formData.get('phone') as string)?.trim()
+  const shippingAddress = (formData.get('shipping_address') as string)?.trim()
+  const emailConsent = formData.get('email_consent') === 'on'
+  const phoneConsent = formData.get('phone_consent') === 'on'
+
+  if (!familyName) return { error: 'Aile/topluluk adı zorunludur' }
+  if (!senderName) return { error: 'Ad Soyad zorunludur' }
+  if (!senderEmail || !senderEmail.includes('@')) return { error: 'Geçerli bir e-posta girin' }
+  if (!phone) return { error: 'Telefon numarası zorunludur' }
+  if (!emailConsent) return { error: 'E-posta bilgilendirme iznini onaylamanız gerekmektedir' }
+  if (!phoneConsent) return { error: 'Telefon araması iznini onaylamanız gerekmektedir' }
+
+  const authResult = await getOrCreatePurchaseUser(supabase, service, formData, senderName, senderEmail)
+  if ('error' in authResult) return { error: authResult.error }
+
+  const user = authResult.user
+  const pendingEmailConfirmation = 'pendingEmailConfirmation' in authResult
+  const confirmUrl = 'confirmUrl' in authResult ? authResult.confirmUrl : undefined
+
+  const pricing = await fetchPricingConfig()
+  const amount = pricing.campaignActive && pricing.campaignFamilyGel
+    ? Number(pricing.campaignFamilyGel)
+    : Number(pricing.familyGel)
+
+  const hdrs = await headers()
+  const consentIp = hdrs.get('x-forwarded-for')?.split(',')[0]?.trim() || hdrs.get('x-real-ip') || null
+
+  if (pendingEmailConfirmation) {
+    await service.from('profiles').upsert(
+      { id: user.id, full_name: senderName, email: senderEmail, phone },
+      { onConflict: 'id', ignoreDuplicates: false }
+    )
+  } else {
+    await service.from('profiles').update({ phone }).eq('id', user.id)
+  }
+
+  await service.from('user_consents').insert({
+    user_id: user.id,
+    email_consent: emailConsent,
+    phone_consent: phoneConsent,
+    consent_ip: consentIp,
+    consent_version: 'v1.0',
+    source: 'purchase_family',
+  })
+
+  const baseSlug = slugify(familyName)
+  const slug = `${baseSlug}-${Date.now().toString(36)}`
+
+  const dbClient = pendingEmailConfirmation ? service : supabase
+
+  const { data: family, error: familyErr } = await dbClient
+    .from('memorial_families')
+    .insert({
+      name: familyName,
+      slug,
+      owner_id: user.id,
+      is_public: false,
+    })
+    .select('id')
+    .single()
+
+  if (familyErr || !family) return { error: 'Aile sayfası oluşturulamadı: ' + familyErr?.message }
+
+  const dueDate = new Date()
+  dueDate.setDate(dueDate.getDate() + 3)
+
+  const { error: paymentErr } = await service.from('payments').insert({
+    family_id: family.id,
+    user_id: user.id,
+    amount,
+    currency: 'GEL',
+    product_type: 'family_package',
+    status: 'pending',
+    payment_method: 'bank_transfer',
+    due_date: dueDate.toISOString().split('T')[0],
+    notes: `Aile paketi — ${familyName} | Gönderen: ${senderName} <${senderEmail}> | Tel: ${phone}${shippingAddress ? ` | Adres: ${shippingAddress}` : ''}`,
+  })
+  if (paymentErr) return { error: 'Ödeme kaydı oluşturulamadı: ' + paymentErr.message }
+
+  try {
+    const adminEmail = await getAdminNotificationEmail()
+    if (adminEmail) {
+      await sendEmail({
+        to: adminEmail,
+        subject: `[The Eternal Memory] Aile Paketi — ${senderName}`,
+        html: adminNewRegistrationEmail({
+          senderName, senderEmail, phone,
+          productType: 'family_package',
+          vaultName: familyName,
+          paymentMethod: 'bank_transfer',
+          amount,
+          adminUrl: `${SITE_URL}/admin/kasa`,
+        }),
+      })
+    }
+  } catch (e) {
+    console.error('[purchaseFamilyAction] admin notify error:', e)
+  }
+
+  if (pendingEmailConfirmation && confirmUrl) {
+    try {
+      await sendEmail({
+        to: senderEmail,
+        subject: `Aile Anma Sayfanızı oluşturun — The Eternal Memory`,
+        html: memorialSignupConfirmEmail({ authorName: senderName, vaultName: familyName, confirmUrl }),
+      })
+    } catch (e) {
+      console.error('[purchaseFamilyAction] confirm email error:', e)
+    }
+    return { emailConfirmationSent: true as const, email: senderEmail }
+  }
+
+  redirect(`/aile/${slug}?purchased=1`)
+}
+
 // ─── PayPal Link Flow ────────────────────────────────────────────────────────
 // Vault + pending payment oluşturur, redirect etmez — PayPal link göstermek için
 

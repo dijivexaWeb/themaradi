@@ -7,6 +7,7 @@ import { updateMediaAction, deleteMediaAction } from '@/lib/actions/media'
 import SubmitButton from '@/components/SubmitButton'
 import PhotoUploadForm from './PhotoUploadForm'
 import SectionHeader from '../_SectionHeader'
+import { getTranslation } from '@/i18n/server'
 
 interface Props {
   params: Promise<{ id: string }>
@@ -35,6 +36,7 @@ export default async function MemorialFotolarPage({ params, searchParams }: Prop
   const { id } = await params
   const { edit: editId } = await searchParams
   const supabase = await createClient()
+  const { t } = await getTranslation()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
@@ -68,11 +70,11 @@ export default async function MemorialFotolarPage({ params, searchParams }: Prop
   return (
     <div className="px-5 py-8 sm:px-8">
       <div className="mx-auto max-w-5xl">
-        <SectionHeader title="Fotoğraflar" icon="📷" subtitle={`${photos?.length ?? 0} / ${PHOTO_LIMIT} fotoğraf`} />
+        <SectionHeader title={t.memorial_panel.pages.photos.title} icon="📷" subtitle={`${photos?.length ?? 0} / ${PHOTO_LIMIT} ${t.memorial_panel.sidebar.photos.toLowerCase()}`} />
 
         {isLocked && (
           <div className="mb-5 rounded-2xl border border-[#dfbd72]/50 bg-[#fff7e6] px-5 py-4 text-sm text-[#725212]">
-            Ödeme doğrulandıktan sonra fotoğraf ekleyebilirsiniz.
+            {t.memorial_panel.pages.common.lockedMsg}
           </div>
         )}
 
@@ -86,10 +88,10 @@ export default async function MemorialFotolarPage({ params, searchParams }: Prop
           <div className="mb-8 rounded-3xl border border-[#c7a76f]/40 bg-[#fff9ee] p-6 shadow-[0_4px_24px_rgba(64,48,24,0.08)]">
             <div className="mb-4 flex items-center justify-between">
               <h2 className="flex items-center gap-2 font-semibold text-[#1f2d27]">
-                <span>✏️</span> Fotoğrafı Düzenle
+                <span>✏️</span> {t.memorial_panel.pages.photos.editTitle}
               </h2>
               <Link href={returnPath} className="text-xs text-[#788177] hover:text-[#174f35]">
-                İptal
+                {t.memorial_panel.pages.common.cancel}
               </Link>
             </div>
             <div className="mb-5 flex items-start gap-4">
@@ -103,7 +105,7 @@ export default async function MemorialFotolarPage({ params, searchParams }: Prop
                 />
               </div>
               <p className="mt-1 text-xs leading-5 text-[#788177]">
-                Fotoğraf değiştirilemez. Değiştirmek için silip yeniden yükleyin.
+                {t.memorial_panel.pages.photos.editNote}
               </p>
             </div>
             <form
@@ -112,7 +114,7 @@ export default async function MemorialFotolarPage({ params, searchParams }: Prop
             >
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <label className={labelCls}>Fotoğraf Adı</label>
+                  <label className={labelCls}>{t.memorial_panel.pages.photos.fieldName}</label>
                   <input
                     type="text"
                     name="title"
@@ -122,7 +124,7 @@ export default async function MemorialFotolarPage({ params, searchParams }: Prop
                   />
                 </div>
                 <div>
-                  <label className={labelCls}>Çekildiği Tarih</label>
+                  <label className={labelCls}>{t.memorial_panel.pages.photos.fieldDate}</label>
                   <input
                     type="datetime-local"
                     name="taken_at"
@@ -134,18 +136,18 @@ export default async function MemorialFotolarPage({ params, searchParams }: Prop
               </div>
               <div className="grid gap-4 sm:grid-cols-2">
                 <div>
-                  <label className={labelCls}>Görünürlük</label>
+                  <label className={labelCls}>{t.memorial_panel.pages.photos.fieldVisibility}</label>
                   <select
                     name="visibility"
                     defaultValue={editingPhoto.is_public ? 'public' : 'private'}
                     className="w-full rounded-xl border border-[#e5dccb] bg-white px-4 py-3 text-sm text-[#1f2d27] outline-none focus:border-[#174f35]"
                   >
-                    <option value="private">Gizli</option>
-                    <option value="public">Herkese açık</option>
+                    <option value="private">{t.memorial_panel.pages.common.private}</option>
+                    <option value="public">{t.memorial_panel.pages.common.public}</option>
                   </select>
                 </div>
                 <div>
-                  <label className={labelCls}>Not</label>
+                  <label className={labelCls}>{t.memorial_panel.pages.photos.fieldCaption}</label>
                   <input
                     type="text"
                     name="caption"
@@ -154,7 +156,7 @@ export default async function MemorialFotolarPage({ params, searchParams }: Prop
                   />
                 </div>
               </div>
-              <SubmitButton pendingLabel="Yükleniyor...">Kaydet</SubmitButton>
+              <SubmitButton pendingLabel={t.memorial_panel.pages.common.saving}>{t.memorial_panel.pages.common.save}</SubmitButton>
             </form>
           </div>
         )}
@@ -163,9 +165,9 @@ export default async function MemorialFotolarPage({ params, searchParams }: Prop
         {!photos?.length ? (
           <div className="rounded-3xl border border-dashed border-[#e5dccb] bg-[#fffdf8] py-20 text-center">
             <p className="mb-4 text-6xl">📷</p>
-            <p className="mb-1 font-serif text-xl text-[#1f2d27]">Henüz fotoğraf yok</p>
+            <p className="mb-1 font-serif text-xl text-[#1f2d27]">{t.memorial_panel.pages.photos.emptyTitle}</p>
             <p className="mx-auto max-w-xs text-sm text-[#788177]">
-              Önemli anları yükleyin. Fotoğraflar anma sayfasında görünür.
+              {t.memorial_panel.pages.photos.emptyText}
             </p>
           </div>
         ) : (
@@ -198,7 +200,7 @@ export default async function MemorialFotolarPage({ params, searchParams }: Prop
                         photo.is_public ? 'bg-[#174f35] text-white' : 'bg-black/50 text-white'
                       }`}
                     >
-                      {photo.is_public ? 'Açık' : 'Gizli'}
+                      {photo.is_public ? t.memorial_panel.pages.common.public : t.memorial_panel.pages.common.private}
                     </span>
                   </div>
                   {!isLocked && (
@@ -249,7 +251,7 @@ export default async function MemorialFotolarPage({ params, searchParams }: Prop
           <div className="sticky top-6 space-y-4">
             <div className="rounded-2xl border border-[#e5dccb] bg-white px-5 py-4">
               <div className="flex items-center justify-between mb-2">
-                <span className="text-xs font-semibold text-[#4a5e55]">Fotoğraf sayısı</span>
+                <span className="text-xs font-semibold text-[#4a5e55]">{t.memorial_panel.pages.photos.counter}</span>
                 <span className="text-sm font-bold text-[#174f35]">{photos?.length ?? 0} / {PHOTO_LIMIT}</span>
               </div>
               <div className="h-1.5 w-full rounded-full bg-[#f0ebe0] overflow-hidden">
@@ -265,7 +267,7 @@ export default async function MemorialFotolarPage({ params, searchParams }: Prop
             )}
             {atLimit && !isLocked && (
               <div className="rounded-2xl border border-[#dfbd72]/50 bg-[#fff7e6] px-4 py-3 text-xs text-[#725212]">
-                Limite ulaştınız ({PHOTO_LIMIT}/{PHOTO_LIMIT})
+                {t.memorial_panel.pages.photos.limitReached} ({PHOTO_LIMIT}/{PHOTO_LIMIT})
               </div>
             )}
           </div>

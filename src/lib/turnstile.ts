@@ -40,6 +40,8 @@ export async function getTurnstileSiteKey(): Promise<string> {
 }
 
 export async function verifyTurnstile(token: string | null | undefined): Promise<boolean> {
+  if (process.env.NODE_ENV === 'development') return true
+
   if (!token) return false
 
   // 1. Check environment variable first

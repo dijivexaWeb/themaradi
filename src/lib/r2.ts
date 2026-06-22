@@ -61,6 +61,8 @@ export function generateFileKey(
     case 'profile_photo':
     case 'hero_bg':
       return `profiles/${idContext}/assets/${fileId}-${safeName}`
+    case 'family_photo':
+      return `families/${idContext}/photos/${fileId}-${safeName}`
     case 'profile_cover_video':
       return `profiles/${idContext}/cover-video/${fileId}-${safeName}`
 

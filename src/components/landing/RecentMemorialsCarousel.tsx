@@ -15,6 +15,7 @@ export type RecentMemorial = {
   cover_photo_url: string | null
   cover_video_url?: string | null
   birth_place: string | null
+  family?: { name: string; slug: string } | null
 }
 
 type Labels = {
@@ -158,6 +159,18 @@ export default function RecentMemorialsCarousel({
                           <ShieldCheck className="h-3 w-3 text-[#2d7a4f]" />
                           <span className="text-[10px] font-semibold text-[#2d7a4f]">Onaylı</span>
                         </div>
+                        {/* Family badge */}
+                        {m.family && (
+                          <Link
+                            href={`/aile/${m.family.slug}`}
+                            onClick={e => e.stopPropagation()}
+                            className="absolute bottom-2 left-2 flex items-center gap-1 rounded-full px-2 py-0.5 backdrop-blur-sm"
+                            style={{ background: 'rgba(143,184,158,.88)' }}
+                          >
+                            <Users className="h-2.5 w-2.5 text-[#0a120e]" />
+                            <span className="text-[9.5px] font-semibold text-[#0a120e] max-w-[90px] truncate">{m.family.name}</span>
+                          </Link>
+                        )}
                       </div>
 
                       {/* Info */}

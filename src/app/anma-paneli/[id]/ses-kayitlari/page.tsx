@@ -5,6 +5,8 @@ import { addMemorialAudioAction, updateMemorialAudioAction } from '../actions'
 import { deleteAudioRecordingAction } from '@/lib/actions/audio'
 import SubmitButton from '@/components/SubmitButton'
 import AudioUploadForm from './AudioUploadForm'
+import SectionHeader from '../_SectionHeader'
+import { getTranslation } from '@/i18n/server'
 
 interface Props {
   params: Promise<{ id: string }>
@@ -15,6 +17,7 @@ export default async function MemorialSesKayitlariPage({ params, searchParams }:
   const { id } = await params
   const { edit: editId } = await searchParams
   const supabase = await createClient()
+  const { t } = await getTranslation()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) redirect('/login')
 
@@ -42,16 +45,11 @@ export default async function MemorialSesKayitlariPage({ params, searchParams }:
     <div className="px-5 py-8 sm:px-8">
       <div className="mx-auto max-w-3xl">
 
-        <div className="flex items-end justify-between mb-7">
-          <div>
-            <h1 className="font-serif text-3xl text-[#1f2d27]">Ses Kayıtları</h1>
-            <p className="text-xs text-[#788177] mt-0.5">{recordings?.length ?? 0} kayıt</p>
-          </div>
-        </div>
+        <SectionHeader title={t.memorial_panel.pages.audio.title} icon="🎵" subtitle={`${recordings?.length ?? 0} ${t.memorial_panel.sidebar.audioRecordings.toLowerCase()}`} />
 
         {isLocked && (
           <div className="mb-6 rounded-2xl border border-[#dfbd72]/50 bg-[#fff7e6] px-5 py-4 text-sm text-[#725212]">
-            Ödeme doğrulandıktan sonra kayıt ekleyebilirsiniz.
+            {t.memorial_panel.pages.common.lockedMsg}
           </div>
         )}
 
@@ -145,8 +143,8 @@ export default async function MemorialSesKayitlariPage({ params, searchParams }:
         {!recordings?.length && !editingRec && (
           <div className="mt-6 rounded-3xl border border-dashed border-[#e5dccb] bg-[#fffdf8] py-14 text-center">
             <p className="text-5xl mb-3">🎙️</p>
-            <p className="font-serif text-lg text-[#1f2d27] mb-1">Henüz ses kaydı yok</p>
-            <p className="text-sm text-[#788177]">Anma sayfasında çalınacak ses dosyası ekleyin.</p>
+            <p className="font-serif text-lg text-[#1f2d27] mb-1">{t.memorial_panel.pages.audio.emptyTitle}</p>
+            <p className="text-sm text-[#788177]">{t.memorial_panel.pages.audio.emptyText}</p>
           </div>
         )}
       </div>

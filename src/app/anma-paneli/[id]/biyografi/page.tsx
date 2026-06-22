@@ -7,6 +7,7 @@ import Link from 'next/link'
 import Image from 'next/image'
 import { BookOpen, User, Music, Heart, MapPin, Upload, Loader2 } from 'lucide-react'
 import PartialDateInput from '@/components/PartialDateInput'
+import { useLang } from '@/i18n/context'
 
 interface VaultData {
   display_name: string
@@ -33,6 +34,7 @@ interface VaultData {
 
 export default function BiyografiPage() {
   const { id } = useParams<{ id: string }>()
+  const { t } = useLang()
   const supabase = useMemo(() => createClient(), [])
 
   const [vault, setVault] = useState<VaultData | null>(null)
@@ -238,14 +240,14 @@ export default function BiyografiPage() {
           <div className="flex items-center gap-3">
             <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[#1c2e25] text-xl shadow-sm">📖</div>
             <div>
-              <h1 className="font-serif text-2xl text-[#1f2d27]">Biyografi & Profil</h1>
+              <h1 className="font-serif text-2xl text-[#1f2d27]">{t.memorial_panel.pages.biography.title}</h1>
             </div>
           </div>
         </div>
 
         {isLocked && (
           <div className="mb-5 rounded-2xl border border-[#dfbd72]/50 bg-[#fff7e6] px-5 py-4 text-sm text-[#725212]">
-            Ödeme doğrulandıktan sonra bilgileri düzenleyebilirsiniz.
+            {t.memorial_panel.pages.common.lockedMsg}
           </div>
         )}
 
@@ -254,7 +256,7 @@ export default function BiyografiPage() {
           <div className={headerCls}>
             <div className="flex items-center gap-2">
               <User className="h-4 w-4 text-[#b08340]" />
-              <h2 className="font-semibold text-[#1f2d27]">Profil Bilgileri</h2>
+              <h2 className="font-semibold text-[#1f2d27]">{t.memorial_panel.pages.biography.profileSection}</h2>
             </div>
           </div>
           <form onSubmit={handleSaveProfile} className="space-y-5 p-6">
@@ -295,31 +297,16 @@ export default function BiyografiPage() {
                       setPhotoUploading(true)
                       setPhotoUploadError(null)
                       try {
-                        const presignRes = await fetch('/api/r2/presign', {
-                          method: 'POST',
-                          headers: { 'Content-Type': 'application/json' },
-                          body: JSON.stringify({
-                            fileName: file.name,
-                            fileSize: file.size,
-                            category: 'profile_photo',
-                            profileId: id,
-                            mimeType: file.type || 'image/jpeg',
-                          }),
-                        })
-                        if (!presignRes.ok) {
-                          const resJson = await presignRes.json()
-                          throw new Error(resJson.error || 'Yükleme izni alınamadı.')
+                        const fd = new FormData()
+                        fd.set('file', file)
+                        fd.set('category', 'profile_photo')
+                        fd.set('profileId', id)
+                        const res = await fetch('/api/r2/upload', { method: 'POST', body: fd })
+                        if (!res.ok) {
+                          const j = await res.json()
+                          throw new Error(j.error || 'Yükleme başarısız.')
                         }
-                        const { uploadUrl, publicUrl } = await presignRes.json()
-
-                        const uploadRes = await fetch(uploadUrl, {
-                          method: 'PUT',
-                          headers: { 'Content-Type': file.type || 'image/jpeg' },
-                          body: file,
-                        })
-                        if (!uploadRes.ok) {
-                          throw new Error('Dosya R2 ye yüklenemedi.')
-                        }
+                        const { publicUrl } = await res.json()
                         setCoverPhotoUrl(publicUrl)
                       } catch (err: any) {
                         setPhotoUploadError(err.message || 'Yükleme sırasında hata oluştu.')
@@ -413,31 +400,16 @@ export default function BiyografiPage() {
                     setHeroBgUploading(true)
                     setHeroBgUploadError(null)
                     try {
-                      const presignRes = await fetch('/api/r2/presign', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                          fileName: file.name,
-                          fileSize: file.size,
-                          category: 'hero_bg',
-                          profileId: id,
-                          mimeType: file.type || 'image/jpeg',
-                        }),
-                      })
-                      if (!presignRes.ok) {
-                        const resJson = await presignRes.json()
-                        throw new Error(resJson.error || 'Yükleme izni alınamadı.')
+                      const fd = new FormData()
+                      fd.set('file', file)
+                      fd.set('category', 'hero_bg')
+                      fd.set('profileId', id)
+                      const res = await fetch('/api/r2/upload', { method: 'POST', body: fd })
+                      if (!res.ok) {
+                        const j = await res.json()
+                        throw new Error(j.error || 'Yükleme başarısız.')
                       }
-                      const { uploadUrl, publicUrl } = await presignRes.json()
-
-                      const uploadRes = await fetch(uploadUrl, {
-                        method: 'PUT',
-                        headers: { 'Content-Type': file.type || 'image/jpeg' },
-                        body: file,
-                      })
-                      if (!uploadRes.ok) {
-                        throw new Error('Dosya R2 ye yüklenemedi.')
-                      }
+                      const { publicUrl } = await res.json()
                       setHeroBgUrl(publicUrl)
                     } catch (err: any) {
                       setHeroBgUploadError(err.message || 'Yükleme sırasında hata oldu.')
@@ -508,32 +480,16 @@ export default function BiyografiPage() {
                         throw new Error('Video en fazla 3 saniye olabilir. Lütfen daha kısa bir video seçin.')
                       }
 
-                      // R2 presign URL al
-                      const presignRes = await fetch('/api/r2/presign', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                          fileName: file.name,
-                          fileSize: file.size,
-                          mimeType: file.type,
-                          category: 'profile_cover_video',
-                          profileId: id,
-                        }),
-                      })
-                      if (!presignRes.ok) {
-                        const j = await presignRes.json()
-                        throw new Error(j.error || 'Yükleme bağlantısı alınamadı.')
+                      const fd = new FormData()
+                      fd.set('file', file)
+                      fd.set('category', 'profile_cover_video')
+                      fd.set('profileId', id)
+                      const res = await fetch('/api/r2/upload', { method: 'POST', body: fd })
+                      if (!res.ok) {
+                        const j = await res.json()
+                        throw new Error(j.error || 'Video yüklenemedi.')
                       }
-                      const { uploadUrl, publicUrl } = await presignRes.json()
-
-                      // R2'ye yükle
-                      const putRes = await fetch(uploadUrl, {
-                        method: 'PUT',
-                        headers: { 'Content-Type': file.type },
-                        body: file,
-                      })
-                      if (!putRes.ok) throw new Error('Video yüklenemedi.')
-
+                      const { publicUrl } = await res.json()
                       setProfileVideoUrl(publicUrl)
                     } catch (err: any) {
                       setVideoUploadError(err.message || 'Yükleme sırasında hata oluştu.')
@@ -648,32 +604,16 @@ export default function BiyografiPage() {
                     setSongUploading(true)
                     setSongUploadError(null)
                     try {
-                      const presignRes = await fetch('/api/r2/presign', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                          fileName: file.name,
-                          fileSize: file.size,
-                          category: 'audio_recording',
-                          profileId: id,
-                          mimeType: file.type || 'audio/mpeg',
-                        }),
-                      })
-                      if (!presignRes.ok) {
-                        const resJson = await presignRes.json()
-                        throw new Error(resJson.error || 'Yükleme izni alınamadı.')
+                      const fd = new FormData()
+                      fd.set('file', file)
+                      fd.set('category', 'audio_recording')
+                      fd.set('profileId', id)
+                      const res = await fetch('/api/r2/upload', { method: 'POST', body: fd })
+                      if (!res.ok) {
+                        const j = await res.json()
+                        throw new Error(j.error || 'Yükleme başarısız.')
                       }
-                      const { uploadUrl, publicUrl } = await presignRes.json()
-
-                      const uploadRes = await fetch(uploadUrl, {
-                        method: 'PUT',
-                        headers: { 'Content-Type': file.type || 'audio/mpeg' },
-                        body: file,
-                      })
-                      if (!uploadRes.ok) {
-                        throw new Error('Dosya R2 ye yüklenemedi.')
-                      }
-
+                      const { publicUrl } = await res.json()
                       setFavSongUrl(publicUrl)
                       if (!favSongTitle) setFavSongTitle(file.name.replace(/\.[^.]+$/, ''))
                     } catch (err: any) {
@@ -743,7 +683,7 @@ export default function BiyografiPage() {
             <div className="flex items-center gap-2">
               <BookOpen className="h-4 w-4 text-[#b08340]" />
               <div>
-                <h2 className="font-semibold text-[#1f2d27]">Hayat Hikayesi</h2>
+                <h2 className="font-semibold text-[#1f2d27]">{t.memorial_panel.pages.biography.biographySection}</h2>
                 <p className="mt-0.5 text-xs text-[#adb5ab]">
                   {words > 0 ? `${words} kelime · ${bio.length} karakter` : 'Henüz yazılmamış'}
                 </p>

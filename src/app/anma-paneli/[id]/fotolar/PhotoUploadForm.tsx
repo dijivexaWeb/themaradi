@@ -41,33 +41,42 @@ export default function PhotoUploadForm({ vaultId, todayMax }: Props) {
     setCurrent(idx + 1)
     setProgress(0)
 
-    const presignRes = await fetch('/api/r2/presign', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        fileName: file.name,
-        fileSize: file.size,
-        category: 'gallery_image',
-        profileId: vaultId,
-        mimeType: file.type || 'image/jpeg',
-      }),
-    })
-    if (!presignRes.ok) {
-      const j = await presignRes.json()
-      throw new Error(j.error || 'Presign hatası.')
-    }
-    const { uploadUrl, fileKey, bucket } = await presignRes.json()
+    // Upload via server-side proxy (avoids R2 CORS)
+    let fileKey = ''
+    let bucket = ''
 
     await new Promise<void>((resolve, reject) => {
+      const fd = new FormData()
+      fd.set('file', file)
+      fd.set('category', 'gallery_image')
+      fd.set('profileId', vaultId)
+
       const xhr = new XMLHttpRequest()
-      xhr.open('PUT', uploadUrl, true)
-      xhr.setRequestHeader('Content-Type', file.type || 'image/jpeg')
+      xhr.open('POST', '/api/r2/upload', true)
       xhr.upload.onprogress = (ev) => {
         if (ev.lengthComputable) setProgress(Math.round((ev.loaded / ev.total) * 100))
       }
-      xhr.onload = () => xhr.status === 200 ? resolve() : reject(new Error(`Yükleme hatası (${xhr.status})`))
-      xhr.onerror = () => reject(new Error('Ağ hatası.'))
-      xhr.send(file)
+      xhr.onload = () => {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          try {
+            const data = JSON.parse(xhr.responseText)
+            fileKey = data.fileKey ?? ''
+            bucket = data.bucket ?? ''
+            resolve()
+          } catch {
+            reject(new Error('Sunucu yanıtı okunamadı.'))
+          }
+        } else {
+          try {
+            const data = JSON.parse(xhr.responseText)
+            reject(new Error(data.error || `Yükleme hatası (${xhr.status})`))
+          } catch {
+            reject(new Error(`Yükleme hatası (${xhr.status})`))
+          }
+        }
+      }
+      xhr.onerror = () => reject(new Error('Bağlantı hatası. İnternet bağlantınızı kontrol edin.'))
+      xhr.send(fd)
     })
 
     const formData = new FormData()

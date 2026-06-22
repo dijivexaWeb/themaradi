@@ -2,6 +2,7 @@
 
 import { verifyTurnstile } from '@/lib/turnstile'
 import { createClient } from '@/lib/supabase/server'
+import { getLoginRedirectUrl } from '@/lib/login-redirect'
 
 export async function checkTurnstileAction(token: string): Promise<{ ok: boolean }> {
   const ok = await verifyTurnstile(token)
@@ -48,22 +49,8 @@ export async function userLogin(
     }
   }
 
-  // 3. Query user's vault to determine redirect URL
-  const { data: vault } = await supabase
-    .from('vaults')
-    .select('id, product_type')
-    .eq('owner_id', data.user.id)
-    .order('created_at', { ascending: false })
-    .limit(1)
-    .maybeSingle()
-
-  let redirectUrl = '/dashboard'
-  if (vault?.product_type === 'memorial_profile') {
-    redirectUrl = `/anma-paneli/${vault.id}`
-  } else if (vault?.product_type === 'life_vault') {
-    redirectUrl = `/dashboard/vault/${vault.id}`
-  }
-
+  // 3. Yönlendirme URL'sini belirle (aile sayfası öncelikli, yoksa otomatik oluştur)
+  const redirectUrl = await getLoginRedirectUrl(supabase, data.user.id)
   return { success: true, redirectUrl }
 }
 

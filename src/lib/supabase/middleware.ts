@@ -34,8 +34,8 @@ export async function updateSession(request: NextRequest) {
   const pathname = request.nextUrl.pathname
   const isPublicAdminPath = PUBLIC_ADMIN_PATHS.some((p) => pathname.startsWith(p))
 
-  // Unauthenticated user on user dashboard → /login
-  if (!user && pathname.startsWith('/dashboard')) {
+  // Unauthenticated user on user dashboard or panel → /login
+  if (!user && (pathname.startsWith('/dashboard') || pathname.startsWith('/anma-paneli'))) {
     const url = request.nextUrl.clone()
     url.pathname = '/login'
     return NextResponse.redirect(url)

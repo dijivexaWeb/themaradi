@@ -4,6 +4,7 @@ import MemorialPageClient from './MemorialPageClient'
 import RealMemorialPage from './RealMemorialPage'
 import ObjectionSection from './ObjectionSection'
 import ViewTracker from './ViewTracker'
+import FamilySiblingsBar from './FamilySiblingsBar'
 
 export const revalidate = 0
 
@@ -138,11 +139,61 @@ export default async function MemorialPage({ params, searchParams }: PropsWithSe
     )
   }
 
+  // Fetch family + siblings for this vault
+  const serviceClient = await createServiceClient()
+  let familySiblings: FamilySibling[] = []
+  let familyInfo: { name: string; slug: string } | null = null
+
+  const { data: memberLink } = await serviceClient
+    .from('family_members')
+    .select('family_id, memorial_families(name, slug)')
+    .eq('vault_id', vault.id)
+    .maybeSingle()
+
+  if (memberLink?.family_id) {
+    const raw = memberLink.memorial_families as { name: string; slug: string }[] | { name: string; slug: string } | null
+    familyInfo = Array.isArray(raw) ? (raw[0] ?? null) : raw
+
+    const { data: siblings } = await serviceClient
+      .from('family_members')
+      .select('vault_id, vaults(display_name, slug, cover_photo_url, birth_date, death_date)')
+      .eq('family_id', memberLink.family_id)
+      .neq('vault_id', vault.id)
+      .limit(8)
+
+    for (const s of siblings ?? []) {
+      const raw2 = s.vaults as { display_name: string; slug: string; cover_photo_url: string | null; birth_date: string | null; death_date: string | null }[] | { display_name: string; slug: string; cover_photo_url: string | null; birth_date: string | null; death_date: string | null } | null
+      const v = Array.isArray(raw2) ? (raw2[0] ?? null) : raw2
+      if (v) {
+        familySiblings.push({
+          vault_id: s.vault_id,
+          display_name: v.display_name,
+          slug: v.slug,
+          cover_photo_url: v.cover_photo_url,
+          birth_date: v.birth_date,
+          death_date: v.death_date,
+        })
+      }
+    }
+  }
+
   return (
     <>
       <ViewTracker vaultId={vault.id} />
       <RealMemorialPage vault={vault} />
       {vault.status === 'public_memorial' && !vault.is_notable && !vault.hide_objection && <ObjectionSection vaultId={vault.id} />}
+      {familySiblings.length > 0 && familyInfo && (
+        <FamilySiblingsBar siblings={familySiblings} family={familyInfo} />
+      )}
     </>
   )
+}
+
+export type FamilySibling = {
+  vault_id: string
+  display_name: string
+  slug: string
+  cover_photo_url: string | null
+  birth_date: string | null
+  death_date: string | null
 }

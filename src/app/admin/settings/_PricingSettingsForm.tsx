@@ -78,6 +78,34 @@ export default function PricingSettingsForm({ settings }: { settings: Record<str
         </div>
       </div>
 
+      {/* Family prices */}
+      <div className="border-t border-slate-100 pt-5">
+        <p className="text-xs font-semibold uppercase tracking-wider text-slate-500 mb-4">Aile Paketi Fiyatları</p>
+        <div className="space-y-4">
+          <div>
+            <p className="text-[11px] font-semibold text-slate-400 mb-2 flex items-center gap-1.5">
+              <span className="inline-block w-5 h-5 rounded bg-emerald-50 text-center leading-5 text-emerald-500">₾</span>
+              GEL — Ana para birimi
+            </p>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <PriceField name="price_family_gel" label="Aile Paketi" sub="4 üye dahil, tek seferlik" symbol="₾" defaultValue={settings.price_family_gel ?? '399'} />
+              <PriceField name="campaign_price_family_gel" label="Kampanya (GEL)" sub="Boşsa kampanya yok" symbol="₾" defaultValue={settings.campaign_price_family_gel ?? ''} required={false} />
+            </div>
+          </div>
+          <div>
+            <p className="text-[11px] font-semibold text-slate-400 mb-2">₺ TRY / $ USD / ₽ RUB</p>
+            <div className="grid gap-3 sm:grid-cols-3">
+              <PriceField name="price_family_try" label="Aile (TRY)" sub="Boşsa GEL gösterilir" symbol="₺" defaultValue={settings.price_family_try ?? ''} required={false} />
+              <PriceField name="price_family_usd" label="Aile (USD)" sub="Boşsa GEL gösterilir" symbol="$" defaultValue={settings.price_family_usd ?? ''} required={false} />
+              <PriceField name="price_family_rub" label="Aile (RUB)" sub="Boşsa GEL gösterilir" symbol="₽" defaultValue={settings.price_family_rub ?? ''} required={false} />
+              <PriceField name="campaign_price_family_try" label="Kampanya (TRY)" sub="" symbol="₺" defaultValue={settings.campaign_price_family_try ?? ''} required={false} />
+              <PriceField name="campaign_price_family_usd" label="Kampanya (USD)" sub="" symbol="$" defaultValue={settings.campaign_price_family_usd ?? ''} required={false} />
+              <PriceField name="campaign_price_family_rub" label="Kampanya (RUB)" sub="" symbol="₽" defaultValue={settings.campaign_price_family_rub ?? ''} required={false} />
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Campaign toggle */}
       <div className="border-t border-slate-100 pt-5">
         <div className="flex items-center justify-between mb-4">
