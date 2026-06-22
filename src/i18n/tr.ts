@@ -329,10 +329,11 @@ const tr: LangDict = {
       readStory: 'Hikayemizi okuyun →',
       members: [
         { name: 'Mehmet Akif Kabakcı', role: 'Kurucu & CEO', photo: '/images/team/kurucu.png' },
-        { name: '[İsim 2]', role: '[Unvan]', photo: null },
-        { name: '[İsim 3]', role: '[Unvan]', photo: null },
-        { name: '[İsim 4]', role: '[Unvan]', photo: null },
-        { name: '[İsim 5]', role: '[Unvan]', photo: null },
+        { name: 'Emre Yıldız', role: 'Kıdemli Yazılım Geliştirici', photo: '/images/team/emre.jpg' },
+        { name: 'Burak Şahin', role: 'Full-Stack Geliştirici', photo: '/images/team/burak.jpg' },
+        { name: 'Can Arslan', role: 'Mobil Geliştirici', photo: '/images/team/can.jpg' },
+        { name: 'Serkan Kaya', role: 'Teknik Analist', photo: '/images/team/serkan.jpg' },
+        { name: 'Nino Beridze', role: 'Tercüman (Gürcüce)', photo: '/images/team/nino.jpg' },
       ],
     },
 

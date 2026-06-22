@@ -317,10 +317,11 @@ const he: LangDict = {
       readStory: 'קראו את הסיפור שלנו →',
       members: [
         { name: 'Mehmet Akif Kabakcı', role: 'מייסד ומנכ"ל', photo: '/images/team/kurucu.png' },
-        { name: '[שם 2]', role: '[תפקיד]', photo: null },
-        { name: '[שם 3]', role: '[תפקיד]', photo: null },
-        { name: '[שם 4]', role: '[תפקיד]', photo: null },
-        { name: '[שם 5]', role: '[תפקיד]', photo: null },
+        { name: 'Emre Yıldız', role: 'מפתח תוכנה בכיר', photo: '/images/team/emre.jpg' },
+        { name: 'Burak Şahin', role: 'מפתח Full-Stack', photo: '/images/team/burak.jpg' },
+        { name: 'Can Arslan', role: 'מפתח מובייל', photo: '/images/team/can.jpg' },
+        { name: 'Serkan Kaya', role: 'אנליסט טכני', photo: '/images/team/serkan.jpg' },
+        { name: 'Nino Beridze', role: 'מתרגמת (גיאורגית)', photo: '/images/team/nino.jpg' },
       ],
     },
 

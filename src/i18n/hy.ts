@@ -317,10 +317,11 @@ const hy: LangDict = {
       readStory: 'Կարդալ մեր պատմությունը →',
       members: [
         { name: 'Mehmet Akif Kabakcı', role: 'Հիմնադիր & CEO', photo: '/images/team/kurucu.png' },
-        { name: '[Անուն 2]', role: '[Պաշտոն]', photo: null },
-        { name: '[Անուն 3]', role: '[Պաշտոն]', photo: null },
-        { name: '[Անուն 4]', role: '[Պաշտոն]', photo: null },
-        { name: '[Անուն 5]', role: '[Պաշտոն]', photo: null },
+        { name: 'Emre Yıldız', role: 'Ավագ ծրագրավորող', photo: '/images/team/emre.jpg' },
+        { name: 'Burak Şahin', role: 'Full-Stack ծրագրավորող', photo: '/images/team/burak.jpg' },
+        { name: 'Can Arslan', role: 'Բջջային ծրագրավորող', photo: '/images/team/can.jpg' },
+        { name: 'Serkan Kaya', role: 'Տեխնիկական վերլուծաբան', photo: '/images/team/serkan.jpg' },
+        { name: 'Nino Beridze', role: 'Թարգմանիչ (վրացերեն)', photo: '/images/team/nino.jpg' },
       ],
     },
 

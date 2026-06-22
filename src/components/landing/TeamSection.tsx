@@ -63,7 +63,7 @@ export default function TeamSection() {
         </div>
 
         {/* Team grid — 2 cols mobile, 5 cols desktop */}
-        <div className="tem-reveal grid grid-cols-2 sm:grid-cols-5 gap-4 sm:gap-5">
+        <div className="tem-reveal grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 sm:gap-5">
           {tm.members.map((member, i) => (
             <div key={i} style={{
               display: 'flex', flexDirection: 'column', alignItems: 'center',

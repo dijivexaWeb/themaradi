@@ -317,10 +317,11 @@ const az: LangDict = {
       readStory: 'Hekayəmizi oxuyun →',
       members: [
         { name: 'Mehmet Akif Kabakcı', role: 'Qurucu & CEO', photo: '/images/team/kurucu.png' },
-        { name: '[Ad 2]', role: '[Vəzifə]', photo: null },
-        { name: '[Ad 3]', role: '[Vəzifə]', photo: null },
-        { name: '[Ad 4]', role: '[Vəzifə]', photo: null },
-        { name: '[Ad 5]', role: '[Vəzifə]', photo: null },
+        { name: 'Emre Yıldız', role: 'Baş Proqram Tərtibatçısı', photo: '/images/team/emre.jpg' },
+        { name: 'Burak Şahin', role: 'Full-Stack Tərtibatçı', photo: '/images/team/burak.jpg' },
+        { name: 'Can Arslan', role: 'Mobil Tərtibatçı', photo: '/images/team/can.jpg' },
+        { name: 'Serkan Kaya', role: 'Texniki Analitik', photo: '/images/team/serkan.jpg' },
+        { name: 'Nino Beridze', role: 'Tərcüməçi (Gürcü)', photo: '/images/team/nino.jpg' },
       ],
     },
 

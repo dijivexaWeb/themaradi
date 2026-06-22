@@ -317,10 +317,11 @@ const ka: LangDict = {
       readStory: 'წაიკითხეთ ჩვენი ისტორია →',
       members: [
         { name: 'Mehmet Akif Kabakcı', role: 'დამფუძნებელი & CEO', photo: '/images/team/kurucu.png' },
-        { name: '[სახელი 2]', role: '[თანამდებობა]', photo: null },
-        { name: '[სახელი 3]', role: '[თანამდებობა]', photo: null },
-        { name: '[სახელი 4]', role: '[თანამდებობა]', photo: null },
-        { name: '[სახელი 5]', role: '[თანამდებობა]', photo: null },
+        { name: 'Emre Yıldız', role: 'უფროსი პროგრამისტი', photo: '/images/team/emre.jpg' },
+        { name: 'Burak Şahin', role: 'Full-Stack პროგრამისტი', photo: '/images/team/burak.jpg' },
+        { name: 'Can Arslan', role: 'მობილური პროგრამისტი', photo: '/images/team/can.jpg' },
+        { name: 'Serkan Kaya', role: 'ტექნიკური ანალიტიკოსი', photo: '/images/team/serkan.jpg' },
+        { name: 'Nino Beridze', role: 'თარჯიმანი (ქართული)', photo: '/images/team/nino.jpg' },
       ],
     },
 

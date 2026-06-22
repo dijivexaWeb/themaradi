@@ -327,10 +327,11 @@ const en = {
       readStory: 'Read our story →',
       members: [
         { name: 'Mehmet Akif Kabakcı', role: 'Founder & CEO', photo: '/images/team/kurucu.png' },
-        { name: '[Name 2]', role: '[Title]', photo: null },
-        { name: '[Name 3]', role: '[Title]', photo: null },
-        { name: '[Name 4]', role: '[Title]', photo: null },
-        { name: '[Name 5]', role: '[Title]', photo: null },
+        { name: 'Emre Yıldız', role: 'Senior Software Developer', photo: '/images/team/emre.jpg' },
+        { name: 'Burak Şahin', role: 'Full-Stack Developer', photo: '/images/team/burak.jpg' },
+        { name: 'Can Arslan', role: 'Mobile Developer', photo: '/images/team/can.jpg' },
+        { name: 'Serkan Kaya', role: 'Technical Analyst', photo: '/images/team/serkan.jpg' },
+        { name: 'Nino Beridze', role: 'Translator (Georgian)', photo: '/images/team/nino.jpg' },
       ],
     },
 

@@ -329,10 +329,11 @@ const ru: LangDict = {
       readStory: 'Читать нашу историю →',
       members: [
         { name: 'Mehmet Akif Kabakcı', role: 'Основатель & CEO', photo: '/images/team/kurucu.png' },
-        { name: '[Имя 2]', role: '[Должность]', photo: null },
-        { name: '[Имя 3]', role: '[Должность]', photo: null },
-        { name: '[Имя 4]', role: '[Должность]', photo: null },
-        { name: '[Имя 5]', role: '[Должность]', photo: null },
+        { name: 'Emre Yıldız', role: 'Ведущий разработчик', photo: '/images/team/emre.jpg' },
+        { name: 'Burak Şahin', role: 'Full-Stack разработчик', photo: '/images/team/burak.jpg' },
+        { name: 'Can Arslan', role: 'Мобильный разработчик', photo: '/images/team/can.jpg' },
+        { name: 'Serkan Kaya', role: 'Технический аналитик', photo: '/images/team/serkan.jpg' },
+        { name: 'Nino Beridze', role: 'Переводчик (грузинский)', photo: '/images/team/nino.jpg' },
       ],
     },
 
