@@ -129,8 +129,8 @@ function PhoneCard({ memorial, scale = 1, rotate = 0, zIndex = 1, translateY = 0
 
 export default function HeroPhoneShowcase({ memorials }: { memorials: NotableMemorial[] }) {
   const [left, center, right] = [
-    memorials[0],
     memorials[1] ?? memorials[0],
+    memorials[0],
     memorials[2] ?? memorials[0],
   ]
 
