@@ -216,11 +216,11 @@ export default function LocalizedLanding({ pricing, notableMemorials, recentMemo
               )}
 
               <div style={{ display: 'flex', flexWrap: 'wrap', gap: 14, marginBottom: 28 }}>
-                <Link href="/satin-al/anma" className="tem-goldbtn" style={{ textDecoration: 'none', background: S.goldGrad, color: '#14110a', fontWeight: 500, fontSize: 15.5, padding: '16px 32px', borderRadius: 999, boxShadow: '0 14px 36px rgba(201,169,110,.26)', fontFamily: S.sans }}>
-                  {s.hero.ctaPrimary.replace('{campaignPrice}', campaignPriceText)}
-                </Link>
-                <Link href="/memorial/demo" className="tem-ghostbtn" style={{ textDecoration: 'none', background: 'none', color: S.text, border: '1px solid rgba(237,232,221,.2)', fontWeight: 300, fontSize: 15.5, padding: '16px 32px', borderRadius: 999, fontFamily: S.sans }}>
+                <Link href="/memorial/demo" className="tem-goldbtn" style={{ textDecoration: 'none', background: S.goldGrad, color: '#14110a', fontWeight: 500, fontSize: 15.5, padding: '16px 32px', borderRadius: 999, boxShadow: '0 14px 36px rgba(201,169,110,.26)', fontFamily: S.sans }}>
                   {s.hero.ctaSecondary}
+                </Link>
+                <Link href="/satin-al/anma" className="tem-ghostbtn" style={{ textDecoration: 'none', background: 'none', color: S.text, border: '1px solid rgba(237,232,221,.2)', fontWeight: 300, fontSize: 15.5, padding: '16px 32px', borderRadius: 999, fontFamily: S.sans }}>
+                  {s.hero.ctaPrimary.replace('{campaignPrice}', campaignPriceText)}
                 </Link>
               </div>
 
