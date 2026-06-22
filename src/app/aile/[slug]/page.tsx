@@ -16,9 +16,24 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     .single()
 
   const name = family?.name ?? 'Anma Sayfası'
+  const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://theeternalmemory.com'
+  const description = family?.tagline ?? `${name} aile anma sayfası — Fotoğraflar, aile ağacı ve anılar. The Eternal Memory.`
   return {
-    title: `${name} — The Eternal Memory`,
-    description: family?.tagline ?? `${name} anma sayfası`,
+    title: `${name} — Aile Anma Sayfası`,
+    description,
+    alternates: { canonical: `${APP_URL}/aile/${slug}` },
+    openGraph: {
+      title: `${name} — Aile Anma Sayfası`,
+      description,
+      type: 'website',
+      siteName: 'The Eternal Memory',
+      url: `${APP_URL}/aile/${slug}`,
+    },
+    twitter: {
+      card: 'summary',
+      title: `${name} — Aile Anma Sayfası`,
+      description,
+    },
   }
 }
 

@@ -1,3 +1,4 @@
+import type { Metadata } from 'next'
 import LandingNav from '@/components/landing/Nav'
 import LocalizedLanding from '@/components/landing/LocalizedLanding'
 import { fetchPricingConfig } from '@/lib/pricing'
@@ -6,6 +7,23 @@ import type { RecentMemorial } from '@/components/landing/RecentMemorialsCarouse
 import type { NotableMemorial } from '@/components/landing/NotableProfilesSection'
 
 export const revalidate = 3600
+
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://theeternalmemory.com'
+
+export const metadata: Metadata = {
+  title: 'The Eternal Memory — Dijital Anma Profili & QR Mezar Taşı',
+  description:
+    'Sevdikleriniz için kalıcı dijital anma profili oluşturun. Fotoğraflar, hayat hikayesi, aile ağacı ve QR mezar taşı. Gürcistan, Türkiye ve dünya genelinde hizmet. — ციფრული მემორიალი, QR საფლავის ქვა, მოგონებები.',
+  alternates: {
+    canonical: APP_URL,
+  },
+  openGraph: {
+    title: 'The Eternal Memory — Dijital Anma Profili & QR Mezar Taşı',
+    description: 'Sevdikleriniz için kalıcı dijital anma profili. QR mezar taşı, fotoğraflar, aile ağacı.',
+    url: APP_URL,
+    type: 'website',
+  },
+}
 
 export default async function LandingPage() {
   const supabase = await createServiceClient()
@@ -61,14 +79,31 @@ export default async function LandingPage() {
     interaction_count: interactionTotals[v.id] ?? 0,
   }))
 
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'Organization',
+    name: 'The Eternal Memory',
+    url: APP_URL,
+    logo: `${APP_URL}/images/logo-mark.png`,
+    description: 'Dijital anma profili, QR mezar taşı ve aile mirası platformu. Gürcistan, Türkiye ve dünya genelinde hizmet.',
+    sameAs: [],
+    contactPoint: { '@type': 'ContactPoint', contactType: 'customer service', email: 'info@theeternalmemory.com' },
+  }
+
   return (
-    <div className="min-h-screen overflow-x-hidden" style={{ background: '#07070d', color: '#EDE8DD' }}>
-      <LandingNav />
-      <LocalizedLanding
-        pricing={pricing}
-        notableMemorials={notableMemorials}
-        recentMemorials={(recentMemorials ?? []).map(m => ({ ...m, family: familyMap[m.id] ?? null })) as RecentMemorial[]}
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-    </div>
+      <div className="min-h-screen overflow-x-hidden" style={{ background: '#07070d', color: '#EDE8DD' }}>
+        <LandingNav />
+        <LocalizedLanding
+          pricing={pricing}
+          notableMemorials={notableMemorials}
+          recentMemorials={(recentMemorials ?? []).map(m => ({ ...m, family: familyMap[m.id] ?? null })) as RecentMemorial[]}
+        />
+      </div>
+    </>
   )
 }

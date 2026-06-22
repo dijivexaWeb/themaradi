@@ -36,18 +36,34 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   const birthYear = vault.birth_date ? new Date(vault.birth_date).getFullYear() : null
   const deathYear = vault.death_date ? new Date(vault.death_date).getFullYear() : null
-  const years = birthYear && deathYear ? ` — ${birthYear}-${deathYear}` : ''
+  const years = birthYear && deathYear ? ` (${birthYear}–${deathYear})` : ''
+  const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://theeternalmemory.com'
+
+  const description = vault.tagline
+    ?? `${vault.display_name}${years} — Dijital anma profili. Fotoğraflar, hayat hikayesi ve anılar. The Eternal Memory.`
+
+  const ogImage = vault.cover_photo_url
+    ? [{ url: vault.cover_photo_url, width: 1200, height: 630, alt: vault.display_name }]
+    : undefined
 
   return {
-    title: `${vault.display_name}${years} - The Eternal Memory`,
-    description: vault.tagline ?? `${vault.display_name} için dijital anma sayfası.`,
+    title: `${vault.display_name}${years}`,
+    description,
     icons,
+    alternates: { canonical: `${APP_URL}/memorial/${slug}` },
     openGraph: {
       title: `${vault.display_name}${years}`,
-      description: vault.tagline ?? `${vault.display_name} için dijital anma sayfası.`,
+      description,
       type: 'profile',
       siteName: 'The Eternal Memory',
-      ...(vault.cover_photo_url ? { images: [{ url: vault.cover_photo_url }] } : {}),
+      url: `${APP_URL}/memorial/${slug}`,
+      ...(ogImage ? { images: ogImage } : {}),
+    },
+    twitter: {
+      card: ogImage ? 'summary_large_image' : 'summary',
+      title: `${vault.display_name}${years}`,
+      description,
+      ...(ogImage ? { images: [ogImage[0].url] } : {}),
     },
   }
 }
@@ -177,8 +193,28 @@ export default async function MemorialPage({ params, searchParams }: PropsWithSe
     }
   }
 
+  const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://theeternalmemory.com'
+  const jsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ProfilePage',
+    name: vault.display_name,
+    url: `${APP_URL}/memorial/${slug}`,
+    mainEntity: {
+      '@type': 'Person',
+      name: vault.display_name,
+      description: vault.tagline ?? undefined,
+      ...(vault.birth_date ? { birthDate: vault.birth_date } : {}),
+      ...(vault.death_date ? { deathDate: vault.death_date } : {}),
+      ...(vault.cover_photo_url ? { image: vault.cover_photo_url } : {}),
+    },
+  }
+
   return (
     <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <ViewTracker vaultId={vault.id} />
       <RealMemorialPage vault={vault} />
       {vault.status === 'public_memorial' && !vault.is_notable && !vault.hide_objection && <ObjectionSection vaultId={vault.id} />}

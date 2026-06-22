@@ -23,27 +23,50 @@ const outfit = Outfit({
   display: "swap",
 });
 
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://theeternalmemory.com'
+
 export const metadata: Metadata = {
-  title: "The Eternal Memory — Where memories never fade.",
+  metadataBase: new URL(APP_URL),
+  title: {
+    default: 'The Eternal Memory — Dijital Anma Profili & QR Mezar Taşı',
+    template: '%s — The Eternal Memory',
+  },
   description:
-    "Hayatınız boyunca biriktirdiğiniz anıları, hikayelerinizi ve dijital mirasınızı güvenle saklayın ve sevdiklerinize bırakın.",
-  metadataBase: new URL(
-    process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
-  ),
+    'Sevdikleriniz için kalıcı dijital anma profili oluşturun. Fotoğraflar, hayat hikayesi, aile ağacı ve QR mezar taşı. Gürcistan, Türkiye ve dünya genelinde hizmet.',
+  keywords: [
+    'dijital anma', 'dijital mezar', 'online anma profili', 'QR mezar taşı',
+    'dijital miras', 'anı sayfası', 'memorial profile', 'digital memorial',
+    'ციფრული მემორიალი', 'QR საფლავის ქვა', 'მოგონებების გვერდი',
+    'цифровой мемориал', 'онлайн-мемориал',
+  ],
+  authors: [{ name: 'The Eternal Memory', url: APP_URL }],
+  creator: 'The Eternal Memory',
+  publisher: 'The Eternal Memory',
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: { index: true, follow: true, 'max-image-preview': 'large', 'max-snippet': -1 },
+  },
   icons: {
     icon: [{ url: '/images/logo-mark.png', type: 'image/png' }],
     apple: [{ url: '/images/logo-mark.png', type: 'image/png', sizes: '180x180' }],
   },
   openGraph: {
-    title: "The Eternal Memory — Where memories never fade.",
-    description: "Anılarınız sonsuza kadar güvende.",
-    type: "website",
-    siteName: "The Eternal Memory",
+    title: 'The Eternal Memory — Dijital Anma Profili & QR Mezar Taşı',
+    description: 'Sevdikleriniz için kalıcı dijital anma profili oluşturun. Fotoğraflar, hayat hikayesi, QR mezar taşı.',
+    type: 'website',
+    siteName: 'The Eternal Memory',
+    url: APP_URL,
+    locale: 'tr_TR',
   },
   twitter: {
-    card: 'summary',
-    title: "The Eternal Memory",
-    description: "Anılarınız sonsuza kadar güvende.",
+    card: 'summary_large_image',
+    title: 'The Eternal Memory — Dijital Anma Profili',
+    description: 'Sevdikleriniz için kalıcı dijital anma profili. QR mezar taşı, fotoğraflar, aile ağacı.',
+    site: '@eternalmemoryco',
+  },
+  alternates: {
+    canonical: APP_URL,
   },
 };
 
