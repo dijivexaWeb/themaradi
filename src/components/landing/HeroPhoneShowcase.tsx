@@ -42,7 +42,7 @@ function PhoneCard({ memorial, scale = 1, rotate = 0, zIndex = 1, translateY = 0
     >
       {/* Phone shell */}
       <div style={{
-        width: 200,
+        width: 240,
         borderRadius: 36,
         padding: 9,
         background: 'linear-gradient(160deg, #26262f, #0b0b12)',
@@ -137,7 +137,7 @@ export default function HeroPhoneShowcase({ memorials }: { memorials: NotableMem
   if (!left) return null
 
   return (
-    <div style={{ position: 'relative', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', gap: 0, height: 480 }}>
+    <div style={{ position: 'relative', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', gap: 0, height: 560 }}>
 
       {/* Halo glow */}
       <div className="tem-animate-haloPulse" style={{
@@ -146,8 +146,8 @@ export default function HeroPhoneShowcase({ memorials }: { memorials: NotableMem
         filter: 'blur(40px)', pointerEvents: 'none',
       }} />
 
-      {/* Left phone */}
-      <div style={{ marginRight: -24 }}>
+      {/* Left phone — mobilde gizli */}
+      <div className="hidden sm:block" style={{ marginRight: -30 }}>
         <PhoneCard memorial={left} scale={0.78} rotate={-8} zIndex={1} translateY={20} />
       </div>
 
@@ -156,8 +156,8 @@ export default function HeroPhoneShowcase({ memorials }: { memorials: NotableMem
         <PhoneCard memorial={center} scale={1} rotate={0} zIndex={3} />
       </div>
 
-      {/* Right phone */}
-      <div style={{ marginLeft: -24 }}>
+      {/* Right phone — mobilde gizli */}
+      <div className="hidden sm:block" style={{ marginLeft: -30 }}>
         <PhoneCard memorial={right} scale={0.78} rotate={8} zIndex={1} translateY={20} />
       </div>
 
