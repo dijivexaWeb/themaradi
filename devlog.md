@@ -3,6 +3,39 @@
 > Her oturum sonunda Claude bu dosyayı günceller.
 > Format: tarih → ne yapıldı → nerede kalındı → sıradaki adım.
 
+## 2026-06-22 — Oturum 160: Hero Yenileme + Ekibimiz Bölümü
+
+### Yapılanlar
+- **Hero CTA sırası değiştirildi**: "Örnek Sayfayı Gör" altın/öne, fiyat butonu sağa
+- **HeroPhoneShowcase**: Tek telefon yerine 3 gerçek profil (II. Ilia ortada)
+- **Telefonlar tıklanabilir**: Profil sayfasına yönlendiriyor, hover animasyonu var
+- **Mobil uyumluluk**: sm: breakpoint'te yan telefonlar gizleniyor, sadece ortadaki görünüyor
+- **Ekibimiz bölümü eklendi**: Hero sonrası, pricing öncesi
+  - Kurucu alıntısı, giriş cümlesi, 6 kişilik ekip grid
+  - Mobil 2 kolon, tablet 3 kolon, masaüstü 6 kolon
+  - 7 dil tam çeviri (TR/EN/KA/RU/AZ/HE/HY)
+- **Ekip fotoğrafları**: kurucu.png + randomuser.me'den 5 placeholder
+  - Emre Yıldız (Kıdemli Yazılım), Burak Şahin (Full-Stack), Can Arslan (Mobil)
+  - Serkan Kaya (Teknik Analist), Nino Beridze (Gürcü Tercüman, kadın)
+- **GA4 trafik analizi** yapıldı: %89 bounce rate anasayfada, profil sayfaları %0
+
+### Proje Durumu
+- [x] Hero 3 telefon showcase (II. Ilia ortada, tıklanabilir)
+- [x] Hero CTA buton sırası
+- [x] Ekibimiz bölümü tam i18n
+- [x] deleteMediaAction R2 hata fix
+- [x] Aile sayfası tree_bg push edildi
+- [ ] Admin settings: price_additional_member_gel alanı
+- [ ] Osman İSTANBOLLU fotoğrafları yeniden yüklenecek (R2'den silindi)
+
+### Nerede Kaldık
+Anasayfa hero + ekibimiz bölümü tamamlandı. Vercel deploy devam ediyor.
+
+### Sıradaki Adım
+1. Deploy sonrası anasayfa görsel kontrolü (hero telefonlar + ekip grid)
+2. Admin ayarlar: `price_additional_member_gel` alanı ekle
+3. Osman İSTANBOLLU için fotoğraf yeniden yükleme (kullanıcı yapacak)
+
 ## 2026-06-22 — Oturum 159: DB İstatistik Güncellemeleri + Silme Fix
 
 ### Yapılanlar
