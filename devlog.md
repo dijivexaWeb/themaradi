@@ -3,6 +3,38 @@
 > Her oturum sonunda Claude bu dosyayı günceller.
 > Format: tarih → ne yapıldı → nerede kalındı → sıradaki adım.
 
+## 2026-06-22 — Oturum 161: SEO Tam Altyapı
+
+### Yapılanlar
+- robots.ts: public/private route kuralları + sitemap URL
+- sitemap.ts: tüm public_memorial + aile sayfaları otomatik (21 sayfa)
+- opengraph-image.tsx: branded gold/dark OG görseli (1200x630)
+- layout.tsx: title template, keywords (TR/KA/RU), twitter large card
+- page.tsx (anasayfa): Organization JSON-LD + metadata
+- memorial/[slug]: Person + ProfilePage JSON-LD, Twitter card, canonical, BreadcrumbList
+- aile/[slug]: OG + Twitter + canonical + BreadcrumbList
+- about, contact, pricing: TR metadata + OG
+- satin-al/anma, satin-al/aile: metadata eklendi
+- /memorial listeleme: metadata eklendi
+- Google Search Console: sahiplik doğrulandı, sitemap gönderildi
+- Google Rich Results Test: 4 geçerli öğe (2 breadcrumb + 2 profil sayfası) ✅
+
+### Proje Durumu
+- [x] robots.txt + sitemap.xml
+- [x] OG image (branded)
+- [x] Tüm sayfalarda metadata
+- [x] JSON-LD (Organization, Person, ProfilePage, BreadcrumbList)
+- [x] Google Search Console doğrulama + sitemap
+- [ ] Admin settings: price_additional_member_gel alanı
+
+### Nerede Kaldık
+SEO altyapısı tamamen tamamlandı. Google Rich Results Test başarılı.
+
+### Sıradaki Adım
+1. Admin ayarlar: price_additional_member_gel ve campaign_price_additional_member_gel alanları
+2. 3-7 gün sonra Search Console'da indexlenen sayfa sayısını kontrol et
+3. Osman İSTANBOLLU fotoğrafları yeniden yükleme (kullanıcı yapacak)
+
 ## 2026-06-22 — Oturum 160: Hero Yenileme + Ekibimiz Bölümü
 
 ### Yapılanlar
