@@ -1,20 +1,33 @@
 'use client'
 
-import { useActionState } from 'react'
+import { useActionState, useEffect } from 'react'
 import { purchaseFamilyAction } from '../actions'
 import Link from 'next/link'
 import type { BankSettings } from '@/lib/bank-settings'
 import BrandLogo from '@/components/BrandLogo'
 import { useLang } from '@/i18n/context'
+import { dictionaries, type Lang } from '@/i18n'
 
 export default function AileFormClient({
   bank,
   amount,
+  currency,
+  forceLang,
 }: {
   bank: BankSettings
   amount: number
+  currency: string
+  forceLang?: string
 }) {
-  const { t } = useLang()
+  const { t: contextT, setLang } = useLang()
+
+  useEffect(() => {
+    if (forceLang && forceLang in dictionaries) {
+      setLang(forceLang as Lang)
+    }
+  }, [forceLang])
+
+  const t = (forceLang && forceLang in dictionaries) ? dictionaries[forceLang as Lang] : contextT
   const f = t.purchasePage.aile
   const [state, action, pending] = useActionState(purchaseFamilyAction, null)
 
@@ -67,7 +80,7 @@ export default function AileFormClient({
               <div className="w-10 h-10 bg-emerald-500/15 rounded-xl flex items-center justify-center text-xl">🏡</div>
               <div>
                 <h1 className="font-bold text-xl text-white">{f.title}</h1>
-                <p className="text-xs text-slate-500">{amount} ₾ {f.priceLabel}</p>
+                <p className="text-xs text-slate-500">{amount} {currency} {f.priceLabel}</p>
               </div>
             </div>
 
@@ -110,7 +123,7 @@ export default function AileFormClient({
                 </div>
                 <div className="flex justify-between pt-2 border-t border-slate-700">
                   <span className="text-slate-400">{f.bankDetails.amountLabel}</span>
-                  <span className="text-white font-bold text-base">{amount} ₾</span>
+                  <span className="text-white font-bold text-base">{amount} {currency}</span>
                 </div>
               </div>
             </div>

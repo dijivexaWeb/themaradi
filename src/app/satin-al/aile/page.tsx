@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { getBankSettings } from '@/lib/bank-settings'
 import { fetchPricingConfig } from '@/lib/pricing'
+import { getTranslation } from '@/i18n/server'
 import AileFormClient from './_AileFormClient'
 
 export const metadata: Metadata = {
@@ -13,11 +14,36 @@ export const metadata: Metadata = {
   },
 }
 
-export default async function AileSatinAlPage() {
-  const [bank, pricing] = await Promise.all([getBankSettings(), fetchPricingConfig()])
-  const amount = pricing.campaignActive && pricing.campaignFamilyGel
-    ? Number(pricing.campaignFamilyGel)
-    : Number(pricing.familyGel || 399)
+interface Props {
+  searchParams: Promise<{ lang?: string }>
+}
 
-  return <AileFormClient bank={bank} amount={amount} />
+export default async function AileSatinAlPage({ searchParams }: Props) {
+  const params = await searchParams
+  const { lang: cookieLang } = await getTranslation()
+  const effectiveLang = params.lang || cookieLang
+
+  const [bank, pricing] = await Promise.all([getBankSettings(), fetchPricingConfig()])
+
+  let amount: number
+  let currency: string
+
+  if (effectiveLang === 'tr') {
+    amount = pricing.campaignActive && pricing.campaignFamilyTry
+      ? Number(pricing.campaignFamilyTry)
+      : Number(pricing.familyTry || pricing.familyGel || 399)
+    currency = '₺'
+  } else if (effectiveLang === 'ka') {
+    amount = pricing.campaignActive && pricing.campaignFamilyGel
+      ? Number(pricing.campaignFamilyGel)
+      : Number(pricing.familyGel || 399)
+    currency = '₾'
+  } else {
+    amount = pricing.campaignActive && pricing.campaignFamilyUsd
+      ? Number(pricing.campaignFamilyUsd)
+      : Number(pricing.familyUsd || pricing.familyGel || 399)
+    currency = '$'
+  }
+
+  return <AileFormClient bank={bank} amount={amount} currency={currency} forceLang={params.lang} />
 }
