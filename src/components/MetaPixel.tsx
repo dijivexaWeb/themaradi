@@ -20,8 +20,19 @@ export default function MetaPixel() {
     if (currentPath === lastTrackedPath.current) return
     lastTrackedPath.current = currentPath
 
+    // Extract test event code from URL search parameters, and persist in sessionStorage for subsequent page views
+    const testCode = searchParams?.get('test_event_code') || (typeof window !== 'undefined' ? sessionStorage.getItem('fb_test_event_code') : null)
+    if (searchParams?.get('test_event_code') && typeof window !== 'undefined') {
+      sessionStorage.setItem('fb_test_event_code', searchParams.get('test_event_code')!)
+    }
+
+    const eventParams: Record<string, any> = {}
+    if (testCode) {
+      eventParams.test_event_code = testCode
+    }
+
     // 1. Track PageView on route change (since default FB snippet runs once, we trigger manually on SPA navigations)
-    fbq('track', 'PageView')
+    fbq('track', 'PageView', eventParams)
 
     // 2. Track InitiateCheckout on checkout pages
     if (
@@ -29,7 +40,7 @@ export default function MetaPixel() {
       pathname.startsWith('/satin-al/anma') ||
       pathname.startsWith('/satin-al/aile')
     ) {
-      fbq('track', 'InitiateCheckout')
+      fbq('track', 'InitiateCheckout', eventParams)
     }
 
     // 3. Track Purchase on successful redirects (indicated by ?purchased=1)
@@ -49,6 +60,7 @@ export default function MetaPixel() {
       }
 
       fbq('track', 'Purchase', {
+        ...eventParams,
         value: value,
         currency: 'GEL',
         content_name: content_name,
