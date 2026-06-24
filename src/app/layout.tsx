@@ -4,6 +4,8 @@ import { LangProvider } from "@/i18n/context";
 import CookieBanner from "@/components/CookieBanner";
 import WhatsAppButton from "@/components/WhatsAppButton";
 import Script from "next/script";
+import { Suspense } from "react";
+import MetaPixel from "@/components/MetaPixel";
 import "./globals.css";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
@@ -94,6 +96,9 @@ export default async function RootLayout({
           gtag('js', new Date());
           gtag('config', 'G-LX3BRV79MJ');
         `}</Script>
+        <Suspense fallback={null}>
+          <MetaPixel />
+        </Suspense>
         <LangProvider serverLang={lang}>
           {children}
           <CookieBanner />
