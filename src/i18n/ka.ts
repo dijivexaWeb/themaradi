@@ -1,4 +1,4 @@
-import type { LangDict } from './en'
+﻿import type { LangDict } from './en'
 
 const ka: LangDict = {
   nav: {
@@ -129,7 +129,7 @@ const ka: LangDict = {
           'QR კოდი შემდეგ საფლავის ქვას ან სამახსოვრო სივრცეს ციფრულ პროფილთან აკავშირებს.',
           'ოჯახის წევრებს ნებისმიერ დროს შეუძლიათ პროფილის განახლება, ახალი მოგონებების დამატება და შეტყობინებების მართვა.',
         ],
-        priceLabel: 'ერთჯერადი',
+        priceLabel: '',
         price: '249',
         currency: '₾',
         detailsBtn: 'დეტალები',
@@ -190,7 +190,11 @@ const ka: LangDict = {
       sub: 'QR ფილა შედის. გადახდის შემდეგ პროფილი ავტომატურად არ ქვეყნდება — გამოქვეყნებთ მზად რომ იქნებით.',
       memorialBadge: 'თქვენი ახლობელი გარდაიცვალა',
       memorialTitle: 'სამახსოვრო პროფილი',
-      memorialPriceLabel: 'ერთჯერადი',
+      memorialPriceLabel: '',
+      memorialHostingBadge: 'პირველი 3 წელი ჰოსტინგი უფასოდ',
+      memorialHostingLine1: 'QR ფილა + ინსტალაცია + პირველი 3 წელი ღრუბლოვანი ჰოსტინგი',
+      memorialHostingLine2: '4-ე წლიდან მხოლოდ 29 ₾ / წელი',
+      memorialHostingRenewalNote: 'გადაუხდელობის შემთხვევაში გალერეა იმალება — გვერდი არ იშლება.',
       memorialFeaturesHeading: 'პაკეტში შემავალი ყველაფერი:',
       memorialFeatures: [
         'ბიოგრაფია & ცხოვრების ისტორია',
@@ -219,7 +223,7 @@ const ka: LangDict = {
       familyPopularBadge: 'ყველაზე მომგებიანი',
       familySavingsLabel: '50% დაზოგვა 4 ცალკე გვერდთან შედარებით',
       familyMembersLabel: '4 წევრი შედის · QR ფირფიტა შედის',
-      familyPriceLabel: 'ერთჯერადი',
+      familyPriceLabel: '',
       familyFeaturesHeading: 'ყველაფერი ინდივიდუალური პაკეტიდან, პლუს:',
       familyExtraFeatures: [
         'საოჯახო პირადობის გვერდი — ყველა წევრი ერთ ადგილას',
@@ -380,8 +384,19 @@ const ka: LangDict = {
       title: 'სამახსოვრო პროფილი',
       price: '249',
       currency: '₾',
-      priceLabel: 'ერთჯერადი',
-      priceNote: 'QR ფილის წარმოება და მიტანა შედის. სხვა გადახდა არ არის.',
+      priceLabel: '',
+      priceNote: 'სხვა გადასახადები არ არის.',
+      hostingBadge: 'პირველი 3 წელი ჰოსტინგი შედის',
+      hostingLine1: 'QR ფილა + ინსტალაცია + პირველი 3 წლის ჰოსტინგი',
+      hostingLine2: 'მე-4 წლიდან — მხოლოდ 29 ₾ / წელი',
+      hostingRenewalNote: 'განახლების შეხსენება იგზავნება ელ-ფოსტით. გადაუხდელობის შემთხვევაში გალერეა იმალება, გვერდი არ იშლება.',
+      phase1Label: 'ფაზა 1 · ადრეული წვდომა',
+      phase1Users: 'პირველი 1000 მომხმარებელი',
+      phase1Active: 'აქტიური',
+      phase2Label: 'ფაზა 2 · სტანდარტი',
+      phase2Users: '1001-ე მომხმარებლიდან',
+      phase3Label: 'ფაზა 3 · დაცვის განახლება',
+      phase3Period: 'მე-3 წლიდან, ყოველწლიურად',
       verificationNote: 'პირადობის ვერიფიკაცია სავალდებულოა. გადახდის შემდეგ დოკუმენტები იტვირთება, ადმინ დამოწმებით პროფილი ქვეყნდება.',
       cta: 'სამახსოვრო პროფილის შექმნა',
       features: [
@@ -1506,7 +1521,11 @@ const ka: LangDict = {
     anma: {
       backLink: '← პაკეტის არჩევაზე დაბრუნება',
       title: 'სამახსოვრო პროფილი',
-      priceLabel: '— ერთჯერადი გადახდა',
+      priceLabel: '',
+            hostingBadge: 'პირველი 3 წელი ჰოსტინგი შედის',
+      hostingLine1: 'QR ფილა + ინსტალაცია + პირველი 3 წლის ჰოსტინგი',
+      hostingLine2: 'მე-4 წლიდან — მხოლოდ 29 ₾ / წელი',
+      hostingRenewalNote: 'გადაუხდელობის შემთხვევაში გალერეა იმალება, გვერდი არ იშლება.',
       paymentMethodLabel: 'გადახდის მეთოდი',
       bankTransfer: {
         name: 'საბანკო გადარიცხვა',
@@ -1569,7 +1588,7 @@ const ka: LangDict = {
     aile: {
       backLink: '← პაკეტის არჩევანზე დაბრუნება',
       title: 'საოჯახო პაკეტი',
-      priceLabel: '— ერთჯერადი გადახდა',
+      priceLabel: '',
       includedHeading: 'პაკეტში შედის',
       included: ['4 წევრის სამახსოვრო გვერდი', 'საოჯახო სიდიდის გვერდი — ყველა წევრი ერთად', 'QR ფირფიტა შედის', '30-დღიანი თანხის დაბრუნების გარანტია'],
       bankTransfer: { name: 'საბანკო გადარიცხვა', status: '✓ აქტიური' },

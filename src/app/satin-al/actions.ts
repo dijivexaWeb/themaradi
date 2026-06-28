@@ -184,10 +184,9 @@ export async function purchaseMemorialAction(_prev: unknown, formData: FormData)
     } catch (e) {
       console.error('[purchaseMemorialAction] confirm email error:', e)
     }
-    return { emailConfirmationSent: true as const, email: senderEmail }
   }
 
-  redirect(`/anma-paneli/${vault.id}?purchased=1`)
+  redirect(`/satin-al/tesekkur?type=anma&name=${encodeURIComponent(senderName)}${pendingEmailConfirmation ? '&pending_email=1' : ''}`)
 }
 
 export async function purchaseVaultAction(_prev: unknown, formData: FormData) {
@@ -304,10 +303,9 @@ export async function purchaseVaultAction(_prev: unknown, formData: FormData) {
     } catch (e) {
       console.error('[purchaseVaultAction] confirm email error:', e)
     }
-    return { emailConfirmationSent: true as const, email: senderEmail }
   }
 
-  redirect(`/dashboard/vault/${vault.id}?purchased=1`)
+  redirect(`/satin-al/tesekkur?type=kasa&name=${encodeURIComponent(senderName)}${pendingEmailConfirmation ? '&pending_email=1' : ''}`)
 }
 
 export async function purchaseFamilyAction(_prev: unknown, formData: FormData) {
@@ -426,10 +424,9 @@ export async function purchaseFamilyAction(_prev: unknown, formData: FormData) {
     } catch (e) {
       console.error('[purchaseFamilyAction] confirm email error:', e)
     }
-    return { emailConfirmationSent: true as const, email: senderEmail }
   }
 
-  redirect(`/aile/${slug}?purchased=1`)
+  redirect(`/satin-al/tesekkur?type=aile&name=${encodeURIComponent(senderName)}${pendingEmailConfirmation ? '&pending_email=1' : ''}`)
 }
 
 // ─── PayPal Link Flow ────────────────────────────────────────────────────────

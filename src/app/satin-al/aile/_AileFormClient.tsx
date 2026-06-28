@@ -33,27 +33,6 @@ export default function AileFormClient({
 
   const inp = 'w-full bg-slate-800 border border-slate-700 text-white placeholder-slate-500 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-emerald-500'
 
-  if (state && 'emailConfirmationSent' in state && state.emailConfirmationSent) {
-    return (
-      <div className="min-h-screen bg-slate-950 text-white flex flex-col items-center justify-center px-4">
-        <div className="max-w-md w-full text-center">
-          <div className="w-20 h-20 bg-emerald-500/15 rounded-full flex items-center justify-center mx-auto mb-6 text-4xl">📧</div>
-          <h1 className="text-2xl font-bold text-white mb-3">{f.success.title}</h1>
-          <p className="text-slate-400 mb-2">
-            <span className="text-emerald-400 font-medium">{'email' in state ? state.email : ''}</span>{' '}
-            {f.success.emailSentTo}
-          </p>
-          <p className="text-slate-500 text-sm mb-8 leading-6">{f.success.clickLinkNote}</p>
-          <div className="bg-slate-800/60 border border-slate-700 rounded-xl p-5 text-left text-sm space-y-3">
-            <div className="flex items-center gap-3 text-emerald-400"><span>✓</span><span>{f.success.statusOrderSaved}</span></div>
-            <div className="flex items-center gap-3 text-amber-400/70"><span>⏳</span><span>{f.success.statusEmailPending}</span></div>
-          </div>
-          <p className="text-xs text-slate-600 mt-4">{f.success.spamNote}</p>
-        </div>
-      </div>
-    )
-  }
-
   return (
     <div className="min-h-screen bg-slate-950 text-white flex flex-col">
       <header className="border-b border-slate-800 bg-slate-950/95 backdrop-blur sticky top-0 z-10">

@@ -103,6 +103,7 @@ export default async function MemorialPage({ params, searchParams }: PropsWithSe
   }
 
   const isLive = vault.status === 'public_memorial' || vault.status === 'private_memorial'
+  const isDormant = vault.status === 'dormant_memorial'
 
   // Owner/admin preview — yayınlanmamış sayfalarda sahibi veya admin görebilir
   if (!isLive && preview === '1') {
@@ -137,6 +138,33 @@ export default async function MemorialPage({ params, searchParams }: PropsWithSe
         </div>
         <RealMemorialPage vault={vault} isPreview />
       </>
+    )
+  }
+
+  if (isDormant) {
+    return (
+      <div className="min-h-screen bg-[#0c3327] flex items-center justify-center px-4">
+        <div className="text-center max-w-sm">
+          <div className="text-6xl mb-4">🕯️</div>
+          <h1 className="text-2xl font-serif text-[#c7a76f] mb-1">{vault.display_name}</h1>
+          {vault.cover_photo_url && (
+            <img
+              src={vault.cover_photo_url}
+              alt={vault.display_name}
+              className="w-24 h-24 rounded-full object-cover mx-auto my-4 border-2 border-[#c7a76f]/40"
+            />
+          )}
+          <p className="text-[#cfc3ad] text-sm mt-2 leading-6">
+            Bu anma sayfası şu an barındırma yenileme bekliyor.
+          </p>
+          <p className="text-[#c7a76f]/60 text-xs mt-3 leading-5">
+            Tam içeriğe erişmek için lütfen sayfa sahibiyle iletişime geçin.
+          </p>
+          <div className="mt-6 bg-[#ffffff08] border border-[#c7a76f]/15 rounded-xl px-5 py-4 text-xs text-[#c7a76f]/50 leading-5">
+            Sayfa sahibi yenileme yaptıktan sonra bu profil tekrar tam içeriğiyle erişilebilir olacak.
+          </div>
+        </div>
+      </div>
     )
   }
 

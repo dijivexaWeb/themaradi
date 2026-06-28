@@ -1,4 +1,4 @@
-import type { LangDict } from './en'
+﻿import type { LangDict } from './en'
 
 const az: LangDict = {
   nav: {
@@ -129,7 +129,7 @@ const az: LangDict = {
           'QR kod sonradan qəbir daşı və ya xatirə sahəsi ilə rəqəmsal profili bir-birinə bağlayır.',
           'Ailə üzvləri profili istədikləri zaman yeniləyə, yeni xatirələr əlavə edə və gələn mesajları idarə edə bilər.',
         ],
-        priceLabel: 'Bir dəfəlik',
+        priceLabel: '',
         price: '249',
         currency: '₾',
         detailsBtn: 'Detallar',
@@ -190,7 +190,11 @@ const az: LangDict = {
       sub: 'QR lövhə daxildir. Ödənişdən sonra profiliniz avtomatik dərc olunmur; hazır olduğunuzda dərc edirsiniz.',
       memorialBadge: 'Yaxınınız vəfat etdi',
       memorialTitle: 'Xatirə Profili',
-      memorialPriceLabel: 'bir dəfəlik',
+      memorialPriceLabel: '',
+      memorialHostingBadge: 'İlk 3 il hosting pulsuzdur',
+      memorialHostingLine1: 'QR lövhə + quraşdırma + ilk 3 il bulud hostinqi',
+      memorialHostingLine2: '4-cü ildən etibarən cəmi 29 ₾ / il',
+      memorialHostingRenewalNote: 'Ödəniş olmadıqda qalereya gizlənir — səhifə silinmir.',
       memorialFeaturesHeading: 'Paketə daxil olan hər şey:',
       memorialFeatures: [
         'Bioqrafiya və Həyat Hekayəsi',
@@ -219,7 +223,7 @@ const az: LangDict = {
       familyPopularBadge: 'ƏN ÇOX QƏNAƏT',
       familySavingsLabel: '4 ayrı səhifəyə nisbətən 50% qənaət',
       familyMembersLabel: '4 üzv daxildir · QR lövhəsi daxildir',
-      familyPriceLabel: 'bir dəfəlik',
+      familyPriceLabel: '',
       familyFeaturesHeading: 'Fərdi plandakı hər şey, plus:',
       familyExtraFeatures: [
         'Ailə kimlik səhifəsi — bütün üzvlər bir yerdə',
@@ -380,8 +384,19 @@ const az: LangDict = {
       title: 'Xatirə Profili',
       price: '249',
       currency: '₾',
-      priceLabel: 'bir dəfəlik',
-      priceNote: 'QR lövhənin istehsalı və göndərilməsi daxildir. Başqa ödəniş yoxdur.',
+      priceLabel: '',
+      priceNote: 'Gizli xərc yoxdur.',
+      hostingBadge: 'İlk 3 il hostinq daxildir',
+      hostingLine1: 'QR lövhə + quraşdırma + 3 illik hostinq',
+      hostingLine2: '4-cü ildən yalnız 29 ₾ / il',
+      hostingRenewalNote: 'Yeniləmə xatırlatması e-poçtla göndərilir. Ödənilmədikdə qalereyası gizlədilir, səhifə silinmir.',
+      phase1Label: 'Faza 1 · Erkən Giriş',
+      phase1Users: 'İlk 1000 istifadəçi',
+      phase1Active: 'aktiv',
+      phase2Label: 'Faza 2 · Standart',
+      phase2Users: '1001-ci istifadəçidən',
+      phase3Label: 'Faza 3 · Mühafizə Yeniləməsi',
+      phase3Period: '3-cü ildən, illik',
       verificationNote: 'Şəxsiyyət təsdiqi vacibdir. Ödənişdən sonra sənədlər yüklənir, admin təsdiqi ilə profil dərc olunur.',
       cta: 'Xatirə Profili Yarat',
       features: [
@@ -1508,7 +1523,11 @@ const az: LangDict = {
     anma: {
       backLink: '← Paket seçiminə qayıt',
       title: 'Xatirə Profili',
-      priceLabel: '— bir dəfəlik ödəniş',
+      priceLabel: '',
+            hostingBadge: 'İlk 3 il hostinq daxildir',
+      hostingLine1: 'QR lövhə + quraşdırma + 3 illik hostinq',
+      hostingLine2: '4-cü ildən yalnız 29 ₾ / il',
+      hostingRenewalNote: 'Ödənilmədikdə qalereyası gizlədilir, səhifə silinmir.',
       paymentMethodLabel: 'Ödəniş Üsulu',
       bankTransfer: {
         name: 'Bank Köçürməsi',
@@ -1571,7 +1590,7 @@ const az: LangDict = {
     aile: {
       backLink: '← Paket seçiminə qayıt',
       title: 'Ailə Paketi',
-      priceLabel: '— birdəfəlik ödəniş',
+      priceLabel: '',
       includedHeading: 'Paketə daxildir',
       included: ['4 üzv xatirə səhifəsi', 'Ailə kimlik səhifəsi — bütün üzvlər bir yerdə', 'QR plitə daxildir', '30 günlük geri ödəmə zəmanəti'],
       bankTransfer: { name: 'Bank köçürməsi', status: '✓ Aktiv' },

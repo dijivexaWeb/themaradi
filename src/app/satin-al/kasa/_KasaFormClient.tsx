@@ -29,7 +29,7 @@ export default function KasaFormClient({
           <div className="w-20 h-20 bg-emerald-500/15 rounded-full flex items-center justify-center mx-auto mb-6 text-4xl">📧</div>
           <h1 className="text-2xl font-bold text-white mb-3">E-postanızı doğrulayın</h1>
           <p className="text-slate-400 mb-8 text-sm leading-6">
-            <span className="text-emerald-400 font-medium">{'email' in bankState ? bankState.email : ''}</span> adresine doğrulama bağlantısı gönderildi.
+            <span className="text-emerald-400 font-medium">{'email' in bankState ? String(bankState.email) : ''}</span> adresine doğrulama bağlantısı gönderildi.
           </p>
           <div className="bg-slate-800/60 border border-slate-700 rounded-xl p-5 text-left text-sm space-y-3">
             <div className="flex items-center gap-3 text-emerald-400"><span>✓</span><span>Sipariş kaydedildi</span></div>

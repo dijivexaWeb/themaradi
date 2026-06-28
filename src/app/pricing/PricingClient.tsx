@@ -98,26 +98,99 @@ export default function PricingClient({ pricing }: { pricing: PricingConfig }) {
               </div>
 
               <div className="mb-6 rounded-xl border border-[#e1d5c3] bg-[#f7f2e9] p-5">
+                {/* Active price */}
                 {hasCampaign && pricing.campaignLabel && (
                   <div className="mb-3 inline-block rounded-full bg-[#b08340] px-3 py-1 text-xs font-semibold text-white">
                     {pricing.campaignLabel}
                   </div>
                 )}
                 <div className="flex items-end gap-2">
-                  {hasCampaign && pricing.campaignMemorial ? (
-                    <>
-                      <span className="font-serif text-4xl text-[#8a7a64] line-through">{memorialPrice}</span>
-                      <span className="font-serif text-6xl text-[#173d31]">{pricing.campaignMemorial}</span>
-                    </>
-                  ) : (
-                    <span className="font-serif text-6xl text-[#173d31]">{memorialPrice}</span>
-                  )}
+                  <span className="font-serif text-6xl text-[#173d31]">
+                    {hasCampaign && pricing.campaignMemorial ? pricing.campaignMemorial : memorialPrice}
+                  </span>
                   <div className="mb-1.5">
                     <span className="text-2xl font-semibold text-[#b08340]">{p.memorial.currency}</span>
-                    <p className="text-sm text-[#8a7a64]">{p.memorial.priceLabel}</p>
                   </div>
                 </div>
-                <p className="mt-2 text-sm text-[#665d50]">{p.memorial.priceNote}</p>
+
+                {/* 3-Phase pricing roadmap */}
+                <div className="mt-4 rounded-lg border border-[#e1d5c3] bg-white/60 divide-y divide-[#e1d5c3]/60 overflow-hidden">
+                  {/* Phase 1 */}
+                  <div className={`flex items-center justify-between px-3.5 py-2.5 ${hasCampaign && pricing.campaignMemorial ? 'bg-[#fdf6e9]' : ''}`}>
+                    <div className="flex items-center gap-2">
+                      <span className={`h-2 w-2 rounded-full shrink-0 ${hasCampaign && pricing.campaignMemorial ? 'bg-[#b08340]' : 'bg-[#d4cfc8]'}`} />
+                      <div>
+                        <span className="text-xs font-semibold text-[#4c463c]">
+                          {p.memorial.phase1Label}
+                        </span>
+                        <span className="ml-2 text-[10px] text-[#8a7a64]">
+                          {p.memorial.phase1Users}
+                        </span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <span className="font-semibold text-sm text-[#173d31]">
+                        {hasCampaign && pricing.campaignMemorial ? pricing.campaignMemorial : '199'} ₾
+                      </span>
+                      {hasCampaign && pricing.campaignMemorial && (
+                        <span className="text-[9px] font-bold text-[#2d7a53] bg-[#edf7f1] border border-[#2d7a53]/20 rounded-full px-1.5 py-0.5 uppercase tracking-wide">
+                          {p.memorial.phase1Active}
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  {/* Phase 2 */}
+                  <div className="flex items-center justify-between px-3.5 py-2.5">
+                    <div className="flex items-center gap-2">
+                      <span className="h-2 w-2 rounded-full shrink-0 bg-[#d4cfc8]" />
+                      <div>
+                        <span className="text-xs text-[#8a7a64]">
+                          {p.memorial.phase2Label}
+                        </span>
+                        <span className="ml-2 text-[10px] text-[#a09690]">
+                          {p.memorial.phase2Users}
+                        </span>
+                      </div>
+                    </div>
+                    <span className="text-sm text-[#8a7a64]">{memorialPrice} ₾</span>
+                  </div>
+                  {/* Phase 3 */}
+                  <div className="flex items-center justify-between px-3.5 py-2.5">
+                    <div className="flex items-center gap-2">
+                      <span className="h-2 w-2 rounded-full shrink-0 bg-[#d4cfc8]" />
+                      <div>
+                        <span className="text-xs text-[#8a7a64]">
+                          {p.memorial.phase3Label}
+                        </span>
+                        <span className="ml-2 text-[10px] text-[#a09690]">
+                          {p.memorial.phase3Period}
+                        </span>
+                      </div>
+                    </div>
+                    <span className="text-sm text-[#8a7a64]">29 ₾ / yıl</span>
+                  </div>
+                </div>
+
+                {/* Hosting policy box */}
+                <div className="mt-3 rounded-lg border border-[#2d7a53]/25 bg-[#edf7f1] p-3.5 space-y-2.5">
+                  <div className="flex items-center gap-1.5">
+                    <span className="inline-block rounded-full bg-[#2d7a53] px-2 py-0.5 text-[10px] font-bold text-white uppercase tracking-wide">
+                      {p.memorial.hostingBadge}
+                    </span>
+                  </div>
+                  <div className="flex items-start gap-2 text-sm">
+                    <span className="mt-0.5 text-[#2d7a53] font-bold shrink-0">✓</span>
+                    <span className="text-[#2d5c3e] font-medium">{p.memorial.hostingLine1}</span>
+                  </div>
+                  <div className="flex items-start gap-2 text-sm border-t border-[#2d7a53]/15 pt-2.5">
+                    <span className="mt-0.5 text-[#b08340] shrink-0">↻</span>
+                    <span className="text-[#665d50]">
+                      {p.memorial.hostingLine2}
+                    </span>
+                  </div>
+                </div>
+
+                <p className="mt-3 text-xs text-[#8a7a64] leading-5">{p.memorial.hostingRenewalNote}</p>
               </div>
 
               <ul className="mb-8 flex-1 space-y-3">

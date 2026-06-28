@@ -1,4 +1,4 @@
-import type { LangDict } from './en'
+﻿import type { LangDict } from './en'
 
 const hy: LangDict = {
   nav: {
@@ -129,7 +129,7 @@ const hy: LangDict = {
           'QR կոդը հետագայում միավորում է տապանաքարը կամ հիշատակի վայրը թվային պրոֆիլի հետ:',
           'Ընտանիքի անդամները կարող են ցանկացած ժամանակ թարմացնել պրոֆիլը, ավելացնել նոր հիշողություններ և կառավարել մուտքային մեսիջները:',
         ],
-        priceLabel: 'Միանվագ վճար',
+        priceLabel: '',
         price: '249',
         currency: '₾',
         detailsBtn: 'Մանրամասներ',
@@ -190,7 +190,11 @@ const hy: LangDict = {
       sub: 'QR ցուցանակը ներառված է: Վճարումից հետո ձեր պրոֆիլն ինքնաբերաբար չի հրապարակվում. դուք հրապարակում եք այն, երբ պատրաստ եք:',
       memorialBadge: 'Ձեր մերձավորը մահացել է',
       memorialTitle: 'Հիշատակի պրոֆիլ',
-      memorialPriceLabel: 'միանվագ',
+      memorialPriceLabel: '',
+      memorialHostingBadge: 'Առաջին 3 տարի հոստինգն անվճար',
+      memorialHostingLine1: 'QR ցուցանակ + կարգաբերում + առաջին 3 տարի ամպային հոստինգ',
+      memorialHostingLine2: '4-րդ տարուց ընդամենը 29 ₾ / տարի',
+      memorialHostingRenewalNote: 'Չվճարման դեպքում պատկերասրահը թաքցվում է — էջը չի ջնջվում:',
       memorialFeaturesHeading: 'Փաթեթում ներառված է ամեն ինչ.',
       memorialFeatures: [
         'Կենսագրություն և կյանքի պատմություն',
@@ -219,7 +223,7 @@ const hy: LangDict = {
       familyPopularBadge: 'ԱՄԵՆԱՁԵՌՆՏՈՒº',
       familySavingsLabel: '50% խնայողություն՝ 4 առանձին էջի համեմատ',
       familyMembersLabel: '4 անդամ ներառված · QR ափսե ներառված',
-      familyPriceLabel: 'մեկ անգամ',
+      familyPriceLabel: '',
       familyFeaturesHeading: 'Անհատական փաթեթի ամեն ինչ, գումարած.',
       familyExtraFeatures: [
         'Ընտանեկան ինքնության էջ — բոլոր անդամներն一 տեղում',
@@ -380,8 +384,19 @@ const hy: LangDict = {
       title: 'Հիշատակի պրոֆիլ',
       price: '249',
       currency: '₾',
-      priceLabel: 'միանվագ',
-      priceNote: 'QR ցուցանակի արտադրությունը և առաքումը ներառված են: Այլ վճար չկա:',
+      priceLabel: '',
+      priceNote: 'Այլ ծախսեր չկան:',
+      hostingBadge: 'Առաջին 3 տարի հոսթինգն ընդգրկված է',
+      hostingLine1: 'QR ցուցանակ + տեղադրում + 3 տարվա հոսթինգ',
+      hostingLine2: '4-րդ տարուց ընդամենը 29 ₾ / տարի',
+      hostingRenewalNote: 'Երկարաձգման հիշեցումն ուղարկվում է էլ. փոստով: Չվճարելու դեպքում պատկերասրահը թաքցվում է, էջը չի ջնջվում:',
+      phase1Label: 'Փուլ 1 · Վաղ մուտք',
+      phase1Users: 'Առաջին 1000 օգտատեր',
+      phase1Active: 'ակտիվ',
+      phase2Label: 'Փուլ 2 · Ստանդարտ',
+      phase2Users: '1001-ից',
+      phase3Label: 'Փուլ 3 · Պաշտպանության Երկարաձգում',
+      phase3Period: '3-րդ տարուց, ամենամյա',
       verificationNote: 'Ինքնության ստուգումը պարտադիր է: Վճարումից հետո վավերագրերը վերբեռնվում են, ադմինիստրատորի հաստատումից հետո պրոֆիլը հրապարակվում է:',
       cta: 'Ստեղծել Հիշատակի պրոֆիլ',
       features: [
@@ -1508,7 +1523,11 @@ const hy: LangDict = {
     anma: {
       backLink: '← Վերադառնալ փաթեթի ընտրությանը',
       title: 'Հիշատակի Պրոֆիլ',
-      priceLabel: '— միանվագ վճար',
+      priceLabel: '',
+      hostingBadge: 'Առաջին 3 տարի հոսթինգն ընդգրկված է',
+      hostingLine1: 'QR ցուցանակ + տեղադրում + 3 տարվա հոսթինգ',
+      hostingLine2: '4-րդ տարուց ընդամենը 29 ₾ / տարի',
+      hostingRenewalNote: 'Երկարաձգման հիշեցումն ուղարկվում է էլ. փոստով: Չվճարելու դեպքում պատկերասրահը թաքցվում է, էջը չի ջնջվում:',
       paymentMethodLabel: 'Վճարման եղանակ',
       bankTransfer: {
         name: 'Բանկային փոխանցում',
@@ -1571,7 +1590,7 @@ const hy: LangDict = {
     aile: {
       backLink: '← Վերադառնալ փաթեթի ընտրությանը',
       title: 'Ընտանեկան փաթեթ',
-      priceLabel: '— մեկանգամյա վճարում',
+      priceLabel: '',
       includedHeading: 'Փաթեթում ընդգրկված',
       included: ['4 անդամի հիշատակի էջ', 'Ընտանեկան ինքնության էջ — բոլոր անդամները միասին', 'QR ափսե ընդգրկված', '30 օրվա փողի վերադարձի երաշխիք'],
       bankTransfer: { name: 'Բանկային փոխանցում', status: '✓ Ակտիվ' },

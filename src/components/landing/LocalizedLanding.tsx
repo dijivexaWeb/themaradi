@@ -769,7 +769,27 @@ export default function LocalizedLanding({ pricing, notableMemorials, recentMemo
                         <p style={{ fontSize: 13, color: 'rgba(163,201,177,.7)', margin: 0, fontFamily: S.sans }}>{p.memorialPriceLabel}</p>
                       </div>
                     </div>
-                    <div style={{ fontSize: 13.5, fontWeight: 300, color: 'rgba(201,169,110,.72)', marginBottom: 30, fontFamily: S.sans }}>tek seferlik · QR plaka dahil</div>
+                    {/* Hosting policy box */}
+                    <div style={{ marginBottom: 22, borderRadius: 12, border: '1px solid rgba(143,184,158,.22)', background: 'rgba(143,184,158,.07)', overflow: 'hidden' }}>
+                      <div style={{ padding: '10px 14px 8px', borderBottom: '1px solid rgba(143,184,158,.14)' }}>
+                        <span style={{ display: 'inline-block', fontSize: 10, fontWeight: 700, letterSpacing: '.15em', textTransform: 'uppercase', color: '#0a0c0b', background: 'linear-gradient(90deg, #8FB89E, #a3d4b4)', padding: '4px 10px', borderRadius: 999, fontFamily: S.sans }}>
+                          {p.memorialHostingBadge}
+                        </span>
+                      </div>
+                      <div style={{ padding: '10px 14px' }}>
+                        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8, marginBottom: 7, fontSize: 13, fontWeight: 400, color: 'rgba(143,184,158,.9)', fontFamily: S.sans }}>
+                          <span style={{ flexShrink: 0, marginTop: 1 }}>✓</span>
+                          <span>{p.memorialHostingLine1}</span>
+                        </div>
+                        <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8, fontSize: 13, fontWeight: 300, color: 'rgba(201,169,110,.72)', fontFamily: S.sans }}>
+                          <span style={{ flexShrink: 0, marginTop: 1 }}>↻</span>
+                          <span>{p.memorialHostingLine2}</span>
+                        </div>
+                        <p style={{ margin: '7px 0 0', fontSize: 11.5, fontWeight: 300, color: 'rgba(237,232,221,.35)', fontFamily: S.sans }}>
+                          {p.memorialHostingRenewalNote}
+                        </p>
+                      </div>
+                    </div>
 
                     {/* Guarantee */}
                     <div style={{ display: 'flex', alignItems: 'flex-start', gap: 12, padding: 16, borderRadius: 14, background: 'rgba(143,184,158,.07)', border: '1px solid rgba(143,184,158,.2)', marginBottom: 26 }}>

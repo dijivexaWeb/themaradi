@@ -1,4 +1,4 @@
-import type { LangDict } from './en'
+﻿import type { LangDict } from './en'
 
 const ru: LangDict = {
   nav: {
@@ -129,7 +129,7 @@ const ru: LangDict = {
           'QR-код затем связывает надгробие или мемориальное пространство с цифровым профилем.',
           'Члены семьи могут обновлять профиль в любое время, добавлять новые воспоминания и управлять входящими сообщениями.',
         ],
-        priceLabel: 'Единовременно',
+        priceLabel: '',
         price: '249',
         currency: '₾',
         detailsBtn: 'Подробнее',
@@ -190,7 +190,11 @@ const ru: LangDict = {
       sub: 'QR-пластина включена. После оплаты профиль не публикуется автоматически — вы публикуете его, когда готовы.',
       memorialBadge: 'Ваш близкий скончался',
       memorialTitle: 'Мемориальный профиль',
-      memorialPriceLabel: 'единовременно',
+      memorialPriceLabel: '',
+      memorialHostingBadge: 'Первые 3 года хостинг в подарок',
+      memorialHostingLine1: 'QR-пластина + настройка + первые 3 года облачного хостинга',
+      memorialHostingLine2: 'С 4-го года — всего 29 ₾ / год',
+      memorialHostingRenewalNote: 'При неоплате галерея скрывается — страница не удаляется.',
       memorialFeaturesHeading: 'Всё включено в пакет:',
       memorialFeatures: [
         'Биография & История жизни',
@@ -219,7 +223,7 @@ const ru: LangDict = {
       familyPopularBadge: 'ЛУЧШАЯ ЦЕНА',
       familySavingsLabel: 'Экономия 50% по сравнению с 4 отдельными страницами',
       familyMembersLabel: '4 члена включено · QR-табличка включена',
-      familyPriceLabel: 'разовый платёж',
+      familyPriceLabel: '',
       familyFeaturesHeading: 'Всё из индивидуального плана, плюс:',
       familyExtraFeatures: [
         'Семейная страница — все члены в одном месте',
@@ -392,8 +396,19 @@ const ru: LangDict = {
       title: 'Мемориальный профиль',
       price: '249',
       currency: '₾',
-      priceLabel: 'единовременно',
-      priceNote: 'Производство и доставка QR-пластины включены. Других платежей нет.',
+      priceLabel: '',
+      priceNote: 'Больше никаких скрытых расходов.',
+      hostingBadge: 'Первые 3 года хостинга включены',
+      hostingLine1: 'QR-пластина + установка + хостинг на 3 года',
+      hostingLine2: 'С 4-го года — всего 29 ₾ / год',
+      hostingRenewalNote: 'Напоминание о продлении придёт по почте. При неоплате галерея скрывается, страница не удаляется.',
+      phase1Label: 'Фаза 1 · Ранний доступ',
+      phase1Users: 'Первые 1000 пользователей',
+      phase1Active: 'активно',
+      phase2Label: 'Фаза 2 · Стандартный',
+      phase2Users: 'С 1001-го пользователя',
+      phase3Label: 'Фаза 3 · Защитное продление',
+      phase3Period: 'С 3-го года, ежегодно',
       verificationNote: 'Верификация личности обязательна. После оплаты загружаются документы, профиль публикуется после одобрения администратора.',
       cta: 'Создать мемориальный профиль',
       features: [
@@ -1518,7 +1533,11 @@ const ru: LangDict = {
     anma: {
       backLink: '← Вернуться к выбору пакета',
       title: 'Мемориальный профиль',
-      priceLabel: '— единовременный платёж',
+      priceLabel: '',
+            hostingBadge: 'Первые 3 года хостинга включены',
+      hostingLine1: 'QR-пластина + установка + хостинг на 3 года',
+      hostingLine2: 'С 4-го года — всего 29 ₾ / год',
+      hostingRenewalNote: 'При неоплате галерея скрывается, страница не удаляется.',
       paymentMethodLabel: 'Способ оплаты',
       bankTransfer: {
         name: 'Банковский перевод',
@@ -1581,7 +1600,7 @@ const ru: LangDict = {
     aile: {
       backLink: '← Вернуться к выбору пакета',
       title: 'Семейный пакет',
-      priceLabel: '— единоразовый платёж',
+      priceLabel: '',
       includedHeading: 'Включено в пакет',
       included: ['4 мемориальные страницы', 'Семейная страница — все члены вместе', 'QR-плита в комплекте', 'Гарантия возврата 30 дней'],
       bankTransfer: { name: 'Банковский перевод', status: '✓ Активен' },

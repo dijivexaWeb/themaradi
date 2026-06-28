@@ -35,27 +35,6 @@ export default function AnmaFormClient({
 
   const inp = 'w-full bg-slate-800 border border-slate-700 text-white placeholder-slate-500 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-amber-500'
 
-  // Bank: email confirmation success
-  if (bankState && 'emailConfirmationSent' in bankState && bankState.emailConfirmationSent) {
-    return (
-      <div className="min-h-screen bg-slate-950 text-white flex flex-col items-center justify-center px-4">
-        <div className="max-w-md w-full text-center">
-          <div className="w-20 h-20 bg-amber-500/15 rounded-full flex items-center justify-center mx-auto mb-6 text-4xl">📧</div>
-          <h1 className="text-2xl font-bold text-white mb-3">{f.success.title}</h1>
-          <p className="text-slate-400 mb-2">
-            <span className="text-amber-400 font-medium">{'email' in bankState ? bankState.email : ''}</span>{' '}
-            {f.success.emailSentTo}
-          </p>
-          <p className="text-slate-500 text-sm mb-8 leading-6">{f.success.clickLinkNote}</p>
-          <div className="bg-slate-800/60 border border-slate-700 rounded-xl p-5 text-left text-sm space-y-3">
-            <div className="flex items-center gap-3 text-emerald-400"><span>✓</span><span>{f.success.statusOrderSaved}</span></div>
-            <div className="flex items-center gap-3 text-amber-400/70"><span>⏳</span><span>{f.success.statusEmailPending}</span></div>
-          </div>
-        </div>
-      </div>
-    )
-  }
-
   // PayPal: vault oluşturuldu → link göster
   if (ppState && 'paypalReady' in ppState && ppState.paypalReady) {
     const paypalUrl = bank.paypalLink
@@ -222,6 +201,26 @@ export default function AnmaFormClient({
                 <h1 className="font-bold text-xl text-white">{f.title}</h1>
                 <p className="text-xs text-slate-500">{amount} {currency} {f.priceLabel}</p>
               </div>
+            </div>
+
+            {/* Hosting policy — dahil olanlar */}
+            <div className="mb-6 rounded-xl border border-emerald-500/20 bg-emerald-950/30 p-4">
+              <span className="inline-block rounded-full bg-emerald-600 px-2.5 py-0.5 text-[10px] font-bold text-white uppercase tracking-wide mb-3">
+                {f.hostingBadge ?? 'İlk 3 Yıl Barındırma Dahil'}
+              </span>
+              <div className="space-y-2 mb-3">
+                <div className="flex items-center gap-2 text-sm">
+                  <span className="text-emerald-400 font-bold shrink-0">✓</span>
+                  <span className="text-slate-300">{f.hostingLine1 ?? 'QR plaka + kurulum + ilk 3 yıl barındırma'}</span>
+                </div>
+              </div>
+              <div className="flex items-center gap-2 text-sm border-t border-emerald-500/15 pt-3">
+                <span className="text-amber-400 shrink-0">↻</span>
+                <span className="text-slate-400">{f.hostingLine2 ?? '4. yıldan itibaren yalnızca 29 ₾ / yıl'}</span>
+              </div>
+              <p className="text-xs text-slate-600 mt-2 leading-5">
+                {f.hostingRenewalNote ?? 'Yenileme hatırlatması e-posta ile gönderilir. Ödenmezse galeri gizlenir, sayfa silinmez.'}
+              </p>
             </div>
 
             {/* Ödeme Yöntemi */}

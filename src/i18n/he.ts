@@ -1,4 +1,4 @@
-import type { LangDict } from './en'
+﻿import type { LangDict } from './en'
 
 const he: LangDict = {
   nav: {
@@ -129,7 +129,7 @@ const he: LangDict = {
           'קוד ה-QR מחבר את המצבה או מרחב הזיכרון עם הפרופיל הדיגיטלי.',
           'בני משפחה יכולים לעדכן את הפרופיל בכל עת, להוסיף זיכרונות חדשים ולנהל הודעות נכנסות.',
         ],
-        priceLabel: 'חד-פעמי',
+        priceLabel: '',
         price: '249',
         currency: '₾',
         detailsBtn: 'פרטים',
@@ -190,7 +190,11 @@ const he: LangDict = {
       sub: 'לוחית QR כלולה. לאחר התשלום, הפרופיל שלכם אינו מתפרסם אוטומטית — אתם מפרסמים כשאתם מוכנים.',
       memorialBadge: 'יקירכם נפטר',
       memorialTitle: 'פרופיל זיכרון',
-      memorialPriceLabel: 'חד-פעמי',
+      memorialPriceLabel: '',
+      memorialHostingBadge: '3 שנות אחסון ראשונות במתנה',
+      memorialHostingLine1: 'לוחית QR + הגדרה + 3 שנות אחסון ענן ראשונות',
+      memorialHostingLine2: 'מהשנה הרביעית — רק 29 ₾ / שנה',
+      memorialHostingRenewalNote: 'אי תשלום יסתיר את הגלריה — הדף לא יימחק.',
       memorialFeaturesHeading: 'כל מה שכלול בחבילה:',
       memorialFeatures: [
         'ביוגרפיה וסיפור חיים',
@@ -219,7 +223,7 @@ const he: LangDict = {
       familyPopularBadge: 'הכי משתלם',
       familySavingsLabel: 'חיסכון של 50% לעומת 4 דפים נפרדים',
       familyMembersLabel: '4 חברים כלולים · לוחית QR כלולה',
-      familyPriceLabel: 'תשלום חד פעמי',
+      familyPriceLabel: '',
       familyFeaturesHeading: 'כל מה שבתוכנית האישית, בנוסף:',
       familyExtraFeatures: [
         'דף זהות משפחתי — כל החברים במקום אחד',
@@ -380,8 +384,19 @@ const he: LangDict = {
       title: 'פרופיל זיכרון',
       price: '249',
       currency: '₾',
-      priceLabel: 'חד-פעמי',
-      priceNote: 'ייצור ומשלוח לוחית QR כלולים. ללא תשלומים נוספים.',
+      priceLabel: '',
+      priceNote: 'ללא הפתעות.',
+      hostingBadge: '3 שנות אחסון ראשונות כלולות',
+      hostingLine1: 'לוחית QR + התקנה + אחסון ל-3 שנים',
+      hostingLine2: 'משנה 4 — רק ‎29 ₾ / שנה',
+      hostingRenewalNote: 'תזכורת חידוש נשלחת במייל. אם לא שולם — הגלריה מוסתרת, הדף אינו נמחק.',
+      phase1Label: 'שלב 1 · גישה מוקדמת',
+      phase1Users: '1,000 משתמשים ראשונים',
+      phase1Active: 'פעיל',
+      phase2Label: 'שלב 2 · מחיר רגיל',
+      phase2Users: 'מהמשתמש ה-1,001',
+      phase3Label: 'שלב 3 · חידוש הגנה',
+      phase3Period: 'משנה 3, שנתי',
       verificationNote: 'נדרש אימות זהות. מסמכים מועלים לאחר התשלום, הפרופיל מתפרסם לאחר אישור מנהל.',
       cta: 'צרו פרופיל זיכרון',
       features: [
@@ -1488,7 +1503,11 @@ const he: LangDict = {
     anma: {
       backLink: '← חזרה לבחירת תוכנית',
       title: 'פרופיל זיכרון',
-      priceLabel: '— תשלום חד-פעמי',
+      priceLabel: '',
+            hostingBadge: '3 שנות אחסון ראשונות כלולות',
+      hostingLine1: 'לוחית QR + התקנה + אחסון ל-3 שנים',
+      hostingLine2: 'משנה 4 — רק \u200E29 ₾ / שנה',
+      hostingRenewalNote: 'אי תשלום יסתיר את הגלריה — הדף לא יימחק.',
       paymentMethodLabel: 'אמצעי תשלום',
       bankTransfer: {
         name: 'העברה בנקאית',
@@ -1551,7 +1570,7 @@ const he: LangDict = {
     aile: {
       backLink: '← חזור לבחירת חבילה',
       title: 'חבילת משפחה',
-      priceLabel: '— תשלום חד-פעמי',
+      priceLabel: '',
       includedHeading: 'כלול בחבילה',
       included: ['4 דפי הנצחה לחברים', 'דף זהות משפחתי — כל החברים יחד', 'לוחית QR כלולה', 'אחריות החזר כספי 30 יום'],
       bankTransfer: { name: 'העברה בנקאית', status: '✓ פעיל' },

@@ -45,7 +45,7 @@ export type PricingConfig = {
 }
 
 const DEFAULTS: PricingConfig = {
-  memorialPrice: '249',
+  memorialPrice: '299',
   vaultSetup: '49',
   vaultMonthly: '12.90',
   memorialTry: '',

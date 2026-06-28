@@ -474,6 +474,7 @@ export async function updatePricingSettings(formData: FormData): Promise<ActionR
     'campaign_price_family_gel', 'campaign_price_family_try',
     'campaign_price_family_usd', 'campaign_price_family_rub',
     'campaign_ends_at',
+    'hosting_renewal_price_gel', 'hosting_renewal_price_usd', 'hosting_renewal_price_try',
   ]
 
   const supabase = await createServiceClient()

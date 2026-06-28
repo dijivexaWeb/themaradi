@@ -45,9 +45,9 @@ const PRODUCTS = [
     id: 'memorial',
     icon: '🕯️',
     label: 'Anma Profili',
-    desc: 'Tek seferlik ödeme',
+    desc: 'Faz 2 (Standart): 299 ₾ · Faz 1 (Erken Erişim): 199 ₾',
     fields: {
-      gel: { normal: 'price_memorial_one_time', campaign: 'campaign_price_memorial', default: '249' },
+      gel: { normal: 'price_memorial_one_time', campaign: 'campaign_price_memorial', default: '299' },
       try: { normal: 'price_memorial_try', campaign: 'campaign_price_memorial_try', default: '' },
       usd: { normal: 'price_memorial_usd', campaign: 'campaign_price_memorial_usd', default: '' },
     },
@@ -56,7 +56,7 @@ const PRODUCTS = [
     id: 'family',
     icon: '👨‍👩‍👧‍👦',
     label: 'Aile Paketi',
-    desc: '4 üye dahil, tek seferlik',
+    desc: '4 üye dahil',
     fields: {
       gel: { normal: 'price_family_gel', campaign: 'campaign_price_family_gel', default: '399' },
       try: { normal: 'price_family_try', campaign: 'campaign_price_family_try', default: '' },
@@ -269,22 +269,60 @@ export default function PricingSettingsForm({ settings }: { settings: Record<str
         </div>
       </div>
 
+      {/* Koruma Yenileme (Faz 3) */}
+      <div className="bg-white border border-emerald-200 rounded-xl shadow-sm overflow-hidden">
+        <div className="px-5 py-4 border-b border-emerald-100 flex items-center gap-3 bg-emerald-50/50">
+          <span className="text-xl">🔄</span>
+          <div>
+            <p className="text-sm font-semibold text-slate-800">Koruma Yenileme <span className="ml-1 text-[10px] font-bold text-emerald-700 bg-emerald-100 px-1.5 py-0.5 rounded-full uppercase tracking-wide">Faz 3</span></p>
+            <p className="text-xs text-slate-400">3. yıldan sonra yıllık ücret — platform_settings tablosunda</p>
+          </div>
+        </div>
+        <div className="p-5 grid sm:grid-cols-3 gap-4">
+          {[
+            { name: 'hosting_renewal_price_gel', label: 'GEL (₾)', sym: '₾', def: '29' },
+            { name: 'hosting_renewal_price_usd', label: 'USD ($)', sym: '$', def: '9' },
+            { name: 'hosting_renewal_price_try', label: 'TRY (₺)', sym: '₺', def: '350' },
+          ].map(f => (
+            <div key={f.name}>
+              <label className="block text-xs font-medium text-slate-600 mb-1">{f.label} · yıllık</label>
+              <div className="relative">
+                <input
+                  name={f.name}
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  defaultValue={settings[f.name] ?? f.def}
+                  placeholder="—"
+                  className="w-full rounded-lg border border-emerald-200 bg-emerald-50/30 pl-3 pr-7 py-2 text-sm text-slate-800 outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-400/15"
+                />
+                <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-xs text-slate-400 font-medium">{f.sym}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+        <div className="px-5 pb-4 flex items-start gap-2">
+          <span className="text-emerald-600 text-xs mt-0.5">ℹ️</span>
+          <p className="text-[11px] text-slate-400">İlk 3 yıl barındırma satın alma fiyatına dahildir. Bu fiyat 4. yıldan itibaren uygulanır. Ödeme yapılmazsa galeri gizlenir, sayfa silinmez (Dormant Mode).</p>
+        </div>
+      </div>
+
       {/* Yaşam Kasası */}
       <div className="bg-white border border-slate-200 rounded-xl shadow-sm overflow-hidden">
         <div className="px-5 py-4 border-b border-slate-100 flex items-center gap-3">
           <span className="text-xl">🗄️</span>
           <div>
             <p className="text-sm font-semibold text-slate-800">Yaşam Kasası</p>
-            <p className="text-xs text-slate-400">Kurulum (tek seferlik) + Aylık abonelik</p>
+            <p className="text-xs text-slate-400">Kurulum + Aylık abonelik</p>
           </div>
         </div>
         <div className="p-5 grid sm:grid-cols-3 gap-4">
           {[
-            { name: 'price_vault_setup', label: 'Kurulum', sym: '₾', def: '49', sub: 'GEL · tek seferlik' },
+            { name: 'price_vault_setup', label: 'Kurulum', sym: '₾', def: '49', sub: 'GEL · kurulum' },
             { name: 'price_vault_monthly', label: 'Aylık', sym: '₾', def: '12.90', sub: 'GEL · aylık tekrarlayan' },
-            { name: 'price_vault_setup_try', label: 'Kurulum', sym: '₺', def: '', sub: 'TRY · tek seferlik' },
+            { name: 'price_vault_setup_try', label: 'Kurulum', sym: '₺', def: '', sub: 'TRY · kurulum' },
             { name: 'price_vault_monthly_try', label: 'Aylık', sym: '₺', def: '', sub: 'TRY · aylık tekrarlayan' },
-            { name: 'price_vault_setup_usd', label: 'Kurulum', sym: '$', def: '', sub: 'USD · tek seferlik' },
+            { name: 'price_vault_setup_usd', label: 'Kurulum', sym: '$', def: '', sub: 'USD · kurulum' },
             { name: 'price_vault_monthly_usd', label: 'Aylık', sym: '$', def: '', sub: 'USD · aylık tekrarlayan' },
           ].map(f => (
             <div key={f.name}>
