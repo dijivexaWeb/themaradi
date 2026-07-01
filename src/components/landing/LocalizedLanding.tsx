@@ -185,11 +185,14 @@ export default function LocalizedLanding({ pricing, notableMemorials, recentMemo
                 </span>
               </h1>
 
-              {/* Video */}
-              <div style={{ borderRadius: 16, overflow: 'hidden', border: '1px solid rgba(201,169,110,.18)', boxShadow: '0 24px 60px rgba(0,0,0,.55)', marginBottom: 20, background: '#0a0a10', position: 'relative' }}>
-                <video autoPlay muted loop playsInline style={{ width: '100%', display: 'block', maxHeight: 420, objectFit: 'cover' }}>
-                  <source src="https://pub-4e99edb14c604383a844cb7f05d69b9b.r2.dev/landing/hero.mp4" type="video/mp4" />
-                </video>
+              {/* Video — Cloudflare Stream (adaptive bitrate, auto-compressed) */}
+              <div style={{ borderRadius: 16, overflow: 'hidden', border: '1px solid rgba(201,169,110,.18)', boxShadow: '0 24px 60px rgba(0,0,0,.55)', marginBottom: 20, background: '#0a0a10', position: 'relative', aspectRatio: '16/9' }}>
+                <iframe
+                  src="https://customer-44azkazwu9bziwvs.cloudflarestream.com/aee794b124e48f9a8e581ad718a34fa4/iframe?autoplay=true&muted=true&loop=true&controls=false&preload=auto&letterboxColor=transparent"
+                  style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 'none' }}
+                  allow="autoplay; fullscreen; picture-in-picture"
+                  title="The Eternal Memory — hero video"
+                />
                 <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 60, background: 'linear-gradient(to top, rgba(7,7,13,.6), transparent)', pointerEvents: 'none' }} />
               </div>
 
