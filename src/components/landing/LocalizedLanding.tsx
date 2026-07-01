@@ -188,7 +188,7 @@ export default function LocalizedLanding({ pricing, notableMemorials, recentMemo
               {/* Video */}
               <div style={{ borderRadius: 16, overflow: 'hidden', border: '1px solid rgba(201,169,110,.18)', boxShadow: '0 24px 60px rgba(0,0,0,.55)', marginBottom: 20, background: '#0a0a10', position: 'relative' }}>
                 <video autoPlay muted loop playsInline style={{ width: '100%', display: 'block', maxHeight: 420, objectFit: 'cover' }}>
-                  <source src="/videos/hero.mp4" type="video/mp4" />
+                  <source src="https://pub-4e99edb14c604383a844cb7f05d69b9b.r2.dev/landing/hero.mp4" type="video/mp4" />
                 </video>
                 <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 60, background: 'linear-gradient(to top, rgba(7,7,13,.6), transparent)', pointerEvents: 'none' }} />
               </div>
@@ -237,7 +237,7 @@ export default function LocalizedLanding({ pricing, notableMemorials, recentMemo
             {/* Right — qr product image */}
             <div style={{ flex: '0 0 auto', display: 'flex', justifyContent: 'center' }}>
               <div style={{ borderRadius: 16, overflow: 'hidden', border: '1px solid rgba(201,169,110,.22)', boxShadow: '0 16px 48px rgba(0,0,0,.5)', maxWidth: 340 }}>
-                <Image src="/videos/qr.png" alt="QR Mezar Plakası" width={340} height={240} style={{ display: 'block', width: '100%', height: 'auto', objectFit: 'cover' }} />
+                <Image src="https://pub-4e99edb14c604383a844cb7f05d69b9b.r2.dev/landing/qr.png" alt="QR Mezar Plakası" width={340} height={240} style={{ display: 'block', width: '100%', height: 'auto', objectFit: 'cover' }} unoptimized />
               </div>
             </div>
 
