@@ -16,8 +16,8 @@ const az: LangDict = {
   landing: {
     hero: {
       eyebrow: '',
-      h1a: 'İtirdiyiniz sevdikləriniz',
-      h1b: 'üçün xüsusi hazırladıq.',
+      h1a: 'Vəfat Etmiş Yaxınlarınızı',
+      h1b: 'Rəqəmsal Dünyada Əbədi Yaşadın.',
       p: 'Vəfat etmiş yaxınınız üçün foto, video, həyat hekayəsi və ailə xatirələrini QR kodlu xüsusi rəqəmsal səhifədə sonsuza qədər saxlayın.',
       promoLine1: 'İlk 1000 ailə üçün xüsusi birtəfəlik {campaignPrice}.',
       promoLine2: 'Sonrakı normal qiymət {regularPrice}.',

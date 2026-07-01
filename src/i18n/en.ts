@@ -14,8 +14,8 @@ const en = {
   landing: {
     hero: {
       eyebrow: '',
-      h1a: 'Specially prepared for the',
-      h1b: 'loved ones you lost.',
+      h1a: 'Honor Your Departed Loved Ones',
+      h1b: 'Forever in the Digital World.',
       p: 'Keep photos, videos, life stories, and family memories of your departed loved ones forever on a custom digital page with a QR code.',
       promoLine1: 'One-time {campaignPrice} special for the first 1,000 families.',
       promoLine2: 'Subsequent regular price {regularPrice}.',
