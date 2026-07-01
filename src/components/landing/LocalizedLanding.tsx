@@ -169,105 +169,78 @@ export default function LocalizedLanding({ pricing, notableMemorials, recentMemo
       <div style={{ position: 'relative', zIndex: 2 }}>
 
         {/* ═══ HERO ═══════════════════════════════════════════════ */}
-        <section style={{ position: 'relative', overflow: 'hidden', padding: 'clamp(64px,11vh,140px) clamp(20px,4vw,60px) clamp(70px,9vh,120px)' }}>
+        <section style={{ position: 'relative', overflow: 'hidden', padding: 'clamp(32px,5.5vh,60px) clamp(20px,4vw,60px) clamp(48px,6vh,80px)' }}>
           <ParticleCanvas count={56} />
-          <div style={{ position: 'relative', zIndex: 3, maxWidth: 1240, margin: '0 auto', display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'clamp(40px,5vw,80px)' }}>
+          <div style={{ position: 'relative', zIndex: 3, maxWidth: 1240, margin: '0 auto', display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'clamp(28px,5vw,56px)' }}>
 
-            {/* Left copy */}
-            <div style={{ flex: '1 1 480px', minWidth: 320 }}>
-              <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginBottom: 34 }}>
-                <span style={{ width: 46, height: 1, background: `linear-gradient(90deg, ${S.gold}, transparent)` }} />
-                <span style={{ fontSize: 11.5, letterSpacing: '.36em', textTransform: 'uppercase', color: S.gold, fontWeight: 300, fontFamily: S.sans }}>
-                  Dijital Anma
-                </span>
-              </div>
+            {/* ── Left: Title + Video + CTA ──────────────────────── */}
+            <div style={{ flex: '1 1 400px', minWidth: 280 }}>
 
-              <h1 style={{ fontFamily: S.serif, fontWeight: 400, fontSize: 'clamp(40px,5.6vw,80px)', lineHeight: 1.04, letterSpacing: '-0.012em', margin: '0 0 30px', color: S.textHead }}>
+              {/* H1 */}
+              <h1 style={{ fontFamily: S.serif, fontWeight: 400, fontSize: 'clamp(22px,2.6vw,38px)', lineHeight: 1.15, letterSpacing: '-0.01em', margin: '0 0 22px', color: S.textHead }}>
                 <span className="tem-word" style={{ animationDelay: '0ms' }}>{s.hero.h1a}</span>
                 {' '}
-                <span className="tem-word" style={{ animationDelay: '180ms', display: 'block', fontStyle: 'italic', color: S.goldBright, position: 'relative' }}>
+                <span className="tem-word" style={{ animationDelay: '180ms', fontStyle: 'italic', color: S.goldBright }}>
                   {s.hero.h1b}
-                  <span style={{ position: 'absolute', left: 1, right: 1, bottom: 0, height: 1, background: `linear-gradient(90deg, rgba(216,190,138,0), rgba(216,190,138,.65), rgba(216,190,138,0))` }} />
                 </span>
               </h1>
 
-              <p style={{ fontSize: 'clamp(16px,1.25vw,18px)', fontWeight: 300, lineHeight: 1.75, color: S.textMuted, maxWidth: 540, margin: '0 0 24px', fontFamily: S.sans }}>
-                {s.hero.p}
-              </p>
-
-              {/* Promo badge container */}
-              {pricing.campaignActive && cur.campaignMemorial && (
-                <div style={{
-                  background: 'rgba(201, 169, 110, 0.05)',
-                  border: '1px solid rgba(201, 169, 110, 0.18)',
-                  borderRadius: 14,
-                  padding: '16px 20px',
-                  marginBottom: 28,
-                  maxWidth: 540,
-                  fontFamily: S.sans,
-                }}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, color: S.goldBright, fontSize: 14, fontWeight: 600, marginBottom: 4 }}>
-                    <Sparkles style={{ width: 15, height: 15 }} />
-                    <span>{s.hero.promoLine1.replace('{campaignPrice}', campaignPriceText)}</span>
-                  </div>
-                  <div style={{ color: S.textMuted, fontSize: 13.5, fontWeight: 300 }}>
-                    {s.hero.promoLine2.replace('{regularPrice}', regularPriceText)}
-                  </div>
-                </div>
-              )}
-
-              <div style={{ display: 'flex', flexWrap: 'wrap', gap: 14, marginBottom: 28 }}>
-                <Link href="/memorial/demo" className="tem-goldbtn" style={{ textDecoration: 'none', background: S.goldGrad, color: '#14110a', fontWeight: 500, fontSize: 15.5, padding: '16px 32px', borderRadius: 999, boxShadow: '0 14px 36px rgba(201,169,110,.26)', fontFamily: S.sans }}>
-                  {s.hero.ctaSecondary}
-                </Link>
-                <Link href="/satin-al/anma" className="tem-ghostbtn" style={{ textDecoration: 'none', background: 'none', color: S.text, border: '1px solid rgba(237,232,221,.2)', fontWeight: 300, fontSize: 15.5, padding: '16px 32px', borderRadius: 999, fontFamily: S.sans }}>
-                  {s.hero.ctaPrimary.replace('{campaignPrice}', campaignPriceText)}
-                </Link>
+              {/* Video */}
+              <div style={{ borderRadius: 16, overflow: 'hidden', border: '1px solid rgba(201,169,110,.18)', boxShadow: '0 24px 60px rgba(0,0,0,.55)', marginBottom: 20, background: '#0a0a10', position: 'relative' }}>
+                <video autoPlay muted loop playsInline style={{ width: '100%', display: 'block', maxHeight: 420, objectFit: 'cover' }}>
+                  <source src="/videos/hero.mp4" type="video/mp4" />
+                </video>
+                <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 60, background: 'linear-gradient(to top, rgba(7,7,13,.6), transparent)', pointerEvents: 'none' }} />
               </div>
 
-              {/* Checklist */}
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '12px 20px', maxWidth: 540, marginTop: 28, paddingTop: 24, borderTop: '1px solid rgba(237,232,221,.08)' }}>
-                {s.hero.features.map((feat, idx) => (
-                  <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: 10, color: S.text }}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 20, height: 20, borderRadius: '50%', background: 'rgba(143,184,158,.15)', border: '1px solid rgba(143,184,158,.3)', flexShrink: 0 }}>
-                      <Check style={{ width: 11, height: 11, stroke: '#8FB89E', strokeWidth: 3 }} />
-                    </div>
-                    <span style={{ fontSize: 14.5, fontWeight: 300, fontFamily: S.sans }}>{feat}</span>
-                  </div>
-                ))}
-              </div>
+              {/* CTA */}
+              <Link
+                href="/satin-al/anma"
+                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, width: '100%', padding: '17px 28px', borderRadius: 14, background: S.goldGrad, color: '#14110a', fontSize: 17, fontWeight: 600, textDecoration: 'none', fontFamily: S.sans, boxShadow: '0 8px 28px rgba(201,169,110,.28)' }}
+              >
+                {s.hero.ctaPrimary}
+                <ArrowRight style={{ width: 19, height: 19 }} />
+              </Link>
             </div>
 
-            {/* Right — Hero Phone Showcase */}
-            <div style={{ flex: '1 1 340px', minWidth: 300, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-              <HeroPhoneShowcase memorials={notableMemorials.slice(0, 3)} />
+            {/* ── Right: Phone showcase ───────────────────────────── */}
+            <div style={{ flex: '1 1 340px', minWidth: 260, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+              <HeroPhoneShowcase memorials={notableMemorials} />
             </div>
+
           </div>
         </section>
 
         <SectionDivider delay={0} />
 
-        {/* ═══ QR BRIDGE BAND ══════════════════════════════════════ */}
-        <section style={{ padding: '0 clamp(20px,4vw,60px) clamp(20px,4vh,40px)' }}>
-          <div className="tem-reveal" style={{ maxWidth: 1100, margin: '0 auto', display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'center', gap: 'clamp(18px,3vw,40px)', padding: '26px 32px', borderRadius: 18, background: S.card, border: `1px solid ${S.cardBorder}` }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-              <div style={{ width: 52, height: 60, borderRadius: '6px 6px 4px 4px', background: 'radial-gradient(120% 100% at 50% 30%, #20202a, #111118)', border: '1px solid rgba(201,169,110,.2)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <QrCode style={{ width: 22, height: 22, stroke: S.gold, strokeWidth: 1.3 }} />
+        {/* ═══ NEDEN SONSUZ HAFIZA — PRODUCT BAND ═════════════════ */}
+        <section style={{ padding: '0 clamp(20px,4vw,60px) clamp(24px,4vh,48px)' }}>
+          <div className="tem-reveal" style={{ maxWidth: 1100, margin: '0 auto', display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: 'clamp(24px,4vw,56px)', padding: 'clamp(28px,4vh,44px) clamp(24px,4vw,48px)', borderRadius: 20, background: S.card, border: `1px solid ${S.cardBorder}` }}>
+
+            {/* Left — heading + features */}
+            <div style={{ flex: '1 1 320px', minWidth: 260 }}>
+              <h2 style={{ fontFamily: S.serif, fontSize: 'clamp(26px,3.5vw,40px)', fontWeight: 400, margin: '0 0 24px', color: S.text, lineHeight: 1.2 }}>
+                {s.whySection.heading}
+              </h2>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px,1fr))', gap: '12px 24px' }}>
+                {s.hero.features.map((feat, idx) => (
+                  <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: 20, height: 20, borderRadius: '50%', background: 'rgba(143,184,158,.15)', border: '1px solid rgba(143,184,158,.3)', flexShrink: 0 }}>
+                      <Check style={{ width: 11, height: 11, stroke: '#8FB89E', strokeWidth: 3 }} />
+                    </div>
+                    <span style={{ fontSize: 14.5, fontWeight: 300, color: S.text, fontFamily: S.sans }}>{feat}</span>
+                  </div>
+                ))}
               </div>
-              <span style={{ fontFamily: S.serif, fontSize: 17, color: 'rgba(237,232,221,.75)' }}>Mezar taşındaki QR kod</span>
             </div>
 
-            <svg width="48" height="14" viewBox="0 0 48 14" fill="none" stroke={S.gold} strokeWidth="1.3" strokeLinecap="round">
-              <path d="M2 7h40" strokeDasharray="4 4" className="tem-animate-dash" />
-              <path d="M38 2l6 5-6 5" className="tem-animate-arrow-head" />
-            </svg>
-
-            <div style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-              <div style={{ width: 36, height: 60, borderRadius: 10, background: 'linear-gradient(160deg, #1a261f, #101018)', border: '1px solid rgba(201,169,110,.25)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <div style={{ width: 18, height: 18, borderRadius: '50%', background: S.goldGrad }} />
+            {/* Right — qr product image */}
+            <div style={{ flex: '0 0 auto', display: 'flex', justifyContent: 'center' }}>
+              <div style={{ borderRadius: 16, overflow: 'hidden', border: '1px solid rgba(201,169,110,.22)', boxShadow: '0 16px 48px rgba(0,0,0,.5)', maxWidth: 340 }}>
+                <Image src="/videos/qr.png" alt="QR Mezar Plakası" width={340} height={240} style={{ display: 'block', width: '100%', height: 'auto', objectFit: 'cover' }} />
               </div>
-              <span style={{ fontFamily: S.serif, fontSize: 17, color: 'rgba(237,232,221,.75)' }}>anıların açıldığı sayfaya götürür</span>
             </div>
+
           </div>
         </section>
 

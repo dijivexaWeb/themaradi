@@ -19,10 +19,9 @@ const en = {
       p: 'Keep photos, videos, life stories, and family memories of your departed loved ones forever on a custom digital page with a QR code.',
       promoLine1: 'One-time {campaignPrice} special for the first 1,000 families.',
       promoLine2: 'Subsequent regular price {regularPrice}.',
-      ctaPrimary: 'Start with {campaignPrice}',
+      ctaPrimary: 'Create Memorial Profile',
       ctaSecondary: 'See Sample Page',
       features: [
-        'One-time payment',
         'QR-coded memorial page',
         'Photos, videos & condolences',
         'Private family sharing link',

@@ -192,8 +192,9 @@ export default function LoginPageClient({ siteKey }: { siteKey: string }) {
 
     setLoading(true)
     setMsg(null)
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || window.location.origin
     const { error } = await supabase.auth.resetPasswordForEmail(targetEmail, {
-      redirectTo: `${window.location.origin}/auth/callback?next=/auth/update-password`,
+      redirectTo: `${siteUrl}/auth/callback?next=/auth/update-password`,
     })
     setMsg({ ok: !error, text: error ? error.message : c.resetSent })
     setLoading(false)
