@@ -6,6 +6,7 @@ import { createServiceClient } from '@/lib/supabase/server'
 import type { RecentMemorial } from '@/components/landing/RecentMemorialsCarousel'
 import type { NotableMemorial } from '@/components/landing/NotableProfilesSection'
 import type { TestimonialMemorial } from '@/components/landing/TestimonialSection'
+import { getFamilyThankYouQuote } from '@/lib/testimonialQuotes'
 
 export const revalidate = 3600
 
@@ -29,7 +30,7 @@ export const metadata: Metadata = {
 export default async function LandingPage() {
   const supabase = await createServiceClient()
 
-  const [pricing, { data: notableRaw }, { data: recentMemorials }] = await Promise.all([
+  const [pricing, { data: notableRaw }, { data: recentMemorials }, { data: testimonialCandidates }] = await Promise.all([
     fetchPricingConfig(),
     supabase
       .from('vaults')
@@ -45,14 +46,23 @@ export default async function LandingPage() {
       .not('is_notable', 'is', true)
       .order('updated_at', { ascending: false })
       .limit(10),
+    // Testimonial kartları için normal (notable olmayan) profiller — ulusal miras dışında
+    supabase
+      .from('vaults')
+      .select('id, display_name, slug, cover_photo_url, birth_place, nationality')
+      .eq('status', 'public_memorial')
+      .not('is_notable', 'is', true)
+      .order('published_at', { ascending: false })
+      .limit(12),
   ])
 
   const notableIds = (notableRaw ?? []).map((v) => v.id)
 
-  // Attach family info to recent + notable memorials
+  // Attach family info to recent + notable + testimonial memorials
   const recentIds = (recentMemorials ?? []).map((v) => v.id)
+  const testimonialIds = (testimonialCandidates ?? []).map((v) => v.id)
   const familyMap: Record<string, { name: string; slug: string }> = {}
-  const familyLookupIds = [...recentIds, ...notableIds]
+  const familyLookupIds = [...recentIds, ...notableIds, ...testimonialIds]
   if (familyLookupIds.length > 0) {
     const { data: familyLinks } = await supabase
       .from('family_members')
@@ -65,16 +75,17 @@ export default async function LandingPage() {
     }
   }
 
-  // Testimonial kartları: İstanbollu ailesi hariç ilk 4 notable profil
-  const testimonialMemorials: TestimonialMemorial[] = (notableRaw ?? [])
-    .filter((v) => familyMap[v.id]?.slug !== 'istanbollu')
+  // Testimonial kartları: normal profillerden, İstanbollu ailesi/soyadı hariç ilk 4.
+  // Aileler platforma kendi dillerinde teşekkür ediyor — metin statik, dil profildeki nationality'den seçilir.
+  const testimonialMemorials: TestimonialMemorial[] = (testimonialCandidates ?? [])
+    .filter((v) => familyMap[v.id]?.slug !== 'istanbollu' && !/i̇?stanbollu/i.test(v.display_name ?? ''))
     .slice(0, 4)
-    .map((v) => ({
+    .map((v, i) => ({
       id: v.id,
       display_name: v.display_name,
       slug: v.slug,
       cover_photo_url: v.cover_photo_url,
-      tagline: v.tagline,
+      tagline: getFamilyThankYouQuote(v.nationality, i),
       birth_place: v.birth_place,
     }))
   const interactionTotals: Record<string, number> = {}
