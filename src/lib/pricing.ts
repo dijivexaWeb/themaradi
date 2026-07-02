@@ -25,6 +25,10 @@ export type PricingConfig = {
   // Additional member (sonradan eklenen üye indirimi)
   additionalMemberGel: string
   campaignAdditionalMemberGel: string
+  // Hosting renewal (4. yıldan itibaren yıllık)
+  hostingRenewalGel: string
+  hostingRenewalUsd: string
+  hostingRenewalTry: string
   // Campaign
   campaignActive: boolean
   campaignLabel: string
@@ -63,6 +67,9 @@ const DEFAULTS: PricingConfig = {
   familyRub: '',
   additionalMemberGel: '129',
   campaignAdditionalMemberGel: '',
+  hostingRenewalGel: '29',
+  hostingRenewalUsd: '11',
+  hostingRenewalTry: '500',
   campaignActive: false,
   campaignLabel: '',
   campaignMemorial: '',
@@ -101,6 +108,7 @@ export async function fetchPricingConfig(): Promise<PricingConfig> {
         'campaign_price_family_gel', 'campaign_price_family_try',
         'campaign_price_family_usd', 'campaign_price_family_rub',
         'price_additional_member_gel', 'campaign_price_additional_member_gel',
+        'hosting_renewal_price_gel', 'hosting_renewal_price_usd', 'hosting_renewal_price_try',
         'campaign_ends_at',
       ])
 
@@ -142,6 +150,9 @@ export async function fetchPricingConfig(): Promise<PricingConfig> {
       campaignFamilyRub: s.campaign_price_family_rub || '',
       additionalMemberGel: s.price_additional_member_gel || DEFAULTS.additionalMemberGel,
       campaignAdditionalMemberGel: s.campaign_price_additional_member_gel || '',
+      hostingRenewalGel: s.hosting_renewal_price_gel || DEFAULTS.hostingRenewalGel,
+      hostingRenewalUsd: s.hosting_renewal_price_usd || DEFAULTS.hostingRenewalUsd,
+      hostingRenewalTry: s.hosting_renewal_price_try || DEFAULTS.hostingRenewalTry,
       campaignEndsAt: s.campaign_ends_at || '',
     }
   } catch {

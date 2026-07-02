@@ -29,6 +29,9 @@ const he: LangDict = {
         'קישור שיתוף פרטי למשפחה',
       ],
       trustBadge: 'אף זיכרון, תמונה או מסר תנחומים לא מפורסם ללא אישור המשפחה.',
+      subLine: 'פרופיל זיכרון עם קוד QR המאגד תמונות, סרטונים, הקלטות קול ומסרי תנחומים במקום אחד.',
+      ctaTrustLine: 'כולל שלט QR • אחסון חינם ל-3 השנים הראשונות • החזר כספי מלא תוך 30 יום',
+      watchVideo: 'צפו (30 שנ׳)',
     },
 
     profilePreview: {
@@ -192,7 +195,7 @@ const he: LangDict = {
       memorialPriceLabel: '',
       memorialHostingBadge: '3 שנות אחסון ראשונות במתנה',
       memorialHostingLine1: 'לוחית QR + הגדרה + 3 שנות אחסון ענן ראשונות',
-      memorialHostingLine2: 'מהשנה הרביעית — רק 29 ₾ / שנה',
+      memorialHostingLine2: 'מהשנה הרביעית — רק {renewalPrice} / שנה',
       memorialHostingRenewalNote: 'אי תשלום יסתיר את הגלריה — הדף לא יימחק.',
       memorialFeaturesHeading: 'כל מה שכלול בחבילה:',
       memorialFeatures: [
@@ -254,6 +257,21 @@ const he: LangDict = {
       viewAllLink: 'דף המחירים',
       viewAllSuffix: 'לכל הפרטים.',
       demoProfileCta: 'לחצו כאן לצפייה בפרופיל זיכרון לדוגמה',
+    },
+
+    packagesSection: {
+      heading: 'החבילות שלנו',
+      singleLabel: 'יחיד',
+      singleDesc: 'פרופיל אחד + שלט QR + 3 שנות אחסון',
+      familyLabel: 'חבילה משפחתית',
+      familyDesc: '4 פרופילים + 4 שלטי QR + 3 שנות אחסון',
+      familySavings: 'חיסכון של עד 50%',
+      renewalNote: 'לאחר מכן, רק {renewalPrice}/שנה. הפרופיל לעולם לא מתפרסם אוטומטית — הוא נשאר טיוטה עד לאישורכם.',
+      viewDetails: 'לפרטי המחירים המלאים',
+    },
+
+    testimonialSection: {
+      heading: 'מה המשפחות אומרות',
     },
 
     familyPage: {

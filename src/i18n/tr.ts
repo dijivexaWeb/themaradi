@@ -29,6 +29,9 @@ const tr: LangDict = {
         'Aileye özel paylaşım linki',
       ],
       trustBadge: 'Hiçbir anı, fotoğraf veya taziye mesajı aile onayı olmadan yayınlanmaz.',
+      subLine: 'QR Kodlu Anma Profili ile fotoğraflar, videolar, ses kayıtları ve taziyeler bir arada.',
+      ctaTrustLine: 'QR Plaka Dahil • İlk 3 Yıl Hosting Ücretsiz • 30 Gün İade Garantisi',
+      watchVideo: 'İzle (30 sn)',
     },
 
     profilePreview: {
@@ -192,7 +195,7 @@ const tr: LangDict = {
       memorialPriceLabel: '',
       memorialHostingBadge: 'İlk 3 Yıl Barındırma Hediyedir',
       memorialHostingLine1: 'QR plaka + kurulum + ilk 3 yıl bulut barındırma',
-      memorialHostingLine2: '4. yıldan itibaren yalnızca 29 ₾ / yıl',
+      memorialHostingLine2: '4. yıldan itibaren yalnızca {renewalPrice} / yıl',
       memorialHostingRenewalNote: 'Ödenmezse galeri gizlenir, sayfa silinmez.',
       memorialFeaturesHeading: 'Pakete dahil olan her şey:',
       memorialFeatures: [
@@ -254,6 +257,21 @@ const tr: LangDict = {
       viewAllLink: 'fiyatlandırma sayfasına',
       viewAllSuffix: 'bakın.',
       demoProfileCta: 'Örnek anma profili sayfası için tıklayınız',
+    },
+
+    packagesSection: {
+      heading: 'Paketlerimiz',
+      singleLabel: 'Tek Kişilik',
+      singleDesc: '1 Profil + QR Plaka + 3 yıl hosting',
+      familyLabel: 'Aile Paketi',
+      familyDesc: '4 Profil + 4 QR Plaka + 3 yıl hosting',
+      familySavings: '%50\'ye varan tasarruf',
+      renewalNote: 'Yıldan sonra sadece {renewalPrice}/yıl. Ödeme sonrası profil otomatik yayınlanmaz, siz onay verene kadar taslak olarak kalır.',
+      viewDetails: 'Detaylı fiyatları gör',
+    },
+
+    testimonialSection: {
+      heading: 'Aileler Ne Diyor?',
     },
 
     familyPage: {

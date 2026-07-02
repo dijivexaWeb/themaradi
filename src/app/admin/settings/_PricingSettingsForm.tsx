@@ -281,8 +281,8 @@ export default function PricingSettingsForm({ settings }: { settings: Record<str
         <div className="p-5 grid sm:grid-cols-3 gap-4">
           {[
             { name: 'hosting_renewal_price_gel', label: 'GEL (₾)', sym: '₾', def: '29' },
-            { name: 'hosting_renewal_price_usd', label: 'USD ($)', sym: '$', def: '9' },
-            { name: 'hosting_renewal_price_try', label: 'TRY (₺)', sym: '₺', def: '350' },
+            { name: 'hosting_renewal_price_usd', label: 'USD ($)', sym: '$', def: '11' },
+            { name: 'hosting_renewal_price_try', label: 'TRY (₺)', sym: '₺', def: '500' },
           ].map(f => (
             <div key={f.name}>
               <label className="block text-xs font-medium text-slate-600 mb-1">{f.label} · yıllık</label>

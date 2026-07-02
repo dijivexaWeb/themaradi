@@ -29,6 +29,9 @@ const az: LangDict = {
         'Ailəyə özəl paylaşım linki',
       ],
       trustBadge: 'Heç bir xatirə, foto və ya başsağlığı mesajı ailənin təsdiqi olmadan dərc edilmir.',
+      subLine: 'QR kodlu xatirə profili ilə fotolar, videolar, səs yazıları və başsağlığı mesajları bir arada.',
+      ctaTrustLine: 'QR Lövhə Daxildir • İlk 3 İl Hostinq Pulsuz • 30 Gün Pul Qaytarma Zəmanəti',
+      watchVideo: 'İzlə (30 san)',
     },
 
     profilePreview: {
@@ -192,7 +195,7 @@ const az: LangDict = {
       memorialPriceLabel: '',
       memorialHostingBadge: 'İlk 3 il hosting pulsuzdur',
       memorialHostingLine1: 'QR lövhə + quraşdırma + ilk 3 il bulud hostinqi',
-      memorialHostingLine2: '4-cü ildən etibarən cəmi 29 ₾ / il',
+      memorialHostingLine2: '4-cü ildən etibarən cəmi {renewalPrice} / il',
       memorialHostingRenewalNote: 'Ödəniş olmadıqda qalereya gizlənir — səhifə silinmir.',
       memorialFeaturesHeading: 'Paketə daxil olan hər şey:',
       memorialFeatures: [
@@ -254,6 +257,21 @@ const az: LangDict = {
       viewAllLink: 'qiymət səhifəsinə',
       viewAllSuffix: 'baxın.',
       demoProfileCta: 'Nümunə xatirə profili səhifəsi üçün klikləyin',
+    },
+
+    packagesSection: {
+      heading: 'Paketlərimiz',
+      singleLabel: 'Fərdi',
+      singleDesc: '1 Profil + QR Lövhə + 3 il hostinq',
+      familyLabel: 'Ailə Paketi',
+      familyDesc: '4 Profil + 4 QR Lövhə + 3 il hostinq',
+      familySavings: '50%-ə qədər qənaət',
+      renewalNote: 'Bundan sonra sadəcə {renewalPrice}/il. Profil ödənişdən sonra avtomatik dərc olunmur — siz təsdiqləyənə qədər qaralama olaraq qalır.',
+      viewDetails: 'Ətraflı qiymətlərə bax',
+    },
+
+    testimonialSection: {
+      heading: 'Ailələr Nə Deyir?',
     },
 
     familyPage: {

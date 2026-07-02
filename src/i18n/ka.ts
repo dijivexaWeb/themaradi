@@ -29,6 +29,9 @@ const ka: LangDict = {
         'საოჯახო გაზიარების პირადი ბმული',
       ],
       trustBadge: 'ოჯახის თანხმობის გარეშე არცერთი მოგონება, ფოტო ან თანამდგომლობა არ ქვეყნდება.',
+      subLine: 'QR კოდიანი სამახსოვრო პროფილი, სადაც ფოტოები, ვიდეოები, ხმოვანი ჩანაწერები და თანაგრძნობის წერილები ერთადაა თავმოყრილი.',
+      ctaTrustLine: 'QR დაფა შედის • პირველი 3 წელი ჰოსტინგი უფასო • 30 დღიანი თანხის დაბრუნების გარანტია',
+      watchVideo: 'ნახეთ (30 წმ)',
     },
 
     profilePreview: {
@@ -192,7 +195,7 @@ const ka: LangDict = {
       memorialPriceLabel: '',
       memorialHostingBadge: 'პირველი 3 წელი ჰოსტინგი უფასოდ',
       memorialHostingLine1: 'QR ფილა + ინსტალაცია + პირველი 3 წელი ღრუბლოვანი ჰოსტინგი',
-      memorialHostingLine2: '4-ე წლიდან მხოლოდ 29 ₾ / წელი',
+      memorialHostingLine2: '4-ე წლიდან მხოლოდ {renewalPrice} / წელი',
       memorialHostingRenewalNote: 'გადაუხდელობის შემთხვევაში გალერეა იმალება — გვერდი არ იშლება.',
       memorialFeaturesHeading: 'პაკეტში შემავალი ყველაფერი:',
       memorialFeatures: [
@@ -254,6 +257,21 @@ const ka: LangDict = {
       viewAllLink: 'ფასების გვერდზე',
       viewAllSuffix: 'გადახედეთ.',
       demoProfileCta: 'დააჭირეთ სამახსოვრო პროფილის მაგალითის სანახავად',
+    },
+
+    packagesSection: {
+      heading: 'ჩვენი პაკეტები',
+      singleLabel: 'ინდივიდუალური',
+      singleDesc: '1 პროფილი + QR დაფა + 3 წელი ჰოსტინგი',
+      familyLabel: 'საოჯახო პაკეტი',
+      familyDesc: '4 პროფილი + 4 QR დაფა + 3 წელი ჰოსტინგი',
+      familySavings: 'დაზოგეთ 50%-მდე',
+      renewalNote: 'ამის შემდეგ მხოლოდ {renewalPrice}/წელიწადში. გადახდის შემდეგ პროფილი ავტომატურად არ ქვეყნდება — თქვენ დაამტკიცებთ და მხოლოდ მაშინ გამოქვეყნდება.',
+      viewDetails: 'იხილეთ სრული ფასების დეტალები',
+    },
+
+    testimonialSection: {
+      heading: 'რას ამბობენ ოჯახები',
     },
 
     familyPage: {

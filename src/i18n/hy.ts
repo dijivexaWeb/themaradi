@@ -29,6 +29,9 @@ const hy: LangDict = {
         'Ընտanekան կisvelu անձnakan հղum',
       ],
       trustBadge: 'Ոչ մի հիշողություն, լուսանկար կամ ցավակցության խոսք չի հրապարակվում առանց ընտանիքի հաստատման։',
+      subLine: 'QR կոդով հիշատակի պրոֆիլում լուսանկարները, տեսանյութերը, ձայնագրություններն ու ցավակցությունները հավաքված են մեկ տեղում։',
+      ctaTrustLine: 'QR Ցուցատախտակը ներառված է • Առաջին 3 տարվա հոսթինգը անվճար • 30-օրյա գումարի վերադարձի երաշխիք',
+      watchVideo: 'Դիտել (30 վրկ)',
     },
 
     profilePreview: {
@@ -192,7 +195,7 @@ const hy: LangDict = {
       memorialPriceLabel: '',
       memorialHostingBadge: 'Առաջին 3 տարի հոստինգն անվճար',
       memorialHostingLine1: 'QR ցուցանակ + կարգաբերում + առաջին 3 տարի ամպային հոստինգ',
-      memorialHostingLine2: '4-րդ տարուց ընդամենը 29 ₾ / տարի',
+      memorialHostingLine2: '4-րդ տարուց ընդամենը {renewalPrice} / տարի',
       memorialHostingRenewalNote: 'Չվճարման դեպքում պատկերասրահը թաքցվում է — էջը չի ջնջվում:',
       memorialFeaturesHeading: 'Փաթեթում ներառված է ամեն ինչ.',
       memorialFeatures: [
@@ -254,6 +257,21 @@ const hy: LangDict = {
       viewAllLink: 'գնագոյացման էջը',
       viewAllSuffix: 'ին:',
       demoProfileCta: 'Սեղմեք՝ տեսնելու համար հիշատակի պրոֆիլի նմուշ էջը',
+    },
+
+    packagesSection: {
+      heading: 'Մեր փաթեթները',
+      singleLabel: 'Անհատական',
+      singleDesc: '1 պրոֆիլ + QR ցուցատախտակ + 3 տարվա հոսթինգ',
+      familyLabel: 'Ընտանեկան փաթեթ',
+      familyDesc: '4 պրոֆիլ + 4 QR ցուցատախտակ + 3 տարվա հոսթինգ',
+      familySavings: 'Խնայեք մինչև 50%',
+      renewalNote: 'Դրանից հետո ընդամենը {renewalPrice}/տարի։ Պրոֆիլը երբեք ավտոմատ չի հրապարակվում — այն մնում է սևագիր, մինչև դուք հաստատեք։',
+      viewDetails: 'Տեսնել գների ամբողջական մանրամասները',
+    },
+
+    testimonialSection: {
+      heading: 'Ինչ են ասում ընտանիքները',
     },
 
     familyPage: {

@@ -27,6 +27,9 @@ const en = {
         'Private family sharing link',
       ],
       trustBadge: 'No memory, photo or condolence message is published without family approval.',
+      subLine: 'A QR-coded memorial profile bringing together photos, videos, voice recordings and condolences.',
+      ctaTrustLine: 'QR Plate Included • First 3 Years Hosting Free • 30-Day Money-Back Guarantee',
+      watchVideo: 'Watch (30s)',
     },
 
     profilePreview: {
@@ -190,7 +193,7 @@ const en = {
       memorialPriceLabel: '',
       memorialHostingBadge: 'First 3 Years Hosting Included Free',
       memorialHostingLine1: 'QR plate + setup + first 3 years cloud hosting',
-      memorialHostingLine2: 'From year 4 onwards — only 29 ₾ / year',
+      memorialHostingLine2: 'From year 4 onwards — only {renewalPrice} / year',
       memorialHostingRenewalNote: 'If unpaid, gallery is hidden — page is never deleted.',
       memorialFeaturesHeading: 'Everything included in the package:',
       memorialFeatures: [
@@ -252,6 +255,21 @@ const en = {
       viewAllLink: 'pricing page',
       viewAllSuffix: 'for all details.',
       demoProfileCta: 'Click here to view a sample memorial profile',
+    },
+
+    packagesSection: {
+      heading: 'Our Packages',
+      singleLabel: 'Individual',
+      singleDesc: '1 Profile + QR Plate + 3 years hosting',
+      familyLabel: 'Family Package',
+      familyDesc: '4 Profiles + 4 QR Plates + 3 years hosting',
+      familySavings: 'Save up to 50%',
+      renewalNote: 'After that, just {renewalPrice}/year. Your profile is never published automatically — it stays a draft until you approve it.',
+      viewDetails: 'See full pricing details',
+    },
+
+    testimonialSection: {
+      heading: 'What Families Are Saying',
     },
 
     familyPage: {

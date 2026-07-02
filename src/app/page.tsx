@@ -5,6 +5,7 @@ import { fetchPricingConfig } from '@/lib/pricing'
 import { createServiceClient } from '@/lib/supabase/server'
 import type { RecentMemorial } from '@/components/landing/RecentMemorialsCarousel'
 import type { NotableMemorial } from '@/components/landing/NotableProfilesSection'
+import type { TestimonialMemorial } from '@/components/landing/TestimonialSection'
 
 export const revalidate = 3600
 
@@ -32,7 +33,7 @@ export default async function LandingPage() {
     fetchPricingConfig(),
     supabase
       .from('vaults')
-      .select('id, display_name, slug, tagline, birth_date, death_date, cover_photo_url, nationality, notable_subtitle')
+      .select('id, display_name, slug, tagline, birth_date, death_date, cover_photo_url, nationality, notable_subtitle, birth_place')
       .eq('status', 'public_memorial')
       .eq('is_notable', true)
       .order('notable_sort_order', { ascending: true, nullsFirst: false })
@@ -46,14 +47,17 @@ export default async function LandingPage() {
       .limit(10),
   ])
 
-  // Attach family info to recent memorials
+  const notableIds = (notableRaw ?? []).map((v) => v.id)
+
+  // Attach family info to recent + notable memorials
   const recentIds = (recentMemorials ?? []).map((v) => v.id)
   const familyMap: Record<string, { name: string; slug: string }> = {}
-  if (recentIds.length > 0) {
+  const familyLookupIds = [...recentIds, ...notableIds]
+  if (familyLookupIds.length > 0) {
     const { data: familyLinks } = await supabase
       .from('family_members')
       .select('vault_id, memorial_families(name, slug)')
-      .in('vault_id', recentIds)
+      .in('vault_id', familyLookupIds)
     for (const link of familyLinks ?? []) {
       const raw = link.memorial_families as { name: string; slug: string }[] | { name: string; slug: string } | null
       const fam = Array.isArray(raw) ? raw[0] : raw
@@ -61,7 +65,18 @@ export default async function LandingPage() {
     }
   }
 
-  const notableIds = (notableRaw ?? []).map((v) => v.id)
+  // Testimonial kartları: İstanbollu ailesi hariç ilk 4 notable profil
+  const testimonialMemorials: TestimonialMemorial[] = (notableRaw ?? [])
+    .filter((v) => familyMap[v.id]?.slug !== 'istanbollu')
+    .slice(0, 4)
+    .map((v) => ({
+      id: v.id,
+      display_name: v.display_name,
+      slug: v.slug,
+      cover_photo_url: v.cover_photo_url,
+      tagline: v.tagline,
+      birth_place: v.birth_place,
+    }))
   const interactionTotals: Record<string, number> = {}
   if (notableIds.length > 0) {
     const { data: actions } = await supabase
@@ -102,6 +117,7 @@ export default async function LandingPage() {
           pricing={pricing}
           notableMemorials={notableMemorials}
           recentMemorials={(recentMemorials ?? []).map(m => ({ ...m, family: familyMap[m.id] ?? null })) as RecentMemorial[]}
+          testimonialMemorials={testimonialMemorials}
         />
       </div>
     </>

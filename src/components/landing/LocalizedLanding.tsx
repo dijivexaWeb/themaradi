@@ -17,6 +17,7 @@ import HeroPhoneShowcase from './HeroPhoneShowcase'
 import TeamSection from './TeamSection'
 import RecentMemorialsCarousel, { type RecentMemorial } from './RecentMemorialsCarousel'
 import NotableProfilesSection, { type NotableMemorial } from './NotableProfilesSection'
+import TestimonialSection, { type TestimonialMemorial } from './TestimonialSection'
 import type { PricingConfig } from '@/lib/pricing'
 
 /* ─── Types ───────────────────────────────────────────────── */
@@ -24,15 +25,23 @@ type CurrencyView = {
   symbol: string; memorial: string; vaultSetup: string
   vaultMonthly: string; campaignMemorial: string; campaignVaultMonthly: string
   family: string; campaignFamily: string
+  renewalPrice: string; renewalSymbol: string
+}
+// Yenileme fiyatı sadece GEL/USD/TRY olarak DB'de tutulur — TR ₺, KA ₾, diğer tüm diller (ru dahil) $ kullanır.
+function getRenewal(pricing: PricingConfig, lang: string): { renewalPrice: string; renewalSymbol: string } {
+  if (lang === 'tr') return { renewalPrice: pricing.hostingRenewalTry, renewalSymbol: '₺' }
+  if (lang === 'ka') return { renewalPrice: pricing.hostingRenewalGel, renewalSymbol: '₾' }
+  return { renewalPrice: pricing.hostingRenewalUsd, renewalSymbol: '$' }
 }
 function buildCurrencyView(pricing: PricingConfig, lang: string): CurrencyView {
+  const renewal = getRenewal(pricing, lang)
   if (lang === 'tr' && pricing.memorialTry)
-    return { symbol: '₺', memorial: pricing.memorialTry, vaultSetup: pricing.vaultSetupTry || pricing.vaultSetup, vaultMonthly: pricing.vaultMonthlyTry || pricing.vaultMonthly, campaignMemorial: pricing.campaignMemorialTry, campaignVaultMonthly: pricing.campaignVaultMonthlyTry, family: pricing.familyTry || pricing.familyGel, campaignFamily: pricing.campaignFamilyTry }
+    return { symbol: '₺', memorial: pricing.memorialTry, vaultSetup: pricing.vaultSetupTry || pricing.vaultSetup, vaultMonthly: pricing.vaultMonthlyTry || pricing.vaultMonthly, campaignMemorial: pricing.campaignMemorialTry, campaignVaultMonthly: pricing.campaignVaultMonthlyTry, family: pricing.familyTry || pricing.familyGel, campaignFamily: pricing.campaignFamilyTry, ...renewal }
   if ((lang === 'en' || lang === 'he') && pricing.memorialUsd)
-    return { symbol: '$', memorial: pricing.memorialUsd, vaultSetup: pricing.vaultSetupUsd || pricing.vaultSetup, vaultMonthly: pricing.vaultMonthlyUsd || pricing.vaultMonthly, campaignMemorial: pricing.campaignMemorialUsd, campaignVaultMonthly: pricing.campaignVaultMonthlyUsd, family: pricing.familyUsd || pricing.familyGel, campaignFamily: pricing.campaignFamilyUsd }
+    return { symbol: '$', memorial: pricing.memorialUsd, vaultSetup: pricing.vaultSetupUsd || pricing.vaultSetup, vaultMonthly: pricing.vaultMonthlyUsd || pricing.vaultMonthly, campaignMemorial: pricing.campaignMemorialUsd, campaignVaultMonthly: pricing.campaignVaultMonthlyUsd, family: pricing.familyUsd || pricing.familyGel, campaignFamily: pricing.campaignFamilyUsd, ...renewal }
   if (lang === 'ru' && pricing.memorialRub)
-    return { symbol: '₽', memorial: pricing.memorialRub, vaultSetup: pricing.vaultSetupRub || pricing.vaultSetup, vaultMonthly: pricing.vaultMonthlyRub || pricing.vaultMonthly, campaignMemorial: pricing.campaignMemorialRub, campaignVaultMonthly: pricing.campaignVaultMonthlyRub, family: pricing.familyRub || pricing.familyGel, campaignFamily: pricing.campaignFamilyRub }
-  return { symbol: '₾', memorial: pricing.memorialPrice, vaultSetup: pricing.vaultSetup, vaultMonthly: pricing.vaultMonthly, campaignMemorial: pricing.campaignMemorial, campaignVaultMonthly: pricing.campaignVaultMonthly, family: pricing.familyGel, campaignFamily: pricing.campaignFamilyGel }
+    return { symbol: '₽', memorial: pricing.memorialRub, vaultSetup: pricing.vaultSetupRub || pricing.vaultSetup, vaultMonthly: pricing.vaultMonthlyRub || pricing.vaultMonthly, campaignMemorial: pricing.campaignMemorialRub, campaignVaultMonthly: pricing.campaignVaultMonthlyRub, family: pricing.familyRub || pricing.familyGel, campaignFamily: pricing.campaignFamilyRub, ...renewal }
+  return { symbol: '₾', memorial: pricing.memorialPrice, vaultSetup: pricing.vaultSetup, vaultMonthly: pricing.vaultMonthly, campaignMemorial: pricing.campaignMemorial, campaignVaultMonthly: pricing.campaignVaultMonthly, family: pricing.familyGel, campaignFamily: pricing.campaignFamilyGel, ...renewal }
 }
 
 const stepIcons = [QrCode, BookOpen, Users, ShieldCheck] as const
@@ -143,17 +152,19 @@ function FooterColumn({ title, links }: { title: string; links: { href: string; 
 }
 
 /* ─── Main component ─────────────────────────────────────── */
-export default function LocalizedLanding({ pricing, notableMemorials, recentMemorials }: {
-  pricing: PricingConfig; notableMemorials: NotableMemorial[]; recentMemorials: RecentMemorial[]
+export default function LocalizedLanding({ pricing, notableMemorials, recentMemorials, testimonialMemorials }: {
+  pricing: PricingConfig; notableMemorials: NotableMemorial[]; recentMemorials: RecentMemorial[]; testimonialMemorials: TestimonialMemorial[]
 }) {
   useReveal()
   const { t, lang } = useLang()
   const [openFaq, setOpenFaq] = useState<number | null>(null)
   const [profileTab, setProfileTab] = useState<'photos' | 'videos' | 'bio' | 'timeline' | 'taziye'>('photos')
+  const [heroVideoPlaying, setHeroVideoPlaying] = useState(false)
   const cur = buildCurrencyView(pricing, lang)
   const formatPrice = (p: string) => (lang === 'en' || lang === 'he') ? `${cur.symbol}${p}` : `${p}${cur.symbol}`
   const campaignPriceText = formatPrice(pricing.campaignActive && cur.campaignMemorial ? cur.campaignMemorial : cur.memorial)
   const regularPriceText = formatPrice(cur.memorial)
+  const renewalPriceText = cur.renewalSymbol === '$' ? `${cur.renewalSymbol}${cur.renewalPrice}` : `${cur.renewalPrice} ${cur.renewalSymbol}`
 
   const quickSteps = t.landing.quickSteps
   const securityItems = t.landing.securityItems
@@ -185,14 +196,30 @@ export default function LocalizedLanding({ pricing, notableMemorials, recentMemo
                 </span>
               </h1>
 
+              {/* Alt başlık */}
+              <p style={{ fontFamily: S.sans, fontSize: 'clamp(13px,1.6vw,16px)', fontWeight: 500, color: S.gold, margin: '0 0 20px', lineHeight: 1.5 }}>
+                {s.hero.subLine}
+              </p>
+
               {/* Video — Cloudflare Stream (adaptive bitrate, auto-compressed) */}
               <div style={{ borderRadius: 16, overflow: 'hidden', border: '1px solid rgba(201,169,110,.18)', boxShadow: '0 24px 60px rgba(0,0,0,.55)', marginBottom: 20, background: '#0a0a10', position: 'relative', aspectRatio: '16/9' }}>
                 <iframe
-                  src="https://customer-44azkazwu9bziwvs.cloudflarestream.com/aee794b124e48f9a8e581ad718a34fa4/iframe?autoplay=true&muted=true&loop=true&controls=false&preload=auto&letterboxColor=transparent"
+                  src={`https://customer-44azkazwu9bziwvs.cloudflarestream.com/aee794b124e48f9a8e581ad718a34fa4/iframe?autoplay=${heroVideoPlaying}&muted=true&loop=true&controls=false&preload=auto&letterboxColor=transparent`}
                   style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', border: 'none' }}
                   allow="autoplay; fullscreen; picture-in-picture"
                   title="The Eternal Memory — hero video"
                 />
+                {!heroVideoPlaying && (
+                  <button
+                    onClick={() => setHeroVideoPlaying(true)}
+                    style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(7,7,13,.32)', border: 'none', cursor: 'pointer', zIndex: 2 }}
+                  >
+                    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, padding: '13px 24px', borderRadius: 999, background: S.goldGrad, color: '#14110a', fontWeight: 600, fontSize: 14.5, fontFamily: S.sans, boxShadow: '0 8px 24px rgba(0,0,0,.4)' }}>
+                      <Play style={{ width: 16, height: 16, fill: '#14110a' }} />
+                      {s.hero.watchVideo}
+                    </span>
+                  </button>
+                )}
                 <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 60, background: 'linear-gradient(to top, rgba(7,7,13,.6), transparent)', pointerEvents: 'none' }} />
               </div>
 
@@ -204,6 +231,9 @@ export default function LocalizedLanding({ pricing, notableMemorials, recentMemo
                 {s.hero.ctaPrimary}
                 <ArrowRight style={{ width: 19, height: 19 }} />
               </Link>
+              <p style={{ textAlign: 'center', fontSize: 12.5, fontWeight: 300, color: S.textMuted, margin: '10px 0 0', fontFamily: S.sans }}>
+                {s.hero.ctaTrustLine}
+              </p>
             </div>
 
             {/* ── Right: Phone showcase ───────────────────────────── */}
@@ -213,6 +243,41 @@ export default function LocalizedLanding({ pricing, notableMemorials, recentMemo
 
           </div>
         </section>
+
+        {/* ═══ PAKETLERİMİZ — ÖZET FİYAT ═══════════════════════════ */}
+        <section style={{ padding: 'clamp(28px,5vh,48px) clamp(20px,4vw,60px) clamp(40px,6vh,64px)' }}>
+          <div style={{ maxWidth: 1000, margin: '0 auto' }}>
+            <div className="tem-reveal" style={{ textAlign: 'center', marginBottom: 32 }}>
+              <SectionHeading style={{ fontSize: 'clamp(26px,3.6vw,40px)' }}>{s.packagesSection.heading}</SectionHeading>
+            </div>
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 20 }}>
+              <div className="tem-reveal tem-card" style={{ flex: '1 1 260px', borderRadius: 20, padding: '28px 26px', background: S.card, border: `1px solid ${S.cardBorder}` }}>
+                <div style={{ fontFamily: S.serif, fontSize: 19, color: S.textHead, marginBottom: 6 }}>{s.packagesSection.singleLabel}</div>
+                <div style={{ fontFamily: S.serif, fontSize: 40, fontWeight: 500, color: S.goldBright, marginBottom: 8 }}>{formatPrice(pricing.campaignActive && cur.campaignMemorial ? cur.campaignMemorial : cur.memorial)}</div>
+                <div style={{ fontSize: 13.5, fontWeight: 300, color: S.textMuted, fontFamily: S.sans }}>{s.packagesSection.singleDesc}</div>
+              </div>
+              <div className="tem-reveal tem-card" style={{ flex: '1 1 260px', borderRadius: 20, padding: '28px 26px', background: 'rgba(143,184,158,.06)', border: '1px solid rgba(143,184,158,.25)', position: 'relative' }}>
+                <div style={{ position: 'absolute', top: 14, right: 18, fontSize: 10, letterSpacing: '.12em', textTransform: 'uppercase', color: '#0a0c0b', background: 'linear-gradient(90deg, #8FB89E, #a3d4b4)', padding: '4px 10px', borderRadius: 999, fontFamily: S.sans, fontWeight: 600 }}>
+                  {s.packagesSection.familySavings}
+                </div>
+                <div style={{ fontFamily: S.serif, fontSize: 19, color: S.textHead, marginBottom: 6 }}>{s.packagesSection.familyLabel}</div>
+                <div style={{ fontFamily: S.serif, fontSize: 40, fontWeight: 500, color: '#a3d4b4', marginBottom: 8 }}>{formatPrice(pricing.campaignActive && cur.campaignFamily ? cur.campaignFamily : cur.family)}</div>
+                <div style={{ fontSize: 13.5, fontWeight: 300, color: S.textMuted, fontFamily: S.sans }}>{s.packagesSection.familyDesc}</div>
+              </div>
+            </div>
+            <p style={{ textAlign: 'center', fontSize: 13, fontWeight: 300, color: S.textFaint, margin: '22px auto 0', fontFamily: S.sans, maxWidth: 640 }}>
+              {s.packagesSection.renewalNote.replace('{renewalPrice}', renewalPriceText)}
+            </p>
+            <div style={{ textAlign: 'center', marginTop: 18 }}>
+              <Link href="#fiyatlar" style={{ color: S.gold, fontSize: 13.5, fontFamily: S.sans, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
+                {s.packagesSection.viewDetails} <ArrowRight style={{ width: 13, height: 13 }} />
+              </Link>
+            </div>
+          </div>
+        </section>
+
+        {/* ═══ TESTIMONIALS ════════════════════════════════════════ */}
+        <TestimonialSection memorials={testimonialMemorials} heading={s.testimonialSection.heading} />
 
         <SectionDivider delay={0} />
 
@@ -759,7 +824,7 @@ export default function LocalizedLanding({ pricing, notableMemorials, recentMemo
                         </div>
                         <div style={{ display: 'flex', alignItems: 'flex-start', gap: 8, fontSize: 13, fontWeight: 300, color: 'rgba(201,169,110,.72)', fontFamily: S.sans }}>
                           <span style={{ flexShrink: 0, marginTop: 1 }}>↻</span>
-                          <span>{p.memorialHostingLine2}</span>
+                          <span>{p.memorialHostingLine2.replace('{renewalPrice}', renewalPriceText)}</span>
                         </div>
                         <p style={{ margin: '7px 0 0', fontSize: 11.5, fontWeight: 300, color: 'rgba(237,232,221,.35)', fontFamily: S.sans }}>
                           {p.memorialHostingRenewalNote}

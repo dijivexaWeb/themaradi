@@ -29,6 +29,9 @@ const ru: LangDict = {
         'Личная семейная ссылка',
       ],
       trustBadge: 'Ни одно воспоминание, фото или соболезнование не публикуется без одобрения семьи.',
+      subLine: 'Мемориальный профиль с QR-кодом объединяет фотографии, видео, аудиозаписи и соболезнования в одном месте.',
+      ctaTrustLine: 'QR-табличка включена • Первые 3 года хостинга бесплатно • Гарантия возврата денег 30 дней',
+      watchVideo: 'Смотреть (30 сек)',
     },
 
     profilePreview: {
@@ -192,7 +195,7 @@ const ru: LangDict = {
       memorialPriceLabel: '',
       memorialHostingBadge: 'Первые 3 года хостинг в подарок',
       memorialHostingLine1: 'QR-пластина + настройка + первые 3 года облачного хостинга',
-      memorialHostingLine2: 'С 4-го года — всего 29 ₾ / год',
+      memorialHostingLine2: 'С 4-го года — всего {renewalPrice} / год',
       memorialHostingRenewalNote: 'При неоплате галерея скрывается — страница не удаляется.',
       memorialFeaturesHeading: 'Всё включено в пакет:',
       memorialFeatures: [
@@ -254,6 +257,21 @@ const ru: LangDict = {
       viewAllLink: 'странице цен',
       viewAllSuffix: '.',
       demoProfileCta: 'Нажмите для просмотра примера мемориального профиля',
+    },
+
+    packagesSection: {
+      heading: 'Наши пакеты',
+      singleLabel: 'Индивидуальный',
+      singleDesc: '1 профиль + QR-табличка + 3 года хостинга',
+      familyLabel: 'Семейный пакет',
+      familyDesc: '4 профиля + 4 QR-таблички + 3 года хостинга',
+      familySavings: 'Экономия до 50%',
+      renewalNote: 'После этого всего {renewalPrice}/год. Профиль никогда не публикуется автоматически — он остаётся черновиком, пока вы его не одобрите.',
+      viewDetails: 'Посмотреть все цены',
+    },
+
+    testimonialSection: {
+      heading: 'Что говорят семьи',
     },
 
     familyPage: {
