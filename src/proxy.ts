@@ -1,5 +1,6 @@
-import { type NextRequest } from 'next/server'
+import { NextResponse, type NextRequest } from 'next/server'
 import { updateSession } from '@/lib/supabase/middleware'
+import { PREFIXED_LOCALES, isLocaleEligible, stripLocalePrefix } from '@/lib/i18n/localizedHref'
 
 // Country code → language mapping (Vercel provides x-vercel-ip-country)
 const COUNTRY_LANG: Record<string, string> = {
@@ -31,17 +32,53 @@ function detectLangFromRequest(request: NextRequest): string | null {
 }
 
 export async function proxy(request: NextRequest) {
-  const response = await updateSession(request)
+  const pathname = request.nextUrl.pathname
 
-  // Admin paths: no caching
-  if (request.nextUrl.pathname.startsWith('/admin')) {
-    response.headers.set('Cache-Control', 'no-store, no-cache')
+  // /api ve /admin: dil mantığı tamamen atlanır.
+  if (pathname.startsWith('/api') || pathname.startsWith('/admin')) {
+    const adminResponse = await updateSession(request)
+    if (pathname.startsWith('/admin')) {
+      adminResponse.headers.set('Cache-Control', 'no-store, no-cache')
+    }
+    return adminResponse
   }
 
-  // Only set language cookie on first visit (user hasn't chosen manually yet)
-  if (!request.cookies.get('tm_lang')) {
-    const lang = detectLangFromRequest(request) ?? 'en'
-    response.cookies.set('tm_lang', lang, {
+  const prefixed = stripLocalePrefix(pathname)
+
+  // Önekli bir yol geldi ve gerçekten önek kapsamındaki bir sayfaysa: içeride
+  // öneksiz path'e rewrite et, tm_lang cookie'sini senkronla.
+  if (prefixed && isLocaleEligible(prefixed.rest)) {
+    const url = request.nextUrl.clone()
+    url.pathname = prefixed.rest
+    const rewritten = NextResponse.rewrite(url, { request })
+    rewritten.headers.set('x-tm-locale', prefixed.locale)
+    rewritten.cookies.set('tm_lang', prefixed.locale, {
+      path: '/',
+      maxAge: 60 * 60 * 24 * 365,
+      sameSite: 'lax',
+    })
+    return rewritten
+  }
+
+  const response = await updateSession(request)
+
+  // İlk ziyaret (tm_lang cookie yok) + önek kapsamındaki bir sayfa: tespit
+  // edilen dil tr değilse ilgili önekli URL'e yönlendir. tr veya tespit
+  // edilemezse TR öneksiz kalır — mevcut indekslenmiş URL'ler bozulmaz.
+  if (!request.cookies.get('tm_lang') && isLocaleEligible(pathname)) {
+    const lang = detectLangFromRequest(request)
+    if (lang && lang !== 'tr' && (PREFIXED_LOCALES as readonly string[]).includes(lang)) {
+      const url = request.nextUrl.clone()
+      url.pathname = `/${lang}${pathname === '/' ? '' : pathname}`
+      const redirected = NextResponse.redirect(url)
+      redirected.cookies.set('tm_lang', lang, {
+        path: '/',
+        maxAge: 60 * 60 * 24 * 365,
+        sameSite: 'lax',
+      })
+      return redirected
+    }
+    response.cookies.set('tm_lang', lang ?? 'en', {
       path: '/',
       maxAge: 60 * 60 * 24 * 365,
       sameSite: 'lax',

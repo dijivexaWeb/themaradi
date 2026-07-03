@@ -204,11 +204,11 @@ export default function PremiumFamilyPageClient({
           <BrandLogo href="/" light={true} />
           
           <ul className="nav-menu">
-            <li><a href="#" className="nav-link">Anasayfa</a></li>
-            {memories.length > 0 && <li><a href="#anilar" className="nav-link">Aile Anıları</a></li>}
-            {displayPhotos.length > 0 && <li><a href="#galeri" className="nav-link">Fotoğraflar</a></li>}
-            {memberVaults.length > 0 && <li><a href="#uyeler" className="nav-link">Aile Üyeleri</a></li>}
-            {condolences.length > 0 && <li><a href="#taziye" className="nav-link">Anı Defteri</a></li>}
+            <li><a href="#" className="nav-link">{fpT.navHome || 'Anasayfa'}</a></li>
+            {memories.length > 0 && <li><a href="#anilar" className="nav-link">{fpT.navMemories || 'Aile Anıları'}</a></li>}
+            {displayPhotos.length > 0 && <li><a href="#galeri" className="nav-link">{fpT.navPhotos || 'Fotoğraflar'}</a></li>}
+            {memberVaults.length > 0 && <li><a href="#uyeler" className="nav-link">{fpT.navMembers || 'Aile Üyeleri'}</a></li>}
+            {condolences.length > 0 && <li><a href="#taziye" className="nav-link">{fpT.navCondolences || 'Anı Defteri'}</a></li>}
           </ul>
           
           <div className="header-actions">
@@ -468,7 +468,7 @@ export default function PremiumFamilyPageClient({
                         e.stopPropagation()
                         setActiveMemory(mem)
                       }}>
-                        <span>Devamını Oku</span>
+                        <span>{fpT.readMore || 'Devamını Oku'}</span>
                         <svg viewBox="0 0 24 24"><path d="M5,12H19M19,12L12,5M19,12L12,19" stroke="currentColor" strokeWidth="2" fill="none"/></svg>
                       </button>
                     </div>
@@ -505,7 +505,7 @@ export default function PremiumFamilyPageClient({
 
             <div className="section-footer-btn">
               <button id="btn-view-all" className="btn-view-profile" style={{ width: 'auto', padding: '12px 32px' }} onClick={() => openLightbox(0)}>
-                <span>Tümünü Gör</span>
+                <span>{fpT.viewAllLabel || 'Tümünü Gör'}</span>
                 <svg viewBox="0 0 24 24" style={{ width: '14px', height: '14px' }}><path d="M5,12H19M19,12L12,5M19,12L12,19" stroke="currentColor" strokeWidth="2" fill="none"/></svg>
               </button>
             </div>
@@ -642,7 +642,7 @@ export default function PremiumFamilyPageClient({
           <div className="footer-top">
             <div className="footer-logo">
               <BrandLogo href="/" light={true} />
-              <p className="footer-logo-tagline">Hatıralar asla solmaz.</p>
+              <p className="footer-logo-tagline">{fpT.footerTagline || 'Hatıralar asla solmaz.'}</p>
             </div>
             
             <div className="footer-links">

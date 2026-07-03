@@ -1,14 +1,11 @@
 'use client'
 
 import { useState, useTransition } from 'react'
-import { X, ChevronRight, Loader2, CheckCircle2, Copy, ExternalLink } from 'lucide-react'
+import { X, ChevronRight, Loader2, CheckCircle2, MessageCircle } from 'lucide-react'
 import { quickPurchaseMemorialAction } from '@/lib/actions/quick-purchase'
 import { useLang } from '@/i18n/context'
 
 interface BankInfo {
-  iban: string
-  bankName: string
-  accountHolder: string
   amount: number
   currency: string
 }
@@ -16,14 +13,13 @@ interface BankInfo {
 interface Props {
   familyId: string
   bankInfo: BankInfo
-  paypalLink?: string | null
   onSuccess?: (vaultId: string) => void
   cardMode?: boolean
 }
 
-type Step = 'info' | 'payment' | 'confirm' | 'done'
+type Step = 'info' | 'confirm' | 'done'
 
-export default function QuickPurchaseModal({ familyId, bankInfo, paypalLink, onSuccess, cardMode = false }: Props) {
+export default function QuickPurchaseModal({ familyId, bankInfo, onSuccess, cardMode = false }: Props) {
   const { t } = useLang()
   const q = t.quickPurchase
 
@@ -32,16 +28,15 @@ export default function QuickPurchaseModal({ familyId, bankInfo, paypalLink, onS
   const [displayName, setDisplayName] = useState('')
   const [qrSame, setQrSame] = useState<'yes' | 'no' | null>(null)
   const [shippingAddr, setShippingAddr] = useState('')
-  const [paymentMethod, setPaymentMethod] = useState<'bank_transfer' | 'paypal'>('bank_transfer')
-  const [copiedIban, setCopiedIban] = useState(false)
   const [isPending, startTransition] = useTransition()
   const [error, setError] = useState<string | null>(null)
   const [doneVaultId, setDoneVaultId] = useState<string | null>(null)
+  const [waLink, setWaLink] = useState<string | null>(null)
 
   const reset = () => {
     setStep('info'); setDisplayName(''); setQrSame(null)
-    setShippingAddr(''); setPaymentMethod('bank_transfer')
-    setError(null); setDoneVaultId(null)
+    setShippingAddr('')
+    setError(null); setDoneVaultId(null); setWaLink(null)
   }
   const close = () => { setOpen(false); setTimeout(reset, 300) }
 
@@ -53,21 +48,15 @@ export default function QuickPurchaseModal({ familyId, bankInfo, paypalLink, onS
     fd.set('display_name', displayName.trim())
     fd.set('qr_same_address', qrSame ?? 'yes')
     fd.set('shipping_address', shippingAddr)
-    fd.set('payment_method', paymentMethod)
 
     const action = quickPurchaseMemorialAction.bind(null, familyId, null)
     startTransition(async () => {
       const result = await action(fd)
       if (!result.ok) { setError(result.error); return }
       setDoneVaultId(result.vaultId)
+      setWaLink(result.waLink)
       setStep('done')
       onSuccess?.(result.vaultId)
-    })
-  }
-
-  const copyIban = () => {
-    navigator.clipboard.writeText(bankInfo.iban).then(() => {
-      setCopiedIban(true); setTimeout(() => setCopiedIban(false), 2000)
     })
   }
 
@@ -108,7 +97,6 @@ export default function QuickPurchaseModal({ familyId, bankInfo, paypalLink, onS
                 <h2 className="font-semibold text-[#1f2d27]">{q.title}</h2>
                 <p className="text-xs text-[#788177] mt-0.5">
                   {step === 'info' && q.steps.info}
-                  {step === 'payment' && q.steps.payment}
                   {step === 'confirm' && q.steps.confirm}
                   {step === 'done' && q.steps.done}
                 </p>
@@ -121,10 +109,10 @@ export default function QuickPurchaseModal({ familyId, bankInfo, paypalLink, onS
             {/* Steps indicator */}
             {step !== 'done' && (
               <div className="flex gap-1.5 px-6 pt-4 shrink-0">
-                {(['info', 'payment', 'confirm'] as const).map((s, i) => (
+                {(['info', 'confirm'] as const).map((s, i) => (
                   <div key={s} className={`h-1 flex-1 rounded-full transition-all ${
                     step === s ? 'bg-[#174f35]' :
-                    ['info', 'payment', 'confirm'].indexOf(step) > i ? 'bg-[#174f35]/40' : 'bg-[#e5dccb]'
+                    ['info', 'confirm'].indexOf(step) > i ? 'bg-[#174f35]/40' : 'bg-[#e5dccb]'
                   }`} />
                 ))}
               </div>
@@ -183,98 +171,29 @@ export default function QuickPurchaseModal({ familyId, bankInfo, paypalLink, onS
                 </>
               )}
 
-              {/* STEP 2: Payment method */}
-              {step === 'payment' && (
-                <>
-                  <p className="text-sm text-[#4a5e55]">
-                    {q.payment.desc.replace('{name}', displayName)}
-                  </p>
-                  <div className="space-y-2">
-                    {[
-                      { value: 'bank_transfer' as const, emoji: '🏦', label: q.payment.bankLabel, desc: q.payment.bankDesc },
-                      ...(paypalLink ? [{ value: 'paypal' as const, emoji: '💳', label: q.payment.paypalLabel, desc: q.payment.paypalDesc }] : []),
-                    ].map(m => (
-                      <button
-                        key={m.value}
-                        type="button"
-                        onClick={() => setPaymentMethod(m.value)}
-                        className={`w-full flex items-center gap-4 rounded-2xl border-2 p-4 text-left transition-all ${
-                          paymentMethod === m.value
-                            ? 'border-[#174f35] bg-[#174f35]/5'
-                            : 'border-[#e5dccb] bg-white hover:border-[#174f35]/30'
-                        }`}
-                      >
-                        <span className="text-2xl">{m.emoji}</span>
-                        <div>
-                          <p className="font-semibold text-sm text-[#1f2d27]">{m.label}</p>
-                          <p className="text-xs text-[#788177]">{m.desc}</p>
-                        </div>
-                        <div className={`ml-auto h-4 w-4 rounded-full border-2 shrink-0 ${paymentMethod === m.value ? 'border-[#174f35] bg-[#174f35]' : 'border-[#c5bba9]'}`} />
-                      </button>
-                    ))}
-                  </div>
-                </>
-              )}
-
-              {/* STEP 3: Confirm */}
+              {/* STEP 2: Confirm — sipariş özeti */}
               {step === 'confirm' && (
                 <>
-                  {paymentMethod === 'bank_transfer' && (
-                    <div className="space-y-3">
-                      <div className="rounded-2xl border border-[#e5dccb] bg-white p-4 space-y-3">
-                        <div className="flex items-center gap-2 text-[#174f35]">
-                          <span className="text-lg">🏦</span>
-                          <span className="font-semibold text-sm">{bankInfo.bankName}</span>
-                        </div>
-
-                        <div>
-                          <p className="text-[10px] font-semibold uppercase tracking-widest text-[#adb5ab] mb-1">{q.confirm.accountHolder}</p>
-                          <p className="font-medium text-sm text-[#1f2d27]">{bankInfo.accountHolder}</p>
-                        </div>
-
-                        <div>
-                          <p className="text-[10px] font-semibold uppercase tracking-widest text-[#adb5ab] mb-1">IBAN</p>
-                          <div className="flex items-center gap-2">
-                            <p className="font-mono text-sm text-[#1f2d27] flex-1 break-all">{bankInfo.iban}</p>
-                            <button type="button" onClick={copyIban} className="flex items-center gap-1 rounded-lg bg-[#f0ece2] px-2 py-1 text-[11px] font-semibold text-[#174f35] hover:bg-[#e5dccb] transition-colors shrink-0">
-                              <Copy className="h-3 w-3" />
-                              {copiedIban ? q.confirm.copied : q.confirm.copy}
-                            </button>
-                          </div>
-                        </div>
-
-                        <div className="rounded-xl bg-[#174f35]/5 border border-[#174f35]/10 px-3 py-2.5">
-                          <p className="text-[10px] font-semibold uppercase tracking-widest text-[#adb5ab] mb-0.5">{q.confirm.amountLabel}</p>
-                          <p className="text-lg font-bold text-[#174f35]">{bankInfo.amount} {bankInfo.currency}</p>
-                        </div>
-
-                        <div className="rounded-xl bg-amber-50 border border-amber-100 px-3 py-2.5">
-                          <p className="text-xs text-amber-700">
-                            {q.confirm.referenceNote.replace('{name}', displayName)}
-                          </p>
-                        </div>
+                  <div className="space-y-3">
+                    <div className="rounded-2xl border border-[#e5dccb] bg-white p-4 space-y-3">
+                      <div className="flex items-center gap-2 text-[#174f35]">
+                        <span className="text-lg">🕯️</span>
+                        <span className="font-semibold text-sm">{displayName}</span>
                       </div>
 
-                      <p className="text-xs text-[#788177] text-center">{q.confirm.bankNote}</p>
-                    </div>
-                  )}
-
-                  {paymentMethod === 'paypal' && paypalLink && (
-                    <div className="space-y-3">
-                      <div className="rounded-2xl border border-[#e5dccb] bg-white p-4 text-center">
-                        <p className="text-3xl mb-2">💳</p>
-                        <p className="font-semibold text-[#1f2d27] mb-1">{q.confirm.paypalTitle}</p>
-                        <p className="text-sm text-[#788177] mb-4">
-                          {q.confirm.paypalAmount.replace('{amount}', String(bankInfo.amount)).replace('{currency}', bankInfo.currency)}
-                        </p>
-                        <a href={paypalLink} target="_blank" rel="noopener noreferrer"
-                          className="inline-flex items-center gap-2 rounded-xl bg-[#0070BA] px-5 py-3 text-sm font-semibold text-white hover:bg-[#003087] transition-colors">
-                          {q.confirm.paypalBtn} <ExternalLink className="h-3.5 w-3.5" />
-                        </a>
+                      <div className="rounded-xl bg-[#174f35]/5 border border-[#174f35]/10 px-3 py-2.5">
+                        <p className="text-[10px] font-semibold uppercase tracking-widest text-[#adb5ab] mb-0.5">{q.confirm.amountLabel}</p>
+                        <p className="text-lg font-bold text-[#174f35]">{bankInfo.amount} {bankInfo.currency}</p>
                       </div>
-                      <p className="text-xs text-[#788177] text-center">{q.confirm.paypalNote}</p>
                     </div>
-                  )}
+
+                    <div className="rounded-2xl border border-[#25D366]/25 bg-[#25D366]/5 p-4 text-sm text-[#4a5e55] leading-6">
+                      <p className="flex items-center gap-2 font-semibold text-[#1f2d27] mb-1">
+                        <MessageCircle className="h-4 w-4 text-[#128C7E]" /> WhatsApp&apos;tan Devam Edin
+                      </p>
+                      Siparişinizi onayladıktan sonra WhatsApp üzerinden bize ulaşarak ödemeyi kişisel olarak tamamlarsınız.
+                    </div>
+                  </div>
 
                   {error && (
                     <div className="rounded-xl bg-red-50 border border-red-200 px-3 py-2.5 text-sm text-red-600">{error}</div>
@@ -282,7 +201,7 @@ export default function QuickPurchaseModal({ familyId, bankInfo, paypalLink, onS
                 </>
               )}
 
-              {/* STEP 4: Done */}
+              {/* STEP 3: Done */}
               {step === 'done' && (
                 <div className="py-8 text-center">
                   <div className="flex justify-center mb-4">
@@ -292,6 +211,17 @@ export default function QuickPurchaseModal({ familyId, bankInfo, paypalLink, onS
                   <p className="text-sm text-[#4a5e55]">
                     {q.done.desc.replace('{name}', displayName)}
                   </p>
+                  {waLink && (
+                    <a
+                      href={waLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-5 inline-flex items-center justify-center gap-2 w-full rounded-xl bg-gradient-to-tr from-[#128C7E] to-[#25D366] hover:brightness-110 py-3 text-sm font-semibold text-white transition-all"
+                    >
+                      <MessageCircle className="h-4 w-4" />
+                      WhatsApp&apos;tan Devam Et
+                    </a>
+                  )}
                   <p className="text-xs text-[#adb5ab] mt-3">{q.done.trackNote}</p>
                 </div>
               )}
@@ -302,30 +232,16 @@ export default function QuickPurchaseModal({ familyId, bankInfo, paypalLink, onS
               {step === 'info' && (
                 <button
                   disabled={!canGoPayment}
-                  onClick={() => setStep('payment')}
+                  onClick={() => setStep('confirm')}
                   className="w-full flex items-center justify-center gap-2 rounded-xl bg-[#174f35] py-3.5 text-sm font-semibold text-white disabled:opacity-40 hover:bg-[#123f2b] transition-colors"
                 >
                   {q.btn.continue} <ChevronRight className="h-4 w-4" />
                 </button>
               )}
 
-              {step === 'payment' && (
-                <div className="flex gap-3">
-                  <button onClick={() => setStep('info')} className="flex-none rounded-xl border border-[#e5dccb] bg-white px-4 py-3 text-sm font-semibold text-[#4a5e55] hover:bg-[#f9f5ee] transition-colors">
-                    {q.btn.back}
-                  </button>
-                  <button
-                    onClick={() => setStep('confirm')}
-                    className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-[#174f35] py-3 text-sm font-semibold text-white hover:bg-[#123f2b] transition-colors"
-                  >
-                    {paymentMethod === 'bank_transfer' ? q.btn.seeBankInfo : q.btn.continuePaypal} <ChevronRight className="h-4 w-4" />
-                  </button>
-                </div>
-              )}
-
               {step === 'confirm' && (
                 <div className="flex gap-3">
-                  <button onClick={() => setStep('payment')} className="flex-none rounded-xl border border-[#e5dccb] bg-white px-4 py-3 text-sm font-semibold text-[#4a5e55] hover:bg-[#f9f5ee] transition-colors">
+                  <button onClick={() => setStep('info')} className="flex-none rounded-xl border border-[#e5dccb] bg-white px-4 py-3 text-sm font-semibold text-[#4a5e55] hover:bg-[#f9f5ee] transition-colors">
                     {q.btn.back}
                   </button>
                   <button

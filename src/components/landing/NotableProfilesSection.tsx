@@ -164,7 +164,7 @@ export default function NotableProfilesSection({ memorials }: { memorials: Notab
                   {(m.interaction_count ?? 0) > 0 && (
                     <div className="flex items-center gap-1 text-[9px] text-[#5a7a65]">
                       <span>✦</span>
-                      <span>{m.interaction_count} etkileşim</span>
+                      <span>{m.interaction_count} {s.interactionsLabel}</span>
                     </div>
                   )}
                   <div className="mt-auto flex items-center justify-between">

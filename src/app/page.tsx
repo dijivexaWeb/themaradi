@@ -4,9 +4,10 @@ import LocalizedLanding from '@/components/landing/LocalizedLanding'
 import { fetchPricingConfig } from '@/lib/pricing'
 import { createServiceClient } from '@/lib/supabase/server'
 import type { RecentMemorial } from '@/components/landing/RecentMemorialsCarousel'
-import type { NotableMemorial } from '@/components/landing/NotableProfilesSection'
+import type { HeroMemorial } from '@/components/landing/HeroPhoneShowcase'
 import type { TestimonialMemorial } from '@/components/landing/TestimonialSection'
 import { getFamilyThankYouQuote } from '@/lib/testimonialQuotes'
+import { buildAlternateLanguages } from '@/lib/i18n/hreflang'
 
 export const revalidate = 3600
 
@@ -18,6 +19,7 @@ export const metadata: Metadata = {
     'Sevdikleriniz için kalıcı dijital anma profili oluşturun. Fotoğraflar, hayat hikayesi, aile ağacı ve QR mezar taşı. Gürcistan, Türkiye ve dünya genelinde hizmet. — ციფრული მემორიალი, QR საფლავის ქვა, მოგონებები.',
   alternates: {
     canonical: APP_URL,
+    languages: buildAlternateLanguages('/'),
   },
   openGraph: {
     title: 'The Eternal Memory — Dijital Anma Profili & QR Mezar Taşı',
@@ -30,15 +32,8 @@ export const metadata: Metadata = {
 export default async function LandingPage() {
   const supabase = await createServiceClient()
 
-  const [pricing, { data: notableRaw }, { data: recentMemorials }, { data: testimonialCandidates }] = await Promise.all([
+  const [pricing, { data: recentMemorials }, { data: testimonialCandidates }] = await Promise.all([
     fetchPricingConfig(),
-    supabase
-      .from('vaults')
-      .select('id, display_name, slug, tagline, birth_date, death_date, cover_photo_url, nationality, notable_subtitle, birth_place')
-      .eq('status', 'public_memorial')
-      .eq('is_notable', true)
-      .order('notable_sort_order', { ascending: true, nullsFirst: false })
-      .order('published_at', { ascending: false }),
     supabase
       .from('vaults')
       .select('id, display_name, slug, tagline, birth_date, death_date, cover_photo_url, cover_video_url, birth_place, published_at')
@@ -56,13 +51,11 @@ export default async function LandingPage() {
       .limit(12),
   ])
 
-  const notableIds = (notableRaw ?? []).map((v) => v.id)
-
-  // Attach family info to recent + notable + testimonial memorials
+  // Attach family info to recent + testimonial memorials
   const recentIds = (recentMemorials ?? []).map((v) => v.id)
   const testimonialIds = (testimonialCandidates ?? []).map((v) => v.id)
   const familyMap: Record<string, { name: string; slug: string }> = {}
-  const familyLookupIds = [...recentIds, ...notableIds, ...testimonialIds]
+  const familyLookupIds = [...recentIds, ...testimonialIds]
   if (familyLookupIds.length > 0) {
     const { data: familyLinks } = await supabase
       .from('family_members')
@@ -89,19 +82,22 @@ export default async function LandingPage() {
       birth_place: v.birth_place,
     }))
   const interactionTotals: Record<string, number> = {}
-  if (notableIds.length > 0) {
+  if (recentIds.length > 0) {
     const { data: actions } = await supabase
       .from('memorial_actions')
       .select('memorial_id, count')
-      .in('memorial_id', notableIds)
+      .in('memorial_id', recentIds)
       .eq('is_active', true)
     for (const a of actions ?? []) {
       interactionTotals[a.memorial_id] = (interactionTotals[a.memorial_id] ?? 0) + ((a.count as number) ?? 0)
     }
   }
 
-  const notableMemorials: NotableMemorial[] = (notableRaw ?? []).map((v) => ({
+  // Hero'daki 3 kart: en son eklenen/güncellenen normal profiller (notable değil),
+  // recentMemorials zaten updated_at DESC sıralı — ilk 3'ü yeniden kullanıyoruz.
+  const heroMemorials: HeroMemorial[] = (recentMemorials ?? []).slice(0, 3).map((v) => ({
     ...v,
+    family: familyMap[v.id] ?? null,
     interaction_count: interactionTotals[v.id] ?? 0,
   }))
 
@@ -126,7 +122,7 @@ export default async function LandingPage() {
         <LandingNav />
         <LocalizedLanding
           pricing={pricing}
-          notableMemorials={notableMemorials}
+          heroMemorials={heroMemorials}
           recentMemorials={(recentMemorials ?? []).map(m => ({ ...m, family: familyMap[m.id] ?? null })) as RecentMemorial[]}
           testimonialMemorials={testimonialMemorials}
         />

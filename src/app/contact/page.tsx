@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import ContactPageClient from './ContactPageClient'
 import { getTurnstileSiteKey } from '@/lib/turnstile'
+import { buildAlternateLanguages } from '@/lib/i18n/hreflang'
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://theeternalmemory.com'
 
@@ -10,6 +11,7 @@ export const metadata: Metadata = {
     'The Eternal Memory ile iletişime geçin. Batumi, Gürcistan ofisimiz — dijital anma profili, aile paketi ve QR mezar taşı soruları için. WhatsApp ile hızlı destek.',
   alternates: {
     canonical: `${APP_URL}/contact`,
+    languages: buildAlternateLanguages('/contact'),
   },
   openGraph: {
     title: 'İletişim — The Eternal Memory',

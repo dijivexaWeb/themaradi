@@ -3,6 +3,210 @@
 > Her oturum sonunda Claude bu dosyayı günceller.
 > Format: tarih → ne yapıldı → nerede kalındı → sıradaki adım.
 
+## 2026-07-04 — Oturum 167: GSC İndeksleme Analizi + Hero'daki Ulusal Miras Kartlarını Gerçek Profillerle Değiştirme
+
+### Yapılanlar
+- **Google Search Console analizi** (kod değişikliği değil, canlı site incelemesi): Kullanıcının paylaştığı "Yönlendirmeli sayfa" (3), "Bulunamadı 404" (1), "Keşfedildi - dizine eklenmemiş" (19) raporları tek tek incelendi.
+  - `/satin-al` → `/#fiyatlar` redirect'i bilinçli bir tasarım (`src/app/satin-al/page.tsx`), hata değil.
+  - `/icon` 404'ü zararsız — sitede böyle bir dosya/route hiç yok, favicon zaten `/images/logo-mark.png` üzerinden doğru çalışıyor; Google'ın konvansiyonel bir yolu deneyip 404 alması normal.
+  - 19 "keşfedildi ama indexlenmedi" sayfanın hepsi anasayfadan gerçek `<a href>` ile linkleniyor (crawlability sorunu yok) — sadece "Son tarama: Yok" durumunda, yani yeni/düşük otoriteli site olduğu için Google henüz taramamış. Kod tarafında yapılacak bir şey yok; öneri: GSC'de "Dizine eklenmeyi iste" ile öncelikli sayfaları manuel tetiklemek.
+- **Hero'daki 3 kart artık "Ulusal Miras" değil, gerçek/güncel müşteri profilleri gösteriyor**: Kullanıcı hero'daki 3 tarihi figür kartının (Ilia Chavchavadze vb.) ziyaretçiyi yanılttığını, platformun ulusal miras odaklıymış gibi göründüğünü belirtti.
+  - `src/app/page.tsx`: artık kullanılmayan `notableRaw` sorgusu tamamen kaldırıldı (anasayfada notable veri gerekmiyor artık, `/miras` kendi sorgusunu kendi çekiyor). `interactionTotals` hesaplaması `recentIds` üzerinden yapılacak şekilde değiştirildi. Yeni `heroMemorials = recentMemorials.slice(0, 3)` — zaten `updated_at DESC` sıralı olduğu için en yeni profil otomatik olarak ortadaki büyük kartta çıkıyor.
+  - `src/components/landing/HeroPhoneShowcase.tsx`: `NotableMemorial` yerine yeni `export type HeroMemorial = RecentMemorial & { interaction_count?: number }` kullanılıyor; `notable_subtitle` → `tagline`; hardcoded `"Sayfayı Ziyaret Et →"` metni `useLang()` ile yeni `t.landing.misc.heroVisitCta` anahtarına bağlandı (7 dile eklendi) — kullanıcının önceden fark ettiği "İngilizce sitede buton Türkçe kalıyor" sorunu da bu vesileyle çözüldü.
+  - `src/components/landing/LocalizedLanding.tsx`: `notableMemorials` prop'u `heroMemorials` ile değiştirildi.
+  - Kullanıcı isteği üzerine her karta `AddedBadge` bileşeni (zaten `RecentMemorialsCarousel`/`ApprovedProfilesPreview`'da kullanılan ortak bileşen) ile "Added on {tarih}" rozeti eklendi — kart resminin sol üstünde.
+  - "Ulusal Miras" içeriği anasayfadan tamamen kalkmadı — bu oturumdan önce zaten `/miras` sayfasına taşınmıştı ve anasayfada kompakt bir teaser kart ("A Nation's Memory" / "Visit Heritage →") olarak duruyor. Kullanıcıya bu hâliyle kalması önerildi, onayladı — değişiklik yapılmadı.
+  - Canlı doğrulama: `/browse` skill'iyle localhost:3001 hero bölümü ekran görüntüsü alındı, 3 kartın gerçek profiller (Giorgi Maisuradze, Hasan İstanbollu, Osman İstanbollu) olduğu, tarih rozetlerinin ve İngilizce "Visit Page →" butonunun doğru göründüğü, tıklamanın doğru profile gittiği teyit edildi.
+- `npx tsc --noEmit` ve `npm run build` temiz geçti.
+
+### Proje Durumu
+- [x] Hero artık gerçek/güncel müşteri profillerini gösteriyor, ulusal miras izlenimi kalmadı
+- [x] Hero kartlarındaki dil sızıntısı (buton metni) düzeltildi
+- [x] Ulusal Miras içeriği korunuyor (kompakt teaser kart + `/miras` sayfası) — kullanıcı onayladı, dokunulmadı
+- [ ] GSC'deki 19 "henüz taranmamış" sayfa için kod tarafında yapılacak bir şey yok — kullanıcı isterse GSC'den manuel "Dizine eklenmeyi iste" yapabilir
+
+### Nerede Kaldık
+Hero değişikliği tamamlandı ve kullanıcı tarafından onaylandı. Hiçbir şey commit/push edilmedi.
+
+### Sıradaki Adım
+1. Kullanıcı localde son haliyle genel bir gözden geçirme yapsın
+2. Onay sonrası commit + push
+3. İstenirse GSC'de öncelikli sayfalar için manuel indexleme talebi
+
+## 2026-07-03 — Oturum 166: Satın Alma Formlarında Kalan Dil Karışıklığı Düzeltmesi + Yan Yana Layout
+
+### Yapılanlar
+Kullanıcı canlı sitede İngilizce dildeyken `/satin-al/anma`'da hâlâ Türkçe metinler gördüğünü bildirdi. Kök neden: önceki oturumda (163) WhatsApp ödeme akışına geçişte sadece ödeme mantığı değişti, birkaç metin parçası hiç `t.xxx` sözlüğüne taşınmadan Türkçe kaldı; ayrıca `kasa` formu hiç `useLang()` kullanmıyordu (%100 hardcoded).
+
+- 7 dil dosyasına (`tr/en/ka/ru/az/hy/he.ts`) `purchasePage.common` bloğu eklendi (secureOrderBadge, whatsappBoxHeading/Body, amountLabel, dataSecurityBadge, submitCta) — 3 formun ortak metinleri artık tek yerden yönetiliyor.
+- `purchasePage.anma`'ya eksik `subtitle` ve `form.shippingAddress/Placeholder/Hint` alanları eklendi (aile'de zaten vardı, anma'da hiç yoktu).
+- Eski banka havalesi dönemine ait ölü anahtarlar (`bankTransfer`, `cardPayment`, `bankDetails`, eski `submitBtn` metinleri, `statusBankInfoSent`) 7 dilin hepsinden temizlendi; `footerNote` metinleri "24 saat içinde aktive edilir" yerine WhatsApp akışına uygun hale getirildi.
+- Yeni `purchasePage.kasa` bloğu 7 dile eklendi (bu form için hiç sözlük girişi yoktu) + `perMonthLabel` ("ay"/"mo"/"თვე" vb.) aylık ücret etiketi için.
+- `_AnmaFormClient.tsx`, `_AileFormClient.tsx`, `_KasaFormClient.tsx` üçü de yeniden yazıldı: tüm hardcoded metinler yeni `common`/`anma`/`aile`/`kasa` anahtarlarına bağlandı; `_KasaFormClient.tsx`'e ilk kez `useLang()` eklendi.
+- **Layout sadeleştirildi**: konteyner genişliği `max-w-lg`→`max-w-xl`, alanlar mantıksal çiftler halinde `grid sm:grid-cols-2` ile yan yana yerleştirildi (ör: "Kimin için" + "Adınız Soyadınız" aynı satırda, "E-posta" + "Telefon" aynı satırda), dikey boşluklar (`mb-6`→`mb-4`, `p-7`→`p-6`) daraltıldı — sayfa gözle görülür şekilde kısaldı.
+- `npx tsc --noEmit` ve `npm run build` temiz geçti. Canlı sunucuda (`localhost:3001`) EN/KA/RU cookie'leriyle 3 sayfa da curl+grep ile tarandı — form içeriğinde artık Türkçe sızıntı yok (tek kalan eşleşme sayfanın statik `og:description` meta etiketiydi, kullanıcıya görünmeyen SEO/paylaşım metadata'sı — ayrı, daha geniş bir i18n konusu, bu oturumun kapsamı dışında bırakıldı).
+
+### Proje Durumu
+- [x] 3 satın alma formunda (anma/aile/kasa) dil karışıklığı giderildi
+- [x] Kasa formuna i18n desteği eklendi (önceden hiç yoktu)
+- [x] Satın alma sayfaları daha kısa, 2 sütunlu, sade bir düzene kavuştu
+- [ ] Sayfa `og:description`/OG meta etiketleri hâlâ tüm dillerde sabit Türkçe — istenirse ayrı bir işte ele alınmalı
+
+### Nerede Kaldık
+Satın alma akışındaki (anma/aile/kasa) tüm görünür metinler artık doğru dilde geliyor ve sayfa düzeni daha kompakt. Hiçbir şey commit/push edilmedi.
+
+### Sıradaki Adım
+1. Kullanıcı tarayıcıda 3 satın alma sayfasını farklı dillerde gezip yeni layout'u ve dil tutarlılığını onaylasın
+2. Onay sonrası commit + push
+3. İstenirse OG/meta açıklamalarının dile göre değişmesi ayrı bir iş olarak ele alınabilir
+
+## 2026-07-03 — Oturum 165: RU Currency Düzeltmesi + Dil Değiştirici URL Yönlendirmesi
+
+### Yapılanlar
+- **RU currency düzeltmesi** (kullanıcı geri bildirimi): `src/lib/currency.ts`'te ru artık USD değil, DB'deki gerçek yapıya uygun şekilde RUB (₽) kullanıyor. Kesin kural: tr→TRY, ru→RUB, ka→GEL, diğer tüm diller (en/az/hy/he)→USD — DB'de sadece bu 3 dil için ayrı fiyat alanı var, gerisi dolar. `CurrencyCode` tipine `'RUB'` eklendi, `buildCurrencyView`/`resolveAmount`'a RUB dalları eklendi. Yenileme (hosting renewal) fiyatı DB'de RUB olarak tutulmadığı için ru için de USD yenileme kullanılmaya devam ediyor (bilinçli, mevcut şemanın kısıtı).
+- `satin-al/anma/page.tsx`, `satin-al/aile/page.tsx`: `resolveAmount()` çağrılarına `rub`/`campaignRub` parametreleri eklendi.
+- `satin-al/kasa/page.tsx` + `_KasaFormClient.tsx`: bu form daha önce dilden bağımsız sabit ₾ gösteriyordu, artık `resolveAmount()` ile dile göre doğru para birimini gösteriyor.
+- **Dil değiştirici artık URL'ye yönlendiriyor**: Önceki oturumda (`Oturum 164`) kurulan `/en`, `/ka` vb. önekli URL yapısı hazırdı ama nav'daki dil değiştirici hâlâ sadece cookie değiştirip aynı sayfayı yeniden render ediyordu. `src/components/landing/Nav.tsx`'e `switchLang()` eklendi: mevcut path'teki önek soyulup (`stripLocalePrefix`) hedef dile göre yeniden öneklendiriliyor (`localizedHref`) ve `router.push()` ile o URL'e gidiliyor — ama sadece sayfa önek kapsamındaysa (`isLocaleEligible`); değilse (ör. `/memorial`, `/privacy` gibi kapsam dışı sayfalar) eskisi gibi sadece cookie değişip yerinde kalıyor.
+- Kod tekrarını önlemek için `PREFIXED_LOCALES`, `isLocaleEligible`, `stripLocalePrefix` tek kaynağa (`src/lib/i18n/localizedHref.ts`) taşındı; `proxy.ts`, `hreflang.ts`, `sitemap.ts` artık kendi kopyalarını değil bu ortak fonksiyonları kullanıyor.
+- `npx tsc --noEmit` ve `npm run build` temiz geçti.
+
+### Proje Durumu
+- [x] RU currency artık DB yapısına uygun (₽)
+- [x] Kasa formu da dile göre doğru para birimi gösteriyor
+- [x] Dil değiştirici (nav dropdown + mobil menü) önek kapsamındaki sayfalarda artık gerçekten URL değiştiriyor
+- [ ] Tarayıcıda gerçek tıklama testi yapılmadı (sadece build/typecheck + curl ile route doğrulaması) — kullanıcının localde denemesi önerilir
+
+### Nerede Kaldık
+Dil URL yapısı artık uçtan uca çalışıyor: proxy rewrite/redirect + hreflang + sitemap + nav'daki dil değiştirici hepsi birbiriyle tutarlı. Hiçbir şey commit/push edilmedi.
+
+### Sıradaki Adım
+1. Kullanıcı tarayıcıda dil değiştiriciyi tıklayıp URL'nin gerçekten `/en`, `/ka` vb. değiştiğini doğrulasın
+2. Onay sonrası commit + push
+
+## 2026-07-03 — Oturum 164: Dış Danışman Analizi Sonrası Kapsamlı Düzeltme — i18n/Currency + WhatsApp Ödeme + Copy + SEO URL Yapısı
+
+### Yapılanlar
+Dış bir danışmanın site analizinde işaret ettiği 4 ana soruna karşı tek seferde 4 paralel iş yapıldı (A→C→D→B sırayla, C bir subagent'a devredildi):
+
+**Track A — i18n & Currency düzeltmeleri**
+- Yeni `src/lib/currency.ts`: tek `LANG_CURRENCY` haritası (tr→₺/TRY, en/he/ru→$/USD, az/hy/ka→₾/GEL) + `buildCurrencyView()`, `getRenewal()`, `resolveAmount()`. Önceden 3 farklı dosyada birbiriyle çelişen kurallar vardı (ru için anasayfa ₽, satın-al sayfası $ gösteriyordu) — artık tek kaynak.
+- `LocalizedLanding.tsx`, `satin-al/anma/page.tsx`, `satin-al/aile/page.tsx` bu ortak utility'yi kullanacak şekilde refactor edildi.
+- 7 dil dosyasına (`tr/en/ka/ru/az/hy/he.ts`) yeni `landing.misc` bloğu + `family_page` nav/footer key'leri + `notableSection.interactionsLabel` eklendi; `LocalizedLanding.tsx`, `PremiumFamilyPageClient.tsx` (nav linkleri, "Kopyalandı!", footer tagline), `NotableProfilesSection.tsx` içindeki hardcoded Türkçe metinler bu key'lere bağlandı.
+- `satin-al/anma` ve `satin-al/aile`'deki eski `?lang=`/`forceLang` query-param pattern'i tamamen kaldırıldı, sayfalar artık düz `useLang()`/cookie tabanlı dil okuyor.
+
+**Track C — WhatsApp ödeme akışı** (bkz. Oturum 163 — bu oturumda paralel bir subagent'a devredildi, ayrıntılar orada)
+
+**Track D — Copy/UX**
+- Hero başlık/alt metni 7 dilde de daha somut/dönüşüm odaklı hale getirildi ("Mezar Taşındaki QR Kodla sevdiklerinizin sesi/fotoğrafları sonsuza kadar yaşasın" + "15 dakikada profil oluşturun" mesajı).
+- Hero'daki ana CTA'nın yanına inline WhatsApp CTA butonu eklendi (`buildWhatsAppChatLink` kullanıyor).
+- "Ulusal Miras"/Notable bölümü anasayfadan çıkarılıp yeni `src/app/miras/page.tsx` route'una taşındı; anasayfada yerine kompakt teaser kart bırakıldı (kendi `generateMetadata` + hreflang'i var).
+
+**Track B — URL bazlı dil yapısı (SEO)**
+- `src/proxy.ts` yeniden yazıldı: TR öneksiz kalıyor, `en/ka/ru/az/hy/he` önekleri sadece pazarlama/satış sayfalarında (`/`, `/pricing`, `/about`, `/contact`, `/miras`, `/satin-al/*`) geçerli — dinamik anı sayfaları (`aile/[slug]`, `memorial/[slug]` vb.) hiç önek almıyor. Önekli istek gelirse içeride rewrite ediliyor (`x-tm-locale` header + `tm_lang` cookie senkronu); ilk ziyarette (`tm_lang` cookie yoksa) geo/Accept-Language tespiti tr değilse önekli URL'e redirect ediyor. `/admin` ve `/api` dil mantığından tamamen muaf.
+- Yeni `src/lib/i18n/localizedHref.ts` ve `src/lib/i18n/hreflang.ts` (`buildAlternateLanguages`) — `layout.tsx`, `page.tsx`, `pricing`, `contact`, `satin-al/anma`, `satin-al/aile`, `miras` sayfalarının metadata'sına `alternates.languages` + `x-default` eklendi.
+- `sitemap.ts` güncellendi: pazarlama sayfaları için 7 dil hreflang alternates'li sitemap girişi üretiyor, dinamik `/memorial/{slug}` ve `/aile/{slug}` tek girişte kalıyor.
+- `node_modules/next/dist/docs` kontrol edildi: App Router'da eski Pages Router `i18n` config'i yok, `proxy.ts` (middleware'in yeni adı) üzerinden manuel rewrite/redirect doğru yaklaşım — plan buna göre kuruldu.
+
+### Proje Durumu
+- [x] Currency mantığı tek kaynağa indirildi, ru/az/hy tutarsızlığı giderildi
+- [x] LocalizedLanding/PremiumFamilyPageClient/NotableProfilesSection hardcoded string'leri i18n'e taşındı
+- [x] WhatsApp ödeme akışı devrede (bkz. Oturum 163)
+- [x] Hero copy + WhatsApp CTA + Notable/Miras sayfa ayrımı tamamlandı
+- [x] URL bazlı dil öneki (proxy rewrite/redirect) + hreflang + sitemap tamamlandı
+- [x] `npx tsc --noEmit` ve `npm run build` temiz geçti
+- [x] Canlı dev server'da URL matrisi test edildi (`/`, `/en`, `/en/pricing`, `/pricing`, `/admin`, `/ka`, `/tr` 404, dinamik `aile/[slug]` önek almıyor) — hepsi beklendiği gibi çalıştı
+- [ ] Checkout formlarındaki (_KasaFormClient, _AnmaFormClient, _AileFormClient) bazı sabit Türkçe metinler (ör. "256-bit SSL", "Veri Güvenliği", header'daki "Güvenli Sipariş") Track C'nin WhatsApp rewrite'ı sırasında dokunulmadı — ileride ayrı bir i18n geçişi gerekebilir
+- [ ] `.env.local`'daki kullanılmayan PayPal değişkenleri ve `package.json`'daki `@paypal/react-paypal-js` bağımlılığı manuel temizlik bekliyor (Oturum 163'te not edildi)
+- [ ] Değişiklikler commit/push edilmedi — kullanıcı onayı bekleniyor
+
+### Kritik Kararlar / Notlar
+- RU para birimi: ödeme sayfalarındaki kural (USD) esas alındı, anasayfadaki eski ₽ kuralı buna göre düzeltildi — kullanıcıdan yanıt gelmediği için önerilen varsayımla ilerlendi.
+- Dil önek kapsamı: sadece pazarlama/satış sayfaları önek alıyor, anı/aile profil sayfaları hiçbir zaman önek almıyor (SEO şişkinliği yaratmasın diye) — kullanıcıdan yanıt gelmediği için önerilen varsayımla ilerlendi.
+- PayPal kodu tamamen silindi (Track C, Oturum 163'te detaylandırıldı) — önerilen varsayımla ilerlendi.
+- Bu oturumda WhatsApp/checkout işini bağımsız bir subagent'a (Oturum 163) devredip, i18n/currency + SEO routing işini paralel olarak ana oturumda yürüttük — dosya çakışması olmaması için görev alanları net ayrıldı (subagent sadece satin-al/*, actions.ts, admin/kasa, quick-purchase.ts dokundu; ana oturum i18n dosyaları, LocalizedLanding, PremiumFamilyPageClient, NotableProfilesSection, proxy.ts, sitemap.ts, layout.tsx dokundu).
+
+### Nerede Kaldık
+4 track de tamamlandı, build+typecheck+canlı URL testi temiz. Hiçbir şey commit/push edilmedi, kullanıcının gözden geçirip onaylaması bekleniyor.
+
+### Sıradaki Adım
+1. Kullanıcı değişiklikleri localde (tarayıcıda) gözden geçirsin — özellikle checkout akışı ve dil değiştirme
+2. Onay sonrası commit + push
+3. Checkout formlarındaki kalan birkaç sabit metni ("256-bit SSL" vb.) i18n'e taşımayı değerlendir
+4. `.env.local`/`package.json`'daki ölü PayPal referanslarını manuel temizle
+5. Google Search Console'a yeni dil URL'lerini (`/en`, `/ka` vb.) submit et, hreflang hatalarını kontrol et
+
+## 2026-07-03 — Oturum 163: Ödeme Akışı — Banka Havalesi/PayPal → WhatsApp Devir Teslimi
+
+### Yapılanlar
+- Satın alma akışındaki "Banka Havalesi / PayPal" ödeme yöntemi seçimi tamamen kaldırıldı; müşteri formu doldurduktan sonra WhatsApp üzerinden işletme sahibiyle doğrudan iletişime geçip ödemeyi kişisel olarak tamamlıyor.
+- Yeni `src/lib/whatsapp.ts`: `WHATSAPP_PHONE` tek doğruluk kaynağı + `buildWhatsAppOrderLink()` (sipariş özetli mesaj) + `buildWhatsAppChatLink()` (genel sohbet linki).
+- `WhatsAppButton.tsx` ve `contact/ContactPageClient.tsx` artık `WHATSAPP_PHONE` sabitini kullanıyor (hardcode kaldırıldı).
+- Supabase `payments.payment_method` kolonunun serbest metin (CHECK constraint yok) olduğu doğrulandı — migration gerekmedi. Sadece `product_type` kolonunda constraint var (önceden var olan, dokunulmadı).
+- `src/app/satin-al/actions.ts`: `purchaseMemorialAction` / `purchaseVaultAction` / `purchaseFamilyAction` içinde `payment_method: 'bank_transfer'` → `'whatsapp'`; her aksiyon artık `buildWhatsAppOrderLink()` ile bir wa.me linki üretip `/satin-al/tesekkur?...&wa=<link>` şeklinde yönlendiriyor. `createVaultForPayPalAction` tamamen silindi.
+- 3 form client (`_KasaFormClient.tsx`, `_AnmaFormClient.tsx`, `_AileFormClient.tsx`): IBAN bloğu + PayPal paneli + yöntem seçici kaldırıldı, tek "Siparişi Oluştur ve WhatsApp'tan Devam Et" formu kaldı. Karşılık gelen `page.tsx` dosyalarından artık kullanılmayan `getBankSettings()`/`bank` prop'u temizlendi.
+- `src/app/satin-al/tesekkur/page.tsx`: IBAN kutusu yerine `wa` query param'ını decode edip WhatsApp CTA butonu gösteriyor (yoksa genel WhatsApp linkine düşüyor).
+- `src/lib/actions/quick-purchase.ts`: `payment_method` sabit `'whatsapp'`, sonuç tipine `waLink` eklendi.
+- `src/components/QuickPurchaseModal.tsx`: ödeme yöntemi adımı (banka/PayPal) kaldırıldı, 3 adımlı akışa indirildi (info → confirm → done), "done" adımında WhatsApp CTA butonu var. `anma-paneli/page.tsx` ve `anma-paneli/aile/[familyId]/page.tsx` içindeki çağrılar ve gereksiz `platform_settings` sorguları (bank/paypal alanları) temizlendi.
+- Ölü PayPal entegrasyonu silindi: `src/app/api/paypal/create-order/route.ts`, `src/app/api/paypal/capture-order/route.ts`, `src/lib/paypal.ts`, `src/components/PayPalCheckoutButton.tsx` (hiçbiri aktif olarak çağrılmıyordu).
+- `src/lib/email/templates.ts`: `adminNewRegistrationEmail` artık `paymentMethod: 'whatsapp'` değerini "WhatsApp" olarak etiketliyor.
+- Admin tarafı (`admin/kasa`, `admin/verifications`, `updatePaymentStatus`, `changeVaultStatus`) hiç değiştirilmedi — zaten `payment_method` değerine göre dallanma yoktu, sadece ham değeri gösteriyorlardı.
+- `src/lib/bank-settings.ts` ve admin ayarlar sayfasındaki `paypal_link` alanı bilinçli olarak dokunulmadan bırakıldı (görev talimatı gereği, admin panelinde kalabilir).
+- `npx tsc --noEmit` temiz geçti (önce `.next` klasöründeki silinen route'lara ait eski tip cache'i temizlendi).
+
+### Proje Durumu
+- [x] WhatsApp tek ödeme/iletişim yöntemi olarak devrede (anma/kasa/aile satın alma + hızlı üye ekleme)
+- [x] PayPal müşteri tarafından tamamen kaldırıldı, ölü kod silindi
+- [x] `payment_method` kolonu migration gerektirmedi (serbest metin)
+- [ ] `.env.local`'daki `PAYPAL_MODE`, `NEXT_PUBLIC_PAYPAL_CLIENT_ID(_LIVE)`, `PAYPAL_CLIENT_SECRET(_LIVE)` artık kullanılmıyor — manuel temizlik gerekebilir
+- [ ] `package.json`'daki `@paypal/react-paypal-js` bağımlılığı artık kullanılmıyor — manuel temizlik gerekebilir (silinmedi, sadece not edildi)
+
+### Kritik Kararlar / Notlar
+- WhatsApp mesaj şablonu tek dilde (Türkçe) tutuldu — işletme sahibi Türkçe konuşuyor, çeviri gerekmiyor dendi.
+- `admin/verifications/page.tsx` ve `admin/kasa` sadece `payment_method` değerini ham gösteriyor, dallanma yok — değişiklik gerekmedi.
+- Paralel bir oturum aynı anda i18n dosyaları, `LocalizedLanding.tsx`, `PremiumFamilyPageClient.tsx`, `NotableProfilesSection.tsx`, `proxy.ts` üzerinde çalışıyor gibi görünüyor (git status'ta bu dosyalar M olarak görünüyor ama bu oturumda dokunulmadı) — talimat gereği bu dosyalara hiç dokunulmadı.
+
+### Nerede Kaldık
+Satın alma akışı (anma/kasa/aile) ve hızlı üye ekleme modalı artık tamamen WhatsApp üzerinden devam ediyor; PayPal ile ilgili tüm müşteri tarafı kod ve ölü dosyalar silindi. Değişiklikler commit edilmedi, working tree'de duruyor.
+
+### Sıradaki Adım
+1. Değişiklikleri gözden geçirip commit et (kullanıcı onayı bekleniyor)
+2. `.env.local`'daki kullanılmayan PayPal değişkenlerini manuel temizle
+3. `package.json`'dan `@paypal/react-paypal-js` bağımlılığını kaldırmayı değerlendir
+4. Prod'da WhatsApp linkinin doğru numarayla açıldığını gerçek cihazda test et
+
+## 2026-06-22 — Oturum 162: Meta Reklam Analizi + İsrail Kampanyası + Dil/Para Birimi Fix
+
+### Yapılanlar
+- Meta Ads CSV analizi (yaş/cinsiyet/kampanya breakdown): Dijivexa kampanyası yanlış URL'e gidiyordu (facebook.com/dijivexa), kullanıcıya bildirildi ve kapatıldı
+- İsrail reklamı (İbranice görsel) incelendi — kaliteli, "אל תתנו לזיכרון להישאר על מצבה" başlığı etkili
+- Reklam URL'si anasayfadan `/satin-al/anma?lang=he` olarak güncellendi
+- `?lang=` URL parametresi desteği: `/satin-al/anma?lang=he` → sayfa direkt İbranice açılıyor
+- Dile göre doğru para birimi: tr→₺, ka→₾, he/en/ru/hy/az→$
+- Değiştirilen dosyalar: `src/app/satin-al/anma/page.tsx`, `src/app/satin-al/anma/_AnmaFormClient.tsx`
+
+### Proje Durumu
+- [x] robots.txt + sitemap.xml
+- [x] OG image + JSON-LD
+- [x] Tüm sayfalarda metadata
+- [x] Google Search Console doğrulama
+- [x] ?lang= URL parametresi desteği (satın alma sayfası)
+- [x] Dile göre para birimi (₺/₾/$)
+- [ ] Admin settings: price_additional_member_gel alanı
+
+### Kritik Kararlar / Notlar
+- Dijivexa kampanyası → kapatıldı (theeternalmemory'ye değil, yanlış sayfaya gidiyordu)
+- İsrail kampanyası → açık, landing URL: `/satin-al/anma?lang=he`
+- 65+ kadın demografisi bütçenin ~%70'ini alıyor — algoritma bu kitleye optimize etti
+- price_memorial_usd admin panelinde set edilmeli (aksi halde GEL fiyatı dolar olarak görünür)
+
+### Nerede Kaldık
+İsrail reklam kampanyası aktif, satın alma sayfası dile göre doğru dil ve para birimini gösteriyor. İki commit push edildi (54f894c, f43e8f8).
+
+### Sıradaki Adım
+1. Admin panelinde `price_memorial_usd` değerini kontrol et ve $75 olarak set et
+2. Deploy sonrası `theeternalmemory.com/satin-al/anma?lang=he` test et
+3. Admin settings sayfasına `price_additional_member_gel` alanı ekle
+
 ## 2026-06-22 — Oturum 161: SEO Tam Altyapı
 
 ### Yapılanlar

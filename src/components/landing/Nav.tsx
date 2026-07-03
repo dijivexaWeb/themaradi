@@ -1,16 +1,28 @@
 'use client'
 
 import Link from 'next/link'
+import { useRouter, usePathname } from 'next/navigation'
 import { ChevronDown, Globe, Menu, X } from 'lucide-react'
 import { useState, useRef, useEffect } from 'react'
 import { useLang } from '@/i18n/context'
-import { langs } from '@/i18n/index'
+import { langs, type Lang } from '@/i18n/index'
+import { localizedHref, stripLocalePrefix, isLocaleEligible } from '@/lib/i18n/localizedHref'
 
 export default function Nav() {
   const { t, lang, setLang } = useLang()
   const [open, setOpen] = useState(false)
   const [langOpen, setLangOpen] = useState(false)
   const langRef = useRef<HTMLDivElement>(null)
+  const router = useRouter()
+  const pathname = usePathname()
+
+  function switchLang(code: Lang) {
+    setLang(code)
+    const basePath = stripLocalePrefix(pathname)?.rest ?? pathname
+    if (isLocaleEligible(basePath)) {
+      router.push(localizedHref(basePath, code))
+    }
+  }
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -133,7 +145,7 @@ export default function Nav() {
               {langs.map(l => (
                 <button
                   key={l.code}
-                  onClick={() => { setLang(l.code); setLangOpen(false) }}
+                  onClick={() => { switchLang(l.code); setLangOpen(false) }}
                   style={{
                     display: 'flex', alignItems: 'center', gap: 10,
                     width: '100%', padding: '9px 12px', borderRadius: 8,
@@ -264,7 +276,7 @@ export default function Nav() {
               {langs.map(l => (
                 <button
                   key={l.code}
-                  onClick={() => { setLang(l.code); setOpen(false) }}
+                  onClick={() => { switchLang(l.code); setOpen(false) }}
                   style={{
                     padding: '6px 12px', borderRadius: 8,
                     border: lang === l.code

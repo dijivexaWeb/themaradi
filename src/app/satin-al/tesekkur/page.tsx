@@ -1,8 +1,8 @@
 import type { Metadata } from 'next'
 import Link from 'next/link'
-import { getBankSettings } from '@/lib/bank-settings'
 import BrandLogo from '@/components/BrandLogo'
-import { CheckCircle2, ArrowRight, Phone, Home } from 'lucide-react'
+import { CheckCircle2, ArrowRight, Phone, Home, MessageCircle } from 'lucide-react'
+import { buildWhatsAppChatLink } from '@/lib/whatsapp'
 
 export const metadata: Metadata = {
   title: 'Teşekkürler',
@@ -14,15 +14,17 @@ interface Props {
     type?: string
     name?: string
     pending_email?: string
+    wa?: string
   }>
 }
 
 export default async function TesekkurPage({ searchParams }: Props) {
-  const { type, name, pending_email } = await searchParams
-  const bank = await getBankSettings()
+  const { type, name, pending_email, wa } = await searchParams
 
   const isPendingEmail = pending_email === '1'
   const displayName = name ? decodeURIComponent(name) : null
+  const waLink = wa ? decodeURIComponent(wa) : null
+  const fallbackWaLink = buildWhatsAppChatLink('Merhaba, siparişimle ilgili ödemeyi tamamlamak istiyorum.')
 
   const typeLabel =
     type === 'kasa'
@@ -54,28 +56,35 @@ export default async function TesekkurPage({ searchParams }: Props) {
             </h1>
             <p className="text-slate-400 text-sm leading-6">
               <span className="text-amber-400 font-semibold">{typeLabel}</span>{' '}
-              siparişiniz kaydedildi. Aşağıdaki IBAN&apos;a havale yapmanız yeterli —
-              ödemenizi aldıktan sonra sayfanızı aktif ediyoruz.
+              siparişiniz kaydedildi. Ödemeyi tamamlamak için WhatsApp&apos;tan bizimle
+              iletişime geçin — ekibimiz size kişisel olarak yardımcı olacak.
             </p>
           </div>
 
-          {/* IBAN kutusu */}
-          <div className="bg-slate-900 border border-amber-500/25 rounded-2xl p-5">
-            <p className="text-xs text-amber-400 uppercase tracking-wider font-semibold mb-4">
-              Havale Bilgileri
+          {/* WhatsApp CTA */}
+          <div className="bg-slate-900 border border-[#25D366]/25 rounded-2xl p-5">
+            <p className="text-xs text-[#25D366] uppercase tracking-wider font-semibold mb-4">
+              Ödemeyi Tamamlayın
             </p>
-            <div className="space-y-3 text-sm">
-              <IbanRow label="IBAN" value={bank.iban} highlight />
-              <IbanRow label="Banka" value={bank.bankName} />
-              <IbanRow label="Alıcı" value={bank.recipient} />
-            </div>
-            <div className="mt-4 pt-4 border-t border-slate-800 rounded-xl bg-slate-800/40 -mx-1 px-3 py-3">
-              <p className="text-xs text-slate-400 leading-5">
-                💡 Havale açıklamasına{' '}
-                <strong className="text-white">adınızı ve soyadınızı</strong>{' '}
-                yazmanız, ödemenizin daha hızlı tanınmasını sağlar.
+            <p className="text-sm text-slate-400 leading-6 mb-4">
+              Aşağıdaki butona tıklayarak WhatsApp üzerinden bize ulaşın. Sipariş
+              detaylarınız otomatik olarak mesaja eklenmiş olacak.
+            </p>
+            <a
+              href={waLink ?? fallbackWaLink}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex w-full items-center justify-center gap-2 bg-gradient-to-tr from-[#128C7E] to-[#25D366] hover:brightness-110 text-white font-semibold py-3.5 rounded-xl transition-all text-sm"
+            >
+              <MessageCircle className="h-4 w-4" />
+              WhatsApp&apos;tan Devam Et
+            </a>
+            {!waLink && (
+              <p className="text-xs text-slate-600 mt-3 leading-5">
+                Sipariş özetiniz bulunamadı, ancak yukarıdaki butonla doğrudan bize
+                yazabilirsiniz.
               </p>
-            </div>
+            )}
           </div>
 
           {/* Adımlar */}
@@ -84,7 +93,7 @@ export default async function TesekkurPage({ searchParams }: Props) {
               Süreç
             </p>
             <Step num={1} done label="Sipariş alındı" />
-            <Step num={2} active label="Banka havalesi yapın" sub="Yukarıdaki IBAN bilgileri ile" />
+            <Step num={2} active label="WhatsApp'tan ödemeyi tamamlayın" sub="Ekibimiz size ödeme detaylarını iletecek" />
             <Step num={3} label="Ekibimiz ödemeyi onaylar" sub="Genellikle 24 saat içinde" />
             <Step num={4} label="Sayfanız aktive edilir" sub="Giriş yapıp içerik ekleyebilirsiniz" />
           </div>
@@ -176,29 +185,6 @@ function Step({
         </p>
         {sub && <p className="text-xs text-slate-500 mt-0.5">{sub}</p>}
       </div>
-    </div>
-  )
-}
-
-function IbanRow({
-  label,
-  value,
-  highlight,
-}: {
-  label: string
-  value: string
-  highlight?: boolean
-}) {
-  return (
-    <div className="flex justify-between items-center gap-3">
-      <span className="text-slate-400 shrink-0">{label}</span>
-      <span
-        className={`text-right select-all ${
-          highlight ? 'font-mono text-xs text-amber-400' : 'text-slate-200'
-        }`}
-      >
-        {value}
-      </span>
     </div>
   )
 }

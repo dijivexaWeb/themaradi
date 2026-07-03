@@ -53,7 +53,7 @@ export default async function ProfillerimPage() {
 
   const { t } = await getTranslation()
 
-  const [{ data: vaults }, { data: families }, { data: credits }, { data: memberRows }, { data: platformSettings }, pricing] = await Promise.all([
+  const [{ data: vaults }, { data: families }, { data: credits }, { data: memberRows }, pricing] = await Promise.all([
     supabase
       .from('vaults')
       .select('id, display_name, status, slug, cover_photo_url, birth_date, death_date, tagline, product_type')
@@ -72,24 +72,15 @@ export default async function ProfillerimPage() {
     supabase
       .from('family_members')
       .select('family_id, vault_id'),
-    supabase
-      .from('platform_settings')
-      .select('key, value')
-      .in('key', ['bank_iban', 'bank_name', 'bank_recipient', 'paypal_link']),
     fetchPricingConfig(),
   ])
 
-  const ps = Object.fromEntries((platformSettings ?? []).map(r => [r.key, r.value as string]))
   const bankInfo = {
-    iban: ps.bank_iban ?? 'GE29TB7522145061700002',
-    bankName: ps.bank_name ?? 'Bank of Georgia',
-    accountHolder: ps.bank_recipient ?? 'The Eternal Memory LLC',
     amount: pricing.campaignActive && pricing.campaignMemorial
       ? Number(pricing.campaignMemorial)
       : Number(pricing.memorialPrice),
     currency: 'GEL',
   }
-  const paypalLink = ps.paypal_link ?? null
 
   const d = t.memorial_panel.dashboard
 
@@ -281,7 +272,6 @@ export default async function ProfillerimPage() {
                               <QuickPurchaseModal
                                 familyId={family.id}
                                 bankInfo={bankInfo}
-                                paypalLink={paypalLink}
                                 cardMode
                               />
                             </div>

@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import PricingClient from './PricingClient'
 import { fetchPricingConfig } from '@/lib/pricing'
+import { buildAlternateLanguages } from '@/lib/i18n/hreflang'
 
 export const revalidate = 3600
 
@@ -12,6 +13,7 @@ export const metadata: Metadata = {
     'The Eternal Memory fiyatları: Anma Profili, Aile Paketi ve Yaşam Kasası. Tek seferlik ödeme, ömür boyu erişim. QR mezar taşı dahil. Gürcistan\'dan dünyaya hizmet.',
   alternates: {
     canonical: `${APP_URL}/pricing`,
+    languages: buildAlternateLanguages('/pricing'),
   },
   openGraph: {
     title: 'Fiyatlar — The Eternal Memory',

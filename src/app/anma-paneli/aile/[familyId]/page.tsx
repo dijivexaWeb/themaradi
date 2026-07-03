@@ -143,27 +143,21 @@ export default async function AileAnmaPaneliPage({ params, searchParams }: Props
     approved = allEntries.filter(e => e.status === 'approved').map(e => ({ ...e, vault_name: vaultNameMap[e.vault_id] ?? '' }))
   }
 
-  const [{ data: familyPhotos }, { data: familyMemories }, { data: familyGuestbook }, { data: allMyVaults }, { data: platformSettings }, pricing] = await Promise.all([
+  const [{ data: familyPhotos }, { data: familyMemories }, { data: familyGuestbook }, { data: allMyVaults }, pricing] = await Promise.all([
     supabase.from('family_media').select('id, original_url, caption, taken_at, created_at').eq('family_id', familyId).order('sort_order', { ascending: true }),
     supabase.from('family_memories').select('id, title, content, memory_date, created_at').eq('family_id', familyId).order('created_at', { ascending: false }),
     supabase.from('family_guestbook').select('id, author_name, author_email, message, relation, status, message_type, created_at').eq('family_id', familyId).order('created_at', { ascending: false }),
     supabase.from('vaults').select('id, display_name').eq('owner_id', user.id).eq('product_type', 'memorial_profile').order('created_at', { ascending: false }),
-    supabase.from('platform_settings').select('key, value').in('key', ['bank_iban', 'bank_name', 'bank_recipient', 'paypal_link']),
     fetchPricingConfig(),
   ])
 
-  const ps = Object.fromEntries((platformSettings ?? []).map(r => [r.key, r.value as string]))
   const additionalMemberAmount = pricing.campaignActive && pricing.campaignAdditionalMemberGel
     ? Number(pricing.campaignAdditionalMemberGel)
     : Number(pricing.additionalMemberGel)
   const bankInfo = {
-    iban: ps.bank_iban ?? 'GE29TB7522145061700002',
-    bankName: ps.bank_name ?? 'Bank of Georgia',
-    accountHolder: ps.bank_recipient ?? 'The Eternal Memory LLC',
     amount: additionalMemberAmount,
     currency: 'GEL',
   }
-  const paypalLink = ps.paypal_link ?? null
 
   const unlinkedVaults = (allMyVaults ?? []).filter(v => !vaultIds.includes(v.id))
 
@@ -304,7 +298,7 @@ export default async function AileAnmaPaneliPage({ params, searchParams }: Props
                   <p className="text-sm font-medium text-[#1f2d27]">{fp.addMember.noVaultsTitle}</p>
                   <p className="text-xs text-[#788177] mt-1 max-w-xs">{fp.addMember.noVaultsDesc}</p>
                 </div>
-                <QuickPurchaseModal familyId={familyId} bankInfo={bankInfo} paypalLink={paypalLink} />
+                <QuickPurchaseModal familyId={familyId} bankInfo={bankInfo} />
               </div>
             ) : (
               <form action={addMember} className="flex gap-3">
@@ -329,7 +323,7 @@ export default async function AileAnmaPaneliPage({ params, searchParams }: Props
                 className="flex items-center gap-1.5 rounded-2xl border border-[#e5dccb] bg-white px-3 py-2 text-sm font-medium text-[#4a5e55] hover:border-[#174f35]/30 hover:bg-[#f9f5ee] transition-colors">
                 <Users className="h-4 w-4" /> {fp.members.addExisting}
               </Link>
-              <QuickPurchaseModal familyId={familyId} bankInfo={bankInfo} paypalLink={paypalLink} />
+              <QuickPurchaseModal familyId={familyId} bankInfo={bankInfo} />
             </div>
           </div>
 
@@ -388,7 +382,7 @@ export default async function AileAnmaPaneliPage({ params, searchParams }: Props
                   </div>
                 )
               })}
-              <QuickPurchaseModal cardMode familyId={familyId} bankInfo={bankInfo} paypalLink={paypalLink} />
+              <QuickPurchaseModal cardMode familyId={familyId} bankInfo={bankInfo} />
             </div>
           )}
         </section>

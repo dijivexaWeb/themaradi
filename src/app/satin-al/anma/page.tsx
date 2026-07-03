@@ -1,7 +1,8 @@
 import type { Metadata } from 'next'
-import { getBankSettings } from '@/lib/bank-settings'
 import { fetchPricingConfig } from '@/lib/pricing'
+import { resolveAmount } from '@/lib/currency'
 import { getTranslation } from '@/i18n/server'
+import { buildAlternateLanguages } from '@/lib/i18n/hreflang'
 import AnmaFormClient from './_AnmaFormClient'
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://theeternalmemory.com'
@@ -11,6 +12,7 @@ export const metadata: Metadata = {
   description: 'Sevdikleriniz için dijital anma profili oluşturun. Tek seferlik ödeme, ömür boyu erişim. Fotoğraflar, hayat hikayesi, aile ağacı ve QR mezar taşı dahil.',
   alternates: {
     canonical: `${APP_URL}/satin-al/anma`,
+    languages: buildAlternateLanguages('/satin-al/anma'),
   },
   openGraph: {
     title: 'Anma Profili Satın Al — The Eternal Memory',
@@ -20,37 +22,17 @@ export const metadata: Metadata = {
   },
 }
 
-interface Props {
-  searchParams: Promise<{ lang?: string }>
-}
+export default async function AnmaSatinAlPage() {
+  const { lang } = await getTranslation()
 
-export default async function AnmaSatinAlPage({ searchParams }: Props) {
-  const params = await searchParams
-  const { lang: cookieLang } = await getTranslation()
-  const effectiveLang = params.lang || cookieLang
+  const pricing = await fetchPricingConfig()
 
-  const [bank, pricing] = await Promise.all([getBankSettings(), fetchPricingConfig()])
+  const { amount, currency } = resolveAmount(lang, {
+    campaignActive: pricing.campaignActive,
+    try_: pricing.memorialTry, gel: pricing.memorialPrice, usd: pricing.memorialUsd, rub: pricing.memorialRub,
+    campaignTry: pricing.campaignMemorialTry, campaignGel: pricing.campaignMemorial, campaignUsd: pricing.campaignMemorialUsd, campaignRub: pricing.campaignMemorialRub,
+    fallbackGel: Number(pricing.memorialPrice),
+  })
 
-  let amount: number
-  let currency: string
-
-  if (effectiveLang === 'tr') {
-    amount = pricing.campaignActive && pricing.campaignMemorialTry
-      ? Number(pricing.campaignMemorialTry)
-      : Number(pricing.memorialTry || pricing.memorialPrice)
-    currency = '₺'
-  } else if (effectiveLang === 'ka') {
-    amount = pricing.campaignActive && pricing.campaignMemorial
-      ? Number(pricing.campaignMemorial)
-      : Number(pricing.memorialPrice)
-    currency = '₾'
-  } else {
-    // he, en, ru, hy, az → USD
-    amount = pricing.campaignActive && pricing.campaignMemorialUsd
-      ? Number(pricing.campaignMemorialUsd)
-      : Number(pricing.memorialUsd || pricing.memorialPrice)
-    currency = '$'
-  }
-
-  return <AnmaFormClient bank={bank} amount={amount} currency={currency} forceLang={params.lang} />
+  return <AnmaFormClient amount={amount} currency={currency} />
 }

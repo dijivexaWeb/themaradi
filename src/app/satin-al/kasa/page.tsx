@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
-import { getBankSettings } from '@/lib/bank-settings'
 import { fetchPricingConfig } from '@/lib/pricing'
+import { resolveAmount } from '@/lib/currency'
+import { getTranslation } from '@/i18n/server'
 import KasaFormClient from './_KasaFormClient'
 
 export const metadata: Metadata = {
@@ -9,13 +10,21 @@ export const metadata: Metadata = {
 }
 
 export default async function KasaSatinAlPage() {
-  const [bank, pricing] = await Promise.all([getBankSettings(), fetchPricingConfig()])
-  const setupAmount = pricing.campaignActive && pricing.campaignVaultSetup
-    ? Number(pricing.campaignVaultSetup)
-    : Number(pricing.vaultSetup)
-  const monthlyAmount = pricing.campaignActive && pricing.campaignVaultMonthly
-    ? Number(pricing.campaignVaultMonthly)
-    : Number(pricing.vaultMonthly)
+  const { lang } = await getTranslation()
+  const pricing = await fetchPricingConfig()
 
-  return <KasaFormClient bank={bank} setupAmount={setupAmount} monthlyAmount={monthlyAmount} />
+  const setup = resolveAmount(lang, {
+    campaignActive: pricing.campaignActive,
+    try_: pricing.vaultSetupTry, gel: pricing.vaultSetup, usd: pricing.vaultSetupUsd, rub: pricing.vaultSetupRub,
+    campaignGel: pricing.campaignVaultSetup,
+    fallbackGel: Number(pricing.vaultSetup),
+  })
+  const monthly = resolveAmount(lang, {
+    campaignActive: pricing.campaignActive,
+    try_: pricing.vaultMonthlyTry, gel: pricing.vaultMonthly, usd: pricing.vaultMonthlyUsd, rub: pricing.vaultMonthlyRub,
+    campaignGel: pricing.campaignVaultMonthly,
+    fallbackGel: Number(pricing.vaultMonthly),
+  })
+
+  return <KasaFormClient setupAmount={setup.amount} monthlyAmount={monthly.amount} currency={setup.currency} />
 }

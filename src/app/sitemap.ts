@@ -1,16 +1,23 @@
 import type { MetadataRoute } from 'next'
 import { createServiceClient } from '@/lib/supabase/server'
+import { buildAlternateLanguages } from '@/lib/i18n/hreflang'
+import { isLocaleEligible } from '@/lib/i18n/localizedHref'
 
 const base = process.env.NEXT_PUBLIC_APP_URL || 'https://theeternalmemory.com'
 
+function withAlternates(url: string, path: string): MetadataRoute.Sitemap[number]['alternates'] {
+  return isLocaleEligible(path) ? { languages: buildAlternateLanguages(path) } : undefined
+}
+
 const staticRoutes: MetadataRoute.Sitemap = [
-  { url: `${base}`, priority: 1.0, changeFrequency: 'daily' },
-  { url: `${base}/about`, priority: 0.7, changeFrequency: 'monthly' },
+  { url: `${base}`, priority: 1.0, changeFrequency: 'daily', alternates: withAlternates(`${base}`, '/') },
+  { url: `${base}/about`, priority: 0.7, changeFrequency: 'monthly', alternates: withAlternates(`${base}/about`, '/about') },
   { url: `${base}/memorial`, priority: 0.8, changeFrequency: 'daily' },
-  { url: `${base}/pricing`, priority: 0.8, changeFrequency: 'weekly' },
-  { url: `${base}/contact`, priority: 0.6, changeFrequency: 'monthly' },
-  { url: `${base}/satin-al/anma`, priority: 0.9, changeFrequency: 'weekly' },
-  { url: `${base}/satin-al/aile`, priority: 0.8, changeFrequency: 'weekly' },
+  { url: `${base}/pricing`, priority: 0.8, changeFrequency: 'weekly', alternates: withAlternates(`${base}/pricing`, '/pricing') },
+  { url: `${base}/contact`, priority: 0.6, changeFrequency: 'monthly', alternates: withAlternates(`${base}/contact`, '/contact') },
+  { url: `${base}/miras`, priority: 0.6, changeFrequency: 'weekly', alternates: withAlternates(`${base}/miras`, '/miras') },
+  { url: `${base}/satin-al/anma`, priority: 0.9, changeFrequency: 'weekly', alternates: withAlternates(`${base}/satin-al/anma`, '/satin-al/anma') },
+  { url: `${base}/satin-al/aile`, priority: 0.8, changeFrequency: 'weekly', alternates: withAlternates(`${base}/satin-al/aile`, '/satin-al/aile') },
   { url: `${base}/privacy`, priority: 0.3, changeFrequency: 'yearly' },
   { url: `${base}/terms`, priority: 0.3, changeFrequency: 'yearly' },
   { url: `${base}/cookies`, priority: 0.3, changeFrequency: 'yearly' },

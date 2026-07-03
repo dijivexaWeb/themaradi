@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react'
 import { useLang } from '@/i18n/context'
+import { WHATSAPP_PHONE } from '@/lib/whatsapp'
 
 export default function WhatsAppButton() {
   const { lang, t } = useLang()
@@ -47,7 +48,7 @@ export default function WhatsAppButton() {
   }
 
   // Formatting WhatsApp link: +995 555 511 884 -> 995555511884
-  const whatsappUrl = `https://wa.me/995555511884?text=${encodeURIComponent(t.whatsapp.message)}`
+  const whatsappUrl = `https://wa.me/${WHATSAPP_PHONE}?text=${encodeURIComponent(t.whatsapp.message)}`
   const isRtl = lang === 'he'
 
   return (

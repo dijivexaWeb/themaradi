@@ -243,12 +243,12 @@ export function adminNewRegistrationEmail(params: {
   phone: string
   productType: 'memorial_one_time' | 'vault_setup' | string
   vaultName: string
-  paymentMethod: 'bank_transfer' | 'paypal' | string
+  paymentMethod: 'bank_transfer' | 'whatsapp' | string
   amount: number
   adminUrl: string
 }): string {
   const productLabel = params.productType === 'memorial_one_time' ? 'Anma Sayfası' : 'Yaşam Kasası'
-  const methodLabel = params.paymentMethod === 'paypal' ? 'PayPal' : 'Banka Havalesi'
+  const methodLabel = params.paymentMethod === 'whatsapp' ? 'WhatsApp' : 'Banka Havalesi'
 
   return wrap(`
     <h2 style="margin:0 0 8px;font-size:22px;color:#0c3327;">🔔 Yeni kayıt — onay bekliyor</h2>

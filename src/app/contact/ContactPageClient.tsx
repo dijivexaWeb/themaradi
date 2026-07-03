@@ -5,6 +5,7 @@ import { Clock, Mail, MapPin, Phone } from 'lucide-react'
 import ContactForm from './ContactForm'
 import { useLang } from '@/i18n/context'
 import LandingNav from '@/components/landing/Nav'
+import { WHATSAPP_PHONE } from '@/lib/whatsapp'
 
 export default function ContactPageClient({ siteKey }: { siteKey: string }) {
   const { t } = useLang()
@@ -15,7 +16,7 @@ export default function ContactPageClient({ siteKey }: { siteKey: string }) {
       icon: Phone,
       label: c.info.phone,
       lines: [
-        { text: '+995 555 51 18 84', href: 'tel:+995555511884', tag: c.info.phoneTag },
+        { text: '+995 555 51 18 84', href: `tel:+${WHATSAPP_PHONE}`, tag: c.info.phoneTag },
       ],
     },
     {

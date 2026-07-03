@@ -6,6 +6,7 @@ import WhatsAppButton from "@/components/WhatsAppButton";
 import Script from "next/script";
 import { Suspense } from "react";
 import MetaPixel from "@/components/MetaPixel";
+import { buildAlternateLanguages } from "@/lib/i18n/hreflang";
 import "./globals.css";
 
 const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
@@ -69,6 +70,7 @@ export const metadata: Metadata = {
   },
   alternates: {
     canonical: APP_URL,
+    languages: buildAlternateLanguages('/'),
   },
 };
 

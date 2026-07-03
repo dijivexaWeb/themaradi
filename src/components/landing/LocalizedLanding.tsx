@@ -13,37 +13,14 @@ import { useLang } from '@/i18n/context'
 import { BrandMark } from '@/components/BrandLogo'
 import { useReveal } from '@/hooks/useReveal'
 import ParticleCanvas from './ParticleCanvas'
-import HeroPhoneShowcase from './HeroPhoneShowcase'
+import HeroPhoneShowcase, { type HeroMemorial } from './HeroPhoneShowcase'
 import TeamSection from './TeamSection'
 import RecentMemorialsCarousel, { type RecentMemorial } from './RecentMemorialsCarousel'
-import NotableProfilesSection, { type NotableMemorial } from './NotableProfilesSection'
 import TestimonialSection, { type TestimonialMemorial } from './TestimonialSection'
 import ApprovedProfilesPreview from './ApprovedProfilesPreview'
+import { buildCurrencyView } from '@/lib/currency'
+import { buildWhatsAppChatLink } from '@/lib/whatsapp'
 import type { PricingConfig } from '@/lib/pricing'
-
-/* ─── Types ───────────────────────────────────────────────── */
-type CurrencyView = {
-  symbol: string; memorial: string; vaultSetup: string
-  vaultMonthly: string; campaignMemorial: string; campaignVaultMonthly: string
-  family: string; campaignFamily: string
-  renewalPrice: string; renewalSymbol: string
-}
-// Yenileme fiyatı sadece GEL/USD/TRY olarak DB'de tutulur — TR ₺, KA ₾, diğer tüm diller (ru dahil) $ kullanır.
-function getRenewal(pricing: PricingConfig, lang: string): { renewalPrice: string; renewalSymbol: string } {
-  if (lang === 'tr') return { renewalPrice: pricing.hostingRenewalTry, renewalSymbol: '₺' }
-  if (lang === 'ka') return { renewalPrice: pricing.hostingRenewalGel, renewalSymbol: '₾' }
-  return { renewalPrice: pricing.hostingRenewalUsd, renewalSymbol: '$' }
-}
-function buildCurrencyView(pricing: PricingConfig, lang: string): CurrencyView {
-  const renewal = getRenewal(pricing, lang)
-  if (lang === 'tr' && pricing.memorialTry)
-    return { symbol: '₺', memorial: pricing.memorialTry, vaultSetup: pricing.vaultSetupTry || pricing.vaultSetup, vaultMonthly: pricing.vaultMonthlyTry || pricing.vaultMonthly, campaignMemorial: pricing.campaignMemorialTry, campaignVaultMonthly: pricing.campaignVaultMonthlyTry, family: pricing.familyTry || pricing.familyGel, campaignFamily: pricing.campaignFamilyTry, ...renewal }
-  if ((lang === 'en' || lang === 'he') && pricing.memorialUsd)
-    return { symbol: '$', memorial: pricing.memorialUsd, vaultSetup: pricing.vaultSetupUsd || pricing.vaultSetup, vaultMonthly: pricing.vaultMonthlyUsd || pricing.vaultMonthly, campaignMemorial: pricing.campaignMemorialUsd, campaignVaultMonthly: pricing.campaignVaultMonthlyUsd, family: pricing.familyUsd || pricing.familyGel, campaignFamily: pricing.campaignFamilyUsd, ...renewal }
-  if (lang === 'ru' && pricing.memorialRub)
-    return { symbol: '₽', memorial: pricing.memorialRub, vaultSetup: pricing.vaultSetupRub || pricing.vaultSetup, vaultMonthly: pricing.vaultMonthlyRub || pricing.vaultMonthly, campaignMemorial: pricing.campaignMemorialRub, campaignVaultMonthly: pricing.campaignVaultMonthlyRub, family: pricing.familyRub || pricing.familyGel, campaignFamily: pricing.campaignFamilyRub, ...renewal }
-  return { symbol: '₾', memorial: pricing.memorialPrice, vaultSetup: pricing.vaultSetup, vaultMonthly: pricing.vaultMonthly, campaignMemorial: pricing.campaignMemorial, campaignVaultMonthly: pricing.campaignVaultMonthly, family: pricing.familyGel, campaignFamily: pricing.campaignFamilyGel, ...renewal }
-}
 
 const stepIcons = [QrCode, BookOpen, Users, ShieldCheck] as const
 const securityIcons = [LockKeyhole, Database, Server, Key, QrCode, ShieldCheck] as const
@@ -153,8 +130,8 @@ function FooterColumn({ title, links }: { title: string; links: { href: string; 
 }
 
 /* ─── Main component ─────────────────────────────────────── */
-export default function LocalizedLanding({ pricing, notableMemorials, recentMemorials, testimonialMemorials }: {
-  pricing: PricingConfig; notableMemorials: NotableMemorial[]; recentMemorials: RecentMemorial[]; testimonialMemorials: TestimonialMemorial[]
+export default function LocalizedLanding({ pricing, heroMemorials, recentMemorials, testimonialMemorials }: {
+  pricing: PricingConfig; heroMemorials: HeroMemorial[]; recentMemorials: RecentMemorial[]; testimonialMemorials: TestimonialMemorial[]
 }) {
   useReveal()
   const { t, lang } = useLang()
@@ -226,13 +203,24 @@ export default function LocalizedLanding({ pricing, notableMemorials, recentMemo
               </div>
 
               {/* CTA */}
-              <Link
-                href="/satin-al/anma"
-                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10, width: '100%', padding: '17px 28px', borderRadius: 14, background: S.goldGrad, color: '#14110a', fontSize: 17, fontWeight: 600, textDecoration: 'none', fontFamily: S.sans, boxShadow: '0 8px 28px rgba(201,169,110,.28)' }}
-              >
-                {s.hero.ctaPrimary}
-                <ArrowRight style={{ width: 19, height: 19 }} />
-              </Link>
+              <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+                <Link
+                  href="/satin-al/anma"
+                  style={{ display: 'flex', flex: '1 1 220px', alignItems: 'center', justifyContent: 'center', gap: 10, padding: '17px 28px', borderRadius: 14, background: S.goldGrad, color: '#14110a', fontSize: 17, fontWeight: 600, textDecoration: 'none', fontFamily: S.sans, boxShadow: '0 8px 28px rgba(201,169,110,.28)' }}
+                >
+                  {s.hero.ctaPrimary}
+                  <ArrowRight style={{ width: 19, height: 19 }} />
+                </Link>
+                <a
+                  href={buildWhatsAppChatLink(s.hero.ctaWhatsapp)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{ display: 'flex', flex: '1 1 220px', alignItems: 'center', justifyContent: 'center', gap: 10, padding: '17px 24px', borderRadius: 14, background: 'rgba(37,211,102,.12)', border: '1px solid rgba(37,211,102,.4)', color: '#4fd97c', fontSize: 15.5, fontWeight: 600, textDecoration: 'none', fontFamily: S.sans }}
+                >
+                  <MessageCircle style={{ width: 18, height: 18 }} />
+                  {s.hero.ctaWhatsapp}
+                </a>
+              </div>
               <p style={{ textAlign: 'center', fontSize: 12.5, fontWeight: 300, color: S.textMuted, margin: '10px 0 0', fontFamily: S.sans }}>
                 {s.hero.ctaTrustLine}
               </p>
@@ -240,7 +228,7 @@ export default function LocalizedLanding({ pricing, notableMemorials, recentMemo
 
             {/* ── Right: Phone showcase ───────────────────────────── */}
             <div style={{ flex: '1 1 340px', minWidth: 260, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-              <HeroPhoneShowcase memorials={notableMemorials} />
+              <HeroPhoneShowcase memorials={heroMemorials} />
             </div>
 
           </div>
@@ -297,8 +285,8 @@ export default function LocalizedLanding({ pricing, notableMemorials, recentMemo
         <section id="nasil-calisir" style={{ padding: 'clamp(60px,10vh,120px) clamp(20px,4vw,60px)' }}>
           <div style={{ maxWidth: 1240, margin: '0 auto' }}>
             <div className="tem-reveal" style={{ textAlign: 'center', marginBottom: 70 }}>
-              <GoldLabel>Nasıl çalışır</GoldLabel>
-              <SectionHeading>Kalıcı bir anma profili, dört adımda</SectionHeading>
+              <GoldLabel>{s.misc.howItWorksLabel}</GoldLabel>
+              <SectionHeading>{s.misc.quickStepsHeading}</SectionHeading>
             </div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(232px,1fr))', gap: 26 }}>
               {quickSteps.map((item, i) => {
@@ -335,7 +323,7 @@ export default function LocalizedLanding({ pricing, notableMemorials, recentMemo
         <section id="profil" style={{ padding: 'clamp(60px,10vh,120px) clamp(20px,4vw,60px)' }}>
           <div style={{ maxWidth: 1140, margin: '0 auto' }}>
             <div className="tem-reveal" style={{ textAlign: 'center', marginBottom: 60 }}>
-              <GoldLabel>Anma profili</GoldLabel>
+              <GoldLabel>{s.misc.profilePreviewLabel}</GoldLabel>
               <SectionHeading>{s.profilePreview.heading}</SectionHeading>
             </div>
 
@@ -351,7 +339,7 @@ export default function LocalizedLanding({ pricing, notableMemorials, recentMemo
                 <div style={{ fontSize: 12.5, letterSpacing: '.12em', color: S.gold, margin: '6px 0 18px', fontFamily: S.sans }}>{s.profilePreview.profileYears}</div>
                 <p style={{ fontSize: 14.5, fontWeight: 300, lineHeight: 1.72, color: S.textMuted, margin: '0 0 26px', fontFamily: S.sans }}>{s.profilePreview.profileBio}</p>
                 <div style={{ display: 'flex', gap: 24, paddingTop: 22, borderTop: '1px solid rgba(201,169,110,.1)' }}>
-                  {[['6', 'Fotoğraf'], ['3', 'Video'], ['3', 'Taziye']].map(([n, l]) => (
+                  {[['6', s.misc.statPhotoLabel], ['3', s.misc.statVideoLabel], ['3', s.misc.statCondolenceLabel]].map(([n, l]) => (
                     <div key={l}>
                       <div style={{ fontFamily: S.serif, fontSize: 27, color: S.goldBright }}>{n}</div>
                       <div style={{ fontSize: 10.5, letterSpacing: '.1em', textTransform: 'uppercase', color: S.textFaint, fontFamily: S.sans }}>{l}</div>
@@ -490,8 +478,33 @@ export default function LocalizedLanding({ pricing, notableMemorials, recentMemo
 
         <SectionDivider delay={1.2} />
 
-        {/* ═══ ULUSAL MİRAS ════════════════════════════════════════ */}
-        <NotableProfilesSection memorials={notableMemorials} />
+        {/* ═══ ULUSAL MİRAS — teaser kart, tam içerik /miras sayfasında ══ */}
+        <section style={{ padding: 'clamp(32px,5vh,64px) clamp(20px,4vw,60px)' }}>
+          <div style={{ maxWidth: 1240, margin: '0 auto' }}>
+            <Link
+              href="/miras"
+              className="tem-reveal tem-card"
+              style={{
+                display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: 20,
+                padding: 'clamp(28px,4vh,44px) clamp(24px,4vw,48px)', borderRadius: 20,
+                background: S.card, border: `1px solid ${S.cardBorder}`, textDecoration: 'none',
+              }}
+            >
+              <div style={{ flex: '1 1 320px' }}>
+                <GoldLabel>{t.notableSection.eyebrow}</GoldLabel>
+                <h3 style={{ fontFamily: S.serif, fontWeight: 400, fontSize: 'clamp(22px,3vw,32px)', margin: '0 0 8px', color: S.textHead }}>
+                  {t.notableSection.heading}
+                </h3>
+                <p style={{ fontSize: 14.5, fontWeight: 300, color: S.textMuted, margin: 0, fontFamily: S.sans }}>
+                  {t.notableSection.sub}
+                </p>
+              </div>
+              <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8, color: S.gold, fontSize: 14.5, fontWeight: 500, fontFamily: S.sans, whiteSpace: 'nowrap' }}>
+                {t.notableSection.visit} <ArrowRight style={{ width: 16, height: 16 }} />
+              </span>
+            </Link>
+          </div>
+        </section>
 
         <SectionDivider delay={1.6} />
 
@@ -537,13 +550,13 @@ export default function LocalizedLanding({ pricing, notableMemorials, recentMemo
                         <div style={{ fontSize: 11.5, color: S.textFaint, fontFamily: S.sans }}>{s.familyPage.mockupYears[i]}</div>
                       </div>
                       {i === 2 && (
-                        <div style={{ fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', color: S.gold, background: 'rgba(201,169,110,.12)', border: '1px solid rgba(201,169,110,.25)', borderRadius: 999, padding: '4px 10px', fontFamily: S.sans }}>Yeni</div>
+                        <div style={{ fontSize: 10, letterSpacing: '.08em', textTransform: 'uppercase', color: S.gold, background: 'rgba(201,169,110,.12)', border: '1px solid rgba(201,169,110,.25)', borderRadius: 999, padding: '4px 10px', fontFamily: S.sans }}>{s.misc.newBadge}</div>
                       )}
                     </div>
                   ))}
                   <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 16px', borderRadius: 14, border: '1px dashed rgba(201,169,110,.25)', cursor: 'default' }}>
                     <div style={{ width: 36, height: 36, borderRadius: '50%', border: '1px dashed rgba(201,169,110,.3)', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'rgba(201,169,110,.5)', fontSize: 20 }}>+</div>
-                    <span style={{ color: 'rgba(201,169,110,.5)', fontSize: 14, fontFamily: S.sans }}>Yeni sayfa ekle…</span>
+                    <span style={{ color: 'rgba(201,169,110,.5)', fontSize: 14, fontFamily: S.sans }}>{s.misc.addNewPageLabel}</span>
                   </div>
                 </div>
               </div>
@@ -589,7 +602,7 @@ export default function LocalizedLanding({ pricing, notableMemorials, recentMemo
         <section id="ozellikler" style={{ padding: 'clamp(64px,11vh,140px) clamp(20px,4vw,60px)' }}>
           <div style={{ maxWidth: 1240, margin: '0 auto' }}>
             <div className="tem-reveal" style={{ textAlign: 'center', marginBottom: 64 }}>
-              <GoldLabel>Neden The Eternal Memory</GoldLabel>
+              <GoldLabel>{s.misc.whySectionLabel}</GoldLabel>
               <SectionHeading style={{ maxWidth: 760, margin: '0 auto' }}>
                 {s.whySection.heading}
               </SectionHeading>
@@ -612,10 +625,10 @@ export default function LocalizedLanding({ pricing, notableMemorials, recentMemo
             {/* Security badges */}
             <div className="tem-reveal" style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: 12 }}>
               {[
-                [LockKeyhole, 'Şifreli bağlantı'],
-                [ShieldCheck, 'Yetkili erişim'],
-                [Database, 'Korumalı medya saklama'],
-                [QrCode, 'Kalıcı QR yönlendirme'],
+                [LockKeyhole, s.misc.securityBadges[0]],
+                [ShieldCheck, s.misc.securityBadges[1]],
+                [Database, s.misc.securityBadges[2]],
+                [QrCode, s.misc.securityBadges[3]],
               ].map(([Icon, label], i) => (
                 <span key={i} style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 12.5, fontWeight: 300, color: S.textMuted, border: '1px solid rgba(201,169,110,.14)', borderRadius: 999, padding: '9px 16px', fontFamily: S.sans }}>
                   {/* @ts-ignore */}
@@ -677,7 +690,7 @@ export default function LocalizedLanding({ pricing, notableMemorials, recentMemo
                     {t.gravestoneQrBanner.body}
                   </p>
                   <Link href="/#fiyatlar" className="tem-goldbtn" style={{ display: 'inline-flex', alignItems: 'center', gap: 8, textDecoration: 'none', background: S.goldGrad, color: '#14110a', fontWeight: 500, fontSize: 14, padding: '12px 24px', borderRadius: 999, fontFamily: S.sans }}>
-                    Hemen başla <ArrowRight style={{ width: 14, height: 14 }} />
+                    {s.misc.ctaStartNow} <ArrowRight style={{ width: 14, height: 14 }} />
                   </Link>
                 </div>
               </div>
@@ -936,7 +949,7 @@ export default function LocalizedLanding({ pricing, notableMemorials, recentMemo
         <section id="sss" style={{ padding: 'clamp(60px,10vh,120px) clamp(20px,4vw,60px)' }}>
           <div style={{ maxWidth: 820, margin: '0 auto' }}>
             <div className="tem-reveal" style={{ textAlign: 'center', marginBottom: 52 }}>
-              <GoldLabel>Sık sorulan sorular</GoldLabel>
+              <GoldLabel>{s.misc.faqLabel}</GoldLabel>
               <SectionHeading>{s.faqSection.heading}</SectionHeading>
             </div>
             <div className="tem-reveal" style={{ borderRadius: 20, overflow: 'hidden', border: `1px solid ${S.cardBorder}`, background: S.card }}>

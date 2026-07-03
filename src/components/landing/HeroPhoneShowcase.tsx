@@ -2,7 +2,11 @@
 
 import Image from 'next/image'
 import Link from 'next/link'
-import type { NotableMemorial } from './NotableProfilesSection'
+import { useLang } from '@/i18n/context'
+import AddedBadge from '@/components/AddedBadge'
+import type { RecentMemorial } from './RecentMemorialsCarousel'
+
+export type HeroMemorial = RecentMemorial & { interaction_count?: number }
 
 const S = {
   gold: '#C9A96E',
@@ -19,8 +23,9 @@ function formatYears(birth: string | null, death: string | null) {
   return ''
 }
 
-function PhoneCard({ memorial, scale = 1, rotate = 0, zIndex = 1, translateY = 0 }: {
-  memorial: NotableMemorial
+function PhoneCard({ memorial, visitLabel, scale = 1, rotate = 0, zIndex = 1, translateY = 0 }: {
+  memorial: HeroMemorial
+  visitLabel: string
   scale?: number
   rotate?: number
   zIndex?: number
@@ -74,6 +79,7 @@ function PhoneCard({ memorial, scale = 1, rotate = 0, zIndex = 1, translateY = 0
             )}
             {/* Gradient overlay bottom */}
             <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(11,19,15,1) 0%, rgba(11,19,15,0.3) 50%, transparent 100%)' }} />
+            <AddedBadge date={memorial.published_at} className="absolute left-2 top-2 z-10" />
             {/* Name over photo */}
             <div style={{ position: 'absolute', bottom: 10, left: 10, right: 10 }}>
               <div style={{ fontFamily: S.serif, fontSize: 17, fontWeight: 500, color: '#F4F0E6', lineHeight: 1.2, textShadow: '0 1px 4px rgba(0,0,0,.6)' }}>
@@ -89,9 +95,9 @@ function PhoneCard({ memorial, scale = 1, rotate = 0, zIndex = 1, translateY = 0
 
           {/* Bottom info */}
           <div style={{ padding: '10px 12px 14px' }}>
-            {memorial.notable_subtitle && (
+            {memorial.tagline && (
               <div style={{ fontSize: 10, color: 'rgba(237,232,221,.5)', fontFamily: S.sans, marginBottom: 10, lineHeight: 1.4, fontStyle: 'italic' }}>
-                {memorial.notable_subtitle}
+                {memorial.tagline}
               </div>
             )}
 
@@ -118,7 +124,7 @@ function PhoneCard({ memorial, scale = 1, rotate = 0, zIndex = 1, translateY = 0
               fontSize: 10, fontWeight: 600, padding: '7px 0',
               borderRadius: 999, fontFamily: S.sans,
             }}>
-              Sayfayı Ziyaret Et →
+              {visitLabel}
             </div>
           </div>
         </div>
@@ -127,7 +133,9 @@ function PhoneCard({ memorial, scale = 1, rotate = 0, zIndex = 1, translateY = 0
   )
 }
 
-export default function HeroPhoneShowcase({ memorials }: { memorials: NotableMemorial[] }) {
+export default function HeroPhoneShowcase({ memorials }: { memorials: HeroMemorial[] }) {
+  const { t } = useLang()
+  const visitLabel = t.landing.misc.heroVisitCta
   const [left, center, right] = [
     memorials[1] ?? memorials[0],
     memorials[0],
@@ -148,17 +156,17 @@ export default function HeroPhoneShowcase({ memorials }: { memorials: NotableMem
 
       {/* Left phone — mobilde gizli */}
       <div className="hidden sm:block" style={{ marginRight: -30 }}>
-        <PhoneCard memorial={left} scale={0.78} rotate={-8} zIndex={1} translateY={20} />
+        <PhoneCard memorial={left} visitLabel={visitLabel} scale={0.78} rotate={-8} zIndex={1} translateY={20} />
       </div>
 
       {/* Center phone — big, upright, float animation */}
       <div className="tem-animate-floatY" style={{ zIndex: 3, position: 'relative' }}>
-        <PhoneCard memorial={center} scale={1} rotate={0} zIndex={3} />
+        <PhoneCard memorial={center} visitLabel={visitLabel} scale={1} rotate={0} zIndex={3} />
       </div>
 
       {/* Right phone — mobilde gizli */}
       <div className="hidden sm:block" style={{ marginLeft: -30 }}>
-        <PhoneCard memorial={right} scale={0.78} rotate={8} zIndex={1} translateY={20} />
+        <PhoneCard memorial={right} visitLabel={visitLabel} scale={0.78} rotate={8} zIndex={1} translateY={20} />
       </div>
 
       {/* Bottom reflection */}

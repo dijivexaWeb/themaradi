@@ -1,34 +1,21 @@
 'use client'
 
-import { useActionState, useEffect } from 'react'
+import { useActionState } from 'react'
 import { purchaseFamilyAction } from '../actions'
 import Link from 'next/link'
-import type { BankSettings } from '@/lib/bank-settings'
 import BrandLogo from '@/components/BrandLogo'
 import { useLang } from '@/i18n/context'
-import { dictionaries, type Lang } from '@/i18n'
 
 export default function AileFormClient({
-  bank,
   amount,
   currency,
-  forceLang,
 }: {
-  bank: BankSettings
   amount: number
   currency: string
-  forceLang?: string
 }) {
-  const { t: contextT, setLang } = useLang()
-
-  useEffect(() => {
-    if (forceLang && forceLang in dictionaries) {
-      setLang(forceLang as Lang)
-    }
-  }, [forceLang])
-
-  const t = (forceLang && forceLang in dictionaries) ? dictionaries[forceLang as Lang] : contextT
+  const { t } = useLang()
   const f = t.purchasePage.aile
+  const c = t.purchasePage.common
   const [state, action, pending] = useActionState(purchaseFamilyAction, null)
 
   const inp = 'w-full bg-slate-800 border border-slate-700 text-white placeholder-slate-500 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-emerald-500'
@@ -36,26 +23,26 @@ export default function AileFormClient({
   return (
     <div className="min-h-screen bg-slate-950 text-white flex flex-col">
       <header className="border-b border-slate-800 bg-slate-950/95 backdrop-blur sticky top-0 z-10">
-        <div className="mx-auto flex h-14 max-w-lg items-center justify-between px-4">
+        <div className="mx-auto flex h-14 max-w-xl items-center justify-between px-4">
           <BrandLogo light href="/" />
           <div className="flex items-center gap-2 text-xs text-slate-500">
             <svg className="h-3.5 w-3.5 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
             </svg>
-            Güvenli Ödeme
+            {c.secureOrderBadge}
           </div>
         </div>
       </header>
 
-      <div className="flex flex-1 flex-col items-center justify-center px-4 py-12">
-        <div className="max-w-lg w-full">
-          <Link href="/satin-al" className="inline-flex items-center gap-2 text-slate-500 hover:text-slate-300 text-sm mb-6 transition-colors">
+      <div className="flex flex-1 flex-col items-center justify-center px-4 py-10">
+        <div className="max-w-xl w-full">
+          <Link href="/satin-al" className="inline-flex items-center gap-2 text-slate-500 hover:text-slate-300 text-sm mb-4 transition-colors">
             {f.backLink}
           </Link>
 
-          <div className="border border-emerald-500/20 bg-slate-900 rounded-2xl p-7">
+          <div className="border border-emerald-500/20 bg-slate-900 rounded-2xl p-6">
             {/* Header */}
-            <div className="flex items-center gap-3 mb-6">
+            <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 bg-emerald-500/15 rounded-xl flex items-center justify-center text-xl">🏡</div>
               <div>
                 <h1 className="font-bold text-xl text-white">{f.title}</h1>
@@ -64,7 +51,7 @@ export default function AileFormClient({
             </div>
 
             {/* What's included */}
-            <div className="bg-emerald-500/5 border border-emerald-500/15 rounded-xl p-4 mb-6 space-y-1.5 text-sm text-slate-300">
+            <div className="bg-emerald-500/5 border border-emerald-500/15 rounded-xl p-3.5 mb-4 space-y-1.5 text-sm text-slate-300">
               <p className="text-xs text-emerald-400 font-semibold uppercase tracking-wide mb-2">{f.includedHeading}</p>
               {f.included.map((item) => (
                 <div key={item} className="flex items-center gap-2">
@@ -74,69 +61,50 @@ export default function AileFormClient({
               ))}
             </div>
 
-            {/* Ödeme yöntemi — sadece havale */}
-            <div className="mb-6">
-              <p className="text-xs text-slate-500 uppercase tracking-wider mb-3 font-semibold">{t.purchasePage.anma.paymentMethodLabel}</p>
-              <div className="rounded-xl border border-emerald-500/40 bg-emerald-500/8 p-3.5">
-                <div className="text-lg mb-1">🏦</div>
-                <div className="text-sm font-semibold text-white">{f.bankTransfer.name}</div>
-                <div className="text-[11px] text-emerald-400 font-medium mt-0.5">{f.bankTransfer.status}</div>
-              </div>
-            </div>
-
-            {/* Havale bilgileri */}
-            <div className="bg-slate-800/60 border border-slate-700 rounded-xl p-4 mb-6">
-              <p className="text-xs text-slate-500 uppercase tracking-wider mb-3 font-semibold">{f.bankDetails.heading}</p>
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between items-center">
-                  <span className="text-slate-400">{f.bankDetails.ibanLabel}</span>
-                  <span className="font-mono text-amber-400 select-all text-xs sm:text-sm">{bank.iban}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-400">{f.bankDetails.bankLabel}</span>
-                  <span className="text-slate-200">{bank.bankName}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-slate-400">{f.bankDetails.recipientLabel}</span>
-                  <span className="text-slate-200">{bank.recipient}</span>
-                </div>
-                <div className="flex justify-between pt-2 border-t border-slate-700">
-                  <span className="text-slate-400">{f.bankDetails.amountLabel}</span>
-                  <span className="text-white font-bold text-base">{amount} {currency}</span>
-                </div>
+            {/* WhatsApp bilgi kutusu */}
+            <div className="mb-4 rounded-xl border border-[#25D366]/25 bg-[#25D366]/5 p-3.5 text-sm text-slate-300 leading-6">
+              <p className="flex items-center gap-2 font-semibold text-white mb-1">
+                <span className="text-lg">💬</span> {c.whatsappBoxHeading}
+              </p>
+              {c.whatsappBoxBody}
+              <div className="mt-3 pt-3 border-t border-[#25D366]/15 flex justify-between">
+                <span className="text-slate-400">{c.amountLabel}</span>
+                <span className="text-white font-bold">{amount} {currency}</span>
               </div>
             </div>
 
             {/* Form */}
             <form action={action} className="space-y-4">
-              <div>
-                <label className="block text-xs text-slate-400 mb-1.5 font-medium">
-                  {f.form.familyName} <span className="text-emerald-400">*</span>
-                </label>
-                <input type="text" name="family_name" placeholder={f.form.familyNamePlaceholder} required className={inp} />
-                <p className="text-xs text-slate-600 mt-1">{f.form.familyNameHint}</p>
+              <div className="grid sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs text-slate-400 mb-1.5 font-medium">
+                    {f.form.familyName} <span className="text-emerald-400">*</span>
+                  </label>
+                  <input type="text" name="family_name" placeholder={f.form.familyNamePlaceholder} required className={inp} />
+                  <p className="text-xs text-slate-600 mt-1">{f.form.familyNameHint}</p>
+                </div>
+                <div>
+                  <label className="block text-xs text-slate-400 mb-1.5 font-medium">
+                    {f.form.yourName} <span className="text-emerald-400">*</span>
+                  </label>
+                  <input type="text" name="sender_name" placeholder={f.form.yourNamePlaceholder} required className={inp} />
+                </div>
               </div>
 
-              <div>
-                <label className="block text-xs text-slate-400 mb-1.5 font-medium">
-                  {f.form.yourName} <span className="text-emerald-400">*</span>
-                </label>
-                <input type="text" name="sender_name" placeholder={f.form.yourNamePlaceholder} required className={inp} />
-              </div>
-
-              <div>
-                <label className="block text-xs text-slate-400 mb-1.5 font-medium">
-                  {f.form.email} <span className="text-emerald-400">*</span>
-                </label>
-                <input type="email" name="sender_email" placeholder={f.form.emailPlaceholder} required className={inp} />
-              </div>
-
-              <div>
-                <label className="block text-xs text-slate-400 mb-1.5 font-medium">
-                  {f.form.phone} <span className="text-emerald-400">*</span>
-                </label>
-                <input type="tel" name="phone" placeholder={f.form.phonePlaceholder} required className={inp} />
-                <p className="text-xs text-slate-600 mt-1">{f.form.phoneHint}</p>
+              <div className="grid sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs text-slate-400 mb-1.5 font-medium">
+                    {f.form.email} <span className="text-emerald-400">*</span>
+                  </label>
+                  <input type="email" name="sender_email" placeholder={f.form.emailPlaceholder} required className={inp} />
+                </div>
+                <div>
+                  <label className="block text-xs text-slate-400 mb-1.5 font-medium">
+                    {f.form.phone} <span className="text-emerald-400">*</span>
+                  </label>
+                  <input type="tel" name="phone" placeholder={f.form.phonePlaceholder} required className={inp} />
+                  <p className="text-xs text-slate-600 mt-1">{f.form.phoneHint}</p>
+                </div>
               </div>
 
               <div>
@@ -147,7 +115,7 @@ export default function AileFormClient({
                   name="shipping_address"
                   placeholder={f.form.shippingAddressPlaceholder}
                   required
-                  rows={3}
+                  rows={2}
                   className={`${inp} resize-none`}
                 />
                 <p className="text-xs text-slate-600 mt-1">{f.form.shippingAddressHint}</p>
@@ -202,7 +170,7 @@ export default function AileFormClient({
                 disabled={pending}
                 className="w-full bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white font-semibold py-3 rounded-xl transition-colors text-sm"
               >
-                {pending ? f.submitPending : f.submitBtn}
+                {pending ? f.submitPending : c.submitCta}
               </button>
             </form>
 

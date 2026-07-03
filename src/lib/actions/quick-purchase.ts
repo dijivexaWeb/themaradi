@@ -4,6 +4,7 @@ import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { sendEmail, getAdminNotificationEmail } from '@/lib/email'
 import { adminNewRegistrationEmail } from '@/lib/email/templates'
 import { fetchPricingConfig } from '@/lib/pricing'
+import { buildWhatsAppOrderLink } from '@/lib/whatsapp'
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://theeternalmemory.com'
 
@@ -20,7 +21,7 @@ function slugify(text: string): string {
 }
 
 export type QuickPurchaseResult =
-  | { ok: true; vaultId: string }
+  | { ok: true; vaultId: string; waLink: string }
   | { ok: false; error: string }
 
 export async function quickPurchaseMemorialAction(
@@ -37,7 +38,7 @@ export async function quickPurchaseMemorialAction(
   const displayName = (formData.get('display_name') as string)?.trim()
   const qrSameAddress = formData.get('qr_same_address') === 'yes'
   const shippingAddress = qrSameAddress ? null : (formData.get('shipping_address') as string)?.trim() || null
-  const paymentMethod = (formData.get('payment_method') as string) || 'bank_transfer'
+  const paymentMethod = 'whatsapp'
 
   if (!displayName) return { ok: false, error: 'İsim zorunludur.' }
 
@@ -104,5 +105,13 @@ export async function quickPurchaseMemorialAction(
     console.error('[quickPurchaseMemorialAction] admin notify error:', e)
   }
 
-  return { ok: true, vaultId: vault.id }
+  const waLink = buildWhatsAppOrderLink({
+    senderName: profile?.full_name ?? user.email ?? '',
+    packageLabel: 'Anma Profili',
+    amount,
+    currency: '₾',
+    vaultName: displayName,
+  })
+
+  return { ok: true, vaultId: vault.id, waLink }
 }
