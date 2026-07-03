@@ -5,20 +5,38 @@ import MemorialsClient, { type MemorialItem } from './_MemorialsClient'
 
 export const revalidate = 60
 
-export const metadata: Metadata = {
-  title: 'Anma Profilleri',
-  description: 'The Eternal Memory\'de yayınlanan dijital anma profillerini keşfedin. Ulusal miras sahipleri, aile büyükleri ve sevdikleriniz için oluşturulmuş profiller.',
-  openGraph: {
-    title: 'Anma Profilleri — The Eternal Memory',
-    description: 'Dijital anma profillerini keşfedin. Fotoğraflar, hayat hikayeleri, anılar.',
-    type: 'website',
-  },
-}
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://theeternalmemory.com'
 
 const PAGE_SIZE = 20
 
 interface Props {
   searchParams: Promise<{ q?: string; l?: string; page?: string }>
+}
+
+export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
+  const params = await searchParams
+  const searchTerm = params.q?.trim() ?? ''
+  const letter = params.l?.toUpperCase() ?? ''
+  const currentPage = Math.max(1, parseInt(params.page ?? '1', 10))
+
+  // Arama/harf filtresi uygulanan görünümler ince/tekrarlayan içerik sayılır — indekslenmesin.
+  const isFiltered = !!searchTerm || !!letter
+  const canonicalUrl = currentPage > 1 ? `${APP_URL}/memorial?page=${currentPage}` : `${APP_URL}/memorial`
+
+  return {
+    title: 'Anma Profilleri',
+    description: 'The Eternal Memory\'de yayınlanan dijital anma profillerini keşfedin. Ulusal miras sahipleri, aile büyükleri ve sevdikleriniz için oluşturulmuş profiller.',
+    alternates: {
+      canonical: canonicalUrl,
+    },
+    robots: isFiltered ? { index: false, follow: true } : undefined,
+    openGraph: {
+      title: 'Anma Profilleri — The Eternal Memory',
+      description: 'Dijital anma profillerini keşfedin. Fotoğraflar, hayat hikayeleri, anılar.',
+      url: canonicalUrl,
+      type: 'website',
+    },
+  }
 }
 
 export default async function MemorialsIndexPage({ searchParams }: Props) {

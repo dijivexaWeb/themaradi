@@ -4,12 +4,18 @@ import { fetchPricingConfig } from '@/lib/pricing'
 import { getTranslation } from '@/i18n/server'
 import AileFormClient from './_AileFormClient'
 
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://theeternalmemory.com'
+
 export const metadata: Metadata = {
   title: 'Aile Paketi Satın Al',
   description: 'Tüm aile için ortak anma sayfası. Aile ağacı, ortak fotoğraf galerisi ve her üye için ayrı profil. Tek seferlik ödeme, ömür boyu erişim.',
+  alternates: {
+    canonical: `${APP_URL}/satin-al/aile`,
+  },
   openGraph: {
     title: 'Aile Paketi Satın Al — The Eternal Memory',
     description: 'Aile ağacı ve ortak anma sayfası — tek seferlik ödeme.',
+    url: `${APP_URL}/satin-al/aile`,
     type: 'website',
   },
 }

@@ -4,12 +4,18 @@ import { fetchPricingConfig } from '@/lib/pricing'
 import { getTranslation } from '@/i18n/server'
 import AnmaFormClient from './_AnmaFormClient'
 
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://theeternalmemory.com'
+
 export const metadata: Metadata = {
   title: 'Anma Profili Satın Al',
   description: 'Sevdikleriniz için dijital anma profili oluşturun. Tek seferlik ödeme, ömür boyu erişim. Fotoğraflar, hayat hikayesi, aile ağacı ve QR mezar taşı dahil.',
+  alternates: {
+    canonical: `${APP_URL}/satin-al/anma`,
+  },
   openGraph: {
     title: 'Anma Profili Satın Al — The Eternal Memory',
     description: 'Dijital anma profili — tek seferlik ödeme, ömür boyu erişim.',
+    url: `${APP_URL}/satin-al/anma`,
     type: 'website',
   },
 }
