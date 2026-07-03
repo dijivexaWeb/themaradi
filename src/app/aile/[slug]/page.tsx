@@ -11,13 +11,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const supabase = await createClient()
   const { data: family } = await supabase
     .from('memorial_families')
-    .select('name, tagline')
+    .select('name, tagline, hero_bg_url')
     .eq('slug', slug)
     .single()
 
   const name = family?.name ?? 'Anma Sayfası'
   const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://theeternalmemory.com'
   const description = family?.tagline ?? `${name} aile anma sayfası — Fotoğraflar, aile ağacı ve anılar. The Eternal Memory.`
+  const ogImage = family?.hero_bg_url || `${APP_URL}/images/landing/memorial-hero-cemetery.png`
   return {
     title: `${name} — Aile Anma Sayfası`,
     description,
@@ -28,11 +29,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       type: 'website',
       siteName: 'The Eternal Memory',
       url: `${APP_URL}/aile/${slug}`,
+      images: [{ url: ogImage, width: 1200, height: 630, alt: name }],
     },
     twitter: {
-      card: 'summary',
+      card: 'summary_large_image',
       title: `${name} — Aile Anma Sayfası`,
       description,
+      images: [ogImage],
     },
   }
 }
@@ -103,12 +106,33 @@ export default async function PublicFamilyPage({ params }: Props) {
     ],
   }
 
+  const membersLd = memberVaults.length > 0 ? {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    itemListElement: memberVaults.map((v, i) => ({
+      '@type': 'ListItem',
+      position: i + 1,
+      item: {
+        '@type': 'Person',
+        name: v.display_name,
+        url: v.slug ? `${APP_URL}/memorial/${v.slug}` : undefined,
+        ...(v.cover_photo_url ? { image: v.cover_photo_url } : {}),
+      },
+    })),
+  } : null
+
   return (
     <>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
       />
+      {membersLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(membersLd) }}
+        />
+      )}
       <div className="family-page-premium">
         <PremiumFamilyPageClient
           family={family}

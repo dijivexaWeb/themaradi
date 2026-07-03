@@ -23,5 +23,45 @@ export const metadata: Metadata = {
 
 export default async function PricingPage() {
   const pricing = await fetchPricingConfig()
-  return <PricingClient pricing={pricing} />
+
+  const productsLd = {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    itemListElement: [
+      {
+        '@type': 'Product',
+        name: 'Anma Profili',
+        description: 'QR mezar taşı dahil dijital anma profili — tek seferlik ödeme, ömür boyu erişim.',
+        offers: {
+          '@type': 'Offer',
+          price: pricing.memorialPrice,
+          priceCurrency: 'GEL',
+          url: `${APP_URL}/satin-al/anma`,
+          availability: 'https://schema.org/InStock',
+        },
+      },
+      {
+        '@type': 'Product',
+        name: 'Aile Paketi',
+        description: '4 üyeli aile anma paketi — ortak aile sayfası ve QR mezar taşı dahil.',
+        offers: {
+          '@type': 'Offer',
+          price: pricing.familyGel,
+          priceCurrency: 'GEL',
+          url: `${APP_URL}/satin-al/aile`,
+          availability: 'https://schema.org/InStock',
+        },
+      },
+    ],
+  }
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productsLd) }}
+      />
+      <PricingClient pricing={pricing} />
+    </>
+  )
 }

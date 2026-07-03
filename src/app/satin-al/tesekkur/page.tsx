@@ -1,7 +1,13 @@
+import type { Metadata } from 'next'
 import Link from 'next/link'
 import { getBankSettings } from '@/lib/bank-settings'
 import BrandLogo from '@/components/BrandLogo'
 import { CheckCircle2, ArrowRight, Phone, Home } from 'lucide-react'
+
+export const metadata: Metadata = {
+  title: 'Teşekkürler',
+  robots: { index: false, follow: true },
+}
 
 interface Props {
   searchParams: Promise<{

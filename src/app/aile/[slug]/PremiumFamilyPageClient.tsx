@@ -1,6 +1,7 @@
 ﻿'use client'
 
 import { useState, useEffect } from 'react'
+import Image from 'next/image'
 import Link from 'next/link'
 import { incrementFamilyActionAction } from '@/lib/actions/family-public'
 import { CondolenceForm } from './FamilyInteractions'
@@ -257,7 +258,7 @@ export default function PremiumFamilyPageClient({
               const frameClass = frameClasses[index]
               const content = (
                 <>
-                  <img src={item.src} alt={item.alt} />
+                  <Image src={item.src} alt={item.alt} fill sizes="80px" />
                 </>
               )
               if (item.slug) {
@@ -400,7 +401,7 @@ export default function PremiumFamilyPageClient({
                   <div className="corners-decor"></div>
                   <div className="avatar-wrapper">
                     {vault.cover_photo_url ? (
-                      <img src={vault.cover_photo_url} className="member-avatar" alt={vault.display_name} />
+                      <Image src={vault.cover_photo_url} fill sizes="100px" className="member-avatar" alt={vault.display_name} />
                     ) : (
                       <div className="member-avatar flex items-center justify-center bg-[#2a4535] text-white text-3xl font-serif">
                         {vault.display_name.charAt(0).toUpperCase()}
@@ -451,7 +452,7 @@ export default function PremiumFamilyPageClient({
                     <div className="corners-decor"></div>
                     {photoSrc && (
                       <div className="memory-image-wrapper">
-                        <img src={photoSrc} className="memory-image" alt={mem.title || 'Anı Görseli'} />
+                        <Image src={photoSrc} fill sizes="(max-width: 640px) 100vw, 320px" className="memory-image" alt={mem.title || 'Anı Görseli'} />
                       </div>
                     )}
                     <div className="memory-content">
@@ -494,7 +495,7 @@ export default function PremiumFamilyPageClient({
               {displayPhotos.map((photo, index) => (
                 <div key={photo.id} className="gallery-item premium-border" onClick={() => openLightbox(index)}>
                   <div className="corners-decor"></div>
-                  <img src={photo.original_url} alt={photo.caption || `Fotoğraf ${index + 1}`} />
+                  <Image src={photo.original_url} fill sizes="(max-width: 640px) 50vw, 200px" alt={photo.caption || `Fotoğraf ${index + 1}`} />
                   <div className="gallery-icon-overlay">
                     <svg viewBox="0 0 24 24"><path d="M21 19V5c0-1.1-.9-2-2-2H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2zM8.5 13.5l2.5 3.01L14.5 12l4.5 6H5l3.5-4.5z"/></svg>
                   </div>

@@ -101,8 +101,24 @@ export default async function MemorialsIndexPage({ searchParams }: Props) {
     }
   }
 
+  const itemListLd = (memorials ?? []).length > 0 ? {
+    '@context': 'https://schema.org',
+    '@type': 'ItemList',
+    itemListElement: (memorials ?? []).map((m, i) => ({
+      '@type': 'ListItem',
+      position: from + i + 1,
+      url: `${APP_URL}/memorial/${m.slug}`,
+    })),
+  } : null
+
   return (
     <div className="min-h-screen bg-[#fbf8f1] text-[#173d31]">
+      {itemListLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListLd) }}
+        />
+      )}
       <LandingNav />
       <MemorialsClient
         memorials={(memorials ?? []).map(m => ({ ...m, family: familyMap[m.id] ?? null })) as MemorialItem[]}

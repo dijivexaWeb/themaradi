@@ -42,9 +42,12 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const description = vault.tagline
     ?? `${vault.display_name}${years} — Dijital anma profili. Fotoğraflar, hayat hikayesi ve anılar. The Eternal Memory.`
 
-  const ogImage = vault.cover_photo_url
-    ? [{ url: vault.cover_photo_url, width: 1200, height: 630, alt: vault.display_name }]
-    : undefined
+  const ogImage = [{
+    url: vault.cover_photo_url || `${APP_URL}/images/landing/memorial-hero-cemetery.png`,
+    width: 1200,
+    height: 630,
+    alt: vault.display_name,
+  }]
 
   return {
     title: `${vault.display_name}${years}`,
@@ -57,13 +60,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       type: 'profile',
       siteName: 'The Eternal Memory',
       url: `${APP_URL}/memorial/${slug}`,
-      ...(ogImage ? { images: ogImage } : {}),
+      images: ogImage,
     },
     twitter: {
-      card: ogImage ? 'summary_large_image' : 'summary',
+      card: 'summary_large_image',
       title: `${vault.display_name}${years}`,
       description,
-      ...(ogImage ? { images: [ogImage[0].url] } : {}),
+      images: [ogImage[0].url],
     },
   }
 }

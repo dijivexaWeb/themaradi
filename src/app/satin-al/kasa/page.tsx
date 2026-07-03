@@ -1,6 +1,12 @@
+import type { Metadata } from 'next'
 import { getBankSettings } from '@/lib/bank-settings'
 import { fetchPricingConfig } from '@/lib/pricing'
 import KasaFormClient from './_KasaFormClient'
+
+export const metadata: Metadata = {
+  title: 'Yaşam Kasası Satın Al',
+  robots: { index: false, follow: true },
+}
 
 export default async function KasaSatinAlPage() {
   const [bank, pricing] = await Promise.all([getBankSettings(), fetchPricingConfig()])
