@@ -260,14 +260,14 @@ const he: LangDict = {
     },
 
     approvedProfilesSection: {
-      heading: 'פרופילי הנצחה שהמשפחה בחרה לשתף',
+      heading: 'משפחות משמרות את זכר יקיריהן איתנו',
       viewProfile: 'צפו בפרופיל',
       priceHint: 'צרו פרופיל הנצחה משלכם החל מ-{price}.',
       viewDetails: 'לפרטי המחירים המלאים',
     },
 
     testimonialSection: {
-      heading: 'מה המשפחות אומרות',
+      heading: 'הודעות תודה מהמשפחות',
     },
 
     familyPage: {

@@ -258,14 +258,14 @@ const en = {
     },
 
     approvedProfilesSection: {
-      heading: 'Memorial Profiles Shared With Family Permission',
+      heading: 'Families Keep Their Loved Ones Alive With Us',
       viewProfile: 'View Profile',
       priceHint: 'Create your own memorial profile starting at {price}.',
       viewDetails: 'See full pricing details',
     },
 
     testimonialSection: {
-      heading: 'What Families Are Saying',
+      heading: 'Thank-You Messages From Families',
     },
 
     familyPage: {

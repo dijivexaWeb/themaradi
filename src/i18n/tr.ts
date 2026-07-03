@@ -260,14 +260,14 @@ const tr: LangDict = {
     },
 
     approvedProfilesSection: {
-      heading: 'Aile İzniyle Paylaşılan Anma Profilleri',
+      heading: 'Aileler Sevdiklerini Bizimle Yaşatıyor',
       viewProfile: 'Profili Gör',
       priceHint: '{price}\'dan başlayan fiyatlarla kendi anma profilinizi oluşturun.',
       viewDetails: 'Detaylı fiyatları gör',
     },
 
     testimonialSection: {
-      heading: 'Aileler Ne Diyor?',
+      heading: 'Ailelerden Teşekkür Mesajları',
     },
 
     familyPage: {

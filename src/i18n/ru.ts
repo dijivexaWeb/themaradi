@@ -260,14 +260,14 @@ const ru: LangDict = {
     },
 
     approvedProfilesSection: {
-      heading: 'Мемориальные страницы, опубликованные с разрешения семьи',
+      heading: 'Семьи хранят память о близких вместе с нами',
       viewProfile: 'Смотреть профиль',
       priceHint: 'Создайте свой мемориальный профиль от {price}.',
       viewDetails: 'Посмотреть все цены',
     },
 
     testimonialSection: {
-      heading: 'Что говорят семьи',
+      heading: 'Слова благодарности от семей',
     },
 
     familyPage: {

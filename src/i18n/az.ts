@@ -260,14 +260,14 @@ const az: LangDict = {
     },
 
     approvedProfilesSection: {
-      heading: 'Ailənin İcazəsi ilə Paylaşılan Xatirə Profilləri',
+      heading: 'Ailələr Sevdiklərini Bizimlə Yaşadır',
       viewProfile: 'Profilə Bax',
       priceHint: '{price}-dan başlayan qiymətlərlə öz xatirə profilinizi yaradın.',
       viewDetails: 'Ətraflı qiymətlərə bax',
     },
 
     testimonialSection: {
-      heading: 'Ailələr Nə Deyir?',
+      heading: 'Ailələrdən Təşəkkür Mesajları',
     },
 
     familyPage: {
