@@ -13,6 +13,10 @@ const az: LangDict = {
     openMenu: 'Menyunu aç',
   },
 
+  addedBadge: {
+    label: '{date} tarixində əlavə edildi',
+  },
+
   landing: {
     hero: {
       eyebrow: '',

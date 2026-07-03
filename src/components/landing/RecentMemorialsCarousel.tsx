@@ -4,6 +4,7 @@ import { useRef, useState, useEffect } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { ChevronLeft, ChevronRight, MapPin, ShieldCheck, Users } from 'lucide-react'
+import AddedBadge from '@/components/AddedBadge'
 
 export type RecentMemorial = {
   id: string
@@ -15,6 +16,7 @@ export type RecentMemorial = {
   cover_photo_url: string | null
   cover_video_url?: string | null
   birth_place: string | null
+  published_at?: string | null
   family?: { name: string; slug: string } | null
 }
 
@@ -154,6 +156,8 @@ export default function RecentMemorialsCarousel({
                         )}
                         {/* Bottom gradient on photo */}
                         <div className="pointer-events-none absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-black/20 to-transparent" />
+                        {/* Added date badge */}
+                        <AddedBadge date={m.published_at} className="absolute left-2 top-2" />
                         {/* Verified badge on photo */}
                         <div className="absolute bottom-2 right-2 flex items-center gap-1 rounded-full bg-white/90 px-2 py-0.5 backdrop-blur-sm">
                           <ShieldCheck className="h-3 w-3 text-[#2d7a4f]" />

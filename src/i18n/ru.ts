@@ -13,6 +13,10 @@ const ru: LangDict = {
     openMenu: 'Открыть меню',
   },
 
+  addedBadge: {
+    label: 'Добавлено {date}',
+  },
+
   landing: {
     hero: {
       eyebrow: '',

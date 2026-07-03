@@ -13,6 +13,10 @@ const ka: LangDict = {
     openMenu: 'მენიუს გახსნა',
   },
 
+  addedBadge: {
+    label: 'დამატებულია {date}',
+  },
+
   landing: {
     hero: {
       eyebrow: '',

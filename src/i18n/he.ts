@@ -13,6 +13,10 @@ const he: LangDict = {
     openMenu: 'פתח תפריט',
   },
 
+  addedBadge: {
+    label: 'נוסף בתאריך {date}',
+  },
+
   landing: {
     hero: {
       eyebrow: '',

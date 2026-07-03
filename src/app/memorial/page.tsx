@@ -29,7 +29,7 @@ export default async function MemorialsIndexPage({ searchParams }: Props) {
 
   const supabase = await createServiceClient()
 
-  const SELECT_FIELDS = 'id, display_name, slug, tagline, birth_date, death_date, cover_photo_url, cover_video_url, birth_place, is_notable, nationality, notable_sort_order'
+  const SELECT_FIELDS = 'id, display_name, slug, tagline, birth_date, death_date, cover_photo_url, cover_video_url, birth_place, is_notable, nationality, notable_sort_order, published_at'
 
   // Notable profiles — always pinned at top, filtered by search/letter when active
   let notableQuery = supabase

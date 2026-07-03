@@ -11,6 +11,10 @@ const en = {
     openMenu: 'Open menu',
   },
 
+  addedBadge: {
+    label: 'Added on {date}',
+  },
+
   landing: {
     hero: {
       eyebrow: '',

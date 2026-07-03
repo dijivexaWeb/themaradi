@@ -41,7 +41,7 @@ export default async function LandingPage() {
       .order('published_at', { ascending: false }),
     supabase
       .from('vaults')
-      .select('id, display_name, slug, tagline, birth_date, death_date, cover_photo_url, cover_video_url, birth_place')
+      .select('id, display_name, slug, tagline, birth_date, death_date, cover_photo_url, cover_video_url, birth_place, published_at')
       .eq('status', 'public_memorial')
       .not('is_notable', 'is', true)
       .order('updated_at', { ascending: false })

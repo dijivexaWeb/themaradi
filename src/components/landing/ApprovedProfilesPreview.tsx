@@ -4,6 +4,7 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { ArrowRight } from 'lucide-react'
 import type { RecentMemorial } from './RecentMemorialsCarousel'
+import AddedBadge from '@/components/AddedBadge'
 
 const S = {
   gold: '#C9A96E',
@@ -58,6 +59,7 @@ export default function ApprovedProfilesPreview({
                   <Image src={m.cover_photo_url} alt={m.display_name} fill sizes="280px" className="object-cover" />
                 )}
                 <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(7,7,13,.85), transparent 55%)' }} />
+                <AddedBadge date={m.published_at} className="absolute left-3 top-3 z-10" />
                 <div style={{ position: 'absolute', left: 14, right: 14, bottom: 12 }}>
                   <div style={{ fontFamily: S.serif, fontSize: 17, color: S.textHead, lineHeight: 1.2 }}>{m.display_name}</div>
                   {formatYears(m.birth_date, m.death_date) && (

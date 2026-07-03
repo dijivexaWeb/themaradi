@@ -7,6 +7,7 @@ import { MapPin, Users, Home } from 'lucide-react'
 import { useLang } from '@/i18n/context'
 import FilterBar from './_FilterBar'
 import MemorialsFooter from './_MemorialsFooter'
+import AddedBadge from '@/components/AddedBadge'
 
 export type MemorialItem = {
   id: string
@@ -21,6 +22,7 @@ export type MemorialItem = {
   is_notable?: boolean | null
   nationality?: string | null
   notable_sort_order?: number | null
+  published_at?: string | null
   family?: { name: string; slug: string } | null
 }
 
@@ -202,6 +204,7 @@ export default function MemorialsClient({
                       {/* Stretched main link */}
                       <Link href={`/memorial/${m.slug}`} className="absolute inset-0 z-10" aria-label={m.display_name} />
                       <div className="relative z-[1] h-[170px] w-full overflow-hidden bg-[#ede8df]">
+                        <AddedBadge date={m.published_at} className="absolute left-2 top-2 z-20" />
                         {m.family && (
                           <Link
                             href={`/aile/${m.family.slug}`}

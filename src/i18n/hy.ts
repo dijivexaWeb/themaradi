@@ -13,6 +13,10 @@ const hy: LangDict = {
     openMenu: 'Բացել ընտրացանկը',
   },
 
+  addedBadge: {
+    label: 'Ավելացվել է {date}',
+  },
+
   landing: {
     hero: {
       eyebrow: '',

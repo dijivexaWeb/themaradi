@@ -13,6 +13,10 @@ const tr: LangDict = {
     openMenu: 'Menüyü aç',
   },
 
+  addedBadge: {
+    label: '{date} tarihinde eklendi',
+  },
+
   landing: {
     hero: {
       eyebrow: '',
