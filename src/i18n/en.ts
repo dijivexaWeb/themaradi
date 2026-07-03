@@ -257,14 +257,10 @@ const en = {
       demoProfileCta: 'Click here to view a sample memorial profile',
     },
 
-    packagesSection: {
-      heading: 'Our Packages',
-      singleLabel: 'Individual',
-      singleDesc: '1 Profile + QR Plate + 3 years hosting',
-      familyLabel: 'Family Package',
-      familyDesc: '4 Profiles + 4 QR Plates + 3 years hosting',
-      familySavings: 'Save up to 50%',
-      renewalNote: 'After that, just {renewalPrice}/year. Your profile is never published automatically — it stays a draft until you approve it.',
+    approvedProfilesSection: {
+      heading: 'Memorial Profiles Shared With Family Permission',
+      viewProfile: 'View Profile',
+      priceHint: 'Create your own memorial profile starting at {price}.',
       viewDetails: 'See full pricing details',
     },
 

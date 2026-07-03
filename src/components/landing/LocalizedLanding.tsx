@@ -18,6 +18,7 @@ import TeamSection from './TeamSection'
 import RecentMemorialsCarousel, { type RecentMemorial } from './RecentMemorialsCarousel'
 import NotableProfilesSection, { type NotableMemorial } from './NotableProfilesSection'
 import TestimonialSection, { type TestimonialMemorial } from './TestimonialSection'
+import ApprovedProfilesPreview from './ApprovedProfilesPreview'
 import type { PricingConfig } from '@/lib/pricing'
 
 /* ─── Types ───────────────────────────────────────────────── */
@@ -173,6 +174,7 @@ export default function LocalizedLanding({ pricing, notableMemorials, recentMemo
   const s = t.landing
   const p = s.pricingSection
   const h = s.howItWorksDetailed
+  const approvedProfiles = recentMemorials.filter((m) => m.family?.slug !== 'istanbollu' && !/i̇?stanbollu/i.test(m.display_name ?? ''))
 
   return (
     <div style={{ position: 'relative' }}>
@@ -244,37 +246,14 @@ export default function LocalizedLanding({ pricing, notableMemorials, recentMemo
           </div>
         </section>
 
-        {/* ═══ PAKETLERİMİZ — ÖZET FİYAT ═══════════════════════════ */}
-        <section style={{ padding: 'clamp(28px,5vh,48px) clamp(20px,4vw,60px) clamp(40px,6vh,64px)' }}>
-          <div style={{ maxWidth: 1000, margin: '0 auto' }}>
-            <div className="tem-reveal" style={{ textAlign: 'center', marginBottom: 32 }}>
-              <SectionHeading style={{ fontSize: 'clamp(26px,3.6vw,40px)' }}>{s.packagesSection.heading}</SectionHeading>
-            </div>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: 20 }}>
-              <div className="tem-reveal tem-card" style={{ flex: '1 1 260px', borderRadius: 20, padding: '28px 26px', background: S.card, border: `1px solid ${S.cardBorder}` }}>
-                <div style={{ fontFamily: S.serif, fontSize: 19, color: S.textHead, marginBottom: 6 }}>{s.packagesSection.singleLabel}</div>
-                <div style={{ fontFamily: S.serif, fontSize: 40, fontWeight: 500, color: S.goldBright, marginBottom: 8 }}>{formatPrice(pricing.campaignActive && cur.campaignMemorial ? cur.campaignMemorial : cur.memorial)}</div>
-                <div style={{ fontSize: 13.5, fontWeight: 300, color: S.textMuted, fontFamily: S.sans }}>{s.packagesSection.singleDesc}</div>
-              </div>
-              <div className="tem-reveal tem-card" style={{ flex: '1 1 260px', borderRadius: 20, padding: '28px 26px', background: 'rgba(143,184,158,.06)', border: '1px solid rgba(143,184,158,.25)', position: 'relative' }}>
-                <div style={{ position: 'absolute', top: 14, right: 18, fontSize: 10, letterSpacing: '.12em', textTransform: 'uppercase', color: '#0a0c0b', background: 'linear-gradient(90deg, #8FB89E, #a3d4b4)', padding: '4px 10px', borderRadius: 999, fontFamily: S.sans, fontWeight: 600 }}>
-                  {s.packagesSection.familySavings}
-                </div>
-                <div style={{ fontFamily: S.serif, fontSize: 19, color: S.textHead, marginBottom: 6 }}>{s.packagesSection.familyLabel}</div>
-                <div style={{ fontFamily: S.serif, fontSize: 40, fontWeight: 500, color: '#a3d4b4', marginBottom: 8 }}>{formatPrice(pricing.campaignActive && cur.campaignFamily ? cur.campaignFamily : cur.family)}</div>
-                <div style={{ fontSize: 13.5, fontWeight: 300, color: S.textMuted, fontFamily: S.sans }}>{s.packagesSection.familyDesc}</div>
-              </div>
-            </div>
-            <p style={{ textAlign: 'center', fontSize: 13, fontWeight: 300, color: S.textFaint, margin: '22px auto 0', fontFamily: S.sans, maxWidth: 640 }}>
-              {s.packagesSection.renewalNote.replace('{renewalPrice}', renewalPriceText)}
-            </p>
-            <div style={{ textAlign: 'center', marginTop: 18 }}>
-              <Link href="#fiyatlar" style={{ color: S.gold, fontSize: 13.5, fontFamily: S.sans, textDecoration: 'none', display: 'inline-flex', alignItems: 'center', gap: 6 }}>
-                {s.packagesSection.viewDetails} <ArrowRight style={{ width: 13, height: 13 }} />
-              </Link>
-            </div>
-          </div>
-        </section>
+        {/* ═══ AİLE İZNİYLE PAYLAŞILAN ANMA PROFİLLERİ ═══════════════ */}
+        <ApprovedProfilesPreview
+          memorials={approvedProfiles}
+          heading={s.approvedProfilesSection.heading}
+          viewProfileLabel={s.approvedProfilesSection.viewProfile}
+          priceHint={s.approvedProfilesSection.priceHint.replace('{price}', campaignPriceText)}
+          viewDetailsLabel={s.approvedProfilesSection.viewDetails}
+        />
 
         {/* ═══ TESTIMONIALS ════════════════════════════════════════ */}
         <TestimonialSection memorials={testimonialMemorials} heading={s.testimonialSection.heading} />

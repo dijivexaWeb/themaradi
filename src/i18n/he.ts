@@ -259,14 +259,10 @@ const he: LangDict = {
       demoProfileCta: 'לחצו כאן לצפייה בפרופיל זיכרון לדוגמה',
     },
 
-    packagesSection: {
-      heading: 'החבילות שלנו',
-      singleLabel: 'יחיד',
-      singleDesc: 'פרופיל אחד + שלט QR + 3 שנות אחסון',
-      familyLabel: 'חבילה משפחתית',
-      familyDesc: '4 פרופילים + 4 שלטי QR + 3 שנות אחסון',
-      familySavings: 'חיסכון של עד 50%',
-      renewalNote: 'לאחר מכן, רק {renewalPrice}/שנה. הפרופיל לעולם לא מתפרסם אוטומטית — הוא נשאר טיוטה עד לאישורכם.',
+    approvedProfilesSection: {
+      heading: 'פרופילי הנצחה שהמשפחה בחרה לשתף',
+      viewProfile: 'צפו בפרופיל',
+      priceHint: 'צרו פרופיל הנצחה משלכם החל מ-{price}.',
       viewDetails: 'לפרטי המחירים המלאים',
     },
 

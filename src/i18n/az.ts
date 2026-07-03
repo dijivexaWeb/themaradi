@@ -259,14 +259,10 @@ const az: LangDict = {
       demoProfileCta: 'Nümunə xatirə profili səhifəsi üçün klikləyin',
     },
 
-    packagesSection: {
-      heading: 'Paketlərimiz',
-      singleLabel: 'Fərdi',
-      singleDesc: '1 Profil + QR Lövhə + 3 il hostinq',
-      familyLabel: 'Ailə Paketi',
-      familyDesc: '4 Profil + 4 QR Lövhə + 3 il hostinq',
-      familySavings: '50%-ə qədər qənaət',
-      renewalNote: 'Bundan sonra sadəcə {renewalPrice}/il. Profil ödənişdən sonra avtomatik dərc olunmur — siz təsdiqləyənə qədər qaralama olaraq qalır.',
+    approvedProfilesSection: {
+      heading: 'Ailənin İcazəsi ilə Paylaşılan Xatirə Profilləri',
+      viewProfile: 'Profilə Bax',
+      priceHint: '{price}-dan başlayan qiymətlərlə öz xatirə profilinizi yaradın.',
       viewDetails: 'Ətraflı qiymətlərə bax',
     },
 

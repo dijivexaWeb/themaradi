@@ -259,14 +259,10 @@ const tr: LangDict = {
       demoProfileCta: 'Örnek anma profili sayfası için tıklayınız',
     },
 
-    packagesSection: {
-      heading: 'Paketlerimiz',
-      singleLabel: 'Tek Kişilik',
-      singleDesc: '1 Profil + QR Plaka + 3 yıl hosting',
-      familyLabel: 'Aile Paketi',
-      familyDesc: '4 Profil + 4 QR Plaka + 3 yıl hosting',
-      familySavings: '%50\'ye varan tasarruf',
-      renewalNote: 'Yıldan sonra sadece {renewalPrice}/yıl. Ödeme sonrası profil otomatik yayınlanmaz, siz onay verene kadar taslak olarak kalır.',
+    approvedProfilesSection: {
+      heading: 'Aile İzniyle Paylaşılan Anma Profilleri',
+      viewProfile: 'Profili Gör',
+      priceHint: '{price}\'dan başlayan fiyatlarla kendi anma profilinizi oluşturun.',
       viewDetails: 'Detaylı fiyatları gör',
     },
 
