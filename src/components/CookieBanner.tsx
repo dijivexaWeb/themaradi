@@ -3,6 +3,7 @@
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useLang } from '@/i18n/context'
+import { CONSENT_CHANGED_EVENT } from './AnalyticsConsentGate'
 
 const STORAGE_KEY = 'tm_cookie_consent'
 
@@ -21,6 +22,7 @@ export default function CookieBanner() {
   function save(choice: Consent) {
     try {
       localStorage.setItem(STORAGE_KEY, choice)
+      window.dispatchEvent(new Event(CONSENT_CHANGED_EVENT))
     } catch {}
     setVisible(false)
   }

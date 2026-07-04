@@ -3,9 +3,8 @@ import { Geist, Cormorant_Garamond, Outfit } from "next/font/google";
 import { LangProvider } from "@/i18n/context";
 import CookieBanner from "@/components/CookieBanner";
 import WhatsAppButton from "@/components/WhatsAppButton";
-import Script from "next/script";
 import { Suspense } from "react";
-import MetaPixel from "@/components/MetaPixel";
+import AnalyticsConsentGate from "@/components/AnalyticsConsentGate";
 import { buildAlternateLanguages } from "@/lib/i18n/hreflang";
 import "./globals.css";
 
@@ -88,18 +87,8 @@ export default async function RootLayout({
       className={`${geistSans.variable} ${cormorantGaramond.variable} ${outfit.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-zinc-950 text-zinc-100">
-        <Script
-          src="https://www.googletagmanager.com/gtag/js?id=G-LX3BRV79MJ"
-          strategy="afterInteractive"
-        />
-        <Script id="google-analytics" strategy="afterInteractive">{`
-          window.dataLayer = window.dataLayer || [];
-          function gtag(){dataLayer.push(arguments);}
-          gtag('js', new Date());
-          gtag('config', 'G-LX3BRV79MJ');
-        `}</Script>
         <Suspense fallback={null}>
-          <MetaPixel />
+          <AnalyticsConsentGate />
         </Suspense>
         <LangProvider serverLang={lang}>
           {children}

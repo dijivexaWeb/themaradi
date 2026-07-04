@@ -7,7 +7,10 @@ export const PREFIXED_LOCALES = ['en', 'ka', 'ru', 'az', 'hy', 'he'] as const
 // sayfaları (aile/[slug], memorial/[slug], q/[code], preview/[id] vb.) her
 // dilde aynı URL'de kalır (gereksiz SEO şişkinliği yaratmamak için).
 // proxy.ts ve sitemap.ts bu fonksiyonu paylaşır — tek doğruluk kaynağı.
-const ELIGIBLE_PREFIXES = ['/pricing', '/about', '/contact', '/miras', '/satin-al', '/dijital-ani-sayfasi']
+const ELIGIBLE_PREFIXES = [
+  '/pricing', '/about', '/contact', '/miras', '/satin-al',
+  '/dijital-ani-sayfasi', '/qr-kodlu-mezar-tasi', '/online-taziye-defteri', '/anma-profili-nasil-hazirlanir',
+]
 
 export function isLocaleEligible(pathname: string): boolean {
   if (pathname === '/') return true
