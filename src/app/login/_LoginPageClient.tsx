@@ -5,7 +5,7 @@ import { langs, type Lang } from '@/i18n'
 import { useLang } from '@/i18n/context'
 import Link from 'next/link'
 import { Loader2 } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import TurnstileWidget from '@/components/TurnstileWidget'
 import { userLogin } from './actions'
 
@@ -21,6 +21,7 @@ const authCopy: Record<Lang, {
   error: string
   errorUnconfirmed: string
   errorCaptcha: string
+  errorCallback: string
   terms: string
   privacy: string
   and: string
@@ -38,6 +39,7 @@ const authCopy: Record<Lang, {
     error: 'E-posta veya şifre hatalı.',
     errorUnconfirmed: 'E-postanızı henüz doğrulamadınız. Gelen kutunuzu ve spam klasörünü kontrol edin.',
     errorCaptcha: 'CAPTCHA doğrulaması başarısız. Sayfayı yenileyip tekrar deneyin.',
+    errorCallback: 'Bağlantı geçersiz veya süresi dolmuş. Lütfen linki e-postayı açtığınız aynı tarayıcıdan tıkladığınızdan emin olun, ya da "Şifremi belirle" ile yeni bir bağlantı isteyin.',
     terms: 'Devam ederek',
     privacy: 'Gizlilik Politikası',
     and: 've',
@@ -55,6 +57,7 @@ const authCopy: Record<Lang, {
     error: 'ელფოსტა ან პაროლი არასწორია.',
     errorUnconfirmed: 'ელფოსტა ჯერ არ გაქვთ დადასტურებული. შეამოწმეთ შემოსული ფოსტა და სპამი.',
     errorCaptcha: 'CAPTCHA ვერიფიკაცია ვერ მოხდა. განაახლეთ გვერდი და სცადეთ კვლავ.',
+    errorCallback: 'ბმული არასწორია ან ვადაგასულია. დარწმუნდით, რომ ბმულს ხსნით იმავე ბრაუზერიდან, საიდანაც გააგზავნეთ მოთხოვნა, ან მოითხოვეთ ახალი ბმული.',
     terms: 'გაგრძელებით ეთანხმებით',
     privacy: 'კონფიდენციალურობის პოლიტიკას',
     and: 'და',
@@ -72,6 +75,7 @@ const authCopy: Record<Lang, {
     error: 'Неверный e-mail или пароль.',
     errorUnconfirmed: 'E-mail ещё не подтверждён. Проверьте входящие и папку «Спам».',
     errorCaptcha: 'Проверка CAPTCHA не прошла. Обновите страницу и попробуйте снова.',
+    errorCallback: 'Ссылка недействительна или истёк срок её действия. Убедитесь, что открываете её в том же браузере, где запрашивали сброс, или запросите новую ссылку.',
     terms: 'Продолжая, вы принимаете',
     privacy: 'Политику конфиденциальности',
     and: 'и',
@@ -89,6 +93,7 @@ const authCopy: Record<Lang, {
     error: 'Email or password is incorrect.',
     errorUnconfirmed: 'Your email has not been confirmed yet. Check your inbox and spam folder.',
     errorCaptcha: 'CAPTCHA verification failed. Refresh the page and try again.',
+    errorCallback: "This link is invalid or has expired. Make sure you're opening it in the same browser you requested the reset from, or request a new link.",
     terms: 'By continuing, you accept the',
     privacy: 'Privacy Policy',
     and: 'and',
@@ -106,6 +111,7 @@ const authCopy: Record<Lang, {
     error: 'Էլ. փոստը կամ գաղտնաբառը սխալ է:',
     errorUnconfirmed: 'Ձեր էլ. փոստը դեռ հաստատված չէ: Ստուգեք մուտքային և spam թղթապանակը:',
     errorCaptcha: 'CAPTCHA ստուգումը ձախողվեց: Թարմացրեք էջը և կրկին փորձեք:',
+    errorCallback: 'Հղումն անվավեր է կամ ժամկետանց: Համոզվեք, որ բացում եք այն նույն բրաուզերից, որտեղից պահանջել եք վերականգնումը, կամ պահանջեք նոր հղում:',
     terms: 'Շարունակելով՝ դուք ընդունում եք',
     privacy: 'Գաղտնիության քաղաքականությունը',
     and: 'և',
@@ -123,6 +129,7 @@ const authCopy: Record<Lang, {
     error: 'E-poçt və ya şifrə yanlışdır.',
     errorUnconfirmed: 'E-poçtunuzu hələ təsdiqləməmisiniz. Gələnlər qutunuzu və spam qovluğunu yoxlayın.',
     errorCaptcha: 'CAPTCHA təsdiqi uğursuz oldu. Səhifəni yeniləyib yenidən cəhd edin.',
+    errorCallback: 'Link etibarsızdır və ya vaxtı bitib. Sıfırlama tələbini göndərdiyiniz eyni brauzerdən açdığınızdan əmin olun, ya da yeni link tələb edin.',
     terms: 'Davam edərək',
     privacy: 'Məxfilik Siyasətini',
     and: 'və',
@@ -140,6 +147,7 @@ const authCopy: Record<Lang, {
     error: 'כתובת דוא"ל או סיסמה שגויה.',
     errorUnconfirmed: 'הדוא"ל שלך טרם אושר. בדוק את תיבת הדואר הנכנס ותיקיית הספאם.',
     errorCaptcha: 'אימות CAPTCHA נכשל. רענן את הדף ונסה שוב.',
+    errorCallback: 'הקישור אינו תקין או שפג תוקפו. ודא שאתה פותח אותו מאותו דפדפן שבו ביקשת את האיפוס, או בקש קישור חדש.',
     terms: 'בהמשך, אתה מקבל את',
     privacy: 'מדיניות הפרטיות',
     and: 'ו',
@@ -147,7 +155,7 @@ const authCopy: Record<Lang, {
   },
 }
 
-export default function LoginPageClient({ siteKey }: { siteKey: string }) {
+export default function LoginPageClient({ siteKey, callbackError }: { siteKey: string; callbackError?: string }) {
   const { lang, setLang } = useLang()
   const c = authCopy[lang]
   const [email, setEmail] = useState('')
@@ -155,6 +163,13 @@ export default function LoginPageClient({ siteKey }: { siteKey: string }) {
   const [loading, setLoading] = useState(false)
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null)
   const supabase = useMemo(() => createClient(), [])
+
+  useEffect(() => {
+    if (callbackError === 'auth_callback_failed') {
+      setMsg({ ok: false, text: c.errorCallback })
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [callbackError])
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault()

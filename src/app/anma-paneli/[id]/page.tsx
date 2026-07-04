@@ -33,6 +33,10 @@ export default async function AnmaPaneliPage({ params, searchParams }: Props) {
 
   if (!vault) notFound()
 
+  if (!vault.onboarding_completed_at) {
+    redirect(`/anma-paneli/${id}/onboarding`)
+  }
+
   const [
     { count: photoCount },
     { count: familyCount },

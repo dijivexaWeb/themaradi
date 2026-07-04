@@ -164,7 +164,12 @@ export default function AnmaFormClient({
                 </div>
 
                 {state?.error && (
-                  <p className="text-red-700 text-sm bg-red-50 border border-red-200 rounded-xl px-4 py-3">{state.error}</p>
+                  <p className="text-red-700 text-sm bg-red-50 border border-red-200 rounded-xl px-4 py-3">
+                    {state.error}
+                    {'existingAccount' in state && state.existingAccount && (
+                      <>{' '}<Link href="/login" className="underline font-semibold">Giriş Yap →</Link></>
+                    )}
+                  </p>
                 )}
 
                 <button type="submit" disabled={pending}

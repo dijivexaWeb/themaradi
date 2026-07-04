@@ -50,6 +50,21 @@ async function getOrCreatePurchaseUser(
   if (!password || password.length < 6) return { error: 'Şifre en az 6 karakter olmalıdır' }
   if (password !== passwordConfirm) return { error: 'Şifreler eşleşmiyor' }
 
+  // Bu email zaten kayıtlı mı? (onaylanmamış hesaplar için generateLink hata vermez ve
+  // sessizce ikinci bir vault oluşturmaya izin verirdi — bu yüzden önce açıkça kontrol ediyoruz)
+  const { data: existingProfile } = await service
+    .from('profiles')
+    .select('id')
+    .eq('email', senderEmail)
+    .maybeSingle()
+
+  if (existingProfile) {
+    return {
+      error: 'Bu e-posta adresiyle zaten bir hesabınız var. Ek bir profil eklemek için lütfen önce giriş yapın.',
+      existingAccount: true as const,
+    }
+  }
+
   // generateLink: kullanıcıyı oluşturur + onay linki üretir, Supabase email göndermez
   const { data: linkData, error: linkError } = await service.auth.admin.generateLink({
     type: 'signup',
@@ -69,13 +84,15 @@ async function getOrCreatePurchaseUser(
     }
   }
 
-  // generateLink başarısız — kullanıcı onaylı olarak zaten varsa giriş yap
-  const { data: signInData, error: signInError } = await supabase.auth.signInWithPassword({ email: senderEmail, password })
-  if (signInError || !signInData.user) {
-    return { error: 'Bu email kayıtlı. Şifrenizi kontrol edin veya giriş yapın.' }
+  // generateLink başarısız oldu — bu email zaten kayıtlı demektir. Anonim (oturum açılmamış)
+  // checkout akışında sessizce o hesaba giriş yapıp İKİNCİ bir vault/sipariş oluşturmuyoruz —
+  // aynı e-postayla defalarca kayıt açılmasını önlemek için kullanıcıyı girişe yönlendiriyoruz.
+  // Ek profil eklemek isteyen kullanıcı önce giriş yapmalı (o zaman currentUser dolu gelir ve
+  // bu fonksiyonun en başındaki "if (currentUser) return" dalı devreye girer).
+  return {
+    error: 'Bu e-posta adresiyle zaten bir hesabınız var. Ek bir profil eklemek için lütfen önce giriş yapın.',
+    existingAccount: true as const,
   }
-
-  return { user: signInData.user }
 }
 
 export async function purchaseMemorialAction(_prev: unknown, formData: FormData) {
@@ -103,7 +120,7 @@ export async function purchaseMemorialAction(_prev: unknown, formData: FormData)
   if (!phone) return { error: 'Telefon numarası zorunludur' }
 
   const authResult = await getOrCreatePurchaseUser(supabase, service, formData, senderName, senderEmail)
-  if ('error' in authResult) return { error: authResult.error }
+  if ('error' in authResult) return { error: authResult.error, existingAccount: 'existingAccount' in authResult }
 
   const user = authResult.user
   const pendingEmailConfirmation = 'pendingEmailConfirmation' in authResult
@@ -261,7 +278,7 @@ export async function purchaseVaultAction(_prev: unknown, formData: FormData) {
   if (!phone) return { error: 'Telefon numarası zorunludur' }
 
   const authResult = await getOrCreatePurchaseUser(supabase, service, formData, senderName, senderEmail)
-  if ('error' in authResult) return { error: authResult.error }
+  if ('error' in authResult) return { error: authResult.error, existingAccount: 'existingAccount' in authResult }
 
   const user = authResult.user
   const pendingEmailConfirmation = 'pendingEmailConfirmation' in authResult
@@ -417,7 +434,7 @@ export async function purchaseFamilyAction(_prev: unknown, formData: FormData) {
   if (!phone) return { error: 'Telefon numarası zorunludur' }
 
   const authResult = await getOrCreatePurchaseUser(supabase, service, formData, senderName, senderEmail)
-  if ('error' in authResult) return { error: authResult.error }
+  if ('error' in authResult) return { error: authResult.error, existingAccount: 'existingAccount' in authResult }
 
   const user = authResult.user
   const pendingEmailConfirmation = 'pendingEmailConfirmation' in authResult

@@ -3,7 +3,7 @@
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
 import { Loader2 } from 'lucide-react'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 
 export default function UpdatePasswordPage() {
   const supabase = useMemo(() => createClient(), [])
@@ -11,6 +11,13 @@ export default function UpdatePasswordPage() {
   const [confirm, setConfirm] = useState('')
   const [loading, setLoading] = useState(false)
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null)
+  const [sessionReady, setSessionReady] = useState<boolean | null>(null)
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setSessionReady(!!session)
+    })
+  }, [supabase])
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -54,45 +61,61 @@ export default function UpdatePasswordPage() {
           </p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-4 rounded-2xl border border-slate-800 bg-slate-900/80 p-7 shadow-sm backdrop-blur-sm">
-          <input
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="Yeni şifre"
-            required
-            minLength={6}
-            className="w-full rounded-xl border border-slate-700/80 bg-slate-800/70 px-4 py-2.5 text-sm text-slate-100 placeholder-slate-500 transition-colors focus:border-blue-500 focus:outline-none"
-          />
-          <input
-            type="password"
-            value={confirm}
-            onChange={(e) => setConfirm(e.target.value)}
-            placeholder="Yeni şifre tekrar"
-            required
-            minLength={6}
-            className="w-full rounded-xl border border-slate-700/80 bg-slate-800/70 px-4 py-2.5 text-sm text-slate-100 placeholder-slate-500 transition-colors focus:border-blue-500 focus:outline-none"
-          />
-
-          {msg && (
-            <div className={`rounded-xl border px-4 py-3 text-center text-sm ${
-              msg.ok
-                ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
-                : 'border-red-200 bg-red-50 text-red-700'
-            }`}>
-              {msg.text}
+        {sessionReady === false ? (
+          <div className="space-y-4 rounded-2xl border border-slate-800 bg-slate-900/80 p-7 shadow-sm backdrop-blur-sm">
+            <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-center text-sm text-red-700">
+              Bu bağlantı geçersiz veya süresi dolmuş. Lütfen bağlantıyı e-postayı açtığınız aynı tarayıcıdan tıkladığınızdan emin olun, ya da giriş sayfasından yeni bir şifre belirleme bağlantısı isteyin.
             </div>
-          )}
+            <Link
+              href="/login"
+              className="block w-full rounded-xl bg-amber-500 px-4 py-2.5 text-center text-sm font-semibold text-white shadow-lg shadow-amber-500/20 transition-colors hover:bg-amber-400"
+            >
+              Giriş Sayfasına Dön
+            </Link>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="space-y-4 rounded-2xl border border-slate-800 bg-slate-900/80 p-7 shadow-sm backdrop-blur-sm">
+            <input
+              type="password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Yeni şifre"
+              required
+              minLength={6}
+              disabled={sessionReady === null}
+              className="w-full rounded-xl border border-slate-700/80 bg-slate-800/70 px-4 py-2.5 text-sm text-slate-100 placeholder-slate-500 transition-colors focus:border-blue-500 focus:outline-none disabled:opacity-50"
+            />
+            <input
+              type="password"
+              value={confirm}
+              onChange={(e) => setConfirm(e.target.value)}
+              placeholder="Yeni şifre tekrar"
+              required
+              minLength={6}
+              disabled={sessionReady === null}
+              className="w-full rounded-xl border border-slate-700/80 bg-slate-800/70 px-4 py-2.5 text-sm text-slate-100 placeholder-slate-500 transition-colors focus:border-blue-500 focus:outline-none disabled:opacity-50"
+            />
 
-          <button
-            type="submit"
-            disabled={loading || !password || !confirm}
-            className="w-full rounded-xl bg-amber-500 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-amber-500/20 transition-colors hover:bg-amber-400 disabled:opacity-50 flex items-center justify-center gap-2"
-          >
-            {loading && <Loader2 className="h-4 w-4 animate-spin" />}
-            {loading ? 'Kaydediliyor...' : 'Şifreyi Kaydet'}
-          </button>
-        </form>
+            {msg && (
+              <div className={`rounded-xl border px-4 py-3 text-center text-sm ${
+                msg.ok
+                  ? 'border-emerald-200 bg-emerald-50 text-emerald-700'
+                  : 'border-red-200 bg-red-50 text-red-700'
+              }`}>
+                {msg.text}
+              </div>
+            )}
+
+            <button
+              type="submit"
+              disabled={loading || !password || !confirm || sessionReady === null}
+              className="w-full rounded-xl bg-amber-500 px-4 py-2.5 text-sm font-semibold text-white shadow-lg shadow-amber-500/20 transition-colors hover:bg-amber-400 disabled:opacity-50 flex items-center justify-center gap-2"
+            >
+              {loading && <Loader2 className="h-4 w-4 animate-spin" />}
+              {sessionReady === null ? 'Kontrol ediliyor...' : loading ? 'Kaydediliyor...' : 'Şifreyi Kaydet'}
+            </button>
+          </form>
+        )}
       </div>
     </div>
   )

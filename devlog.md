@@ -3,6 +3,88 @@
 > Her oturum sonunda Claude bu dosyayı günceller.
 > Format: tarih → ne yapıldı → nerede kalındı → sıradaki adım.
 
+## 2026-07-05 — Oturum 168 (devam 12): "Şifremi Unuttum" Akışı — Sessiz Hata Kaynakları Düzeltildi
+
+### Yapılanlar
+- Kullanıcı "şifremi unuttum çalışmıyor" dedi. Bir araştırma ajanıyla akış incelendi (`login/_LoginPageClient.tsx` → `resetPasswordForEmail` → email linki → `auth/callback/route.ts` → `auth/update-password/page.tsx`). İki somut, kod seviyesinde düzeltilebilir bug bulundu (üçüncü kısıt mimari, aşağıda not edildi):
+  1. **`auth/callback/route.ts`**: `exchangeCodeForSession` başarısız olduğunda kullanıcı sessizce `/login?error=auth_callback_failed`'e düşüyordu ama **hiçbir yerde bu `error` parametresi okunmuyordu** — kullanıcı hiçbir mesaj görmeden "sanki hiçbir şey olmamış gibi" giriş ekranına dönüyordu. Düzeltme: `login/page.tsx` artık `searchParams`'tan `error`'ı okuyup `LoginPageClient`'a `callbackError` prop'u olarak geçiyor; bileşen mount olduğunda bunu görürse net bir hata mesajı gösteriyor (7 dile çevrildi).
+  2. **`auth/update-password/page.tsx`**: Sayfa, geçerli bir "recovery" oturumu olup olmadığını hiç kontrol etmeden formu normal şekilde render ediyordu — link geçersiz/süresi dolmuşsa kullanıcı formu doldurup gönderene kadar bunu anlamıyor, sonra da Supabase'in ham İngilizce hata mesajını ("Auth session missing!" gibi) görüyordu. Düzeltme: sayfa artık mount olduğunda `supabase.auth.getSession()` ile kontrol ediyor; oturum yoksa form yerine net bir Türkçe uyarı + "Giriş Sayfasına Dön" butonu gösteriyor.
+- **Düzeltilemeyen ama not edilen mimari kısıt**: Proje PKCE auth akışı kullanıyor (`exchangeCodeForSession`) — bu akışta `code_verifier` isteği başlatan tarayıcıya cookie olarak yazılır. Kullanıcı şifre sıfırlamayı bilgisayarda başlatıp linke telefonundan/farklı bir tarayıcıdan tıklarsa (çok yaygın bir kullanıcı davranışı), bu cookie karşı tarafta olmadığı için `exchangeCodeForSession` başarısız olur — bu PKCE'nin bilinen bir kısıtı, kod tarafında tam çözülemez (Supabase Auth ayarlarında flow tipini değiştirmek gerekir, kapsam dışı). Yeni hata mesajı bu ihtimali kullanıcıya doğrudan söylüyor ("aynı tarayıcıdan açtığınızdan emin olun").
+- `npx tsc --noEmit` ve `npm run build` temiz geçti.
+- **Canlı doğrulama**: `/login?error=auth_callback_failed` ziyaret edilip yeni hata mesajının doğru göründüğü teyit edildi. `/auth/update-password`'a oturumsuz gidilip "Bu bağlantı geçersiz veya süresi dolmuş..." mesajı + "Giriş Sayfasına Dön" butonunun doğru göründüğü teyit edildi. Login sayfasında "Şifremi belirle/unuttum" butonuna gerçekten tıklanıp `resetPasswordForEmail` çağrısının hatasız döndüğü (redirect URL Supabase allow-list'inde doğru tanımlı) doğrulandı. **Not**: Gerçek e-postadaki linke tıklama adımı test edilemedi (gelen kutusuna erişim yok) — bu üçüncü, mimari kısıtla ilgili senaryo kullanıcının kendi ortamında test edilmeli.
+
+### Proje Durumu
+- [x] Aynı e-postayla çoklu kayıt bug'ı düzeltildi ve canlı doğrulandı
+- [x] Şifremi unuttum akışındaki 2 sessiz-hata bug'ı düzeltildi, kod seviyesinde doğrulandı
+- [ ] Hiçbiri commit edilmedi — kullanıcı onayı bekleniyor
+- [ ] Kullanıcı gerçek email linkiyle uçtan uca test etmeli (PKCE cross-device kısıtı hâlâ geçerli olabilir)
+
+### Nerede Kaldık
+İki bug fix'i de (duplicate registration + forgot password sessiz hatalar) kod tarafında tamamlandı, mümkün olduğunca canlı doğrulandı, commit edilmedi.
+
+### Sıradaki Adım
+1. Kullanıcı localde her iki fix'i de kontrol etsin (özellikle gerçek email linkiyle şifre sıfırlama)
+2. Onaylarsa commit et
+3. Admin sipariş detay sayfası / Faz 8 (SEO) / backlog'a geç
+
+## 2026-07-05 — Oturum 168 (devam 11): Aynı E-postayla Birden Fazla Kayıt Bug'ı Düzeltildi
+
+### Yapılanlar
+- Kullanıcı canlı sitede aynı e-posta ile birden fazla anma sayfası/kayıt açılabildiğini bildirdi. Kök neden bulundu: `src/app/satin-al/actions.ts`'teki `getOrCreatePurchaseUser()` fonksiyonu, oturum açılmamış (anonim) bir ziyaretçi zaten kayıtlı ama **e-postasını hiç onaylamamış** bir hesabın bilgileriyle formu tekrar doldurduğunda, Supabase'in `generateLink({type:'signup'})` çağrısı hata VERMİYOR (onaylanmamış hesaplar için sessizce yeni bir link üretiyor) — bu da kodun "başarılı yeni kayıt" dalına düşüp aynı `user_id` altında **ikinci bir vault/sipariş** oluşturmasına yol açıyordu.
+- **İlk fix denemesi yetersiz kaldı**: sadece `generateLink` hata verdiğinde (onaylı hesaplar için) blocking eklemek yetmedi, canlı testte 2. deneme yine yeni vault oluşturdu.
+- **Kalıcı fix**: `generateLink` çağrılmadan ÖNCE, `profiles` tablosunda bu email'e ait bir kayıt olup olmadığı doğrudan kontrol ediliyor artık (`service.from('profiles').select('id').eq('email', senderEmail).maybeSingle()`). Varsa (onaylı ya da onaysız fark etmez) işlem durduruluyor: "Bu e-posta adresiyle zaten bir hesabınız var. Ek bir profil eklemek için lütfen önce giriş yapın." + "Giriş Yap →" linki (3 form client'ına da eklendi).
+- Zaten oturum açmış (giriş yapmış) kullanıcılar için mevcut "Yeni Profil Ekle" akışı (panelden tekrar satın alma) etkilenmedi — fonksiyonun en başındaki `if (currentUser) return { user: currentUser }` dalı hâlâ önce çalışıyor, bu kontrol sadece anonim/yeni ziyaretçi akışını kapsıyor.
+- Bu tek fonksiyon `purchaseMemorialAction`, `purchaseFamilyAction`, `purchaseVaultAction`'ın üçü tarafından da paylaşıldığı için düzeltme otomatik olarak 3 üründe de geçerli.
+- `npx tsc --noEmit` ve `npm run build` temiz geçti.
+- **Canlı doğrulama**: aynı email ile 3 kez sipariş denendi — 1. ve 2. deneme (fix öncesi doğrulanan bug ile) her ikisi de vault oluşturmuştu (kanıt: DB'de aynı `owner_id` altında 2 vault), fix sonrası 3. deneme doğru şekilde engellendi ve vault sayısı 2'de sabit kaldı, hata mesajı + Giriş Yap linki ekranda doğru göründü. Test verisi temizlendi.
+
+### Proje Durumu
+- [x] Aynı e-postayla çoklu kayıt bug'ı düzeltildi ve canlı doğrulandı
+- [ ] Commit edilmedi — kullanıcı onayı bekleniyor
+- [ ] "Şifremi unuttum" akışı araştırılıyor (kullanıcı bunun da çalışmadığını bildirdi) — sıradaki iş
+
+### Nerede Kaldık
+Duplicate-registration fix'i kod tarafında tamamlandı, canlı test edildi, commit edilmedi. Şifremi unuttum akışı için araştırma sürüyor.
+
+### Sıradaki Adım
+1. Şifremi unuttum akışının araştırma sonucunu değerlendirip düzelt
+2. İkisini birlikte (veya ayrı ayrı) commit et — kullanıcı onayına göre
+3. Admin sipariş detay sayfası / Faz 8 (SEO) / backlog'a geç
+
+## 2026-07-04 — Oturum 168 (devam 10): Faz 7 — Kullanıcı Paneli Stepper Onboarding Tamamlandı
+
+### Yapılanlar
+- Kullanıcıyla birlikte yaklaşım netleştirildi: mevcut `biyografi` sayfası temel bilgiler + hayat hikayesini tek sayfada birleştirdiği için, kullanıcı **tam 5 adımlı, spesifikasyona birebir uyan** bir wizard istedi (kısayol değil).
+- **DB**: `vaults.onboarding_step` (int, default 1) ve `vaults.onboarding_completed_at` (timestamptz) eklendi. Mevcut 18 vault otomatik "tamamlandı" işaretlendi (geriye dönük kullanıcılar wizard'a zorlanmasın diye).
+- **Yeni `/anma-paneli/[id]/onboarding/` route'u** — 5 adım, `?step=1..5` ile:
+  1. **Temel Bilgiler** (`_BasicsForm.tsx`, yeni küçük form): Ad Soyad, Doğum/Vefat Tarihi (`PartialDateInput` bileşeni yeniden kullanıldı), Şehir/Ülke, Kısa Açıklama, Kapak Fotoğrafı (R2 upload) — spesifikasyondaki listeyle birebir.
+  2. **Fotoğraflar**: mevcut `PhotoUploadForm` + `addMemorialPhotoAction` yeniden kullanıldı (fotolar sayfasından, hiç kod tekrarı yok).
+  3. **Hayat Hikayesi** (`_StoryForm.tsx`, yeni küçük form): Meslek + biyografi metni.
+  4. **Video/Ses**: mevcut `VideoUploadForm` + `AudioUploadForm` yeniden kullanıldı (videolar/ses-kayıtları sayfalarından).
+  5. **Yayın Onayı**: özet ekranı + gerçek `/dogrulama` sayfasına link (belge+tanık doğrulama süreci orada, tekrar yazılmadı) + "Daha sonra yaparım" ile tamamla.
+- **İlk giriş yönlendirmesi**: `anma-paneli/[id]/page.tsx`'e `if (!vault.onboarding_completed_at) redirect(.../onboarding)` eklendi — yeni satın alınan her profil ilk panel ziyaretinde otomatik wizard'a düşüyor.
+- **Server actions** (`onboarding/actions.ts`): `saveOnboardingBasics`, `saveOnboardingStory`, `advanceOnboardingStep`, `completeOnboarding` — her biri `owner_id` kontrolü yapıyor, ilgili adımı kaydedip bir sonrakine yönlendiriyor.
+- **Bulunan ve düzeltilen bug**: İlk yazımda `<form action={serverAction} onSubmit={...}>` kombinasyonu React'ta "A React form was unexpectedly submitted" hatasına yol açıp action'ı bozuyordu. Mevcut `@/components/SubmitButton` (`useFormStatus` tabanlı) bileşeni kullanılarak düzeltildi — artık tüm formlar sade `<form action={boundFn}>` deseninde.
+- `npx tsc --noEmit` ve `npm run build` temiz geçti.
+- **Uçtan uca canlı doğrulama**: Gerçek bir satın alma (anma formu) ile test kullanıcısı oluşturuldu, e-postası SQL ile onaylanıp giriş yapıldı, panele girince **otomatik olarak onboarding'e yönlendiği** doğrulandı. 5 adımın hepsi sırayla dolduruldu (isim, tarih, şehir, kısa açıklama → fotoğraf adımı → hayat hikayesi + meslek → video/ses adımı → yayın onayı özeti), her adımda ilerleme çubuğunun doğru güncellendiği ekran görüntüleriyle teyit edildi. Son adımda "Daha sonra yaparım" ile tamamlanınca `onboarding_completed_at` DB'de doğru set oldu ve panel köküne tekrar gidildiğinde artık wizard'a düşmediği doğrulandı. Tüm alanların (display_name, biography, profession) doğru kaydedildiği SQL ile teyit edildi. Test verisi temizlendi.
+
+### Kritik Kararlar / Notlar
+- Onboarding wizard'ı kendi route'unda ama `anma-paneli/[id]/layout.tsx`'in tam kenar çubuğunu (14 link) miras alıyor — kullanıcı isterse sidebar'dan direkt başka bir sayfaya atlayıp wizard'ı atlayabilir. Bilinçli bir sınırlama (izole bir layout kurmak ek kapsam gerektirirdi), engelleyici değil sadece yönlendirici bir akış.
+- Video/Ses ve Fotoğraflar adımlarında minimum zorunluluk yok — kullanıcı hiç eklemeden de "İleri" diyebiliyor (spesifikasyonun "opsiyonel" vurgusuna uygun).
+
+### Proje Durumu
+- [x] Faz 7 — kullanıcı paneli stepper onboarding tamamlandı, uçtan uca canlı doğrulandı
+- [ ] Hiçbir şey commit edilmedi — kullanıcı onayı bekleniyor
+- [ ] Kalan: admin sipariş detay tam sayfası, Faz 8 (SEO), backlog (çerez banner)
+
+### Nerede Kaldık
+Faz 1-7'nin hepsi kod tarafında tamamlandı ve canlı doğrulandı. Bu son parça (Faz 7) henüz commit edilmedi.
+
+### Sıradaki Adım
+1. Kullanıcı localde onboarding akışını (yeni bir sipariş oluşturup) bizzat denesin
+2. Onaylarsa Faz 7 değişikliklerini commit et
+3. Admin sipariş detay sayfası veya Faz 8'e (SEO) geç
+
 ## 2026-07-04 — Oturum 168 (devam 7): Orijinal 21 Maddelik Spesifikasyonla Yeniden Karşılaştırma + Boşluk Kapatma
 
 ### Yapılanlar
