@@ -3,6 +3,32 @@
 > Her oturum sonunda Claude bu dosyayı günceller.
 > Format: tarih → ne yapıldı → nerede kalındı → sıradaki adım.
 
+## 2026-07-05 — Oturum 168 (devam 13): Admin Sipariş Detay Sayfası
+
+### Yapılanlar
+- **DB**: `payments.admin_notes` (text, nullable) eklendi — "WhatsApp mesaj geçmişi/notlar" alanı için.
+- **Yeni `src/app/admin/kasa/[paymentId]/page.tsx`**: `/admin/kasa` listesindeki sipariş kodu artık tıklanabilir link, tıklayınca tam detay sayfasına gidiyor. Sayfa 5 kart gösteriyor:
+  - **Kullanıcı Bilgileri**: ad soyad, e-posta, telefon + WhatsApp Aç butonu (mevcut `_WhatsAppButton.tsx` yeniden kullanıldı, `order_locale`'e göre doğru dilde).
+  - **Sipariş Bilgileri**: sipariş kodu, ürün, tutar, sipariş dili, "kimin için", oluşturulma/vade/ödeme tarihleri, sipariş notları. Üstte durum dropdown'u (mevcut `_PaymentStatusForm.tsx` yeniden kullanıldı — burada değiştirmek listedeki ile aynı action'ı tetikliyor).
+  - **Profil / Yayın Durumu**: `vault_id` varsa vault bilgileri (profil adı, `StatusBadge` ile yayın durumu, doğum/vefat tarihi, kargo adresi girilmiş mi) + admin/memorials sayfasına link; `family_id` varsa aile sayfası bilgisi.
+  - **KVKK Onay Kaydı**: aydınlatma/rıza/pazarlama izni, onay dili, IP, tarih, sözleşme versiyonu, user-agent — tam kayıt (listedeki satır-altı özet değil, hepsi).
+  - **WhatsApp Mesaj Geçmişi / Notlar**: yeni `_AdminNotesForm.tsx` — serbest metin, admin'in müşteriyle yaptığı WhatsApp görüşmelerini not almasına yarıyor, yeni `updatePaymentAdminNotes` action'ıyla kaydediliyor.
+- `npx tsc --noEmit` ve `npm run build` temiz geçti.
+- **Doğrulama**: Faz 6'daki gibi gerçek admin oturumuna giremediğim için (kimlik bilgisi yok, denemek uygun değil) SQL ile sorgu şeklinin gerçek veriyle (`EM-2026-0023` siparişi) doğru çalıştığı teyit edildi, `curl` ile route'un 500 vermeden doğru şekilde admin girişine yönlendirdiği (307) doğrulandı, `tsc`/`build` temiz. **Kullanıcının kendi admin oturumuyla tarayıcıdan gerçek tıklama testi yapması gerekiyor.**
+
+### Proje Durumu
+- [x] Admin sipariş detay tam sayfası tamamlandı (kod/SQL seviyesinde doğrulandı)
+- [ ] Commit edilmedi — kullanıcı onayı bekleniyor
+- [ ] Kullanıcı localde admin oturumuyla gözden geçirmeli
+
+### Nerede Kaldık
+Admin sipariş detay sayfası kod tarafında tamamlandı, commit edilmedi.
+
+### Sıradaki Adım
+1. Kullanıcı localde admin panelinden `/admin/kasa`'ya girip bir sipariş koduna tıklasın, detay sayfasını kontrol etsin
+2. Onaylarsa commit (+ istenirse push)
+3. Faz 8 (SEO) / backlog (çerez banner) — kalan tek şeyler
+
 ## 2026-07-05 — Oturum 168 (devam 12): "Şifremi Unuttum" Akışı — Sessiz Hata Kaynakları Düzeltildi
 
 ### Yapılanlar

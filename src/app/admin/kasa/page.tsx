@@ -1,4 +1,5 @@
 import { Fragment } from 'react'
+import Link from 'next/link'
 import { requireAdmin } from '@/lib/admin/auth'
 import { createServiceClient } from '@/lib/supabase/server'
 import StatusBadge from '../_components/StatusBadge'
@@ -207,7 +208,9 @@ function PaymentFullTable({
               <Fragment key={p.id}>
               <tr className="hover:bg-slate-50 transition-colors">
                 <td className="px-4 py-3">
-                  <p className="font-mono text-xs font-semibold text-amber-700">{p.order_code ?? '—'}</p>
+                  <Link href={`/admin/kasa/${p.id}`} className="font-mono text-xs font-semibold text-amber-700 hover:text-amber-900 hover:underline">
+                    {p.order_code ?? '—'}
+                  </Link>
                   {p.profile_for && (
                     <p className="text-xs text-slate-400">{PROFILE_FOR_LABELS[p.profile_for] ?? p.profile_for}</p>
                   )}

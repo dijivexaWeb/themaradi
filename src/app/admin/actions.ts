@@ -301,6 +301,33 @@ export async function updatePaymentStatus(
   return { success: true }
 }
 
+export async function updatePaymentAdminNotes(paymentId: string, notes: string): Promise<ActionResult> {
+  const { user, profile } = await requireAdmin()
+
+  const schema = z.string().uuid()
+  if (!schema.safeParse(paymentId).success) return { success: false, error: 'Geçersiz ID' }
+
+  const supabase = await createServiceClient()
+
+  const { error } = await supabase
+    .from('payments')
+    .update({ admin_notes: notes.trim() || null, updated_at: new Date().toISOString() })
+    .eq('id', paymentId)
+
+  if (error) return { success: false, error: error.message }
+
+  await logAdminAction({
+    adminId: user.id,
+    adminEmail: user.email ?? profile.email ?? '',
+    action: 'payment_admin_notes_updated',
+    entityType: 'payment',
+    entityId: paymentId,
+  })
+
+  revalidatePath(`/admin/kasa/${paymentId}`)
+  return { success: true }
+}
+
 // ─── Alive Alerts ────────────────────────────────────────────────────────────
 
 export async function resolveAliveAlert(
