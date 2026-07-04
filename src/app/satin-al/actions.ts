@@ -5,7 +5,7 @@ import { redirect } from 'next/navigation'
 import { fetchPricingConfig } from '@/lib/pricing'
 import { sendEmail, getAdminNotificationEmail } from '@/lib/email'
 import { memorialSignupConfirmEmail, vaultSignupConfirmEmail, adminNewRegistrationEmail, orderCreatedEmail, orderCreatedEmailSubject } from '@/lib/email/templates'
-import { headers } from 'next/headers'
+import { headers, cookies } from 'next/headers'
 import { buildWhatsAppOrderLink } from '@/lib/whatsapp'
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://theeternalmemory.com'
@@ -14,6 +14,12 @@ const ORDER_LOCALES = ['tr', 'ka', 'ru', 'en', 'az', 'hy', 'he'] as const
 
 function normalizeOrderLocale(value: string | null | undefined): string {
   return ORDER_LOCALES.includes(value as typeof ORDER_LOCALES[number]) ? (value as string) : 'tr'
+}
+
+// Kullanıcıya ayrıca sorulmuyor — sipariş anında sitenin gezindiği dil (tm_lang cookie) order_locale olarak kullanılır
+async function detectOrderLocale(): Promise<string> {
+  const cookieStore = await cookies()
+  return normalizeOrderLocale(cookieStore.get('tm_lang')?.value)
 }
 
 function slugify(text: string): string {
@@ -76,24 +82,25 @@ export async function purchaseMemorialAction(_prev: unknown, formData: FormData)
   const supabase = await createClient()
   const service = await createServiceClient()
 
-  const displayName = (formData.get('display_name') as string)?.trim()
   const senderName = (formData.get('sender_name') as string)?.trim()
   const senderEmail = (formData.get('sender_email') as string)?.trim().toLowerCase()
   const phone = (formData.get('phone') as string)?.trim()
-  const shippingAddress = (formData.get('shipping_address') as string)?.trim()
-  const profileFor = (formData.get('profile_for') as string)?.trim() || null
-  const profileLanguage = normalizeOrderLocale(formData.get('profile_language') as string)
-  const privacyNoticeAck = formData.get('privacy_notice_ack') === 'on'
-  const dataProcessingConsent = formData.get('data_processing_consent') === 'on'
+  const shippingAddress: string | null = null
+  const profileFor: string | null = null
+  const profileLanguage = await detectOrderLocale()
+  // Ayrı bir onay kutusu yok — "Sipariş Kodumu Oluştur" butonuna tıklanması Aydınlatma Metni'nin
+  // okunduğu ve bilgilerin kullanılmasının kabul edildiği anlamına gelir (implicitConsentNote metniyle bildiriliyor)
+  const consentAck = true
+  const privacyNoticeAck = consentAck
+  const dataProcessingConsent = consentAck
   const marketingPermission = formData.get('marketing_permission') === 'on'
 
-  if (!displayName) return { error: 'Anma profili sahibinin adı zorunludur' }
+  // Vefat eden kişinin adı bu ekranda sorulmuyor — ödeme sonrası kullanıcı panelinde (biyografi adımı) girilecek
+  const displayName = 'İsimsiz Anma Profili'
+
   if (!senderName) return { error: 'Ad Soyad zorunludur' }
   if (!senderEmail || !senderEmail.includes('@')) return { error: 'Geçerli bir e-posta girin' }
   if (!phone) return { error: 'Telefon numarası zorunludur' }
-  if (!shippingAddress) return { error: 'QR kod tabela kargo adresi zorunludur' }
-  if (!privacyNoticeAck) return { error: "Aydınlatma Metni'ni okuduğunuzu onaylamanız gerekmektedir" }
-  if (!dataProcessingConsent) return { error: 'Bilgilerinizin kullanılmasına ilişkin rızayı onaylamanız gerekmektedir' }
 
   const authResult = await getOrCreatePurchaseUser(supabase, service, formData, senderName, senderEmail)
   if ('error' in authResult) return { error: authResult.error }
@@ -240,17 +247,18 @@ export async function purchaseVaultAction(_prev: unknown, formData: FormData) {
   const senderName = (formData.get('sender_name') as string)?.trim()
   const senderEmail = (formData.get('sender_email') as string)?.trim().toLowerCase()
   const phone = (formData.get('phone') as string)?.trim()
-  const profileLanguage = normalizeOrderLocale(formData.get('profile_language') as string)
-  const privacyNoticeAck = formData.get('privacy_notice_ack') === 'on'
-  const dataProcessingConsent = formData.get('data_processing_consent') === 'on'
+  const profileLanguage = await detectOrderLocale()
+  // Ayrı bir onay kutusu yok — "Sipariş Kodumu Oluştur" butonuna tıklanması Aydınlatma Metni'nin
+  // okunduğu ve bilgilerin kullanılmasının kabul edildiği anlamına gelir (implicitConsentNote metniyle bildiriliyor)
+  const consentAck = true
+  const privacyNoticeAck = consentAck
+  const dataProcessingConsent = consentAck
   const marketingPermission = formData.get('marketing_permission') === 'on'
 
   if (!displayName) return { error: 'Anı alanı adı zorunludur' }
   if (!senderName) return { error: 'Ad Soyad zorunludur' }
   if (!senderEmail || !senderEmail.includes('@')) return { error: 'Geçerli bir e-posta girin' }
   if (!phone) return { error: 'Telefon numarası zorunludur' }
-  if (!privacyNoticeAck) return { error: "Aydınlatma Metni'ni okuduğunuzu onaylamanız gerekmektedir" }
-  if (!dataProcessingConsent) return { error: 'Bilgilerinizin kullanılmasına ilişkin rızayı onaylamanız gerekmektedir' }
 
   const authResult = await getOrCreatePurchaseUser(supabase, service, formData, senderName, senderEmail)
   if ('error' in authResult) return { error: authResult.error }
@@ -393,19 +401,20 @@ export async function purchaseFamilyAction(_prev: unknown, formData: FormData) {
   const senderName = (formData.get('sender_name') as string)?.trim()
   const senderEmail = (formData.get('sender_email') as string)?.trim().toLowerCase()
   const phone = (formData.get('phone') as string)?.trim()
-  const shippingAddress = (formData.get('shipping_address') as string)?.trim()
-  const profileFor = (formData.get('profile_for') as string)?.trim() || null
-  const profileLanguage = normalizeOrderLocale(formData.get('profile_language') as string)
-  const privacyNoticeAck = formData.get('privacy_notice_ack') === 'on'
-  const dataProcessingConsent = formData.get('data_processing_consent') === 'on'
+  const shippingAddress: string | null = null
+  const profileFor: string | null = null
+  const profileLanguage = await detectOrderLocale()
+  // Ayrı bir onay kutusu yok — "Sipariş Kodumu Oluştur" butonuna tıklanması Aydınlatma Metni'nin
+  // okunduğu ve bilgilerin kullanılmasının kabul edildiği anlamına gelir (implicitConsentNote metniyle bildiriliyor)
+  const consentAck = true
+  const privacyNoticeAck = consentAck
+  const dataProcessingConsent = consentAck
   const marketingPermission = formData.get('marketing_permission') === 'on'
 
   if (!familyName) return { error: 'Aile/topluluk adı zorunludur' }
   if (!senderName) return { error: 'Ad Soyad zorunludur' }
   if (!senderEmail || !senderEmail.includes('@')) return { error: 'Geçerli bir e-posta girin' }
   if (!phone) return { error: 'Telefon numarası zorunludur' }
-  if (!privacyNoticeAck) return { error: "Aydınlatma Metni'ni okuduğunuzu onaylamanız gerekmektedir" }
-  if (!dataProcessingConsent) return { error: 'Bilgilerinizin kullanılmasına ilişkin rızayı onaylamanız gerekmektedir' }
 
   const authResult = await getOrCreatePurchaseUser(supabase, service, formData, senderName, senderEmail)
   if ('error' in authResult) return { error: authResult.error }

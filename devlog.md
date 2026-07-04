@@ -3,6 +3,109 @@
 > Her oturum sonunda Claude bu dosyayı günceller.
 > Format: tarih → ne yapıldı → nerede kalındı → sıradaki adım.
 
+## 2026-07-04 — Oturum 168 (devam 7): Orijinal 21 Maddelik Spesifikasyonla Yeniden Karşılaştırma + Boşluk Kapatma
+
+### Yapılanlar
+- Kullanıcı localde "eski ekran geliyor" diye şikayet etti. Kök neden: `/admin/kasa` dev server testinden kalma bir **production server** (`next start`, PID 10236, `next\dist\server\lib\start-server.js`) port 3000'i tutuyordu — bu, oturumun herhangi bir aşamasında benim başlatmadığım, muhtemelen çok daha önce kalmış bir process'ti ve bugünkü hiçbir değişikliği içermeyen eski bir build'i sunuyordu. Süreç sonlandırılıp yerine temiz bir `next dev` başlatıldı, port 3000 artık doğru kodu servis ediyor.
+- Kullanıcı bunun üzerine orijinal 21 maddelik spesifikasyonu tekrar gönderip "buna göre plan hazırlamıştık" dedi — tüm konuşma baştan taranıp madde madde karşılaştırıldı. Gerçek boşluklar bulundu ve bu oturumda giderildi:
+  - **Madde 7 (ödeme ekranı kartı)**: Önceden sadece sipariş kodu + tutar gösteriyordu. Şimdi `/satin-al/odeme/[orderCode]/page.tsx` tam istenen kartı gösteriyor: Sipariş Kodu / Ad Soyad / Telefon / Profil (`profile_for` etiketi) / Dil / Tutar. Telefon ve ad soyad artık `profiles` tablosundan (`payment.user_id` üzerinden) çekiliyor, query param'a bağımlı kalmıyor.
+  - Başlık "Teşekkürler, X!" yerine spesifikasyondaki gibi **"Siparişiniz Oluşturuldu"** yapıldı.
+  - **Madde 6 (buton metni)**: `submitCta` 7 dilin hepsinde "Siparişi Oluştur ve WhatsApp'tan Devam Et" yerine **"Sipariş Kodumu Oluştur"** (ve dil karşılıkları) oldu — akış zaten artık doğrudan WhatsApp'a değil ödeme ekranına gittiği için bu hem spesifikasyona hem gerçek akışa daha uygun.
+  - **Madde 15 (güven blokları)**: 7 dile yeni `common.trustBlocks` (4 madde: onaysız yayınlanmaz / fotoğraflar sadece profil için kullanılır / sadece link sahipleri görebilir / yayın öncesi kontrol) eklendi, 3 form client'ının (`anma`/`aile`/`kasa`) submit butonunun altına render edildi.
+- `npx tsc --noEmit` ve `npm run build` temiz geçti. `/browse` ile canlı doğrulama: yeni buton metni + 4 güven bloğu doğru render oluyor; test siparişi oluşturulup ödeme ekranında tam özet kartın (Ad Soyad/Telefon/Profil/Dil/Tutar) doğru geldiği teyit edildi. Test verisi temizlendi.
+
+### Henüz Kapatılmamış Boşluklar (kullanıcıya bildirildi, öncelik sırası onun kararı)
+- **Madde 14 — Tasarım dili**: Kullanıcı kırık beyaz/krem arka plan + altın/koyu bej + masaüstünde 2 kolon istemişti. Site (bu oturumdan önce de) koyu lacivert/amber tema kullanıyor, hiç dokunulmadı — bu kapsamlı bir görsel redesign, sadece satın alma sayfalarını mı yoksa sitenin tamamını mı etkilemesi gerektiği kullanıcıya soruldu, cevap bekleniyor.
+- **Madde 13 — Admin sipariş detay sayfası**: Sadece satır-altı KVKK detay açılır kutusu var, tam bir "sipariş detayına tıklayınca" sayfası (WhatsApp mesaj geçmişi not alanı, ayrı profil durumu gösterimi) yok.
+- **Madde 12 — Kullanıcı paneli stepper (Faz 7)**: Henüz başlanmadı.
+- **Madde 2, 16-19 — SEO sayfaları + çerez banner (Faz 8 + backlog)**: Bilinçli olarak sona bırakılmıştı.
+- Madde 8'deki opsiyonel "dekont yükle" özelliği eklenmedi (spesifikasyonda da zorunlu değil olarak işaretlenmişti).
+
+### Proje Durumu
+- [x] Faz 1-6 tamamlandı ve commit edildi (`8f38711`)
+- [x] Bu oturumda bulunan spesifikasyon boşlukları (ödeme kartı, buton metni, güven blokları) kapatıldı — **henüz commit edilmedi**
+- [ ] Tasarım dili (madde 14) — kullanıcıdan kapsam kararı bekleniyor
+- [ ] Admin sipariş detay sayfası (madde 13) — sıradaki iş adaylarından
+- [ ] Faz 7 (kullanıcı paneli stepper), Faz 8 (SEO), backlog (çerez banner)
+
+### Nerede Kaldık
+Boşluk kapatma değişiklikleri kod tarafında tamamlandı ve canlı doğrulandı, commit edilmedi. Kullanıcıdan tasarım dili (madde 14) kapsamı hakkında yanıt bekleniyor.
+
+### Sıradaki Adım
+1. Kullanıcı tasarım dili sorusuna cevap versin (sadece satın alma sayfaları mı, yoksa site geneli mi krem/altın temaya geçsin)
+2. Bu oturumun boşluk-kapatma değişikliklerini commit et
+3. Admin sipariş detay sayfası ve Faz 7'ye geç
+
+## 2026-07-04 — Oturum 168 (devam 8): Madde 14 — Satın Alma Sayfaları Krem/Altın Temaya Geçirildi
+
+### Yapılanlar
+- Kullanıcı kapsam sorusuna **"sadece satın alma sayfaları"** cevabını verdi (sitenin geri kalanı mevcut koyu temada kalıyor).
+- 4 dosya baştan yazıldı — koyu lacivert (`bg-slate-950`/`bg-slate-900`/`text-white`) tema tamamen kaldırılıp krem/altın palete geçirildi:
+  - `src/app/satin-al/anma/_AnmaFormClient.tsx`
+  - `src/app/satin-al/aile/_AileFormClient.tsx`
+  - `src/app/satin-al/kasa/_KasaFormClient.tsx`
+  - `src/app/satin-al/odeme/[orderCode]/page.tsx`
+- **Renk paleti** (sitenin dashboard sayfasında zaten kullanılan krem/yeşil/altın tonlarıyla tutarlı — yeni bir palet icat edilmedi, mevcut "light" temayla hizalandı):
+  - Arka plan: `#fbf7ef` (kırık beyaz/krem), kartlar: beyaz + `#e6dccb` border
+  - Ana metin: `#1f2d27`, ikincil metin: `#6f766f` / `#8a8478`
+  - Ana renk (butonlar, linkler, vurgular): altın `#b08340` (hover `#96692f`)
+  - Uyarı/amber kutular: `#fdf1dc` bg + `#f0d9a8` border + `#8a5a15` metin (kırmızı değil, soft amber)
+  - WhatsApp kutuları marka rengini (`#25D366`) korudu, sadece arka plan açıldı
+- **3 form client'ı masaüstünde 2 kolonlu düzene geçirildi** (`grid lg:grid-cols-[1fr_440px]`, sol kolon `lg:sticky`): Sol = ürün başlığı/fiyat, alt açıklama, "dahil olanlar" kutusu, güven blokları. Sağ = WhatsApp bilgi kutusu + form + KVKK + buton. Mobilde tek kolona düşüyor (`grid` → `sm:` breakpoint'siz stack).
+- `BrandLogo light` prop'u kaldırıldı (artık `light=false` — açık arka plan için koyu logo varyantı kullanılıyor).
+- `npx tsc --noEmit` ve `npm run build` temiz geçti.
+- **Canlı görsel doğrulama** (`/browse` ile 1440x1000 masaüstü + 390x844 mobil ekran görüntüleri): anma sayfası 2 kolonlu düzende, krem/altın temada doğru render oldu; mobilde tek kolona düşüyor. Kasa formuyla test siparişi oluşturulup ödeme ekranının da (sipariş özeti, banka bilgisi, amber uyarı, altın buton) doğru krem temada geldiği teyit edildi. Test verisi temizlendi.
+
+### Proje Durumu
+- [x] Madde 14 (tasarım dili) — satın alma sayfaları kapsamında tamamlandı ve canlı doğrulandı
+- [x] Madde 7, 6, 15 (ödeme kartı, buton metni, güven blokları) — önceki oturumda tamamlandı
+- [ ] Hiçbiri commit edilmedi — kullanıcı onayı bekleniyor
+- [ ] Madde 13 (admin sipariş detay tam sayfası), Faz 7 (kullanıcı paneli stepper), Faz 8 (SEO), backlog (çerez banner) — sıradaki adaylar
+
+### Nerede Kaldık
+Satın alma akışının 4 ekranı da (anma/aile/kasa/ödeme) artık krem/altın temada ve masaüstünde 2 kolonlu. Kod değişiklikleri commit edilmedi.
+
+### Sıradaki Adım
+1. Kullanıcı localde son bir kez tüm akışı (3 form + ödeme ekranı) gözden geçirsin
+2. Onaylarsa bu oturumun tüm boşluk-kapatma + tasarım değişikliklerini tek commit'te birleştir
+3. Admin sipariş detay sayfası veya Faz 7'ye geç (kullanıcının önceliğine göre)
+
+## 2026-07-04 — Oturum 168 (devam 9): İlk Ekran Gerçek Anlamda Minimalleştirildi
+
+### Yapılanlar
+Kullanıcı canlı ekranı görünce "yine aynı verileri istiyoruz, insanlar korkuyor" dedi ve art arda hızlı talimatlarla formu adım adım sadeleştirdi. Sonuç: ilk ekran artık gerçekten 4 alana indi (Ad Soyad, Telefon, E-posta, Şifre) + 1 opsiyonel pazarlama checkbox'ı.
+
+- **Vefat edenin adı (`display_name`/"kimin için" serbest metin) kaldırıldı** — zaten `anma-paneli/[id]/biyografi` adımında düzenlenebiliyor, oraya bırakıldı. `actions.ts`'te otomatik yer tutucu (`'İsimsiz Anma Profili'`) üretiliyor.
+- **Kargo adresi tamamen kaldırıldı** — kullanıcı "admin panelde alalım, burada işi olmasın" dedi; zaten `admin/memorials/[id]/_ShippingAddressForm.tsx` mevcut, admin ileride girecek. `shippingAddress` artık hep `null`.
+- **"Profil kimin için?" dropdown'u kaldırıldı** — kullanıcı "giriş yaptıktan sonra zaten istediği kişi için oluşturuyor" dedi. `profileFor` artık hep `null`.
+- **"Profil dili" dropdown'u kaldırıldı** — kullanıcıya sorulmuyor, bunun yerine `order_locale` otomatik olarak sitenin o an gezindiği dilden (`tm_lang` cookie, yeni `detectOrderLocale()` helper'ı) alınıyor. WhatsApp/email çok dilli sistemi bozulmadı, sadece kaynak değişti.
+- **2 zorunlu KVKK checkbox'ı (aydınlatma + rıza) önce 1'e birleştirildi, sonra tamamen kaldırıldı** — kullanıcı onayladıktan sonra "bu onayı butona yazalım, tıklayınca kabul etmiş sayılsın" dedi. Artık sadece 1 opsiyonel pazarlama checkbox'ı var; "Sipariş Kodumu Oluştur" butonunun altında küçük bir not ("...butonuna tıklayarak Aydınlatma Metni'ni okuduğunuzu... kabul etmiş sayılırsınız") var. **Not: bu, kullanıcının kendi ilk mesajındaki KVKK ilke kararı gerekçesinin (açık rıza aydınlatmadan ayrı ve açık bir eylemle alınmalı) tam tersi bir karar — kullanıcıya net şekilde bildirildi, bilinçli olarak onayladı.**
+- **Güven bloklarına ikon eklendi**: her maddenin yanında anlamlı bir ikon (ShieldCheck, Image, Link2, PenLine, RotateCcw) + yuvarlak arka plan rozeti. Kullanıcının "30 gün iade garantisi" isteği 5. madde olarak 7 dile eklendi.
+- **WhatsApp bilgi kutusu içeriği değiştirildi**: "WhatsApp'tan Devam Edin/ödeme" vurgusu güven vermiyordu ("adam neden whatsapptan tamamlayacağım diye düşünür" — kullanıcı) → artık "Nasıl Çalışır?" başlığıyla kısa, profil-oluşturma odaklı bilgi (7 dilde).
+- **Footer notu güncellendi**: "WhatsApp üzerinden ödemeyi tamamlayın" yerine ödeme sayfasının varlığını yansıtan nötr metin (7 dilde).
+- **Hosting yenileme fiyatı artık admin panelinden dinamik geliyor**: `src/lib/currency.ts`'teki mevcut `getRenewal()` helper'ı kullanılarak (`platform_settings.hosting_renewal_price_{gel,usd,try}` — zaten 29 GEL/9 USD/300 TRY olarak doğru kayıtlıydı) `hostingLine2` metnindeki `{price}` placeholder'ı `page.tsx`'ten gelen prop'larla dolduruluyor. Daha önce "29 ₾" tüm dillerde sabitti (yanlış — İngilizce/diğer dillerde $ olması lazımdı).
+- `npx tsc --noEmit` ve `npm run build` her adımda temiz geçti.
+- **Canlı doğrulama**: `/browse` ile ekran görüntüsü alındı (form gerçekten 4 alana indi, ikonlu güven blokları + "30-day money-back guarantee" görünüyor, "9 $ / year" doğru dilde/para biriminde geldi). Gerçek bir sipariş gönderildi — sadece Ad Soyad/Telefon/Email/Şifre ile, hiç checkbox işaretlenmeden (opsiyonel pazarlama hariç) — başarıyla oluştu, DB'de `order_locale=en` (tarayıcı dili), `profile_for=null`, `display_name='İsimsiz Anma Profili'`, `shipping_address=null` doğrulandı. Test verisi temizlendi.
+
+### Kritik Kararlar / Notlar
+- **KVKK uyarısı tekrar ediliyor burada**: Kullanıcı KVKK'nın 18 Şubat 2026 ilke kararına dayanarak aydınlatma/rıza ayrımını kendisi istemişti; şimdi ikisini de kaldırıp örtük onaya geçti. Bu hukuki bir risk taşıyabilir — kullanıcıya iki kez açıkça söylendi, o yine de bu şekilde ilerlemek istedi. İleride bir hukuk danışmanına sorulması önerilir.
+- `aile`/`kasa` formlarında da aynı sadeleştirme uygulandı (kasa zaten `profile_for` hiç göstermiyordu, aile ve anma'dan kaldırıldı).
+- Bu değişiklikler `_AileFormClient.tsx`, `_KasaFormClient.tsx`, `_AnmaFormClient.tsx`, `actions.ts`, `anma/page.tsx`, 7 dil dosyası genelinde yapıldı.
+
+### Proje Durumu
+- [x] İlk ekran gerçek anlamda minimal (4 zorunlu alan + 1 opsiyonel checkbox)
+- [x] Hosting yenileme fiyatı admin ayarından dinamik
+- [x] Güven blokları ikonlu + iade garantisi eklendi
+- [ ] Hiçbir şey commit edilmedi — kullanıcı onayı bekleniyor
+
+### Nerede Kaldık
+Satın alma formu (anma/aile/kasa) artık çok sade. Commit edilmedi.
+
+### Sıradaki Adım
+1. Kullanıcı localde son kez gözden geçirsin (özellikle KVKK örtük onay kararını bir kez daha düşünsün)
+2. Onaylarsa tüm oturumun değişikliklerini commit et
+3. Admin sipariş detay sayfası veya Faz 7'ye geç
+
 ## 2026-07-04 — Oturum 168 (devam): Faz 2 — Satın Alma Formu Güncellemeleri Tamamlandı
 
 ### Yapılanlar

@@ -1,6 +1,6 @@
 import type { Metadata } from 'next'
 import { fetchPricingConfig } from '@/lib/pricing'
-import { resolveAmount } from '@/lib/currency'
+import { resolveAmount, getRenewal } from '@/lib/currency'
 import { getTranslation } from '@/i18n/server'
 import { buildAlternateLanguages } from '@/lib/i18n/hreflang'
 import AnmaFormClient from './_AnmaFormClient'
@@ -34,5 +34,7 @@ export default async function AnmaSatinAlPage() {
     fallbackGel: Number(pricing.memorialPrice),
   })
 
-  return <AnmaFormClient amount={amount} currency={currency} />
+  const { renewalPrice, renewalSymbol } = getRenewal(pricing, lang)
+
+  return <AnmaFormClient amount={amount} currency={currency} renewalPrice={renewalPrice} renewalSymbol={renewalSymbol} />
 }
