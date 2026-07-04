@@ -1954,6 +1954,52 @@ const en = {
     errorConnection: 'Connection error.',
     errorGeneric: 'An error occurred.',
   },
+
+  seoDijitalAniSayfasi: {
+    metaTitle: 'What Is a Digital Memorial Page? | The Eternal Memory',
+    metaDescription: 'A digital memorial page keeps a loved one’s photos, life story, videos and voice alive forever, reachable by scanning a QR code on the gravestone. Learn how it works.',
+    breadcrumbHome: 'Home',
+    breadcrumbCurrent: 'Digital Memorial Page',
+    h1: 'What Is a Digital Memorial Page?',
+    intro: 'A digital memorial page is a private web page created for someone who has passed away, holding their photos, life story, videos, voice recordings and family memories in one place — reachable anytime by anyone who scans the QR code on their gravestone.',
+    howItWorksTitle: 'How Does It Work?',
+    howItWorksSteps: [
+      { title: 'Create the order', desc: 'Fill in a short form with the name, your contact details and a password. You’ll get an order code immediately.' },
+      { title: 'Complete the payment', desc: 'Confirm the payment over WhatsApp or bank transfer using the order code. We verify it and activate your account.' },
+      { title: 'Build the profile', desc: 'Log into your panel and add photos, the life story, videos and voice recordings step by step — at your own pace.' },
+      { title: 'Receive the QR plate', desc: 'We ship a QR-coded plate for the gravestone. Anyone who scans it opens the memorial page instantly.' },
+    ],
+    whoForTitle: 'Who Is It For?',
+    whoForItems: [
+      'Families who want to preserve a loved one’s memory beyond a name and two dates on a stone',
+      'Anyone who wants relatives living far away to visit and leave a message',
+      'Families who want to gather scattered old photos and videos in one safe place',
+      'Anyone who wants future generations to know their ancestors’ life stories',
+      'Cemeteries and municipalities that want to offer a modern memorial option',
+    ],
+    whatsIncludedTitle: 'What’s Included?',
+    whatsIncludedItems: [
+      'A private memorial page with unlimited photos, videos and voice recordings',
+      'A durable QR-coded plate, shipped to your address',
+      'First 3 years of hosting included — renews at a low yearly fee afterwards',
+      'A condolence book where visitors can leave memories and messages',
+      'Full control over what’s published — nothing goes live without your approval',
+      'Support over WhatsApp whenever you need help',
+    ],
+    privacyTitle: 'Privacy & Trust',
+    privacyBody: 'Photos and information you upload are used only to build the memorial profile and are never sold or shared with third parties. You choose whether the page is fully public or visible only to people with the link. Every submitted memory and photo passes through your approval before publishing. If you’re not satisfied, we offer a 30-day money-back guarantee, no questions asked.',
+    faqTitle: 'Frequently Asked Questions',
+    faqItems: [
+      { q: 'How long does it take to set up a memorial page?', a: 'Creating the order takes about 2 minutes. Once payment is confirmed, you can add photos and the life story to your panel whenever you have time — there’s no deadline.' },
+      { q: 'What happens if I stop paying the yearly hosting fee?', a: 'The gallery and detailed content are hidden, but the page itself is never deleted. Reactivating it later restores everything.' },
+      { q: 'Can I edit the page after it’s published?', a: 'Yes. You can add or remove photos, videos, and text at any time from your panel, for as long as you want.' },
+      { q: 'Does everyone who scans the QR code see everything?', a: 'You choose the visibility — fully public, or restricted to people who have the direct link.' },
+      { q: 'Do I need to know how to use a computer?', a: 'No. The panel is designed to be simple, and our WhatsApp support can walk you through every step.' },
+    ],
+    ctaTitle: 'Preserve Their Memory Today',
+    ctaBody: 'Create the memorial profile in a few minutes and give your loved one’s story a permanent home.',
+    ctaButton: 'Create Memorial Profile',
+  },
 }
 
 export default en

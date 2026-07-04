@@ -16,6 +16,7 @@ const staticRoutes: MetadataRoute.Sitemap = [
   { url: `${base}/pricing`, priority: 0.8, changeFrequency: 'weekly', alternates: withAlternates(`${base}/pricing`, '/pricing') },
   { url: `${base}/contact`, priority: 0.6, changeFrequency: 'monthly', alternates: withAlternates(`${base}/contact`, '/contact') },
   { url: `${base}/miras`, priority: 0.6, changeFrequency: 'weekly', alternates: withAlternates(`${base}/miras`, '/miras') },
+  { url: `${base}/dijital-ani-sayfasi`, priority: 0.7, changeFrequency: 'monthly', alternates: withAlternates(`${base}/dijital-ani-sayfasi`, '/dijital-ani-sayfasi') },
   { url: `${base}/satin-al/anma`, priority: 0.9, changeFrequency: 'weekly', alternates: withAlternates(`${base}/satin-al/anma`, '/satin-al/anma') },
   { url: `${base}/satin-al/aile`, priority: 0.8, changeFrequency: 'weekly', alternates: withAlternates(`${base}/satin-al/aile`, '/satin-al/aile') },
   { url: `${base}/privacy`, priority: 0.3, changeFrequency: 'yearly' },

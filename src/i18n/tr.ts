@@ -1960,6 +1960,52 @@ const tr: LangDict = {
     errorConnection: 'Bağlantı hatası.',
     errorGeneric: 'Hata oluştu.',
   },
+
+  seoDijitalAniSayfasi: {
+    metaTitle: 'Dijital Anı Sayfası Nedir? | The Eternal Memory',
+    metaDescription: 'Dijital anı sayfası, vefat eden bir yakınınızın fotoğraflarını, hayat hikayesini, videolarını ve sesini sonsuza dek yaşatan; mezar taşındaki QR kod ile ulaşılan özel bir web sayfasıdır. Nasıl çalıştığını öğrenin.',
+    breadcrumbHome: 'Ana Sayfa',
+    breadcrumbCurrent: 'Dijital Anı Sayfası',
+    h1: 'Dijital Anı Sayfası Nedir?',
+    intro: 'Dijital anı sayfası, hayatını kaybetmiş bir yakınınız için oluşturulan; fotoğraflarını, hayat hikayesini, videolarını, ses kayıtlarını ve aile anılarını tek bir yerde toplayan özel bir web sayfasıdır — mezar taşındaki QR kodu okutan herkes, istediği an bu sayfaya ulaşabilir.',
+    howItWorksTitle: 'Nasıl Çalışır?',
+    howItWorksSteps: [
+      { title: 'Siparişi oluşturun', desc: 'Kısa bir formda isim, iletişim bilgileriniz ve bir şifre girin. Anında bir sipariş kodu alırsınız.' },
+      { title: 'Ödemeyi tamamlayın', desc: 'Sipariş kodunuzla WhatsApp veya banka havalesi üzerinden ödemeyi onaylayın. Ödemeyi doğrulayıp hesabınızı aktive ediyoruz.' },
+      { title: 'Profili hazırlayın', desc: 'Panelinize giriş yapıp fotoğrafları, hayat hikayesini, videoları ve ses kayıtlarını kendi hızınızda, adım adım ekleyin.' },
+      { title: 'QR plakanızı teslim alın', desc: 'Mezar taşı için QR kodlu bir plaka gönderiyoruz. Kodu okutan herkes anı sayfasını anında açabilir.' },
+    ],
+    whoForTitle: 'Kimler İçin Uygun?',
+    whoForItems: [
+      'Bir yakınının hatırasını, mezar taşındaki isim ve iki tarihten fazlasıyla yaşatmak isteyen aileler',
+      'Uzakta yaşayan akrabalarının da ziyaret edip bir şey yazabilmesini isteyenler',
+      'Dağınık eski fotoğraf ve videoları tek, güvenli bir yerde toplamak isteyen aileler',
+      'Gelecek nesillerin atalarının hayat hikayesini bilmesini isteyenler',
+      'Modern bir anma seçeneği sunmak isteyen mezarlıklar ve belediyeler',
+    ],
+    whatsIncludedTitle: 'Neler Dahil?',
+    whatsIncludedItems: [
+      'Sınırsız fotoğraf, video ve ses kaydı ekleyebileceğiniz özel bir anı sayfası',
+      'Adresinize gönderilen, dayanıklı QR kodlu bir plaka',
+      'İlk 3 yıl hosting dahil — sonrasında düşük bir yıllık ücretle yenilenir',
+      'Ziyaretçilerin anı ve mesaj bırakabildiği bir taziye defteri',
+      'Yayınlanan her şey üzerinde tam kontrol — onayınız olmadan hiçbir şey yayınlanmaz',
+      'İhtiyaç duyduğunuzda WhatsApp üzerinden destek',
+    ],
+    privacyTitle: 'Gizlilik ve Güven',
+    privacyBody: 'Yüklediğiniz fotoğraf ve bilgiler yalnızca anma profilini oluşturmak için kullanılır, asla satılmaz veya üçüncü taraflarla paylaşılmaz. Sayfanın tamamen herkese açık mı, yoksa yalnızca linke sahip kişilere mi görünür olacağını siz seçersiniz. Gönderilen her anı ve fotoğraf, yayınlanmadan önce sizin onayınızdan geçer. Memnun kalmazsanız, soru sormadan 30 gün içinde para iade garantisi sunuyoruz.',
+    faqTitle: 'Sıkça Sorulan Sorular',
+    faqItems: [
+      { q: 'Bir anı sayfası hazırlamak ne kadar sürer?', a: 'Sipariş oluşturmak yaklaşık 2 dakika sürer. Ödeme onaylandıktan sonra fotoğrafları ve hayat hikayesini panelinize istediğiniz zaman ekleyebilirsiniz — bir son tarih yoktur.' },
+      { q: 'Yıllık hosting ücretini ödemeyi bırakırsam ne olur?', a: 'Galeri ve detaylı içerik gizlenir, ancak sayfa asla silinmez. Daha sonra yeniden aktif ettiğinizde her şey geri gelir.' },
+      { q: 'Sayfa yayınlandıktan sonra düzenleyebilir miyim?', a: 'Evet. İstediğiniz kadar süre boyunca, panelinizden dilediğiniz zaman fotoğraf, video ve metin ekleyip çıkarabilirsiniz.' },
+      { q: 'QR kodu okutan herkes her şeyi görür mü?', a: 'Görünürlüğü siz seçersiniz — tamamen herkese açık ya da yalnızca doğrudan linke sahip kişilerle sınırlı.' },
+      { q: 'Bilgisayar kullanmayı bilmem gerekir mi?', a: 'Hayır. Panel basit olacak şekilde tasarlandı, ayrıca WhatsApp desteğimiz her adımda size yardımcı olabilir.' },
+    ],
+    ctaTitle: 'Hatırasını Bugün Yaşatın',
+    ctaBody: 'Birkaç dakika içinde anma profilini oluşturun, yakınınızın hikayesine kalıcı bir yuva verin.',
+    ctaButton: 'Anma Profili Oluştur',
+  },
 }
 
 export default tr

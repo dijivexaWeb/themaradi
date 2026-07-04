@@ -3,6 +3,36 @@
 > Her oturum sonunda Claude bu dosyayı günceller.
 > Format: tarih → ne yapıldı → nerede kalındı → sıradaki adım.
 
+## 2026-07-05 — Oturum 168 (devam 14): Faz 8 — SEO Landing Sayfası (/dijital-ani-sayfasi)
+
+### Yapılanlar
+- Kullanıcı "faz 8'e geç" dedi. Plandaki Faz 8 kapsamı: satın alma sayfasından bağımsız SEO içerik sayfaları, `/miras` paterni takip edilerek (tek fiziksel dosya, dil başına ayrı dosya YOK, `getTranslation()` ile dil-aware render, `buildAlternateLanguages()` ile hreflang).
+- **Yeni sayfa: `src/app/dijital-ani-sayfasi/page.tsx`** — "Dijital Anı Sayfası Nedir?" başlıklı, tam SEO makale sayfası:
+  - Breadcrumb, H1, giriş paragrafı, CTA (→ `/satin-al/anma`)
+  - "Nasıl Çalışır?" (4 adım kartı), "Kimler İçin Uygun?" (5 madde), "Neler Dahil?" (6 madde), "Gizlilik ve Güven" kutusu, SSS (5 soru, `<details>`), alt CTA bloğu
+  - `generateMetadata()` ile dil-aware title/description + `alternates.canonical`/`languages`
+  - `BreadcrumbList` + `FAQPage` JSON-LD şeması eklendi (Google zengin sonuç uygunluğu için)
+  - Site genelindeki koyu tema (`#07070d`/`#EDE8DD`/altın `#c7a76f`) ile birebir tutarlı — `/miras` ve anasayfa ile aynı `LandingNav` kullanılıyor
+- **7 dil dosyasına yeni `seoDijitalAniSayfasi` namespace'i eklendi** (tr/en/ka/ru/az/hy/he) — tam içerik, kısaltma yok.
+- **`src/lib/i18n/localizedHref.ts`**: `ELIGIBLE_PREFIXES` listesine `/dijital-ani-sayfasi` eklendi — bu sayede `proxy.ts` otomatik dil algılama/yönlendirme ve `sitemap.ts` hreflang üretimi bu sayfa için de otomatik çalışıyor (ayrı kod gerekmedi, tek doğruluk kaynağı paylaşılıyor).
+- **`src/app/sitemap.ts`**: yeni sayfa eklendi (priority 0.7, monthly).
+- `npx tsc --noEmit` ve `npm run build` temiz geçti.
+- **Canlı doğrulama**: hem `/dijital-ani-sayfasi` (varsayılan TR/tarayıcı diline göre) hem `/en/dijital-ani-sayfasi` 200 dönüyor; `Accept-Language: tr-TR` header'ıyla test edilince doğru Türkçe içerik geldiği doğrulandı (curl'ün varsayılan olarak Accept-Language göndermemesi nedeniyle ilk testte proxy'nin genel "en" fallback'ine düştüğü görüldü — bu mevcut sistemin/`miras` sayfasının da paylaştığı, benim eklemediğim, tasarım gereği bir davranış). Hreflang tag'leri 7 dilde doğru üretiliyor, sitemap'te sayfa var, FAQPage JSON-LD doğru render oluyor. `/browse` ile ekran görüntüsü alınıp sayfanın tüm bölümlerinin (hero, 4 adım, kimler için, neler dahil, gizlilik, SSS, alt CTA) doğru ve site temasıyla tutarlı göründüğü teyit edildi.
+
+### Proje Durumu
+- [x] Faz 8 — ilk SEO landing sayfası (`/dijital-ani-sayfasi`) tamamlandı ve canlı doğrulandı
+- [ ] Commit edilmedi — kullanıcı onayı bekleniyor
+- [ ] Orijinal spekte listelenen diğer SEO sayfaları (QR mezar taşı, online taziye defteri, vb.) henüz yapılmadı — aynı patern tekrar kullanılarak eklenebilir
+- [ ] Backlog: çerez izni banner'ı — hâlâ yapılmadı
+
+### Nerede Kaldık
+Faz 8'in ilk (bayrak) sayfası tamamlandı, commit edilmedi. Plandaki tüm fazlar (1-8) artık kod tarafında tamamlanmış durumda.
+
+### Sıradaki Adım
+1. Kullanıcı sayfayı localde kontrol etsin, onaylarsa commit (+ istenirse push)
+2. İstenirse aynı patern ile ek SEO sayfaları (QR mezar taşı, taziye defteri vb.) eklenebilir
+3. Backlog: çerez izni banner'ı
+
 ## 2026-07-05 — Oturum 168 (devam 13): Admin Sipariş Detay Sayfası
 
 ### Yapılanlar

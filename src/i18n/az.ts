@@ -1937,6 +1937,52 @@ const az: LangDict = {
     errorConnection: 'Bağlantı xətası.',
     errorGeneric: 'Xəta baş verdi.',
   },
+
+  seoDijitalAniSayfasi: {
+    metaTitle: 'Rəqəmsal Anım Səhifəsi Nədir? | The Eternal Memory',
+    metaDescription: 'Rəqəmsal anım səhifəsi vəfat etmiş yaxınınızın şəkillərini, həyat hekayəsini, videolarını və səsini əbədi olaraq yaşadan, məzar daşındakı QR koddan keçidlə əlçatan xüsusi bir veb səhifədir. Necə işlədiyini öyrənin.',
+    breadcrumbHome: 'Ana Səhifə',
+    breadcrumbCurrent: 'Rəqəmsal Anım Səhifəsi',
+    h1: 'Rəqəmsal Anım Səhifəsi Nədir?',
+    intro: 'Rəqəmsal anım səhifəsi vəfat etmiş bir yaxınınız üçün yaradılan; şəkillərini, həyat hekayəsini, videolarını, səs qeydlərini və ailə xatirələrini bir yerdə toplayan xüsusi veb səhifədir — məzar daşındakı QR kodu oxudan hər kəs istənilən vaxt bu səhifəyə çata bilər.',
+    howItWorksTitle: 'Necə İşləyir?',
+    howItWorksSteps: [
+      { title: 'Sifarişi yaradın', desc: 'Qısa formada ad, əlaqə məlumatlarınız və bir şifrə daxil edin. Dərhal sifariş kodu alacaqsınız.' },
+      { title: 'Ödənişi tamamlayın', desc: 'Sifariş kodunuzla WhatsApp və ya bank köçürməsi vasitəsilə ödənişi təsdiqləyin. Ödənişi yoxlayıb hesabınızı aktivləşdiririk.' },
+      { title: 'Profili hazırlayın', desc: 'Panelinizə daxil olub şəkilləri, həyat hekayəsini, videoları və səs qeydlərini öz sürətinizlə, addım-addım əlavə edin.' },
+      { title: 'QR lövhənizi qəbul edin', desc: 'Məzar daşı üçün QR kodlu lövhə göndəririk. Kodu oxudan hər kəs anım səhifəsini dərhal aça bilər.' },
+    ],
+    whoForTitle: 'Kimlər Üçün Uyğundur?',
+    whoForItems: [
+      'Yaxınının xatirəsini məzar daşındakı ad və iki tarixdən artıq yaşatmaq istəyən ailələr',
+      'Uzaqda yaşayan qohumlarının da səhifəni ziyarət edib mesaj yaza bilməsini istəyənlər',
+      'Dağınıq köhnə şəkil və videoları bir təhlükəsiz yerdə toplamaq istəyən ailələr',
+      'Gələcək nəsillərin əcdadlarının həyat hekayəsini bilməsini istəyənlər',
+      'Müasir anım seçimi təklif etmək istəyən qəbiristanlıqlar və bələdiyyələr',
+    ],
+    whatsIncludedTitle: 'Nə Daxildir?',
+    whatsIncludedItems: [
+      'Limitsiz şəkil, video və səs qeydi əlavə edə biləcəyiniz xüsusi anım səhifəsi',
+      'Ünvanınıza göndərilən davamlı QR kodlu lövhə',
+      'İlk 3 il hosting daxildir — sonra aşağı illik ödənişlə yenilənir',
+      'Ziyarətçilərin xatirə və mesaj buraxa biləcəyi bir başsağlığı dəftəri',
+      'Yayımlanan hər şey üzərində tam nəzarət — təsdiqiniz olmadan heç nə yayımlanmır',
+      'İhtiyac olduqda WhatsApp vasitəsilə dəstək',
+    ],
+    privacyTitle: 'Məxfilik və Etibar',
+    privacyBody: 'Yüklədiyiniz şəkil və məlumatlar yalnız anım profilini yaratmaq üçün istifadə olunur, heç vaxt satılmır və ya üçüncü tərəflərlə paylaşılmır. Səhifənin tamamilə hər kəsə açıq, yoxsa yalnız linki olanlara görünən olacağını siz seçirsiniz. Göndərilən hər xatirə və şəkil yayımlanmadan əvvəl sizin təsdiqinizdən keçir. Məmnun qalmasanız, sual soruşmadan 30 gün ərzində pulun geri qaytarılması təminatı təqdim edirik.',
+    faqTitle: 'Tez-tez Verilən Suallar',
+    faqItems: [
+      { q: 'Anım səhifəsi hazırlamaq nə qədər vaxt aparır?', a: 'Sifariş yaratmaq təxminən 2 dəqiqə çəkir. Ödəniş təsdiqləndikdən sonra şəkilləri və həyat hekayəsini panelinizə istənilən vaxt əlavə edə bilərsiniz — son tarix yoxdur.' },
+      { q: 'İllik hosting ödənişini dayandırsam nə olar?', a: 'Qalereya və ətraflı məzmun gizlədilir, lakin səhifə heç vaxt silinmir. Sonradan yenidən aktivləşdirdikdə hər şey geri qayıdır.' },
+      { q: 'Səhifə yayımlandıqdan sonra redaktə edə bilərəmmi?', a: 'Bəli. İstədiyiniz qədər müddətdə, panelinizdən istənilən vaxt şəkil, video və mətn əlavə edib silə bilərsiniz.' },
+      { q: 'QR kodu oxudan hər kəs hər şeyi görürmü?', a: 'Görünürlüyü siz seçirsiniz — tamamilə açıq səhifə və ya yalnız birbaşa linki olanlarla məhdudlaşdırılmış.' },
+      { q: 'Kompüterdən istifadə etməyi bilmək lazımdırmı?', a: 'Xeyr. Panel sadə olacaq şəkildə hazırlanıb, WhatsApp dəstəyimiz hər addımda sizə kömək edə bilər.' },
+    ],
+    ctaTitle: 'Xatirəsini Bu Gün Yaşadın',
+    ctaBody: 'Bir neçə dəqiqədə anım profilini yaradın, yaxınınızın hekayəsinə daimi bir ev verin.',
+    ctaButton: 'Anım Profili Yarat',
+  },
 }
 
 export default az
