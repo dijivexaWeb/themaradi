@@ -101,6 +101,29 @@ export default function AnmaFormClient({
               <div className="grid sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs text-slate-400 mb-1.5 font-medium">
+                    {c.profileForLabel}
+                  </label>
+                  <select name="profile_for" className={inp}>
+                    {Object.entries(c.profileForOptions).map(([value, label]) => (
+                      <option key={value} value={value}>{label}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs text-slate-400 mb-1.5 font-medium">
+                    {c.profileLanguageLabel}
+                  </label>
+                  <select name="profile_language" className={inp}>
+                    {Object.entries(c.profileLanguageOptions).map(([value, label]) => (
+                      <option key={value} value={value}>{label}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs text-slate-400 mb-1.5 font-medium">
                     {f.form.email} <span className="text-amber-400">*</span>
                   </label>
                   <input type="email" name="sender_email" placeholder={f.form.emailPlaceholder} required className={inp} />
@@ -145,25 +168,32 @@ export default function AnmaFormClient({
               <p className="text-xs text-slate-600 leading-5">{f.form.accountNote}</p>
 
               <div className="border border-slate-700/60 bg-slate-800/30 rounded-xl p-4 space-y-4">
-                <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">{f.consents.heading}</p>
+                <p className="text-xs text-slate-400 font-semibold uppercase tracking-wider">{c.consents.heading}</p>
                 <label className="flex items-start gap-3 cursor-pointer">
-                  <input type="checkbox" name="email_consent" required className="mt-0.5 h-4 w-4 shrink-0 rounded accent-amber-500 cursor-pointer" />
+                  <input type="checkbox" name="privacy_notice_ack" required className="mt-0.5 h-4 w-4 shrink-0 rounded accent-amber-500 cursor-pointer" />
                   <div>
-                    <span className="text-sm text-slate-200 leading-5">{f.consents.emailConsent}{' '}<span className="text-amber-400 text-xs">*</span></span>
-                    <p className="text-xs text-slate-500 mt-1 leading-5">{f.consents.emailConsentDesc}</p>
+                    <span className="text-sm text-slate-200 leading-5">{c.consents.privacyNoticeAck}{' '}<span className="text-amber-400 text-xs">*</span></span>
+                    <p className="text-xs text-slate-500 mt-1 leading-5">{c.consents.privacyNoticeAckDesc}</p>
                   </div>
                 </label>
                 <label className="flex items-start gap-3 cursor-pointer">
-                  <input type="checkbox" name="phone_consent" required className="mt-0.5 h-4 w-4 shrink-0 rounded accent-amber-500 cursor-pointer" />
+                  <input type="checkbox" name="data_processing_consent" required className="mt-0.5 h-4 w-4 shrink-0 rounded accent-amber-500 cursor-pointer" />
                   <div>
-                    <span className="text-sm text-slate-200 leading-5">{f.consents.phoneConsent}{' '}<span className="text-amber-400 text-xs">*</span></span>
-                    <p className="text-xs text-slate-500 mt-1 leading-5">{f.consents.phoneConsentDesc}</p>
+                    <span className="text-sm text-slate-200 leading-5">{c.consents.dataProcessingConsent}{' '}<span className="text-amber-400 text-xs">*</span></span>
+                    <p className="text-xs text-slate-500 mt-1 leading-5">{c.consents.dataProcessingConsentDesc}</p>
+                  </div>
+                </label>
+                <label className="flex items-start gap-3 cursor-pointer">
+                  <input type="checkbox" name="marketing_permission" className="mt-0.5 h-4 w-4 shrink-0 rounded accent-amber-500 cursor-pointer" />
+                  <div>
+                    <span className="text-sm text-slate-200 leading-5">{c.consents.marketingConsent}</span>
+                    <p className="text-xs text-slate-500 mt-1 leading-5">{c.consents.marketingConsentDesc}</p>
                   </div>
                 </label>
                 <p className="text-xs text-slate-600 leading-5 pt-1 border-t border-slate-700/50">
-                  {f.consents.kvkkNote}{' '}
+                  {c.consents.kvkkNote}{' '}
                   <Link href="/kvkk" className="text-amber-400/70 hover:text-amber-400 underline underline-offset-2">
-                    {f.consents.kvkkLink}
+                    {c.consents.kvkkLink}
                   </Link>
                 </p>
               </div>

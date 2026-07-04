@@ -107,10 +107,11 @@ export async function quickPurchaseMemorialAction(
 
   const waLink = buildWhatsAppOrderLink({
     senderName: profile?.full_name ?? user.email ?? '',
-    packageLabel: 'Anma Profili',
+    packageType: 'memorial',
     amount,
     currency: '₾',
     vaultName: displayName,
+    locale: 'tr',
   })
 
   return { ok: true, vaultId: vault.id, waLink }

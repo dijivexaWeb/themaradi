@@ -11,6 +11,8 @@ import {
   shippingShippedEmail,
   shippingDeliveredEmail,
   shippingConfirmedEmail,
+  paymentConfirmedEmail,
+  paymentConfirmedEmailSubject,
 } from '@/lib/email/templates'
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://theeternalmemory.com'
@@ -231,7 +233,11 @@ export async function updatePaymentStatus(
   status: string
 ): Promise<ActionResult> {
   const { user, profile } = await requireAdmin()
-  const allowedStatuses = ['pending', 'paid', 'overdue', 'failed', 'refunded', 'cancelled']
+  const allowedStatuses = [
+    'order_created', 'pending', 'payment_verification', 'paid',
+    'info_pending', 'profile_preparing', 'publish_approval', 'published', 'completed',
+    'overdue', 'failed', 'refunded', 'cancelled',
+  ]
   if (!allowedStatuses.includes(status)) return { success: false, error: 'Geçersiz durum' }
 
   const schema = z.string().uuid()
@@ -241,7 +247,7 @@ export async function updatePaymentStatus(
 
   const { data: oldPayment } = await supabase
     .from('payments')
-    .select('status')
+    .select('status, order_code, order_locale, user_id')
     .eq('id', paymentId)
     .single()
 
@@ -265,6 +271,31 @@ export async function updatePaymentStatus(
     oldValue: { status: oldPayment?.status },
     newValue: { status },
   })
+
+  // Ödeme yeni onaylandıysa müşteriye bildirim maili gönder (tekrar tekrar göndermemek için sadece geçiş anında)
+  if (status === 'paid' && oldPayment?.status !== 'paid' && oldPayment?.user_id) {
+    try {
+      const { data: customerProfile } = await supabase
+        .from('profiles')
+        .select('email, full_name')
+        .eq('id', oldPayment.user_id)
+        .maybeSingle()
+
+      if (customerProfile?.email) {
+        await sendEmail({
+          to: customerProfile.email,
+          subject: paymentConfirmedEmailSubject(oldPayment.order_locale),
+          html: paymentConfirmedEmail({
+            recipientName: customerProfile.full_name ?? '',
+            loginUrl: `${SITE_URL}/login`,
+            locale: oldPayment.order_locale,
+          }),
+        })
+      }
+    } catch (e) {
+      console.error('[updatePaymentStatus] payment confirmed email error:', e)
+    }
+  }
 
   revalidatePath('/admin/kasa')
   return { success: true }

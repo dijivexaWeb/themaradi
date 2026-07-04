@@ -1,8 +1,15 @@
+import { Fragment } from 'react'
 import { requireAdmin } from '@/lib/admin/auth'
 import { createServiceClient } from '@/lib/supabase/server'
 import StatusBadge from '../_components/StatusBadge'
 import PaymentStatusForm from './_PaymentStatusForm'
 import ManualPaymentForm from './_ManualPaymentForm'
+import WhatsAppButton from './_WhatsAppButton'
+
+const PROFILE_FOR_LABELS: Record<string, string> = {
+  baba: 'Babası için', anne: 'Annesi için', es: 'Eşi için',
+  kardes: 'Kardeşi için', yakin: 'Yakını için', diger: 'Diğer',
+}
 
 export default async function KasaPage() {
   await requireAdmin()
@@ -18,6 +25,7 @@ export default async function KasaPage() {
 
   const paymentSelect = `
     id, amount, currency, product_type, status, due_date, paid_at, created_at, notes,
+    order_code, order_locale, profile_for, user_id,
     vaults!payments_vault_id_fkey (
       id, display_name, status,
       profiles!vaults_owner_id_fkey (full_name, email)
@@ -38,6 +46,24 @@ export default async function KasaPage() {
     // For manual payment form — vault list with owner info
     supabase.from('vaults').select('id, display_name, owner_id, profiles!vaults_owner_id_fkey(full_name, email)').order('created_at', { ascending: false }).limit(200),
   ])
+
+  // Sipariş kodu satırlarında WhatsApp Aç + KVKK onay detayı için ek toplu sorgular
+  const userIds = [...new Set([...(upcoming ?? []), ...(overdue ?? []), ...(allPayments ?? [])].map((p) => p.user_id).filter(Boolean))]
+
+  const [{ data: profilesData }, { data: consentsData }] = await Promise.all([
+    userIds.length
+      ? supabase.from('profiles').select('id, full_name, email, phone').in('id', userIds)
+      : Promise.resolve({ data: [] as { id: string; full_name: string | null; email: string | null; phone: string | null }[] }),
+    userIds.length
+      ? supabase.from('user_consents').select('user_id, privacy_notice_ack, data_processing_consent, marketing_permission, consent_language, consent_ip, user_agent, accepted_at, created_at').in('user_id', userIds).order('created_at', { ascending: false })
+      : Promise.resolve({ data: [] as ConsentRow[] }),
+  ])
+
+  const phoneMap = new Map((profilesData ?? []).map((p) => [p.id, p.phone]))
+  const consentMap = new Map<string, ConsentRow>()
+  for (const c of consentsData ?? []) {
+    if (!consentMap.has(c.user_id)) consentMap.set(c.user_id, c) // en güncel kayıt (created_at DESC sıralı)
+  }
 
   const mrr = (allPayments ?? []).filter(p => p.status === 'paid').reduce((s, p) => s + Number(p.amount), 0)
   const monthTotal = (paidThisMonth ?? []).reduce((s, p) => s + Number(p.amount), 0)
@@ -86,7 +112,7 @@ export default async function KasaPage() {
       {(upcoming ?? []).length > 0 && (
         <div className="mb-8">
           <h2 className="text-base font-semibold text-yellow-700 mb-3">⚠ Vadesi Gelenler (7 Gün)</h2>
-          <PaymentFullTable payments={upcoming ?? []} />
+          <PaymentFullTable payments={upcoming ?? []} phoneMap={phoneMap} consentMap={consentMap} />
         </div>
       )}
 
@@ -94,17 +120,29 @@ export default async function KasaPage() {
       {(overdue ?? []).length > 0 && (
         <div className="mb-8">
           <h2 className="text-base font-semibold text-red-700 mb-3">🔴 Vadesi Geçmiş</h2>
-          <PaymentFullTable payments={overdue ?? []} />
+          <PaymentFullTable payments={overdue ?? []} phoneMap={phoneMap} consentMap={consentMap} />
         </div>
       )}
 
       {/* All payments */}
       <div>
         <h2 className="text-base font-semibold text-slate-800 mb-3">Tüm Ödemeler (Son 100)</h2>
-        <PaymentFullTable payments={allPayments ?? []} showStatusForm />
+        <PaymentFullTable payments={allPayments ?? []} phoneMap={phoneMap} consentMap={consentMap} showStatusForm />
       </div>
     </div>
   )
+}
+
+type ConsentRow = {
+  user_id: string
+  privacy_notice_ack: boolean
+  data_processing_consent: boolean
+  marketing_permission: boolean
+  consent_language: string | null
+  consent_ip: string | null
+  user_agent: string | null
+  accepted_at: string | null
+  created_at: string
 }
 
 type OwnerProfile = { full_name: string | null; email: string | null }
@@ -119,14 +157,22 @@ type PaymentRow = {
   due_date: string | null
   paid_at: string | null
   notes: string | null
+  order_code: string | null
+  order_locale: string | null
+  profile_for: string | null
+  user_id: string
   vaults: VaultInfo | VaultInfo[]
 }
 
 function PaymentFullTable({
   payments,
+  phoneMap,
+  consentMap,
   showStatusForm = false,
 }: {
   payments: PaymentRow[]
+  phoneMap: Map<string, string | null>
+  consentMap: Map<string, ConsentRow>
   showStatusForm?: boolean
 }) {
   if (payments.length === 0) {
@@ -138,12 +184,14 @@ function PaymentFullTable({
       <table className="w-full text-sm">
         <thead className="bg-slate-50 text-slate-600 text-xs uppercase tracking-wide">
           <tr>
+            <th className="text-left px-4 py-3">Sipariş</th>
             <th className="text-left px-4 py-3">Kullanıcı</th>
             <th className="text-left px-4 py-3">Vault</th>
             <th className="text-left px-4 py-3">Tür</th>
             <th className="text-left px-4 py-3">Tutar</th>
             <th className="text-left px-4 py-3">Durum</th>
             <th className="text-left px-4 py-3">Vade / Ödeme</th>
+            <th className="text-left px-4 py-3">WhatsApp</th>
             {showStatusForm && <th className="text-left px-4 py-3">Güncelle</th>}
           </tr>
         </thead>
@@ -152,9 +200,18 @@ function PaymentFullTable({
             const vault = Array.isArray(p.vaults) ? p.vaults[0] : p.vaults
             const ownerRaw = vault?.profiles
             const owner = Array.isArray(ownerRaw) ? ownerRaw[0] : ownerRaw
+            const phone = phoneMap.get(p.user_id) ?? null
+            const consent = consentMap.get(p.user_id)
 
             return (
-              <tr key={p.id} className="hover:bg-slate-50 transition-colors">
+              <Fragment key={p.id}>
+              <tr className="hover:bg-slate-50 transition-colors">
+                <td className="px-4 py-3">
+                  <p className="font-mono text-xs font-semibold text-amber-700">{p.order_code ?? '—'}</p>
+                  {p.profile_for && (
+                    <p className="text-xs text-slate-400">{PROFILE_FOR_LABELS[p.profile_for] ?? p.profile_for}</p>
+                  )}
+                </td>
                 <td className="px-4 py-3">
                   <p className="font-medium text-slate-800">{owner?.full_name ?? '—'}</p>
                   <p className="text-xs text-slate-400">{owner?.email ?? '—'}</p>
@@ -186,12 +243,34 @@ function PaymentFullTable({
                   ) : '—'}
                   {p.notes && <p className="text-slate-400 mt-0.5 italic truncate max-w-[140px]">{p.notes}</p>}
                 </td>
+                <td className="px-4 py-3">
+                  <WhatsAppButton phone={phone} orderCode={p.order_code} locale={p.order_locale} />
+                </td>
                 {showStatusForm && (
                   <td className="px-4 py-3">
                     <PaymentStatusForm paymentId={p.id} currentStatus={p.status} />
                   </td>
                 )}
               </tr>
+              {consent && (
+                <tr key={`${p.id}-consent`} className="bg-slate-50/60">
+                  <td colSpan={showStatusForm ? 8 : 7} className="px-4 py-2">
+                    <details className="text-xs text-slate-500">
+                      <summary className="cursor-pointer select-none text-slate-400 hover:text-slate-600">KVKK onay kaydı</summary>
+                      <div className="mt-2 grid grid-cols-2 sm:grid-cols-4 gap-x-4 gap-y-1 pb-1">
+                        <span>Aydınlatma okundu: <strong className={consent.privacy_notice_ack ? 'text-emerald-600' : 'text-red-600'}>{consent.privacy_notice_ack ? 'Evet' : 'Hayır'}</strong></span>
+                        <span>Rıza: <strong className={consent.data_processing_consent ? 'text-emerald-600' : 'text-red-600'}>{consent.data_processing_consent ? 'Evet' : 'Hayır'}</strong></span>
+                        <span>Pazarlama izni: <strong>{consent.marketing_permission ? 'Evet' : 'Hayır'}</strong></span>
+                        <span>Dil: <strong>{consent.consent_language ?? '—'}</strong></span>
+                        <span>IP: <strong>{consent.consent_ip ?? '—'}</strong></span>
+                        <span>Tarih: <strong>{consent.accepted_at ? new Date(consent.accepted_at).toLocaleString('tr-TR') : '—'}</strong></span>
+                        <span className="col-span-2 truncate">User-Agent: <strong>{consent.user_agent ?? '—'}</strong></span>
+                      </div>
+                    </details>
+                  </td>
+                </tr>
+              )}
+              </Fragment>
             )
           })}
         </tbody>

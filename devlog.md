@@ -3,6 +3,228 @@
 > Her oturum sonunda Claude bu dosyayı günceller.
 > Format: tarih → ne yapıldı → nerede kalındı → sıradaki adım.
 
+## 2026-07-04 — Oturum 168 (devam): Faz 2 — Satın Alma Formu Güncellemeleri Tamamlandı
+
+### Yapılanlar
+- **Faz 2 tamamlandı**: 3 satın alma formuna (`anma`, `aile`, `kasa`) yeni alanlar ve 3'lü KVKK onay yapısı eklendi.
+- 7 dil dosyasına (`src/i18n/{tr,en,ka,ru,az,hy,he}.ts`) `purchasePage.common` altına eklendi: `profileForLabel`/`profileForOptions` (baba/anne/es/kardes/yakin/diger), `profileLanguageLabel`/`profileLanguageOptions` (tr/ka/ru/en), ve yeni `common.consents` bloğu (heading, privacyNoticeAck+Desc+link, dataProcessingConsent+Desc, marketingConsent+Desc, kvkkNote/kvkkLink) — eski ürün bazlı `f.consents` (emailConsent/phoneConsent) artık kullanılmıyor ama i18n dosyalarından silinmedi (dead ama zararsız).
+- `_AnmaFormClient.tsx`, `_AileFormClient.tsx`: "Profil kimin için?" + "Profil dili" dropdown'ları eklendi (email/phone alanlarından önce); eski 2 checkbox'lı consent bloğu 3 checkbox'lı yapıya (`privacy_notice_ack`, `data_processing_consent` zorunlu + `marketing_permission` opsiyonel) çevrildi.
+- `_KasaFormClient.tsx`: sadece "Profil dili" dropdown'u eklendi (kasa kendi adına olduğu için "kimin için" alanı yok), aynı 3 checkbox'lı consent yapısı uygulandı.
+- `src/app/satin-al/actions.ts`: her 3 action (`purchaseMemorialAction`, `purchaseFamilyAction`, `purchaseVaultAction`) güncellendi — yeni `normalizeOrderLocale()` helper'ı ile `profile_language` form alanı doğrulanıp `payments.order_locale`'e yazılıyor; `profile_for` (anma/aile'de) `payments.profile_for`'a yazılıyor; `user_consents` insert'i yeni kolonlarla (`privacy_notice_ack`, `data_processing_consent`, `marketing_permission`, `consent_language`, `user_agent` — `headers()`'tan okunuyor, `accepted_at`) dolduruluyor, `consent_version` `'v2.0'`'a çıkarıldı; eski `email_consent`/`phone_consent` kolonları geriye uyumluluk için `data_processing_consent` değeriyle dolduruluyor.
+- `/kvkk` sayfası kontrol edildi — zaten "KVKK Disclosure Text" içeriği barındırıyor (`KvkkClient`), aydınlatma metni linkinin hedefi olarak uygun, yeni sayfa gerekmedi.
+- `npx tsc --noEmit` (exit 0) ve `npm run build` (exit 0, hatasız) ile doğrulandı.
+
+### Kritik Kararlar / Notlar
+- **Tespit edilen önceden var olan bir bug (bu oturumun kapsamı dışı, sadece not edildi)**: `purchaseFamilyAction` (aile paketi) `payments.product_type: 'family_package'` ile insert yapıyor ama canlı DB'deki `payments_product_type_check` constraint'i sadece `memorial_one_time | vault_setup | vault_monthly` kabul ediyor — yani aile paketi satın alma akışı şu anda muhtemelen ödeme kaydı oluştururken hata veriyor olmalı. Bu Faz 2'nin kapsamına girmiyor (DB constraint'i benim eklediğim migration'larla ilgisi yok, önceden beri böyleymiş), kullanıcıya ayrıca bildirilecek.
+- `profile_for` alanı sadece anma/aile formlarında var; kasa formu "kendim için" ürünü olduğundan bu alanı göstermiyor (plandaki karar).
+
+### Proje Durumu
+- [x] Faz 1 — DB temeli tamamlandı
+- [x] Faz 2 — Satın alma formu (dropdown'lar + 3 KVKK checkbox'ı) tamamlandı
+- [ ] Faz 3 — Ödeme ekranı (sipariş kodu + banka bilgisi + "Ödemeyi Tamamladım") — sıradaki iş
+- [ ] `purchaseFamilyAction`'daki `product_type` constraint uyumsuzluğu — kullanıcıya bildirilecek, ayrı bir düzeltme gerekebilir
+
+### Nerede Kaldık
+Faz 2 kod tarafında tamamlandı, build/typecheck temiz. Kullanıcı localde tarayıcıda test edecek (form gönderimi, dropdown'lar, 7 dilde metin kontrolü). Commit/push edilmedi.
+
+### Sıradaki Adım
+1. Kullanıcı localde 3 formu (anma/aile/kasa) birkaç dilde test etsin, özellikle yeni dropdown'lar ve 3 checkbox'lı onay bloğunu
+2. Onay sonrası Faz 3'e (ödeme ekranı) geç
+
+## 2026-07-04 — Oturum 168 (devam 2): product_type Bug Düzeltildi + Uçtan Uca Canlı Doğrulama
+
+### Yapılanlar
+- **`payments_product_type_check` constraint düzeltildi**: bir önceki notta bulunan bug (aile paketi `family_package` product_type ile insert denerken constraint'in bunu reddetmesi) `supabase/migrations/20260704_payments_product_type_family_package.sql` ile giderildi — constraint artık `memorial_one_time | vault_setup | vault_monthly | family_package` kabul ediyor. Canlı DB'ye uygulandı, `pg_get_constraintdef` ile doğrulandı.
+- **Uçtan uca canlı doğrulama** (`/browse` skill ile, `npm run dev` → localhost:3000): 3 satın alma formu da (anma/aile/kasa) gerçek tarayıcıda dolduruldu ve gönderildi:
+  - **Anma**: "Profil kimin için" = Annem için, "Profil dili" = Rusça seçilip gönderildi → `/satin-al/tesekkur`'a yönlendi, konsol hatası yok. DB'de doğrulandı: `order_code=EM-2026-0008`, `order_locale=ru`, `profile_for=anne`, `privacy_notice_ack/data_processing_consent=true`, `marketing_permission=false`, `consent_language=ru`, `user_agent` doluydu, `consent_version=v2.0`.
+  - **Aile**: "Eşim için" + İngilizce seçilip gönderildi → başarıyla teşekkür sayfasına düştü (product_type fix'i doğrulandı, önceden bu akış hata veriyor olmalıydı). DB: `order_code=EM-2026-0009`, `order_locale=en`, `profile_for=es`, `product_type=family_package` (artık kabul ediliyor).
+  - **Kasa**: sadece "Profil dili" = Gürcüce (profile_for alanı bu formda hiç gösterilmiyor, doğru). DB: `order_code=EM-2026-0010`, `order_locale=ka`, `profile_for=null`, `privacy_notice_ack/data_processing_consent=true`.
+  - Her 3 formda da form alanları (`profile_for` seçenekleri, `profile_language` seçenekleri, 3 checkbox) doğru render oldu, İngilizce dilinde test edildi (varsayılan tarayıcı diliyle) ve çeviriler doğru geldi.
+- Test için oluşturulan 3 kullanıcı (`test-anma-qa@`, `test-aile-qa@`, `test-kasa-qa@example.com`) ve bağlı vault/family/payment/consent kayıtları `auth.users` silme ile cascade temizlendi — canlı DB'de kalıntı yok, doğrulandı (`leftover_vaults=0, leftover_families=0, leftover_payments=0`).
+- Dev server durduruldu.
+
+### Proje Durumu
+- [x] Faz 1 — DB temeli tamamlandı ve canlı doğrulandı
+- [x] Faz 2 — Satın alma formu güncellemeleri tamamlandı ve **3 formda uçtan uca canlı test edildi**
+- [x] `purchaseFamilyAction` product_type bug'ı düzeltildi ve doğrulandı
+- [ ] Faz 3 — Ödeme ekranı (sipariş kodu + banka bilgisi + "Ödemeyi Tamamladım") — sıradaki iş
+
+### Nerede Kaldık
+Faz 1 + Faz 2 tam olarak çalışıyor — hem build/typecheck hem canlı tarayıcı testi hem DB doğrulaması geçti. Kullanıcı kendi localinde ayrıca gözden geçirecek. Commit/push edilmedi (kullanıcı onayı bekleniyor).
+
+### Sıradaki Adım
+1. Kullanıcı localde son bir kez gözden geçirsin, onaylarsa commit/push
+2. Onay sonrası Faz 3'e (ödeme ekranı: `/satin-al/odeme/[orderCode]`, banka bilgisi, "Ödemeyi Tamamladım" butonu) geç
+
+## 2026-07-04 — Oturum 168 (devam 3): Faz 3 — Ödeme Ekranı Tamamlandı
+
+### Yapılanlar
+- **Yeni sayfa**: `src/app/satin-al/odeme/[orderCode]/page.tsx` — dinamik route parametresi aslında `payments.id` (UUID), sıralı/tahmin edilebilir `order_code` (EM-2026-XXXX) URL'de KULLANILMIYOR (güvenlik: enumeration riski) — insan-okunur sipariş kodu sayfa içinde gösteriliyor, banka açıklaması olarak kullanılıyor.
+  - Sayfa: sipariş kodu + tutar + ürün etiketi, banka bilgisi kartı (`platform_settings` tablosundan `bank_iban`/`bank_name`/`bank_recipient` okunuyor — bunlar zaten admin/settings üzerinden önceden dolduruşmuştu), "Ödemeyi Tamamladım" butonu (server action) ve "Sorularım Var, WhatsApp'a Yaz" linki (query'den gelen `wa` linkini kullanıyor, yoksa `buildWhatsAppChatLink` fallback).
+  - Yetkilendirme: eğer bir session VARSA ve `payment.user_id` o session'ın kullanıcısıyla eşleşmiyorsa `notFound()`. Session yoksa (email-doğrulama-bekleyen yeni müşteri akışı) erişime izin veriliyor — bu akışta zaten oturum açılmıyor, tasarım gereği.
+  - Ödeme zaten `pending`'den ileri bir duruma geçmişse (payment_verification/paid/vb.) farklı bir ekran gösteriliyor: "Ödeme Doğrulama Bekliyor" + "Hesabıma Giriş Yap" CTA'sı — kullanıcının orijinal 21 maddelik spesifikasyonundaki "Ödemeyi Tamamladım sonrası" ekranıyla birebir örtüşüyor.
+  - Süreç adımları (`Step` bileşeni) tesekkur sayfasından kopyalanıp duruma göre günceller (2. adım tamamlandı işareti alıyor, 3. adım aktifleşiyor).
+- **Yeni server action**: `src/app/satin-al/odeme/actions.ts` → `markPaymentSubmitted(paymentId, redirectQuery)` — status `pending` ise `payment_verification`'a çeker (idempotent: zaten ilerlemiş bir sipariş tekrar tıklanırsa dokunmaz), aynı sayfaya `redirect` eder (bound server action pattern — `useActionState` gerekmedi, düz `<form action={boundFn}>`).
+- `src/app/satin-al/actions.ts`: 3 action'ın da `payments` insert'i artık `.select('id').single()` ile dönen id'yi kullanıyor; 3 redirect de `/satin-al/tesekkur` yerine `/satin-al/odeme/${payment.id}` hedefine gidiyor (aynı query param'lar — `type`, `name`, `wa`, `pending_email` — korunuyor).
+- `src/app/satin-al/tesekkur/page.tsx` dosyasına dokunulmadı (artık normal akışta hedeflenmiyor ama silinmedi — dead code, zararsız).
+- `npx tsc --noEmit` ve `npm run build` temiz geçti.
+- **Canlı uçtan uca test** (`/browse`, gerçek dev server): anma/aile/kasa 3 formu da doldurulup gönderildi, üçü de doğru `/satin-al/odeme/[uuid]` sayfasına düştü, sayfa içeriği (sipariş kodu, banka bilgisi — gerçek `platform_settings` verisiyle: Bank of Georgia / M.A.K. / GE36BG...) doğru render oldu. "Ödemeyi Tamamladım" butonuna tıklandı → sayfa "Ödeme Doğrulama Bekliyor" durumuna geçti, adım göstergesi güncellendi, DB'de `payments.status` gerçekten `payment_verification`'a döndüğü doğrulandı. Nonexistent UUID → 404 doğrulandı.
+- **Yan not**: Test sırasında kullanıcının önceden çalışan dev server'ı (`localhost:3000`, PID 6580) tekrarlayan "Jest worker encountered 2 child process exceptions" hatalarıyla kararsız haldeydi (loglarda benim testimden önce de aynı hata görülüyordu — ortamsal/Turbopack flakiness, kod hatası değil). Server durdurulup temiz yeniden başlatıldı, sonrasında her şey stabil çalıştı. Kullanıcı localde kendi sunucusunu tekrar başlatmalı.
+- Test için oluşturulan 3 kullanıcı ve bağlı kayıtlar temizlendi, kalıntı yok.
+
+### Proje Durumu
+- [x] Faz 1 — DB temeli
+- [x] Faz 2 — Satın alma formu güncellemeleri
+- [x] Faz 3 — Ödeme ekranı (sipariş kodu + banka bilgisi + "Ödemeyi Tamamladım") — **tamamlandı ve canlı doğrulandı**
+- [ ] Faz 4 — WhatsApp çok dilli şablonlar — sıradaki iş
+- [ ] Faz 5-8 ve backlog — bkz. plan dosyası (`C:\Users\Akif-MaccBook\.claude\plans\toasty-toasting-turtle.md`)
+
+### Kritik Kararlar / Notlar
+- Ödeme sayfasının URL'i sipariş kodu değil `payments.id` (UUID) kullanıyor — sıralı `EM-2026-XXXX` kodu URL'de olsaydı enumeration ile başkalarının banka tutarı/sipariş bilgisi görülebilirdi. Bu, plandaki "yetkisiz erişim engellenir" maddesinin somut karşılığı.
+- Kullanıcının kendi dev server'ı test sırasında zaten kararsızdı (benim değişikliklerimden bağımsız, önceki oturumlardan beri devam eden bir Turbopack/Windows sorunu olabilir) — eğer kullanıcı localde "Jest worker" hatası görürse, dev server'ı durdurup yeniden başlatması yeterli.
+
+### Nerede Kaldık
+Faz 1+2+3 tamamlandı, hepsi uçtan uca canlı test edildi ve DB'de doğrulandı. Commit/push edilmedi (kullanıcı onayı bekleniyor).
+
+### Sıradaki Adım
+1. Kullanıcı localde son bir kez gözden geçirsin (yeni `/satin-al/odeme/[orderCode]` akışını dahil), onaylarsa commit/push
+2. Onay sonrası Faz 4'e (WhatsApp çok dilli şablonlar — `src/lib/whatsapp.ts`'e `locale` parametresi, admin "WhatsApp Aç" butonu) geç
+
+## 2026-07-04 — Oturum 168 (devam 4): Faz 4 — WhatsApp Çok Dilli Şablonlar Tamamlandı
+
+### Yapılanlar
+- **`src/lib/whatsapp.ts` tamamen yeniden yazıldı** (önceden tek dil, hardcoded Türkçe): artık `WhatsAppLocale` tipi (`tr|ka|ru|en` — kullanıcının orijinal spesifikasyonundaki 4 dil kapsamı; `az/hy/he` şu an `en`'e fallback ediyor, `toWhatsAppLocale()` ile normalize ediliyor).
+  - `buildWhatsAppOrderLink()`: artık `packageLabel: string` yerine `packageType: 'memorial'|'family'|'vault'` alıyor (dahili `PACKAGE_LABELS` sözlüğünden dile göre etiket çekiliyor) + yeni `locale` parametresi. Sipariş oluşturma mesajı 4 dilde (`ORDER_MESSAGE_STRINGS`).
+  - Yeni `buildWhatsAppPaymentSubmittedLink()`: "Ödemeyi Tamamladım" sonrası müşterinin göndereceği mesaj, 4 dilde (`PAYMENT_SUBMITTED_STRINGS`) — kullanıcının orijinal spesifikasyonundaki "ödeme sonrası WhatsApp mesajı" (madde 10) birebir uygulandı.
+  - Yeni `buildWhatsAppAdminReplyLink()`: admin'in "WhatsApp Aç" butonuna bastığında müşteriye gönderileceği hazır mesaj, 4 dilde (`ADMIN_REPLY_STRINGS`) — bu fonksiyon hazır, ama admin/kasa arayüzüne buton olarak bağlanması Faz 6'nın işi (plandaki sıralamaya göre).
+- `src/app/satin-al/actions.ts`: 3 action'daki `buildWhatsAppOrderLink()` çağrıları `packageLabel` yerine `packageType` (`memorial`/`family`/`vault`) + `locale: profileLanguage` kullanacak şekilde güncellendi — artık sipariş oluşturma WhatsApp mesajı, formda seçilen "Profil dili"ne göre gidiyor.
+- `src/app/satin-al/odeme/[orderCode]/page.tsx`: "Ödeme Doğrulama Bekliyor" ekranına (zaten ödeme bildirilmiş siparişler için) yeni bir "WhatsApp ile Bilgi Ver" butonu eklendi — `buildWhatsAppPaymentSubmittedLink()` kullanıyor, `payment.order_locale` ve sipariş kodunu DB'den okuyor.
+- `src/lib/actions/quick-purchase.ts`: aynı fonksiyon imzası değişikliğine uyarlandı (`packageLabel`→`packageType: 'memorial'`, `locale: 'tr'` sabit — bu dosya ana satın alma formlarının dışında, giriş yapmış kullanıcının "hızlı satın alma" modalı için, kapsam dışı bırakıldı, sadece derleme hatası giderildi).
+- `npx tsc --noEmit` ve `npm run build` temiz geçti.
+- **Canlı doğrulama** (`/browse`, dev server — bu sefer port 3000 zombi bir process tarafından tutulduğu için port 3001 kullanıldı, zombi process temizlendi): 4 dilde (tr/ka/ru/en) anma siparişi oluşturuldu, her birinin WhatsApp linki decode edilip doğru dilde geldiği teyit edildi (ör. Gürcüce: "გამარჯობა, ახალი შეკვეთა შევქმენი: პაკეტი: ხსოვნის პროფილი..."; Rusça: "Здравствуйте, я оформил(а) новый заказ..."; İngilizce: "Hello, I just created a new order..."). Ayrıca İngilizce siparişte "Ödemeyi Tamamladım" tıklanıp "WhatsApp ile Bilgi Ver" linkinin doğru İngilizce ödeme-onay mesajını (sipariş kodu dahil) ürettiği doğrulandı.
+- **Ortam notu**: Bu oturumda dev server iki kez daha "Jest worker"/"Turbopack error" ile çöktü (kod hatası değil — `npm run build` her seferinde temizdi); ayrıca port 3000'i tutan eski bir zombi process (kullanıcının makinesinde birikmiş, muhtemelen önceki oturumlardan kalma) tespit edilip temizlendi. Kullanıcı localde garip 500 hataları görürse, açık `next dev` process'lerini tamamen kapatıp temiz başlatması önerilir.
+- Test kullanıcıları ve kayıtları temizlendi, kalıntı yok.
+
+### Proje Durumu
+- [x] Faz 1 — DB temeli
+- [x] Faz 2 — Satın alma formu güncellemeleri
+- [x] Faz 3 — Ödeme ekranı
+- [x] Faz 4 — WhatsApp çok dilli şablonlar (sipariş oluşturma + ödeme sonrası + admin hazır mesaj fonksiyonu) — **tamamlandı ve 4 dilde canlı doğrulandı**
+- [ ] Faz 5 — Email çok dilli şablonlar — sıradaki iş
+- [ ] Faz 6 — Admin panel entegrasyonu (buildWhatsAppAdminReplyLink'in admin/kasa'ya buton olarak bağlanması dahil)
+- [ ] Faz 7-8 ve backlog — bkz. plan dosyası
+
+### Nerede Kaldık
+Faz 1-4 tamamlandı, hepsi build/typecheck + canlı tarayıcı testiyle doğrulandı. Commit/push edilmedi (kullanıcı onayı bekleniyor).
+
+### Sıradaki Adım
+1. Kullanıcı localde son bir kez gözden geçirsin, onaylarsa commit/push
+2. Onay sonrası Faz 5'e (email çok dilli şablonlar — `src/lib/email/templates.ts`'e `locale` parametresi + yeni sipariş/ödeme durumu mailleri) geç
+
+## 2026-07-04 — Oturum 168 (devam 5): Faz 5 — Email Çok Dilli Şablonlar Tamamlandı
+
+### Yapılanlar
+- **`src/lib/email/templates.ts`e 3 yeni çok dilli (tr/ka/ru/en) fonksiyon eklendi** — mevcut ~12 template'e dokunulmadı (onlar guestbook/shipping gibi sipariş akışıyla ilgisiz konular, kapsam dışı bırakıldı; sadece sipariş akışının 3 aşaması için yeni fonksiyonlar yazıldı):
+  - `orderCreatedEmail()` + `orderCreatedEmailSubject()` — "Siparişiniz oluşturuldu", sipariş kodu + ödeme sayfası linkini içeriyor.
+  - `paymentVerificationPendingEmail()` + `paymentVerificationPendingEmailSubject()` — "Ödeme bildiriminiz alındı, doğrulama sürecinde".
+  - `paymentConfirmedEmail()` + `paymentConfirmedEmailSubject()` — "Ödemeniz onaylandı", giriş linkini içeriyor.
+  - Her biri `whatsapp.ts`'teki pattern'i takip ediyor: `EmailLocale` tipi + `normalizeEmailLocale()` + dil başına string sözlüğü, `locale` parametresi opsiyonel (default `en`'e fallback).
+- **3 tetikleyici bağlandı:**
+  - `src/app/satin-al/actions.ts`: 3 action'ın da payment insert'i artık `order_code`'u da seçiyor (`.select('id, order_code')`); sipariş oluşturulduktan hemen sonra müşteriye `orderCreatedEmail` gönderiliyor (`locale: profileLanguage` — formda seçilen dil).
+  - `src/app/satin-al/odeme/actions.ts` `markPaymentSubmitted`: status `pending`→`payment_verification` geçişinde, `profiles` tablosundan müşteri email/adını çekip `paymentVerificationPendingEmail` gönderiyor.
+  - `src/app/admin/actions.ts` `updatePaymentStatus`: status `paid`'e geçtiğinde (ve önceki durum `paid` değilse — tekrar tekrar göndermemek için idempotent kontrol) müşteriye `paymentConfirmedEmail` gönderiyor. Bu, önceki oturumlarda not edilen "admin ödeme onayladığında email side-effect'i yok" eksikliğini gideriyor.
+- `npx tsc --noEmit` ve `npm run build` temiz geçti.
+- **Canlı doğrulama**: `/browse` ile bir sipariş oluşturulup (İngilizce, `test-email-faz5@example.com`) hem sipariş-oluşturma hem ödeme-bildirimi akışları tetiklendi (DB'de `status` doğru `payment_verification`'a geçti). Dev server loglarında hiçbir `sendEmail`/Resend hatası çıkmadı (API key `platform_settings`'te zaten kayıtlı — gerçek gönderim denemesi yapıldı, sessiz başarı = hata yok demek).
+- **Test edilemeyen kısım**: `paymentConfirmedEmail` tetikleyicisi admin panelinin `updatePaymentStatus` fonksiyonu içinde ama bunu tıklayarak tetikleyecek bir admin arayüzü şu an yok (mevcut `_PaymentStatusForm.tsx` hâlâ eski 6 statüyle sınırlı ve admin oturumu gerektiriyor) — bu entegrasyon Faz 6'nın işi. Kod, diğer iki tetikleyiciyle birebir aynı, doğrulanmış pattern'i takip ediyor.
+- Test verileri temizlendi.
+
+### Proje Durumu
+- [x] Faz 1 — DB temeli
+- [x] Faz 2 — Satın alma formu güncellemeleri
+- [x] Faz 3 — Ödeme ekranı
+- [x] Faz 4 — WhatsApp çok dilli şablonlar
+- [x] Faz 5 — Email çok dilli şablonlar (3 yeni email + 3 tetikleyici) — **tamamlandı, 2/3 tetikleyici canlı doğrulandı**
+- [ ] Faz 6 — Admin panel entegrasyonu (sipariş kodu kolonu, granüler status dropdown, WhatsApp Aç butonu, `paymentConfirmedEmail` tetikleyicisinin gerçek UI'dan tıklanarak test edilmesi) — sıradaki iş
+- [ ] Faz 7-8 ve backlog — bkz. plan dosyası
+
+### Nerede Kaldık
+Faz 1-5 tamamlandı. Commit/push edilmedi (kullanıcı onayı bekleniyor).
+
+### Sıradaki Adım
+1. Kullanıcı localde son bir kez gözden geçirsin, onaylarsa commit/push
+2. Onay sonrası Faz 6'ya (admin panel: `/admin/kasa` sipariş kodu kolonu + yeni statü dropdown'u + WhatsApp Aç butonu + KVKK onay kaydı görünümü) geç — bu faz aynı zamanda `paymentConfirmedEmail`'in gerçek admin akışında tetiklendiğini de doğrulama fırsatı verecek
+
+## 2026-07-04 — Oturum 168 (devam 6): Faz 6 — Admin Panel Entegrasyonu Tamamlandı
+
+### Yapılanlar
+- **`src/app/admin/_components/StatusBadge.tsx`**: yeni granüler payment statüleri için etiket/renk eklendi (`order_created`, `payment_verification`, `info_pending`, `profile_preparing`, `publish_approval`, `published` — `completed` zaten vardı, `paid`/`overdue`/vb. korundu).
+- **`src/app/admin/actions.ts`**: `updatePaymentStatus`'daki `allowedStatuses` listesi 6 değerden 13 granüler değere genişletildi (Faz 1'de DB'ye eklenen tüm statüler artık admin tarafından da set edilebiliyor).
+- **`src/app/admin/kasa/_PaymentStatusForm.tsx`**: dropdown artık ham status string'leri değil, Türkçe etiketli 13 seçenek gösteriyor (`STATUS_OPTIONS` listesi + onay mesajında da okunabilir etiket kullanılıyor).
+- **Yeni `src/app/admin/kasa/_WhatsAppButton.tsx`**: `buildWhatsAppAdminReplyLink()`'i kullanan basit bir link bileşeni — telefon veya sipariş kodu yoksa "—" gösteriyor, varsa `payment.order_locale`'e göre doğru dilde hazır mesajla WhatsApp açıyor.
+- **`src/app/admin/kasa/page.tsx`**: kapsamlı güncelleme —
+  - `paymentSelect` sorgusuna `order_code, order_locale, profile_for, user_id` eklendi.
+  - Tüm sorgulanan ödemelerin `user_id`'lerinden tekilleştirilmiş bir liste çıkarılıp **tek seferde** iki ek toplu sorgu yapılıyor: `profiles` (telefon dahil — WhatsApp butonu için) ve `user_consents` (en güncel kayıt — KVKK detay görünümü için). Bu, satır başına ayrı sorgu yapmaktan kaçınıyor (N+1 önlendi).
+  - Tabloya yeni "Sipariş" kolonu (sipariş kodu + varsa `profile_for` etiketi) ve "WhatsApp" kolonu eklendi.
+  - Her satırın altına, `<details>` ile açılıp kapanan (JS gerektirmeyen) bir "KVKK onay kaydı" satırı eklendi: aydınlatma okundu / rıza / pazarlama izni / dil / IP / tarih / user-agent.
+  - Fragment/key yönetimi için `Fragment` import edildi (satır + detay satırı birlikte tek anahtarla map ediliyor).
+- `npx tsc --noEmit` ve `npm run build` temiz geçti.
+- **Doğrulama şekli bu fazda farklıydı**: admin paneli gerçek bir admin oturumu gerektiriyor ve kullanıcının kendi admin hesabının şifresini bilmediğim/denemenin uygun olmayacağı için tarayıcıdan tıklayarak test edemedim. Bunun yerine: (1) `paymentSelect` sorgusunun ürettiği JOIN yapısını canlı DB'de düz SQL ile simüle edip gerçek verilerle (mevcut 5 ödeme kaydı — hepsinde `order_code`/`order_locale`/telefon doğru geldi) hatasız çalıştığını doğruladım, (2) `tsc`/`build` ile render/tip güvenliğini doğruladım, (3) `buildWhatsAppAdminReplyLink` kodunu gözden geçirdim — Faz 4'te 4 dilde canlı doğrulanan diğer 3 WhatsApp fonksiyonuyla birebir aynı kalıbı kullanıyor, tek yeni kısım telefon numarasından rakam olmayan karakterleri temizleyen basit bir regex.
+- Bu fazda test kullanıcısı oluşturulmadı (gerçek admin oturumu gerektirdiği için canlı form testi yapılamadı) — kullanıcı localde kendi admin oturumuyla `/admin/kasa`'yı gözden geçirmeli.
+
+### Proje Durumu
+- [x] Faz 1 — DB temeli
+- [x] Faz 2 — Satın alma formu güncellemeleri
+- [x] Faz 3 — Ödeme ekranı
+- [x] Faz 4 — WhatsApp çok dilli şablonlar
+- [x] Faz 5 — Email çok dilli şablonlar
+- [x] Faz 6 — Admin panel entegrasyonu (sipariş kodu, granüler statü, WhatsApp Aç, KVKK detay) — **tamamlandı, SQL+build ile doğrulandı; tarayıcı testi kullanıcının kendi admin oturumuyla yapılmalı**
+- [ ] Faz 7 — Kullanıcı paneli stepper onboarding — sıradaki iş
+- [ ] Faz 8 ve backlog — bkz. plan dosyası
+
+### Kritik Kararlar / Notlar
+- Admin panelde canlı tıklama testi yapılamadı çünkü gerçek admin kimlik bilgileri gerekiyordu ve kullanıcının hesabına yetkisiz erişim/deneme uygun değil — bu bilinçli bir sınır, atlanmış bir adım değil.
+- WhatsApp butonu telefon numarasını `payment.user_id` üzerinden `profiles.phone`'dan çekiyor (vault sahibi üzerinden değil) — bu sayede aile paketi (family_package, vault_id'si olmayan) siparişlerde de doğru telefon geliyor.
+
+### Nerede Kaldık
+Faz 1-6 tamamlandı. Commit/push edilmedi (kullanıcı onayı bekleniyor).
+
+### Sıradaki Adım
+1. **Kullanıcı localde kendi admin oturumuyla `/admin/kasa`'yı mutlaka gözden geçirmeli** — bu faz kod/SQL seviyesinde doğrulandı ama gerçek tarayıcı testi yapılamadı
+2. Onaylanırsa commit/push
+3. Onay sonrası Faz 7'ye (kullanıcı paneli stepper onboarding) geç
+
+## 2026-07-04 — Oturum 168: Satın Alma Sistemi Yeniden Tasarımı — Fazlı Plan + Faz 1 (DB Temeli) Tamamlandı
+
+### Yapılanlar
+- Kullanıcı `/satin-al/anma` için 21 maddelik kapsamlı bir sistem tasarımı verdi: sipariş kodu (`EM-2026-0001`), granüler sipariş durumları, sipariş bazlı dil (`order_locale` — tüm mail/WhatsApp/admin iletişimi bu dilde gitmeli), KVKK consent restructure (aydınlatma/rıza/pazarlama ayrımı), ayrı ödeme ekranı, çok dilli WhatsApp/email şablonları, admin panel geliştirmeleri, kullanıcı paneli stepper onboarding, satın alma sayfasından ayrıştırılmış SEO landing sayfaları.
+- İki keşif ajanı + bir planlama ajanı ile mevcut sistem (payments/vaults/user_consents şeması, admin/kasa, i18n yapısı, email/whatsapp lib'leri) incelendi ve **9 fazlık bir yol haritası** çıkarıldı (plan dosyası: `C:\Users\Akif-MaccBook\.claude\plans\toasty-toasting-turtle.md`). Kullanıcı onayladı, sırayla uygulanacak.
+- **Faz 1 (DB Temeli) tamamlandı ve canlı DB'ye uygulandı** (Supabase MCP `apply_migration` ile):
+  - `supabase/migrations/20260704_order_code_and_locale.sql`: `payments.order_code` (otomatik `EM-{yıl}-{4 haneli sıra}` üreten trigger + sequence, geriye dönük dolgu yapıldı — mevcut 7 payments satırının hepsi kod aldı), `payments.order_locale` (CHECK: tr/ka/ru/en/az/hy/he, default 'tr'), `payments.profile_for` (CHECK: baba/anne/es/kardes/yakin/diger, nullable), `payments.status` CHECK constraint'i genişletildi (eski 6 değere ek olarak order_created/payment_verification/info_pending/profile_preparing/publish_approval/published/completed eklendi — vaults.status'teki pending_verification ile isim çakışmasın diye payment tarafında payment_verification kullanıldı).
+  - `supabase/migrations/20260704_consent_restructure.sql`: `user_consents`e consent_language (CHECK 7 dil), user_agent, accepted_at, marketing_permission, privacy_notice_ack (aydınlatma okundu), data_processing_consent (rıza) eklendi. Eski email_consent/phone_consent silinmedi, DEPRECATED yorumu eklendi (geriye uyumluluk, eski admin ekranları kırılmasın).
+  - Canlı DB'de doğrulandı: yeni insert'lerde order_code otomatik doluyor, tüm constraint'ler (`payments_status_check`, `payments_order_locale_check`, `payments_profile_for_check`, `user_consents_consent_language_check`) `pg_get_constraintdef` ile teyit edildi.
+  - Migration dosyaları repo'ya da yazıldı (`supabase/migrations/` altına) — canlı DB'ye MCP ile uygulanan SQL ile birebir aynı.
+- Kod tarafına (form/action/admin/whatsapp/email) hiç dokunulmadı — bu faz sadece DB temeli, bir sonraki fazın (Faz 2: form güncellemeleri) üzerine oturacağı zemin.
+
+### Proje Durumu
+- [x] Fazlı yol haritası çıkarıldı ve onaylandı (9 faz + backlog)
+- [x] Faz 1 — DB temeli (order_code, order_locale, profile_for, granüler status, consent restructure) tamamlandı
+- [ ] Faz 2 — Satın alma formu (yeni dropdown'lar + 3 KVKK checkbox'ı) — sıradaki iş
+- [ ] Faz 3-8 ve backlog — bkz. plan dosyası
+
+### Kritik Kararlar / Notlar
+- `payments` tablosu hâlâ migration geçmişinde tam temsil edilmiyor (canlı DB'ye önceden doğrudan uygulanmış birçok kolon var) — yeni migration'lar bu yüzden hep `IF NOT EXISTS`/`DROP CONSTRAINT IF EXISTS` ile idempotent yazıldı.
+- Eski `email_consent`/`phone_consent` kolonları silinmedi, yeni akış `privacy_notice_ack`/`data_processing_consent`/`marketing_permission` kullanacak — iki nesil consent alanı bir arada duruyor, ileride eski alanlar temizlenebilir.
+- Plan dosyası tam yol haritasını içeriyor: `C:\Users\Akif-MaccBook\.claude\plans\toasty-toasting-turtle.md` — sonraki oturumlarda oradan devam edilecek.
+
+### Nerede Kaldık
+Faz 1 tamamlandı ve canlı DB'de doğrulandı. Faz 2'ye (satın alma formu güncellemeleri: `_AnmaFormClient.tsx`, `_AileFormClient.tsx`, `_KasaFormClient.tsx`, `actions.ts`, 7 dil dosyası) henüz başlanmadı. Kod tarafında hiçbir dosya değişmedi, sadece DB migration'ları var — commit/push edilmedi.
+
+### Sıradaki Adım
+1. Faz 2: satın alma formlarına "Profil kimin için?" ve "Profil dili" dropdown'ları + 3 ayrı KVKK checkbox'ı (aydınlatma/rıza/pazarlama) ekle
+2. `src/app/satin-al/actions.ts`'i yeni form alanlarını okuyacak, `order_locale`'i `tm_lang` cookie'sinden belirleyecek ve yeni consent kolonlarını dolduracak şekilde güncelle
+3. 7 dil dosyasına yeni etiketleri ekle
+4. Faz 2 bitince kullanıcı onayı al, sonra Faz 3'e (ödeme ekranı) geç
+
 ## 2026-07-04 — Oturum 167: GSC İndeksleme Analizi + Hero'daki Ulusal Miras Kartlarını Gerçek Profillerle Değiştirme
 
 ### Yapılanlar

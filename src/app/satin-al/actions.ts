@@ -4,11 +4,17 @@ import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import { fetchPricingConfig } from '@/lib/pricing'
 import { sendEmail, getAdminNotificationEmail } from '@/lib/email'
-import { memorialSignupConfirmEmail, vaultSignupConfirmEmail, adminNewRegistrationEmail } from '@/lib/email/templates'
+import { memorialSignupConfirmEmail, vaultSignupConfirmEmail, adminNewRegistrationEmail, orderCreatedEmail, orderCreatedEmailSubject } from '@/lib/email/templates'
 import { headers } from 'next/headers'
 import { buildWhatsAppOrderLink } from '@/lib/whatsapp'
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://theeternalmemory.com'
+
+const ORDER_LOCALES = ['tr', 'ka', 'ru', 'en', 'az', 'hy', 'he'] as const
+
+function normalizeOrderLocale(value: string | null | undefined): string {
+  return ORDER_LOCALES.includes(value as typeof ORDER_LOCALES[number]) ? (value as string) : 'tr'
+}
 
 function slugify(text: string): string {
   return text
@@ -75,16 +81,19 @@ export async function purchaseMemorialAction(_prev: unknown, formData: FormData)
   const senderEmail = (formData.get('sender_email') as string)?.trim().toLowerCase()
   const phone = (formData.get('phone') as string)?.trim()
   const shippingAddress = (formData.get('shipping_address') as string)?.trim()
-  const emailConsent = formData.get('email_consent') === 'on'
-  const phoneConsent = formData.get('phone_consent') === 'on'
+  const profileFor = (formData.get('profile_for') as string)?.trim() || null
+  const profileLanguage = normalizeOrderLocale(formData.get('profile_language') as string)
+  const privacyNoticeAck = formData.get('privacy_notice_ack') === 'on'
+  const dataProcessingConsent = formData.get('data_processing_consent') === 'on'
+  const marketingPermission = formData.get('marketing_permission') === 'on'
 
   if (!displayName) return { error: 'Anma profili sahibinin adı zorunludur' }
   if (!senderName) return { error: 'Ad Soyad zorunludur' }
   if (!senderEmail || !senderEmail.includes('@')) return { error: 'Geçerli bir e-posta girin' }
   if (!phone) return { error: 'Telefon numarası zorunludur' }
   if (!shippingAddress) return { error: 'QR kod tabela kargo adresi zorunludur' }
-  if (!emailConsent) return { error: 'E-posta bilgilendirme iznini onaylamanız gerekmektedir' }
-  if (!phoneConsent) return { error: 'Telefon araması iznini onaylamanız gerekmektedir' }
+  if (!privacyNoticeAck) return { error: "Aydınlatma Metni'ni okuduğunuzu onaylamanız gerekmektedir" }
+  if (!dataProcessingConsent) return { error: 'Bilgilerinizin kullanılmasına ilişkin rızayı onaylamanız gerekmektedir' }
 
   const authResult = await getOrCreatePurchaseUser(supabase, service, formData, senderName, senderEmail)
   if ('error' in authResult) return { error: authResult.error }
@@ -117,10 +126,16 @@ export async function purchaseMemorialAction(_prev: unknown, formData: FormData)
   // KVKK rıza kaydı
   await service.from('user_consents').insert({
     user_id: user.id,
-    email_consent: emailConsent,
-    phone_consent: phoneConsent,
+    email_consent: dataProcessingConsent,
+    phone_consent: dataProcessingConsent,
+    privacy_notice_ack: privacyNoticeAck,
+    data_processing_consent: dataProcessingConsent,
+    marketing_permission: marketingPermission,
+    consent_language: profileLanguage,
+    user_agent: hdrs.get('user-agent'),
+    accepted_at: new Date().toISOString(),
     consent_ip: consentIp,
-    consent_version: 'v1.0',
+    consent_version: 'v2.0',
     source: 'purchase_memorial',
   })
 
@@ -141,7 +156,7 @@ export async function purchaseMemorialAction(_prev: unknown, formData: FormData)
   const dueDate = new Date()
   dueDate.setDate(dueDate.getDate() + 3)
 
-  const { error: paymentErr } = await service.from('payments').insert({
+  const { data: payment, error: paymentErr } = await service.from('payments').insert({
     vault_id: vault.id,
     user_id: user.id,
     amount,
@@ -149,10 +164,12 @@ export async function purchaseMemorialAction(_prev: unknown, formData: FormData)
     product_type: 'memorial_one_time',
     status: 'pending',
     payment_method: 'whatsapp',
+    order_locale: profileLanguage,
+    profile_for: profileFor,
     due_date: dueDate.toISOString().split('T')[0],
     notes: `Gönderen: ${senderName} <${senderEmail}> | Tel: ${phone}`,
-  })
-  if (paymentErr) return { error: 'Ödeme kaydı oluşturulamadı: ' + paymentErr.message }
+  }).select('id, order_code').single()
+  if (paymentErr || !payment) return { error: 'Ödeme kaydı oluşturulamadı: ' + paymentErr?.message }
 
   // Admin bildirim emaili
   try {
@@ -175,6 +192,22 @@ export async function purchaseMemorialAction(_prev: unknown, formData: FormData)
     console.error('[purchaseMemorialAction] admin notify error:', e)
   }
 
+  // Sipariş oluşturuldu maili (müşteri)
+  try {
+    await sendEmail({
+      to: senderEmail,
+      subject: orderCreatedEmailSubject(profileLanguage),
+      html: orderCreatedEmail({
+        recipientName: senderName,
+        orderCode: payment.order_code,
+        paymentUrl: `${SITE_URL}/satin-al/odeme/${payment.id}`,
+        locale: profileLanguage,
+      }),
+    })
+  } catch (e) {
+    console.error('[purchaseMemorialAction] order created email error:', e)
+  }
+
   if (pendingEmailConfirmation && confirmUrl) {
     try {
       await sendEmail({
@@ -189,13 +222,14 @@ export async function purchaseMemorialAction(_prev: unknown, formData: FormData)
 
   const waLink = buildWhatsAppOrderLink({
     senderName,
-    packageLabel: 'Anma Profili',
+    packageType: 'memorial',
     amount,
     currency: '₾',
     vaultName: displayName,
+    locale: profileLanguage,
   })
 
-  redirect(`/satin-al/tesekkur?type=anma&name=${encodeURIComponent(senderName)}&wa=${encodeURIComponent(waLink)}${pendingEmailConfirmation ? '&pending_email=1' : ''}`)
+  redirect(`/satin-al/odeme/${payment.id}?type=anma&name=${encodeURIComponent(senderName)}&wa=${encodeURIComponent(waLink)}${pendingEmailConfirmation ? '&pending_email=1' : ''}`)
 }
 
 export async function purchaseVaultAction(_prev: unknown, formData: FormData) {
@@ -206,15 +240,17 @@ export async function purchaseVaultAction(_prev: unknown, formData: FormData) {
   const senderName = (formData.get('sender_name') as string)?.trim()
   const senderEmail = (formData.get('sender_email') as string)?.trim().toLowerCase()
   const phone = (formData.get('phone') as string)?.trim()
-  const emailConsent = formData.get('email_consent') === 'on'
-  const phoneConsent = formData.get('phone_consent') === 'on'
+  const profileLanguage = normalizeOrderLocale(formData.get('profile_language') as string)
+  const privacyNoticeAck = formData.get('privacy_notice_ack') === 'on'
+  const dataProcessingConsent = formData.get('data_processing_consent') === 'on'
+  const marketingPermission = formData.get('marketing_permission') === 'on'
 
   if (!displayName) return { error: 'Anı alanı adı zorunludur' }
   if (!senderName) return { error: 'Ad Soyad zorunludur' }
   if (!senderEmail || !senderEmail.includes('@')) return { error: 'Geçerli bir e-posta girin' }
   if (!phone) return { error: 'Telefon numarası zorunludur' }
-  if (!emailConsent) return { error: 'E-posta bilgilendirme iznini onaylamanız gerekmektedir' }
-  if (!phoneConsent) return { error: 'Telefon araması iznini onaylamanız gerekmektedir' }
+  if (!privacyNoticeAck) return { error: "Aydınlatma Metni'ni okuduğunuzu onaylamanız gerekmektedir" }
+  if (!dataProcessingConsent) return { error: 'Bilgilerinizin kullanılmasına ilişkin rızayı onaylamanız gerekmektedir' }
 
   const authResult = await getOrCreatePurchaseUser(supabase, service, formData, senderName, senderEmail)
   if ('error' in authResult) return { error: authResult.error }
@@ -245,10 +281,16 @@ export async function purchaseVaultAction(_prev: unknown, formData: FormData) {
 
   await service.from('user_consents').insert({
     user_id: user.id,
-    email_consent: emailConsent,
-    phone_consent: phoneConsent,
+    email_consent: dataProcessingConsent,
+    phone_consent: dataProcessingConsent,
+    privacy_notice_ack: privacyNoticeAck,
+    data_processing_consent: dataProcessingConsent,
+    marketing_permission: marketingPermission,
+    consent_language: profileLanguage,
+    user_agent: hdrs2.get('user-agent'),
+    accepted_at: new Date().toISOString(),
     consent_ip: consentIp2,
-    consent_version: 'v1.0',
+    consent_version: 'v2.0',
     source: 'purchase_vault',
   })
 
@@ -268,7 +310,7 @@ export async function purchaseVaultAction(_prev: unknown, formData: FormData) {
   const dueDate = new Date()
   dueDate.setDate(dueDate.getDate() + 3)
 
-  const { error: paymentErr } = await service.from('payments').insert({
+  const { data: payment, error: paymentErr } = await service.from('payments').insert({
     vault_id: vault.id,
     user_id: user.id,
     amount: setupAmount,
@@ -276,10 +318,11 @@ export async function purchaseVaultAction(_prev: unknown, formData: FormData) {
     product_type: 'vault_setup',
     status: 'pending',
     payment_method: 'whatsapp',
+    order_locale: profileLanguage,
     due_date: dueDate.toISOString().split('T')[0],
     notes: `Gönderen: ${senderName} <${senderEmail}> | Tel: ${phone}`,
-  })
-  if (paymentErr) return { error: 'Ödeme kaydı oluşturulamadı: ' + paymentErr.message }
+  }).select('id, order_code').single()
+  if (paymentErr || !payment) return { error: 'Ödeme kaydı oluşturulamadı: ' + paymentErr?.message }
 
   // Admin bildirim emaili
   try {
@@ -302,6 +345,22 @@ export async function purchaseVaultAction(_prev: unknown, formData: FormData) {
     console.error('[purchaseVaultAction] admin notify error:', e)
   }
 
+  // Sipariş oluşturuldu maili (müşteri)
+  try {
+    await sendEmail({
+      to: senderEmail,
+      subject: orderCreatedEmailSubject(profileLanguage),
+      html: orderCreatedEmail({
+        recipientName: senderName,
+        orderCode: payment.order_code,
+        paymentUrl: `${SITE_URL}/satin-al/odeme/${payment.id}`,
+        locale: profileLanguage,
+      }),
+    })
+  } catch (e) {
+    console.error('[purchaseVaultAction] order created email error:', e)
+  }
+
   if (pendingEmailConfirmation && confirmUrl) {
     try {
       await sendEmail({
@@ -316,13 +375,14 @@ export async function purchaseVaultAction(_prev: unknown, formData: FormData) {
 
   const waLink = buildWhatsAppOrderLink({
     senderName,
-    packageLabel: 'Yaşam Kasası',
+    packageType: 'vault',
     amount: setupAmount,
     currency: '₾',
     vaultName: displayName,
+    locale: profileLanguage,
   })
 
-  redirect(`/satin-al/tesekkur?type=kasa&name=${encodeURIComponent(senderName)}&wa=${encodeURIComponent(waLink)}${pendingEmailConfirmation ? '&pending_email=1' : ''}`)
+  redirect(`/satin-al/odeme/${payment.id}?type=kasa&name=${encodeURIComponent(senderName)}&wa=${encodeURIComponent(waLink)}${pendingEmailConfirmation ? '&pending_email=1' : ''}`)
 }
 
 export async function purchaseFamilyAction(_prev: unknown, formData: FormData) {
@@ -334,15 +394,18 @@ export async function purchaseFamilyAction(_prev: unknown, formData: FormData) {
   const senderEmail = (formData.get('sender_email') as string)?.trim().toLowerCase()
   const phone = (formData.get('phone') as string)?.trim()
   const shippingAddress = (formData.get('shipping_address') as string)?.trim()
-  const emailConsent = formData.get('email_consent') === 'on'
-  const phoneConsent = formData.get('phone_consent') === 'on'
+  const profileFor = (formData.get('profile_for') as string)?.trim() || null
+  const profileLanguage = normalizeOrderLocale(formData.get('profile_language') as string)
+  const privacyNoticeAck = formData.get('privacy_notice_ack') === 'on'
+  const dataProcessingConsent = formData.get('data_processing_consent') === 'on'
+  const marketingPermission = formData.get('marketing_permission') === 'on'
 
   if (!familyName) return { error: 'Aile/topluluk adı zorunludur' }
   if (!senderName) return { error: 'Ad Soyad zorunludur' }
   if (!senderEmail || !senderEmail.includes('@')) return { error: 'Geçerli bir e-posta girin' }
   if (!phone) return { error: 'Telefon numarası zorunludur' }
-  if (!emailConsent) return { error: 'E-posta bilgilendirme iznini onaylamanız gerekmektedir' }
-  if (!phoneConsent) return { error: 'Telefon araması iznini onaylamanız gerekmektedir' }
+  if (!privacyNoticeAck) return { error: "Aydınlatma Metni'ni okuduğunuzu onaylamanız gerekmektedir" }
+  if (!dataProcessingConsent) return { error: 'Bilgilerinizin kullanılmasına ilişkin rızayı onaylamanız gerekmektedir' }
 
   const authResult = await getOrCreatePurchaseUser(supabase, service, formData, senderName, senderEmail)
   if ('error' in authResult) return { error: authResult.error }
@@ -370,10 +433,16 @@ export async function purchaseFamilyAction(_prev: unknown, formData: FormData) {
 
   await service.from('user_consents').insert({
     user_id: user.id,
-    email_consent: emailConsent,
-    phone_consent: phoneConsent,
+    email_consent: dataProcessingConsent,
+    phone_consent: dataProcessingConsent,
+    privacy_notice_ack: privacyNoticeAck,
+    data_processing_consent: dataProcessingConsent,
+    marketing_permission: marketingPermission,
+    consent_language: profileLanguage,
+    user_agent: hdrs.get('user-agent'),
+    accepted_at: new Date().toISOString(),
     consent_ip: consentIp,
-    consent_version: 'v1.0',
+    consent_version: 'v2.0',
     source: 'purchase_family',
   })
 
@@ -398,18 +467,20 @@ export async function purchaseFamilyAction(_prev: unknown, formData: FormData) {
   const dueDate = new Date()
   dueDate.setDate(dueDate.getDate() + 3)
 
-  const { error: paymentErr } = await service.from('payments').insert({
+  const { data: payment, error: paymentErr } = await service.from('payments').insert({
     family_id: family.id,
     user_id: user.id,
     amount,
     currency: 'GEL',
+    order_locale: profileLanguage,
+    profile_for: profileFor,
     product_type: 'family_package',
     status: 'pending',
     payment_method: 'whatsapp',
     due_date: dueDate.toISOString().split('T')[0],
     notes: `Aile paketi — ${familyName} | Gönderen: ${senderName} <${senderEmail}> | Tel: ${phone}${shippingAddress ? ` | Adres: ${shippingAddress}` : ''}`,
-  })
-  if (paymentErr) return { error: 'Ödeme kaydı oluşturulamadı: ' + paymentErr.message }
+  }).select('id, order_code').single()
+  if (paymentErr || !payment) return { error: 'Ödeme kaydı oluşturulamadı: ' + paymentErr?.message }
 
   try {
     const adminEmail = await getAdminNotificationEmail()
@@ -431,6 +502,22 @@ export async function purchaseFamilyAction(_prev: unknown, formData: FormData) {
     console.error('[purchaseFamilyAction] admin notify error:', e)
   }
 
+  // Sipariş oluşturuldu maili (müşteri)
+  try {
+    await sendEmail({
+      to: senderEmail,
+      subject: orderCreatedEmailSubject(profileLanguage),
+      html: orderCreatedEmail({
+        recipientName: senderName,
+        orderCode: payment.order_code,
+        paymentUrl: `${SITE_URL}/satin-al/odeme/${payment.id}`,
+        locale: profileLanguage,
+      }),
+    })
+  } catch (e) {
+    console.error('[purchaseFamilyAction] order created email error:', e)
+  }
+
   if (pendingEmailConfirmation && confirmUrl) {
     try {
       await sendEmail({
@@ -445,11 +532,12 @@ export async function purchaseFamilyAction(_prev: unknown, formData: FormData) {
 
   const waLink = buildWhatsAppOrderLink({
     senderName,
-    packageLabel: 'Aile Paketi',
+    packageType: 'family',
     amount,
     currency: '₾',
     vaultName: familyName,
+    locale: profileLanguage,
   })
 
-  redirect(`/satin-al/tesekkur?type=aile&name=${encodeURIComponent(senderName)}&wa=${encodeURIComponent(waLink)}${pendingEmailConfirmation ? '&pending_email=1' : ''}`)
+  redirect(`/satin-al/odeme/${payment.id}?type=aile&name=${encodeURIComponent(senderName)}&wa=${encodeURIComponent(waLink)}${pendingEmailConfirmation ? '&pending_email=1' : ''}`)
 }
