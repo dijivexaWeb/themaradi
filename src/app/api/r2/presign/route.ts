@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { generateFileKey, createPresignedUploadUrl, getPublicUrl } from '@/lib/r2'
+import { verifyUploadOwnership, verifyOrderOwnership } from '@/lib/r2-ownership'
 import type { NextRequest } from 'next/server'
 
 const MAX_IMAGE_BYTES = 8 * 1024 * 1024       // 8 MB
@@ -55,8 +56,12 @@ export async function POST(request: NextRequest) {
     } else {
       contextId = user.id
       if (category === 'payment_proof' && orderId) {
+        const owns = await verifyOrderOwnership(supabase, user.id, orderId)
+        if (!owns) return Response.json({ error: 'Bu sipariş üzerinde yetkiniz yok' }, { status: 403 })
         contextId = orderId
       } else if (profileId) {
+        const owns = await verifyUploadOwnership(supabase, user.id, category, profileId)
+        if (!owns) return Response.json({ error: 'Bu profil üzerinde yetkiniz yok' }, { status: 403 })
         contextId = profileId
       }
     }

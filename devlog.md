@@ -3,6 +3,41 @@
 > Her oturum sonunda Claude bu dosyayı günceller.
 > Format: tarih → ne yapıldı → nerede kalındı → sıradaki adım.
 
+## 2026-07-05 — Oturum 168 (devam 16): Kapsamlı Güvenlik Denetimi ve Düzeltmeler
+
+### Yapılanlar
+Kullanıcı "sistemin güvenlik durumunu ayrıntılı analiz et, bug/sızma her şeyi kontrol et" dedi. Tam bir denetim yapıldı (XSS, IDOR, RLS, secret exposure, admin auth, Supabase advisor taraması), bulgular raporlandı, sonra kullanıcı "hepsini düzelt ama sistemi bozma, adım adım" dedi — 5 madde adım adım düzeltildi ve her biri test edildi.
+
+**Bulgular ve düzeltmeler:**
+
+1. **🔴 KRİTİK — `secrets_vault` RPC exposure**: `vault_get`/`vault_upsert`/`vault_encrypt`/`vault_decrypt` fonksiyonları hiçbir sahiplik kontrolü olmadan `anon`+`authenticated` rollerine açıktı — teorik olarak herkes şifreli "gizli kasa" kayıtlarını okuyup üzerine yazabilirdi. İnceleme: bu mekanizma hiçbir app kodu/trigger tarafından kullanılmıyor (gerçek "gizli içerik" özelliği `vault_memories`/`media` tablolarında, düzgün RLS ile korunuyor). **Fix**: 4 fonksiyondan `PUBLIC, anon, authenticated` EXECUTE yetkisi kaldırıldı (`20260705_revoke_secrets_vault_rpc.sql`).
+
+2. **🟠 YÜKSEK — `/api/r2/upload` ve `/api/r2/presign` IDOR**: Giriş yapmış herhangi bir kullanıcı, `profileId`/`orderId` parametresini başkasının vault/aile/sipariş ID'siyle değiştirip onun storage alanına (bazı kategoriler için private bucket'a bile) dosya yükleyebiliyordu — sahiplik kontrolü hiç yoktu. **Fix**: yeni `src/lib/r2-ownership.ts` (`verifyUploadOwnership`, `verifyOrderOwnership`) — her iki route'a da entegre edildi. **Canlı test**: gerçek bir kullanıcıyla başkasının vault ID'sine yükleme denendi → 403 "Bu profil üzerinde yetkiniz yok"; kendi vault'una yükleme → 200 başarılı (regresyon yok).
+
+3. **🟡 ORTA — Bilgi sızdıran RPC'ler**: `get_vault_owner_id`, `get_heir_vault_ids_for_user` `anon`'a açıktı (sahiplik/varis eşleşmesi sızdırıyordu) — **ama** bu ikisi `heirs`/`vaults` tablolarının RLS politikalarında `authenticated` için gerekliydi, o yüzden sadece `anon`'dan kaldırıldı, `authenticated` korundu. `get_db_stats` sadece admin panelinde (service role ile) kullanılıyor, ikisinden de kaldırıldı. **Önemli teknik detay**: İlk denemede sadece `REVOKE ... FROM anon` yazıldı ama işe yaramadı — Postgres'te fonksiyonlar varsayılan olarak `PUBLIC` pseudo-role'üne açık olduğu için, spesifik rolden kaldırmak yetmiyor, önce `PUBLIC`'ten kaldırıp gerekirse tekrar `authenticated`'a vermek gerekiyor. Bu `has_function_privilege()` ile doğrulanarak düzeltildi (`20260705_restrict_anon_info_leak_rpcs.sql`).
+
+4. **🟡 ORTA — Public storage bucket'larında sınırsız yazma**: Supabase Storage'daki (R2'den ayrı, eski/kullanılmayan bir sistem — ama `vault-media` bucket'ında hâlâ 43 gerçek dosya var) `media`/`vault-media` bucket'larının INSERT politikaları hiç kısıtlama içermiyordu — giriş yapmış herhangi biri herhangi bir path'e yazabilirdi. **Fix**: mevcut DELETE politikalarındaki path-tabanlı sahiplik deseni (`{vaultId}/{userId}/...`) INSERT'e de uygulandı. Okuma erişimi (43 dosya dahil) etkilenmedi. **Bilinçli olarak dokunulmayan**: bucket'ların "listing'e açık" olması (advisor uyarısı) — okuma davranışını bozma riski taşıdığı için, ek doğrulama olmadan dokunulmadı.
+
+5. **🟢 DÜŞÜK — Hijyen**: 3 fonksiyonda (`generate_order_code`, `set_order_code`, `increment_family_action`) eksik olan `search_path` ayarı düzeltildi. **Dokunulamayan**: "Leaked password protection" (HaveIBeenPwned kontrolü) Supabase Auth dashboard ayarı — mevcut MCP araç setinde bunu değiştirecek bir tool yok, kullanıcının Supabase dashboard'undan (Authentication → Providers → Email) elle açması gerekiyor.
+
+**Bilinçli olarak düzeltilmeyenler (kasıtlı tasarım, hata değil):** Guestbook/contact/reactions/qr_analytics gibi tablolardaki "WITH CHECK (true)" INSERT politikaları — bunlar ziyaretçilerin taziye/anı/tepki bırakabilmesi için kasıtlı olarak açık, spam/rate-limit koruması yok ama bu ayrı bir konu (öneri: gelecekte Cloudflare Turnstile veya rate limiting eklenebilir).
+
+- `npx tsc --noEmit` ve `npm run build` her adımdan sonra temiz geçti.
+- **Doğrulama**: Supabase security advisor tekrar çalıştırıldı — hedeflenen tüm bulgular (`vault_get` vb., `get_db_stats`, `search_path_mutable`) listeden tamamen kalktı; `get_vault_owner_id`/`get_heir_vault_ids_for_user` artık sadece `authenticated` için listeleniyor (beklenen, `anon` için kalktı). Canlı sitede ana sayfa, satın alma formu, miras sayfası, gerçek bir anma sayfası, fiyatlandırma sayfası test edildi — hepsi 200, hiçbir regresyon yok.
+
+### Proje Durumu
+- [x] Güvenlik denetimi tamamlandı, kritik/yüksek/orta bulgular düzeltildi ve test edildi
+- [ ] Commit edilmedi — kullanıcı onayı bekleniyor
+- [ ] Kullanıcının manuel yapması gereken: Supabase dashboard'dan "Leaked Password Protection" açılması
+
+### Nerede Kaldık
+5 güvenlik düzeltmesi de kod+DB tarafında tamamlandı, canlı test edildi, commit edilmedi.
+
+### Sıradaki Adım
+1. Kullanıcı Supabase dashboard'dan Leaked Password Protection'ı açsın (Authentication → Providers → Email)
+2. Onaylarsa commit (+ istenirse push)
+3. İleride düşünülebilir: guestbook/contact/reactions tablolarına rate limiting veya Turnstile ekleme
+
 ## 2026-07-05 — Oturum 168 (devam 15): Kalan Her Şey — 3 Yeni SEO Sayfası + Çerez Rıza Gate'i
 
 ### Yapılanlar

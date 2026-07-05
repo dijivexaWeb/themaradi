@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { generateFileKey, uploadR2Object, getPublicUrl } from '@/lib/r2'
+import { verifyUploadOwnership } from '@/lib/r2-ownership'
 import type { NextRequest } from 'next/server'
 
 const MAX_IMAGE_BYTES = 8 * 1024 * 1024
@@ -38,6 +39,16 @@ export async function POST(request: NextRequest) {
     const fileName = file.name
 
     const contextId = profileId ?? user.id
+
+    // profileId varsa, bu kullanıcının gerçekten o profile/aile üzerinde yetkisi olduğunu
+    // doğrula — aksi halde herkes başkasının vault/aile ID'siyle onun storage alanına
+    // dosya yükleyebilirdi (IDOR).
+    if (profileId) {
+      const owns = await verifyUploadOwnership(supabase, user.id, category, profileId)
+      if (!owns) {
+        return Response.json({ error: 'Bu profil üzerinde yetkiniz yok' }, { status: 403 })
+      }
+    }
 
     // Validate category + mime + size
     let isAllowed = false
