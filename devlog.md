@@ -3,6 +3,23 @@
 > Her oturum sonunda Claude bu dosyayı günceller.
 > Format: tarih → ne yapıldı → nerede kalındı → sıradaki adım.
 
+## 2026-07-06 — Oturum 168 (devam 17): Güvenlik Denetimi Kapatıldı — Push + Leaked Password Protection
+
+### Yapılanlar
+- Kullanıcı Supabase dashboard'dan Authentication → Attack Protection altındaki **"Prevent use of leaked passwords"** ayarını aktif etti (Captcha alanına dokunmadan) — bir önceki oturumdaki güvenlik denetiminin tek manuel/dashboard'a bağlı maddesiydi.
+- Güvenlik düzeltmeleri commit'i (`f5b2ee6`) push edildi — `master` artık `origin/master` ile senkron.
+
+### Proje Durumu
+- [x] Kapsamlı güvenlik denetimi tamamen kapatıldı (kod+DB fix'leri + push + dashboard ayarı)
+- [ ] Açık bir görev kalmadı — sıradaki adımlar kullanıcının yeni taleplerine bağlı
+
+### Nerede Kaldık
+Güvenlik denetimi baştan sona tamamlandı: bulgular → düzeltmeler → canlı test → commit → push → dashboard ayarı. Bekleyen bir iş yok.
+
+### Sıradaki Adım
+1. Kullanıcının yeni bir talebi olursa ona göre devam edilecek — planlı bekleyen iş yok
+2. (Backlog, düşük öncelik) Guestbook/contact/reactions gibi herkese açık INSERT tablolarına ileride rate limiting/Turnstile eklenebilir
+
 ## 2026-07-05 — Oturum 168 (devam 16): Kapsamlı Güvenlik Denetimi ve Düzeltmeler
 
 ### Yapılanlar
