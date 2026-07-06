@@ -60,29 +60,44 @@ export async function sendBulkEmailAction(_prev: unknown, formData: FormData): P
   const fromAddress = s.email_from_address || 'info@theeternalmemory.com'
   const resend = new Resend(s.email_api_key)
 
-  // Sıralı gönderim — Resend rate limit'ine takılmamak için küçük gruplar halinde
-  const results: BulkEmailResult[] = []
-  const BATCH_SIZE = 5
+  // Resend'in limiti saniyede 10 istek — tek tek, aralarında gecikmeyle gönderiyoruz
+  // (paralel/toplu gönderim bu limiti anında aşıyordu). Rate-limit hatası alınırsa
+  // birkaç kez otomatik tekrar deneniyor.
+  const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms))
+  const isRateLimitError = (msg: string) => /rate limit|too many requests/i.test(msg)
 
-  for (let i = 0; i < recipients.length; i += BATCH_SIZE) {
-    const batch = recipients.slice(i, i + BATCH_SIZE)
-    const batchResults = await Promise.all(
-      batch.map(async (email): Promise<BulkEmailResult> => {
-        try {
-          const { error } = await resend.emails.send({
-            from: `${fromName} <${fromAddress}>`,
-            to: [email],
-            subject,
-            html: body.replace(/\n/g, '<br>'),
-          })
-          if (error) return { email, success: false, error: error.message }
-          return { email, success: true }
-        } catch (e) {
-          return { email, success: false, error: e instanceof Error ? e.message : 'Bilinmeyen hata' }
+  async function sendOne(email: string): Promise<BulkEmailResult> {
+    const maxAttempts = 4
+    for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+      try {
+        const { error } = await resend.emails.send({
+          from: `${fromName} <${fromAddress}>`,
+          to: [email],
+          subject,
+          html: body.replace(/\n/g, '<br>'),
+        })
+        if (!error) return { email, success: true }
+        if (isRateLimitError(error.message) && attempt < maxAttempts) {
+          await sleep(1500 * attempt)
+          continue
         }
-      })
-    )
-    results.push(...batchResults)
+        return { email, success: false, error: error.message }
+      } catch (e) {
+        const msg = e instanceof Error ? e.message : 'Bilinmeyen hata'
+        if (isRateLimitError(msg) && attempt < maxAttempts) {
+          await sleep(1500 * attempt)
+          continue
+        }
+        return { email, success: false, error: msg }
+      }
+    }
+    return { email, success: false, error: 'Tekrar denemeler tükendi' }
+  }
+
+  const results: BulkEmailResult[] = []
+  for (const email of recipients) {
+    results.push(await sendOne(email))
+    await sleep(250) // ~4 istek/saniye — Resend'in 10/sn limitinin altında güvenli marj
   }
 
   const sent = results.filter((r) => r.success).length
