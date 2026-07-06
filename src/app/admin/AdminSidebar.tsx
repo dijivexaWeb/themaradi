@@ -24,6 +24,7 @@ import {
   ChevronRight,
   Package,
   HardDrive,
+  Send,
 } from 'lucide-react'
 
 const NAV_ITEMS = [
@@ -39,6 +40,7 @@ const NAV_ITEMS = [
   { href: '/admin/alive-alerts', label: 'Ben Yaşıyorum', icon: HeartPulse },
   { href: '/admin/email', label: 'Email Ayarları', icon: Mail },
   { href: '/admin/inbox', label: 'Gelen Kutusu', icon: Inbox },
+  { href: '/admin/toplu-mail', label: 'Toplu Mail', icon: Send },
   { href: '/admin/contacts', label: 'İletişim Formu', icon: MessageSquare },
   { href: '/admin/users', label: 'Kullanıcılar', icon: UserCircle },
   { href: '/admin/gdpr', label: 'GDPR', icon: FileText },
