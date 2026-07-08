@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Cormorant_Garamond, Outfit } from "next/font/google";
+import { GoogleTagManager } from "@next/third-parties/google";
 import { LangProvider } from "@/i18n/context";
 import CookieBanner from "@/components/CookieBanner";
 import WhatsAppButton from "@/components/WhatsAppButton";
@@ -86,7 +87,16 @@ export default async function RootLayout({
       lang={lang}
       className={`${geistSans.variable} ${cormorantGaramond.variable} ${outfit.variable} h-full antialiased`}
     >
+      <GoogleTagManager gtmId="GTM-MD53BTFC" />
       <body className="min-h-full flex flex-col bg-zinc-950 text-zinc-100">
+        <noscript>
+          <iframe
+            src="https://www.googletagmanager.com/ns.html?id=GTM-MD53BTFC"
+            height="0"
+            width="0"
+            style={{ display: 'none', visibility: 'hidden' }}
+          />
+        </noscript>
         <Suspense fallback={null}>
           <AnalyticsConsentGate />
         </Suspense>
