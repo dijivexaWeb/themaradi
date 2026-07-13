@@ -7,6 +7,7 @@ import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { buildWhatsAppChatLink, buildWhatsAppPaymentSubmittedLink } from '@/lib/whatsapp'
 import { markPaymentSubmitted, initiateBogPayment } from '../actions'
 import { getBogSettings } from '@/lib/bog'
+import PaymentBrandRow from '@/components/PaymentBrandIcons'
 
 export const metadata: Metadata = {
   title: 'Ödeme',
@@ -187,9 +188,10 @@ export default async function OdemePage({ params, searchParams }: Props) {
                       <CreditCard className="h-4 w-4" />
                       Kartla Öde ({payment.amount} {payment.currency})
                     </button>
-                    <p className="text-xs text-[#8a8478] text-center mt-2">
-                      Visa, Mastercard, Google Pay — güvenli ödeme, anında onay
-                    </p>
+                    <div className="flex items-center justify-center gap-2 mt-2.5">
+                      <PaymentBrandRow />
+                      <span className="text-[10px] text-[#a39a86]">Bank of Georgia güvencesiyle</span>
+                    </div>
                   </form>
                   <div className="flex items-center gap-3 py-1">
                     <div className="h-px flex-1 bg-[#e6dccb]" />
