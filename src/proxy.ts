@@ -50,8 +50,12 @@ export async function proxy(request: NextRequest) {
   if (prefixed && isLocaleEligible(prefixed.rest)) {
     const url = request.nextUrl.clone()
     url.pathname = prefixed.rest
-    const rewritten = NextResponse.rewrite(url, { request })
-    rewritten.headers.set('x-tm-locale', prefixed.locale)
+    // x-tm-locale, REQUEST header'larına eklenmeli ki generateMetadata()/getTranslation()
+    // headers() ile bu isteğin gerçek dilini okuyabilsin — tm_lang cookie'si sadece
+    // SONRAKİ istekler için geçerli olur, bu rewrite'ın kendi SSR render'ında henüz yok.
+    const requestHeaders = new Headers(request.headers)
+    requestHeaders.set('x-tm-locale', prefixed.locale)
+    const rewritten = NextResponse.rewrite(url, { request: { headers: requestHeaders } })
     rewritten.cookies.set('tm_lang', prefixed.locale, {
       path: '/',
       maxAge: 60 * 60 * 24 * 365,

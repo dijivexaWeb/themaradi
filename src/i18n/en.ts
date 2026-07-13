@@ -15,6 +15,19 @@ const en = {
     label: 'Added on {date}',
   },
 
+  seoMeta: {
+    home: { title: 'The Eternal Memory — Digital Memorial Profile & QR Tombstone', description: 'Create a lasting digital memorial profile for your loved ones. Photos, life story, family tree and QR tombstone. Serving Georgia, Turkey and worldwide.' },
+    pricing: { title: 'Pricing — Digital Memorial Profile', description: 'The Eternal Memory pricing: Memorial Profile, Family Package and Life Vault. One-time payment, lifetime access. QR tombstone included.' },
+    about: { title: 'About Us', description: 'Meet the team behind The Eternal Memory. Founded in 2023, based in Batumi, Georgia — digital memorial profiles and QR tombstones.' },
+    contact: { title: 'Contact', description: 'Get in touch with The Eternal Memory. Our Batumi, Georgia office — for memorial profile, family package and QR tombstone questions.' },
+    miras: { title: "National Heritage — A Nation's Memory", description: 'Digital memorial profiles of figures who left a mark on history. Keep national heritage alive with The Eternal Memory.' },
+    privacy: { title: 'Privacy Policy', description: 'The Eternal Memory personal data processing policy. GDPR, Georgian PDL and KVKK compliant.' },
+    terms: { title: 'Terms of Service', description: 'The Eternal Memory terms of service, payment and refund policy.' },
+    cookies: { title: 'Cookie Policy', description: 'Information about cookie usage and preference management at The Eternal Memory.' },
+    kvkk: { title: 'KVKK Disclosure Text', description: "Disclosure text under Turkey's Personal Data Protection Law (KVKK)." },
+    verificationPolicy: { title: 'Verification and Objection Policy', description: 'Memorial Profile identity verification process, document requirements and 14-day objection window.' },
+  },
+
   landing: {
     hero: {
       eyebrow: '',

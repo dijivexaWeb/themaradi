@@ -7,27 +7,24 @@ import type { RecentMemorial } from '@/components/landing/RecentMemorialsCarouse
 import type { HeroMemorial } from '@/components/landing/HeroPhoneShowcase'
 import type { TestimonialMemorial } from '@/components/landing/TestimonialSection'
 import { getFamilyThankYouQuote } from '@/lib/testimonialQuotes'
-import { buildAlternateLanguages } from '@/lib/i18n/hreflang'
+import { buildAlternateLanguages, buildCanonical } from '@/lib/i18n/hreflang'
 import { getCampaignStats } from '@/lib/campaign'
+import { getTranslation } from '@/i18n/server'
 
 export const revalidate = 3600
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://theeternalmemory.com'
+const PATH = '/'
 
-export const metadata: Metadata = {
-  title: 'The Eternal Memory — Dijital Anma Profili & QR Mezar Taşı',
-  description:
-    'Sevdikleriniz için kalıcı dijital anma profili oluşturun. Fotoğraflar, hayat hikayesi, aile ağacı ve QR mezar taşı. Gürcistan, Türkiye ve dünya genelinde hizmet. — ციფრული მემორიალი, QR საფლავის ქვა, მოგონებები.',
-  alternates: {
-    canonical: APP_URL,
-    languages: buildAlternateLanguages('/'),
-  },
-  openGraph: {
-    title: 'The Eternal Memory — Dijital Anma Profili & QR Mezar Taşı',
-    description: 'Sevdikleriniz için kalıcı dijital anma profili. QR mezar taşı, fotoğraflar, aile ağacı.',
-    url: APP_URL,
-    type: 'website',
-  },
+export async function generateMetadata(): Promise<Metadata> {
+  const { t, lang } = await getTranslation()
+  const m = t.seoMeta.home
+  return {
+    title: m.title,
+    description: m.description,
+    alternates: { canonical: buildCanonical(lang, PATH), languages: buildAlternateLanguages(PATH) },
+    openGraph: { title: m.title, description: m.description, url: buildCanonical(lang, PATH), type: 'website' },
+  }
 }
 
 export default async function LandingPage() {

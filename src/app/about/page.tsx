@@ -1,20 +1,19 @@
 import type { Metadata } from 'next'
 import AboutClient from './AboutClient'
+import { getTranslation } from '@/i18n/server'
+import { buildAlternateLanguages, buildCanonical } from '@/lib/i18n/hreflang'
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://theeternalmemory.com'
+const PATH = '/about'
 
-export const metadata: Metadata = {
-  title: 'Hakkımızda',
-  description: 'The Eternal Memory ekibini tanıyın. 2023\'te kurulan platform, dijital anma profilleri ve QR mezar taşı ile sevdiklerinizin anısını sonsuza taşır. Batumi, Gürcistan merkezli.',
-  alternates: {
-    canonical: `${APP_URL}/about`,
-  },
-  openGraph: {
-    title: 'Hakkımızda — The Eternal Memory',
-    description: 'Dijital anma profili ve QR mezar taşı platformunun hikayesi. Batumi, Gürcistan.',
-    url: `${APP_URL}/about`,
-    type: 'website',
-  },
+export async function generateMetadata(): Promise<Metadata> {
+  const { t, lang } = await getTranslation()
+  const m = t.seoMeta.about
+  return {
+    title: m.title,
+    description: m.description,
+    alternates: { canonical: buildCanonical(lang, PATH), languages: buildAlternateLanguages(PATH) },
+    openGraph: { title: m.title, description: m.description, url: buildCanonical(lang, PATH), type: 'website' },
+  }
 }
 
 export default function AboutPage() {

@@ -1,24 +1,20 @@
 import type { Metadata } from 'next'
 import ContactPageClient from './ContactPageClient'
 import { getTurnstileSiteKey } from '@/lib/turnstile'
-import { buildAlternateLanguages } from '@/lib/i18n/hreflang'
+import { buildAlternateLanguages, buildCanonical } from '@/lib/i18n/hreflang'
+import { getTranslation } from '@/i18n/server'
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://theeternalmemory.com'
+const PATH = '/contact'
 
-export const metadata: Metadata = {
-  title: 'İletişim',
-  description:
-    'The Eternal Memory ile iletişime geçin. Batumi, Gürcistan ofisimiz — dijital anma profili, aile paketi ve QR mezar taşı soruları için. WhatsApp ile hızlı destek.',
-  alternates: {
-    canonical: `${APP_URL}/contact`,
-    languages: buildAlternateLanguages('/contact'),
-  },
-  openGraph: {
-    title: 'İletişim — The Eternal Memory',
-    description: 'Batumi, Gürcistan — dijital anma profili ve QR mezar taşı için iletişim.',
-    url: `${APP_URL}/contact`,
-    type: 'website',
-  },
+export async function generateMetadata(): Promise<Metadata> {
+  const { t, lang } = await getTranslation()
+  const m = t.seoMeta.contact
+  return {
+    title: m.title,
+    description: m.description,
+    alternates: { canonical: buildCanonical(lang, PATH), languages: buildAlternateLanguages(PATH) },
+    openGraph: { title: m.title, description: m.description, url: buildCanonical(lang, PATH), type: 'website' },
+  }
 }
 
 export default async function ContactPage() {

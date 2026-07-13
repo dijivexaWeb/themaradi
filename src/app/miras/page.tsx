@@ -2,22 +2,21 @@ import type { Metadata } from 'next'
 import LandingNav from '@/components/landing/Nav'
 import NotableProfilesSection, { type NotableMemorial } from '@/components/landing/NotableProfilesSection'
 import { createServiceClient } from '@/lib/supabase/server'
-import { buildAlternateLanguages } from '@/lib/i18n/hreflang'
-
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://theeternalmemory.com'
+import { buildAlternateLanguages, buildCanonical } from '@/lib/i18n/hreflang'
+import { getTranslation } from '@/i18n/server'
 
 export const revalidate = 3600
+const PATH = '/miras'
 
-export const metadata: Metadata = {
-  title: 'Ulusal Miras — Bir Milletin Hafızası | The Eternal Memory',
-  description: 'Tarihe iz bırakmış isimlerin dijital anma profilleri. The Eternal Memory ile ulusal mirası yaşatın.',
-  alternates: { canonical: `${APP_URL}/miras`, languages: buildAlternateLanguages('/miras') },
-  openGraph: {
-    title: 'Ulusal Miras — Bir Milletin Hafızası',
-    description: 'Tarihe iz bırakmış isimlerin dijital anma profilleri.',
-    url: `${APP_URL}/miras`,
-    type: 'website',
-  },
+export async function generateMetadata(): Promise<Metadata> {
+  const { t, lang } = await getTranslation()
+  const m = t.seoMeta.miras
+  return {
+    title: m.title,
+    description: m.description,
+    alternates: { canonical: buildCanonical(lang, PATH), languages: buildAlternateLanguages(PATH) },
+    openGraph: { title: m.title, description: m.description, url: buildCanonical(lang, PATH), type: 'website' },
+  }
 }
 
 export default async function MirasPage() {

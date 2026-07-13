@@ -3,6 +3,39 @@
 > Her oturum sonunda Claude bu dosyayı günceller.
 > Format: tarih → ne yapıldı → nerede kalındı → sıradaki adım.
 
+## 2026-07-13 — Oturum 169 (devam): SEO Denetimi + Kritik Metadata/Canonical Bug Fix
+
+### Yapılanlar
+- **SEO denetimi**: `robots.txt` ve `sitemap.xml` (30 URL, doğru hreflang) sağlam bulundu. Ama `site:theeternalmemory.com` Google araması **sıfır sonuç** verdi — site indekslenmemiş.
+- **Kök neden bulundu**: `/en/*`, `/ka/*`, `/ru/*` vb. önekli URL'ler `proxy.ts`'de öneksiz path'e (`/pricing` vb.) `rewrite` ediliyor, ama sayfaların `<head>` metadata'sı (title/description/canonical) **statik** `export const metadata` idi — dil bilgisine hiç bakmıyordu. Sonuç: 10 SEO-kritik sayfa (ana sayfa, pricing, about, contact, miras, privacy, terms, cookies, kvkk, verification-policy) × 7 dil = 70 URL varyantının hepsi **aynı** (Türkçe) title/description'ı ve **aynı** (öneksiz) canonical'ı gösteriyordu — hreflang etiketlerini anlamsız kılıp Google'a "hepsi aynı sayfa" sinyali veriyordu.
+- **İkinci, daha derin bug**: `proxy.ts`'in rewrite sırasında eklediği `x-tm-locale` header'ı **response**'a set ediliyordu (`rewritten.headers.set(...)`), request'e değil — bu yüzden `headers()` ile hiçbir server component bu isteğin gerçek dilini okuyamıyordu (dead header, hiç kullanılmıyordu). Düzeltme: `NextResponse.rewrite(url, { request: { headers: requestHeaders } })` ile request header'larına doğru şekilde enjekte edildi.
+- **Fix**: 
+  - `src/i18n/server.ts` → `getTranslation()` artık önce `x-tm-locale` request header'ına (önekli URL'in GERÇEK dili), yoksa `tm_lang` cookie'sine (dönen ziyaretçi), yoksa `tr` varsayılana bakıyor.
+  - `src/lib/i18n/hreflang.ts` → yeni `buildCanonical(lang, path)` helper'ı — dile göre doğru URL'i (tr → öneksiz, diğerleri → `/xx` önekli) üretiyor.
+  - 10 sayfanın hepsi statik `metadata`'dan `generateMetadata()`'ya çevrildi, her dilin kendi title/description/canonical'ını dönüyor.
+  - 7 dile `seoMeta` namespace'i eklendi (`src/i18n/*.ts`) — 10 sayfa × title+description, tam çeviri.
+  - **Önemli istisna**: `privacy/terms/cookies/kvkk/legal/verification-policy` sayfaları `ELIGIBLE_PREFIXES` listesinde yok (yani `/en/privacy` gibi URL'ler hiç var olmuyor, 404 veriyor — bu önceden de böyleydi, ben bozmadım). Bu 5 sayfa için canonical'ı öneksiz TEK URL'de sabit tutup sadece title/description'ı (cookie'ye göre) yerelleştirdim — hreflang eklemedim, çünkü prefixed URL'ler gerçekte yok, eklemek Google'a 404 sinyali gönderirdi.
+  - Root layout'taki `title.template: '%s — The Eternal Memory'` yüzünden ilk yazdığım title'lar çift "The Eternal Memory" gösteriyordu (örn. "Pricing — ... — The Eternal Memory — The Eternal Memory") — 7 dilin `seoMeta`sındaki (home hariç) tüm title'lardan sondaki tekrarı temizledim.
+  - `npx tsc --noEmit`, `npm run build` temiz. Local dev server'da (`localhost:3000`) tüm senaryolar canlı test edildi: `/en/pricing`, `/ru`, `/ka/pricing`, `/en/miras` → doğru dil + doğru canonical + tek marka adı; `/privacy`, `/terms`, `/kvkk` (cookie ile TR/EN/RU) → doğru dil, sabit canonical; `/en/privacy` → 404 (beklenen, regresyon değil).
+
+### Proje Durumu
+- [x] SEO denetimi tamamlandı, kritik metadata/canonical bug'ı bulundu ve düzeltildi
+- [x] Kod tarafında tamamlandı, local'de uçtan uca doğrulandı
+- [ ] **Commit/deploy edilmedi** — kullanıcı onayı bekleniyor
+- [ ] Deploy sonrası Google Search Console'a sitemap yeniden gönderilmeli / "URL incelemesi" ile yeniden indeksleme istenmeli (kod düzeltmesi tek başına anlık indekslemeyi garanti etmez)
+
+### Kritik Kararlar / Notlar
+- Legal sayfalara (`privacy` vb.) dil öneki eklemedim — mevcut `ELIGIBLE_PREFIXES` mimarisini genişletmek ayrı, daha büyük bir karar; şimdilik sadece mevcut URL yapısı içinde doğru metadata üretmeye odaklanıldı.
+- `x-tm-locale` header bug'ı, önceki oturumlarda yazılan `/dijital-ani-sayfasi` gibi sayfaların da (özneksiz -> rewrite kullanmıyorlarsa) etkilenip etkilenmediği kontrol edilmedi ayrıca — onlar zaten kendi `generateMetadata()`'larını kullanıyordu, muhtemelen bu fix onları da daha doğru hale getirdi (cookie yerine artık header önceliği var).
+
+### Nerede Kaldık
+SEO metadata/canonical fix'i uçtan uca tamamlandı ve local'de doğrulandı, commit/deploy edilmedi.
+
+### Sıradaki Adım
+1. Kullanıcı onaylarsa commit + push + deploy
+2. Deploy sonrası Google Search Console'da sitemap yeniden gönderilsin, birkaç kritik URL için "URL incelemesi / yeniden indeksleme iste" yapılsın
+3. Birkaç gün sonra `site:theeternalmemory.com` ile indeksleme durumu tekrar kontrol edilmeli
+
 ## 2026-07-13 — Oturum 169: Trafik/Satış Teşhisi + "İlk 100 Aile" Kampanya Sayacı
 
 ### Yapılanlar

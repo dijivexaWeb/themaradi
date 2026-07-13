@@ -17,6 +17,19 @@ const tr: LangDict = {
     label: '{date} tarihinde eklendi',
   },
 
+  seoMeta: {
+    home: { title: 'The Eternal Memory — Dijital Anma Profili & QR Mezar Taşı', description: 'Sevdikleriniz için kalıcı dijital anma profili oluşturun. Fotoğraflar, hayat hikayesi, aile ağacı ve QR mezar taşı. Gürcistan, Türkiye ve dünya genelinde hizmet.' },
+    pricing: { title: 'Fiyatlar — Dijital Anma Profili', description: 'The Eternal Memory fiyatları: Anma Profili, Aile Paketi ve Yaşam Kasası. Tek seferlik ödeme, ömür boyu erişim. QR mezar taşı dahil.' },
+    about: { title: 'Hakkımızda', description: 'The Eternal Memory ekibini tanıyın. 2023\'te kurulan platform, dijital anma profilleri ve QR mezar taşı ile sevdiklerinizin anısını sonsuza taşır. Batumi, Gürcistan merkezli.' },
+    contact: { title: 'İletişim', description: 'The Eternal Memory ile iletişime geçin. Batumi, Gürcistan ofisimiz — dijital anma profili, aile paketi ve QR mezar taşı soruları için.' },
+    miras: { title: 'Ulusal Miras — Bir Milletin Hafızası', description: 'Tarihe iz bırakmış isimlerin dijital anma profilleri. The Eternal Memory ile ulusal mirası yaşatın.' },
+    privacy: { title: 'Gizlilik Politikası', description: 'The Eternal Memory kişisel veri işleme politikası. GDPR, Gürcistan KVK ve KVKK uyumlu.' },
+    terms: { title: 'Kullanım Koşulları', description: 'The Eternal Memory kullanım koşulları, ödeme ve iade politikası.' },
+    cookies: { title: 'Çerez Politikası', description: 'The Eternal Memory çerez kullanımı ve tercih yönetimi hakkında bilgi.' },
+    kvkk: { title: 'KVKK Aydınlatma Metni', description: 'Kişisel Verilerin Korunması Kanunu kapsamında aydınlatma metni.' },
+    verificationPolicy: { title: 'Doğrulama ve İtiraz Politikası', description: 'Anma Profili kimlik doğrulama süreci, belge gereksinimleri ve 14 günlük itiraz süresi.' },
+  },
+
   landing: {
     hero: {
       eyebrow: '',

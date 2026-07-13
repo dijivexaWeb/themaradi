@@ -1,26 +1,23 @@
 import type { Metadata } from 'next'
 import PricingClient from './PricingClient'
 import { fetchPricingConfig } from '@/lib/pricing'
-import { buildAlternateLanguages } from '@/lib/i18n/hreflang'
+import { buildAlternateLanguages, buildCanonical } from '@/lib/i18n/hreflang'
+import { getTranslation } from '@/i18n/server'
 
 export const revalidate = 3600
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://theeternalmemory.com'
+const PATH = '/pricing'
 
-export const metadata: Metadata = {
-  title: 'Fiyatlar — Dijital Anma Profili',
-  description:
-    'The Eternal Memory fiyatları: Anma Profili, Aile Paketi ve Yaşam Kasası. Tek seferlik ödeme, ömür boyu erişim. QR mezar taşı dahil. Gürcistan\'dan dünyaya hizmet.',
-  alternates: {
-    canonical: `${APP_URL}/pricing`,
-    languages: buildAlternateLanguages('/pricing'),
-  },
-  openGraph: {
-    title: 'Fiyatlar — The Eternal Memory',
-    description: 'Dijital anma profili fiyatları. Tek seferlik ödeme, ömür boyu erişim.',
-    url: `${APP_URL}/pricing`,
-    type: 'website',
-  },
+export async function generateMetadata(): Promise<Metadata> {
+  const { t, lang } = await getTranslation()
+  const m = t.seoMeta.pricing
+  return {
+    title: m.title,
+    description: m.description,
+    alternates: { canonical: buildCanonical(lang, PATH), languages: buildAlternateLanguages(PATH) },
+    openGraph: { title: m.title, description: m.description, url: buildCanonical(lang, PATH), type: 'website' },
+  }
 }
 
 export default async function PricingPage() {

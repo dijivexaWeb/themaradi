@@ -17,6 +17,19 @@ const az: LangDict = {
     label: '{date} tarixində əlavə edildi',
   },
 
+  seoMeta: {
+    home: { title: 'The Eternal Memory — Rəqəmsal Xatirə Profili və QR Məzar Daşı', description: 'Sevdikləriniz üçün əbədi rəqəmsal xatirə profili yaradın. Fotolar, həyat hekayəsi, ailə ağacı və QR məzar daşı. Gürcüstan, Türkiyə və dünya üzrə xidmət.' },
+    pricing: { title: 'Qiymətlər — Rəqəmsal Xatirə Profili', description: 'The Eternal Memory qiymətləri: Xatirə Profili, Ailə Paketi və Həyat Anbarı. Birdəfəlik ödəniş, ömürlük giriş. QR lövhə daxildir.' },
+    about: { title: 'Haqqımızda', description: 'The Eternal Memory komandası ilə tanış olun. 2023-cü ildə qurulan platforma, Batumi, Gürcüstan mərkəzli.' },
+    contact: { title: 'Əlaqə', description: 'The Eternal Memory ilə əlaqə saxlayın. Batumi, Gürcüstan ofisimiz — xatirə profili, ailə paketi və QR məzar daşı sualları üçün.' },
+    miras: { title: 'Milli İrs — Bir Millətin Yaddaşı', description: 'Tarixə iz salmış şəxsiyyətlərin rəqəmsal xatirə profilləri.' },
+    privacy: { title: 'Məxfilik Siyasəti', description: 'The Eternal Memory şəxsi məlumatların işlənməsi siyasəti. GDPR, Gürcüstan və Türkiyə qanunvericiliyinə uyğun.' },
+    terms: { title: 'İstifadə Şərtləri', description: 'The Eternal Memory istifadə şərtləri, ödəniş və geri qaytarma siyasəti.' },
+    cookies: { title: 'Kuki Siyasəti', description: 'Kuki istifadəsi və tənzimləmələrin idarə edilməsi haqqında məlumat.' },
+    kvkk: { title: 'KVKK Məlumatlandırma Mətni', description: 'Türkiyənin Şəxsi Məlumatların Qorunması Qanunu (KVKK) çərçivəsində məlumatlandırma mətni.' },
+    verificationPolicy: { title: 'Doğrulama və Etiraz Siyasəti', description: 'Xatirə Profili şəxsiyyət doğrulama prosesi, sənəd tələbləri və 14 günlük etiraz müddəti.' },
+  },
+
   landing: {
     hero: {
       eyebrow: '',

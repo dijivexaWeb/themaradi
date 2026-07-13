@@ -17,6 +17,19 @@ const he: LangDict = {
     label: 'נוסף בתאריך {date}',
   },
 
+  seoMeta: {
+    home: { title: 'The Eternal Memory — פרופיל הנצחה דיגיטלי וקוד QR למצבה', description: 'צרו פרופיל הנצחה דיגיטלי נצחי ליקיריכם. תמונות, סיפור חיים, עץ משפחה וקוד QR למצבה. פועלים בגאורגיה, טורקיה ובעולם כולו.' },
+    pricing: { title: 'מחירים — פרופיל הנצחה דיגיטלי', description: 'מחירי The Eternal Memory: פרופיל הנצחה, חבילה משפחתית וכספת חיים. תשלום חד-פעמי, גישה לכל החיים. כולל שלט QR.' },
+    about: { title: 'אודותינו', description: 'הכירו את צוות The Eternal Memory. הפלטפורמה נוסדה ב-2023, ומרכזה בבאתומי, גאורגיה.' },
+    contact: { title: 'צור קשר', description: 'צרו קשר עם The Eternal Memory. המשרד שלנו בבאתומי, גאורגיה — לשאלות על פרופיל הנצחה, חבילה משפחתית וקוד QR למצבה.' },
+    miras: { title: 'מורשת לאומית — זיכרון האומה', description: 'פרופילי הנצחה דיגיטליים של דמויות היסטוריות משמעותיות.' },
+    privacy: { title: 'מדיניות פרטיות', description: 'מדיניות עיבוד הנתונים האישיים של The Eternal Memory. תואמת ל-GDPR ולחוקי גאורגיה וטורקיה.' },
+    terms: { title: 'תנאי שימוש', description: 'תנאי השימוש, התשלום ומדיניות ההחזרים של The Eternal Memory.' },
+    cookies: { title: 'מדיניות עוגיות', description: 'מידע על השימוש בעוגיות וניהול ההעדפות.' },
+    kvkk: { title: 'הצהרת KVKK', description: 'הצהרה במסגרת חוק הגנת הנתונים האישיים הטורקי (KVKK).' },
+    verificationPolicy: { title: 'מדיניות אימות והתנגדות', description: 'תהליך אימות זהות לפרופיל הנצחה, דרישות מסמכים וחלון התנגדות של 14 יום.' },
+  },
+
   landing: {
     hero: {
       eyebrow: '',
