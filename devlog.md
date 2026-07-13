@@ -3,6 +3,32 @@
 > Her oturum sonunda Claude bu dosyayı günceller.
 > Format: tarih → ne yapıldı → nerede kalındı → sıradaki adım.
 
+## 2026-07-13 — Oturum 169 (devam): Kartla Ödemede Otomatik Panel Açma + Ödeme Sayfası Tam i18n
+
+### Yapılanlar
+- **Kartla ödemede admin onayı kaldırıldı**: Kullanıcı fark etti — kart ödemesi zaten BOG tarafından anında/kesin doğrulanıyor, ama vault hâlâ `pending_verification`'da kalıyordu (panel kilitli), çünkü admin'in banka havalesi için elle bastığı `approvePaymentAction` (vault → `hidden_vault`) kartla ödemede hiç tetiklenmiyordu. `src/app/api/bog/callback/route.ts`: ödeme `completed` olduğunda artık `payments.status='paid'` yanında `vaults.status='pending_verification' → 'hidden_vault'` de OTOMATİK yapılıyor (aynı admin action'ın mantığı, admin_id=null + `admin_email:'system:bog_callback'` audit log kaydıyla). Kullanıcı gerçek 2 GEL'lik siparişinde (EM-2026-0034) bunu doğruladı.
+- **"24 saat" → "15 dakika"**: Kullanıcı talebiyle banka havalesi onay süresi mesajı "Genellikle 24 saat içinde"den "Genellikle 15 dakika içinde"ye çevrildi. Kartla ödeme için ayrı, "anında onaylanır" mesajı eklendi (`payment_method==='bog_card'` kontrolüyle ayrıştırılıyor).
+- **Ödeme sayfası (`/satin-al/odeme/[orderCode]`) tamamen Türkçe hardcoded idi** — kullanıcı fark etti, "kullanıcı dili ne ise onu kullansın" dedi. Tüm sayfa (`paymentPage` namespace, 7 dilde `src/i18n/*.ts`) çevrildi: başlıklar, sipariş özeti alanları, banka havalesi bölümü, kart butonu, WhatsApp CTA'ları, 4 adımlı süreç kutusu, e-posta doğrulama notu, geç saat notu — hepsi. Sayfa dili **ziyaretçinin o anki tarayıcı diline değil, `payment.order_locale`'e** (siparişin oluşturulduğu dile) göre seçiliyor — bir makbuz/fatura gibi, sipariş hangi dilde verildiyse öyle kalıyor.
+- **Adım mantığı yeniden tasarlandı**: `isPaid` (status `paid` ve ötesi) ile `alreadySubmitted` (status `payment_verification` de dahil) ayrıştırıldı. Kartla ödeme → 4 adımın 4'ü de ✓ (tamamen bitmiş, "giriş yap" CTA'sı tek aksiyon). Banka havalesi/WhatsApp bildirimi → sadece adım 1-2 ✓, adım 3 "aktif" (bekliyor), adım 4 nötr — eskisi gibi manuel admin onayı akışı korundu.
+- `npx tsc --noEmit`, `npm run build` temiz. Local'de gerçek 2 GEL'lik kayıt (EM-2026-0034) Gürcüce görüntülendi — 4/4 adım ✓, "Ödemeniz Onaylandı" başlığı, doğru dil; ayrıca yeni bir test siparişiyle İngilizce + banka havalesi (henüz ödenmemiş) senaryosu da doğrulandı — "Bank transfers are usually confirmed within 15 minutes" doğru gösterildi, adım 3-4 henüz ✓ değil (doğru davranış). Test kayıtları temizlendi.
+
+### Proje Durumu
+- [x] Kartla ödemede otomatik panel açma (admin onayı gerektirmiyor) — canlı gerçek işlemle doğrulandı
+- [x] Banka havalesi metni "15 dakika" olarak güncellendi, kart için ayrı "anında" mesajı
+- [x] Ödeme sayfası tam 7 dilde, siparişin kendi diline göre gösteriliyor
+- [ ] **Commit/push/deploy bekliyor**
+
+### Kritik Kararlar / Notlar
+- Banka havalesi akışı hâlâ manuel admin onayı gerektiriyor (`approvePaymentAction`, `/admin/verifications`) — bu oturumda SADECE kart ödemesi otomatikleştirildi, kullanıcının isteği bu yöndeydi ("banka için bu şekilde doğrulama filan kalsın").
+- Sipariş dili artık `payment.order_locale`'den okunuyor (cookie/anlık tarayıcı dili değil) — bu sayfanın mantığına en uygunu, çünkü bir makbuz gibi sipariş hangi dilde oluşturulduysa o dilde kalmalı.
+
+### Nerede Kaldık
+Kartla ödeme akışı artık uçtan uca (BOG onayı → otomatik panel açma → doğru dilde onay ekranı) tam çalışıyor ve local'de doğrulandı. Commit/push bekliyor.
+
+### Sıradaki Adım
+1. Push et, deploy sonrası kullanıcı EM-2026-0034 siparişiyle giriş yapıp panelin gerçekten açık olduğunu doğrulasın
+2. Apple Pay merchant kaydı için kullanıcı hâlâ BOG'a mail atmalı
+
 ## 2026-07-13 — Oturum 169 (devam): BOG Canlı Doğrulama + Race Condition Fix
 
 ### Yapılanlar

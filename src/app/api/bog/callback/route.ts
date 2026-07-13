@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
 
   const { data: payment } = await supabase
     .from('payments')
-    .select('id, status, user_id, order_locale')
+    .select('id, status, user_id, order_locale, vault_id')
     .eq('external_payment_id', bogOrderId)
     .maybeSingle()
 
@@ -52,6 +52,26 @@ export async function POST(req: NextRequest) {
       .from('payments')
       .update({ status: 'paid', paid_at: new Date().toISOString(), updated_at: new Date().toISOString() })
       .eq('id', payment.id)
+
+    // Kartla ödeme BOG tarafından anında ve kesin olarak doğrulandığı için, banka
+    // havalesindeki gibi admin'in elle "ödeme onayla" yapmasına gerek yok — panel
+    // erişimi (pending_verification → hidden_vault) otomatik açılıyor.
+    if (payment.vault_id) {
+      await supabase
+        .from('vaults')
+        .update({ status: 'hidden_vault', payment_verified_at: new Date().toISOString() })
+        .eq('id', payment.vault_id)
+        .eq('status', 'pending_verification')
+
+      await supabase.from('admin_audit_logs').insert({
+        admin_id: null,
+        admin_email: 'system:bog_callback',
+        action: 'payment_approved_auto',
+        entity_type: 'vault',
+        entity_id: payment.vault_id,
+        new_value: { payment_id: payment.id, bog_order_id: bogOrderId },
+      })
+    }
 
     if (payment.user_id) {
       try {

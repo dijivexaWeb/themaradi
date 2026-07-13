@@ -8,33 +8,21 @@ import { buildWhatsAppChatLink, buildWhatsAppPaymentSubmittedLink } from '@/lib/
 import { markPaymentSubmitted, initiateBogPayment } from '../actions'
 import { getBogSettings } from '@/lib/bog'
 import PaymentBrandRow from '@/components/PaymentBrandIcons'
+import { dictionaries, type Lang } from '@/i18n'
 
 export const metadata: Metadata = {
   title: 'Ödeme',
   robots: { index: false, follow: true },
 }
 
-const PRODUCT_LABELS: Record<string, string> = {
-  memorial_one_time: 'Anma Profili',
-  vault_setup: 'Yaşam Kasası',
-  vault_monthly: 'Yaşam Kasası (Aylık)',
-  family_package: 'Aile Paketi',
-}
-
-const PROFILE_FOR_LABELS: Record<string, string> = {
-  baba: 'Babam için', anne: 'Annem için', es: 'Eşim için',
-  kardes: 'Kardeşim için', yakin: 'Yakınım için', diger: 'Diğer',
-}
-
-const LOCALE_LABELS: Record<string, string> = {
-  tr: 'Türkçe', ka: 'Gürcüce', ru: 'Rusça', en: 'İngilizce', az: 'Azerice', hy: 'Ermenice', he: 'İbranice',
-}
+// Kartla ödeme (BOG) ANINDA ve kesin olarak doğrulanıyor — bu durumlarda süreç
+// tamamen bitmiş sayılır, banka havalesindeki "doğrulama bekliyor" adımı gösterilmez.
+const FULLY_PAID_STATUSES = new Set([
+  'paid', 'info_pending', 'profile_preparing', 'publish_approval', 'published', 'completed',
+])
 
 // pending sonrası ulaşılabilecek her durum — "ödeme bildirimi alındı" ekranını gösterir
-const SUBMITTED_STATUSES = new Set([
-  'payment_verification', 'paid', 'info_pending', 'profile_preparing',
-  'publish_approval', 'published', 'completed',
-])
+const SUBMITTED_STATUSES = new Set(['payment_verification', ...FULLY_PAID_STATUSES])
 
 interface Props {
   params: Promise<{ orderCode: string }>
@@ -50,7 +38,7 @@ export default async function OdemePage({ params, searchParams }: Props) {
 
   const { data: payment } = await service
     .from('payments')
-    .select('id, order_code, amount, currency, product_type, status, user_id, order_locale, profile_for')
+    .select('id, order_code, amount, currency, product_type, status, user_id, order_locale, profile_for, payment_method')
     .eq('id', paymentId)
     .maybeSingle()
 
@@ -76,12 +64,19 @@ export default async function OdemePage({ params, searchParams }: Props) {
     .eq('id', payment.user_id)
     .maybeSingle()
 
+  // Sipariş kendi diliyle taşınır (satın alma anında seçilen dil) — o sırada
+  // sitede gezinen ziyaretçinin GÜNCEL diline değil, siparişin diline bakılır.
+  const lang = (payment.order_locale as Lang) in dictionaries ? (payment.order_locale as Lang) : 'tr'
+  const t = dictionaries[lang].paymentPage
+
   const isPendingEmail = pending_email === '1'
   const displayName = name ? decodeURIComponent(name) : (customerProfile?.full_name ?? null)
-  const fallbackWaLink = buildWhatsAppChatLink('Merhaba, siparişimle ilgili ödemeyi tamamlamak istiyorum.')
+  const fallbackWaLink = buildWhatsAppChatLink(t.whatsappChatMessage)
   const waLink = wa ? decodeURIComponent(wa) : fallbackWaLink
-  const productLabel = PRODUCT_LABELS[payment.product_type] ?? 'Sipariş'
+  const productLabel = t.products[payment.product_type as keyof typeof t.products] ?? t.products.default
   const alreadySubmitted = SUBMITTED_STATUSES.has(payment.status)
+  const isPaid = FULLY_PAID_STATUSES.has(payment.status)
+  const isCardPayment = payment.payment_method === 'bog_card'
   const paymentSubmittedWaLink = buildWhatsAppPaymentSubmittedLink({
     senderName: displayName ?? 'Müşteri',
     orderCode: payment.order_code,
@@ -124,28 +119,33 @@ export default async function OdemePage({ params, searchParams }: Props) {
             <div className="w-20 h-20 bg-[#f2f7f0] border border-[#c9dfc9] rounded-full flex items-center justify-center mx-auto mb-5">
               <CheckCircle2 className="h-10 w-10 text-emerald-700" />
             </div>
-            <h1 className="text-2xl font-bold text-[#1f2d27] mb-2">Siparişiniz Oluşturuldu</h1>
+            <h1 className="text-2xl font-bold text-[#1f2d27] mb-2">{t.heroTitle}</h1>
             <p className="text-[#6f766f] text-sm leading-6">
-              <span className="text-[#b08340] font-semibold">{productLabel}</span> siparişiniz kaydedildi.
+              {t.heroSubtitle.split('{product}').map((part, i, arr) => (
+                <span key={i}>
+                  {part}
+                  {i < arr.length - 1 && <span className="text-[#b08340] font-semibold">{productLabel}</span>}
+                </span>
+              ))}
             </p>
           </div>
 
           {/* Sipariş özeti */}
           <div className="bg-white border border-[#e6dccb] rounded-2xl p-5 shadow-sm">
-            <p className="text-xs text-[#8a8478] uppercase tracking-wider font-semibold mb-3 text-center">Sipariş Kodunuz</p>
+            <p className="text-xs text-[#8a8478] uppercase tracking-wider font-semibold mb-3 text-center">{t.orderCodeLabel}</p>
             <p className="text-2xl font-bold text-[#b08340] tracking-wide font-mono text-center mb-4">{payment.order_code}</p>
             <div className="space-y-2 text-sm border-t border-[#e6dccb] pt-3">
               {displayName && (
-                <div className="flex justify-between"><span className="text-[#8a8478]">Ad Soyad</span><span className="text-[#1f2d27] font-medium">{displayName}</span></div>
+                <div className="flex justify-between"><span className="text-[#8a8478]">{t.fieldName}</span><span className="text-[#1f2d27] font-medium">{displayName}</span></div>
               )}
               {customerProfile?.phone && (
-                <div className="flex justify-between"><span className="text-[#8a8478]">Telefon</span><span className="text-[#1f2d27] font-medium">{customerProfile.phone}</span></div>
+                <div className="flex justify-between"><span className="text-[#8a8478]">{t.fieldPhone}</span><span className="text-[#1f2d27] font-medium">{customerProfile.phone}</span></div>
               )}
               {payment.profile_for && (
-                <div className="flex justify-between"><span className="text-[#8a8478]">Profil</span><span className="text-[#1f2d27] font-medium">{PROFILE_FOR_LABELS[payment.profile_for] ?? payment.profile_for}</span></div>
+                <div className="flex justify-between"><span className="text-[#8a8478]">{t.fieldProfile}</span><span className="text-[#1f2d27] font-medium">{t.profileFor[payment.profile_for as keyof typeof t.profileFor] ?? payment.profile_for}</span></div>
               )}
-              <div className="flex justify-between"><span className="text-[#8a8478]">Dil</span><span className="text-[#1f2d27] font-medium">{LOCALE_LABELS[payment.order_locale] ?? payment.order_locale}</span></div>
-              <div className="flex justify-between pt-2 border-t border-[#e6dccb]"><span className="text-[#8a8478]">Tutar</span><span className="text-[#1f2d27] font-bold">{payment.amount} {payment.currency}</span></div>
+              <div className="flex justify-between"><span className="text-[#8a8478]">{t.fieldLanguage}</span><span className="text-[#1f2d27] font-medium">{t.languages[payment.order_locale as keyof typeof t.languages] ?? payment.order_locale}</span></div>
+              <div className="flex justify-between pt-2 border-t border-[#e6dccb]"><span className="text-[#8a8478]">{t.fieldAmount}</span><span className="text-[#1f2d27] font-bold">{payment.amount} {payment.currency}</span></div>
             </div>
           </div>
 
@@ -153,37 +153,38 @@ export default async function OdemePage({ params, searchParams }: Props) {
           {bog === 'fail' && !alreadySubmitted && (
             <div className="flex items-start gap-2.5 bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-sm text-red-800 leading-6">
               <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" />
-              <p>Kart ödemesi tamamlanamadı. Tekrar deneyebilir veya aşağıdaki banka havalesi seçeneğini kullanabilirsiniz.</p>
+              <p>{t.bogFailMessage}</p>
             </div>
           )}
 
           {alreadySubmitted ? (
             <div className="bg-white border border-[#c9dfc9] rounded-2xl p-5 shadow-sm">
               <p className="text-xs text-emerald-700 uppercase tracking-wider font-semibold mb-3 flex items-center gap-2">
-                <Clock className="h-3.5 w-3.5" /> Ödeme Doğrulama Bekliyor
+                {isPaid ? <CheckCircle2 className="h-3.5 w-3.5" /> : <Clock className="h-3.5 w-3.5" />}
+                {isPaid ? t.paidTitle : t.pendingTitle}
               </p>
               <p className="text-sm text-[#3d453f] leading-6 mb-4">
-                Teşekkür ederiz. Ödemeniz doğrulama sürecine alınmıştır. Kontrol tamamlandığında
-                size e-posta ile bilgi verilecektir. Bu sırada hesabınıza giriş yaparak anma
-                profili için gerekli bilgileri hazırlamaya başlayabilirsiniz.
+                {isPaid ? t.paidBody : t.pendingBody}
               </p>
               <div className="space-y-3">
                 <Link
                   href="/login"
                   className="inline-flex w-full items-center justify-center gap-2 bg-[#b08340] hover:bg-[#96692f] text-white font-semibold py-3 rounded-xl transition-colors text-sm"
                 >
-                  Hesabıma Giriş Yap
+                  {t.loginCta}
                   <ArrowRight className="h-4 w-4" />
                 </Link>
-                <a
-                  href={paymentSubmittedWaLink}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-flex w-full items-center justify-center gap-2 bg-gradient-to-tr from-[#128C7E] to-[#25D366] hover:brightness-110 text-white font-semibold py-3 rounded-xl transition-all text-sm"
-                >
-                  <MessageCircle className="h-4 w-4" />
-                  WhatsApp ile Bilgi Ver
-                </a>
+                {!isPaid && (
+                  <a
+                    href={paymentSubmittedWaLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex w-full items-center justify-center gap-2 bg-gradient-to-tr from-[#128C7E] to-[#25D366] hover:brightness-110 text-white font-semibold py-3 rounded-xl transition-all text-sm"
+                  >
+                    <MessageCircle className="h-4 w-4" />
+                    {t.whatsappInfoCta}
+                  </a>
+                )}
               </div>
             </div>
           ) : (
@@ -197,16 +198,16 @@ export default async function OdemePage({ params, searchParams }: Props) {
                       className="inline-flex w-full items-center justify-center gap-2 bg-[#173d31] hover:bg-[#0f2822] text-white font-semibold py-3.5 rounded-xl transition-colors text-sm"
                     >
                       <CreditCard className="h-4 w-4" />
-                      Kartla Öde ({payment.amount} {payment.currency})
+                      {t.cardPayCta} ({payment.amount} {payment.currency})
                     </button>
                     <div className="flex items-center justify-center gap-2 mt-2.5">
                       <PaymentBrandRow />
-                      <span className="text-[10px] text-[#a39a86]">Bank of Georgia güvencesiyle</span>
+                      <span className="text-[10px] text-[#a39a86]">{t.cardTrustNote}</span>
                     </div>
                   </form>
                   <div className="flex items-center gap-3 py-1">
                     <div className="h-px flex-1 bg-[#e6dccb]" />
-                    <span className="text-xs text-[#a39a86] uppercase tracking-wider">veya</span>
+                    <span className="text-xs text-[#a39a86] uppercase tracking-wider">{t.orDivider}</span>
                     <div className="h-px flex-1 bg-[#e6dccb]" />
                   </div>
                 </>
@@ -215,17 +216,17 @@ export default async function OdemePage({ params, searchParams }: Props) {
               {/* Banka bilgisi */}
               <div className="bg-white border border-[#e6dccb] rounded-2xl p-5 shadow-sm">
                 <p className="text-xs text-[#8a8478] uppercase tracking-wider font-semibold mb-4">
-                  Banka Havalesi ile Ödeme
+                  {t.bankTransferTitle}
                 </p>
                 <div className="space-y-2 text-sm">
-                  <div className="flex justify-between"><span className="text-[#8a8478]">Alıcı</span><span className="text-[#1f2d27] font-medium">{bankSettings.bank_recipient || 'The Eternal Memory LLC'}</span></div>
-                  <div className="flex justify-between"><span className="text-[#8a8478]">Banka</span><span className="text-[#1f2d27] font-medium">{bankSettings.bank_name || 'TBC Bank'}</span></div>
-                  <div className="flex justify-between items-start gap-2"><span className="text-[#8a8478] shrink-0">IBAN</span><span className="text-[#1f2d27] font-mono text-xs text-right break-all">{bankSettings.bank_iban || 'GE29TB7522145061700002'}</span></div>
-                  <div className="flex justify-between pt-2 border-t border-[#e6dccb]"><span className="text-[#8a8478]">Tutar</span><span className="text-[#1f2d27] font-bold">{payment.amount} {payment.currency}</span></div>
-                  <div className="flex justify-between"><span className="text-[#8a8478]">Açıklama</span><span className="text-[#b08340] font-mono font-semibold">{payment.order_code}</span></div>
+                  <div className="flex justify-between"><span className="text-[#8a8478]">{t.bankRecipientLabel}</span><span className="text-[#1f2d27] font-medium">{bankSettings.bank_recipient || 'The Eternal Memory LLC'}</span></div>
+                  <div className="flex justify-between"><span className="text-[#8a8478]">{t.bankNameLabel}</span><span className="text-[#1f2d27] font-medium">{bankSettings.bank_name || 'TBC Bank'}</span></div>
+                  <div className="flex justify-between items-start gap-2"><span className="text-[#8a8478] shrink-0">{t.ibanLabel}</span><span className="text-[#1f2d27] font-mono text-xs text-right break-all">{bankSettings.bank_iban || 'GE29TB7522145061700002'}</span></div>
+                  <div className="flex justify-between pt-2 border-t border-[#e6dccb]"><span className="text-[#8a8478]">{t.fieldAmount}</span><span className="text-[#1f2d27] font-bold">{payment.amount} {payment.currency}</span></div>
+                  <div className="flex justify-between"><span className="text-[#8a8478]">{t.descriptionLabel}</span><span className="text-[#b08340] font-mono font-semibold">{payment.order_code}</span></div>
                 </div>
                 <p className="text-xs text-[#8a5a15] bg-[#fdf1dc] border border-[#f0d9a8] rounded-lg px-3 py-2.5 mt-4 leading-5">
-                  Lütfen havale açıklamasına mutlaka sipariş kodunuzu ({payment.order_code}) yazın. Bu kod ödeme doğrulaması için gereklidir.
+                  {t.bankNote.replace('{code}', payment.order_code)}
                 </p>
               </div>
 
@@ -235,7 +236,7 @@ export default async function OdemePage({ params, searchParams }: Props) {
                   type="submit"
                   className="inline-flex w-full items-center justify-center gap-2 bg-[#b08340] hover:bg-[#96692f] text-white font-semibold py-3.5 rounded-xl transition-colors text-sm"
                 >
-                  Ödemeyi Tamamladım
+                  {t.markPaidCta}
                 </button>
               </form>
 
@@ -246,27 +247,32 @@ export default async function OdemePage({ params, searchParams }: Props) {
                 className="inline-flex w-full items-center justify-center gap-2 bg-gradient-to-tr from-[#128C7E] to-[#25D366] hover:brightness-110 text-white font-semibold py-3.5 rounded-xl transition-all text-sm"
               >
                 <MessageCircle className="h-4 w-4" />
-                Sorularım Var, WhatsApp&apos;a Yaz
+                {t.whatsappQuestionCta}
               </a>
             </>
           )}
 
           {/* Adımlar */}
           <div className="bg-white border border-[#e6dccb] rounded-2xl p-5 space-y-4 shadow-sm">
-            <p className="text-xs text-[#8a8478] uppercase tracking-wider font-semibold">Süreç</p>
-            <Step num={1} done label="Sipariş alındı" />
-            <Step num={2} done={alreadySubmitted} active={!alreadySubmitted} label="Ödemeyi tamamlayın" sub="Banka havalesi veya WhatsApp üzerinden" />
-            <Step num={3} active={alreadySubmitted} label="Ekibimiz ödemeyi onaylar" sub="Genellikle 24 saat içinde" />
-            <Step num={4} label="Sayfanız aktive edilir" sub="Giriş yapıp içerik ekleyebilirsiniz" />
+            <p className="text-xs text-[#8a8478] uppercase tracking-wider font-semibold">{t.processTitle}</p>
+            <Step num={1} done label={t.step1} />
+            <Step num={2} done={alreadySubmitted} active={!alreadySubmitted} label={t.step2} sub={t.step2Sub} />
+            <Step
+              num={3}
+              done={isPaid}
+              active={alreadySubmitted && !isPaid}
+              label={t.step3}
+              sub={isCardPayment ? t.step3SubCard : t.step3SubBank}
+            />
+            <Step num={4} done={isPaid} active={isPaid} label={t.step4} sub={t.step4Sub} />
           </div>
 
           {/* E-posta doğrulama notu */}
           {isPendingEmail && (
             <div className="bg-[#fdf1dc] border border-[#f0d9a8] rounded-xl p-4 text-sm text-[#8a5a15] leading-6">
-              <p className="font-semibold mb-1">📧 E-postanızı doğrulayın</p>
+              <p className="font-semibold mb-1">{t.emailVerifyTitle}</p>
               <p className="text-[#8a5a15]/80 text-xs">
-                Kayıt e-postanıza bir doğrulama bağlantısı gönderdik. Ödeme onaylandıktan
-                sonra hesabınıza giriş yapabilmek için önce bu bağlantıya tıklayın.
+                {t.emailVerifyBody}
               </p>
             </div>
           )}
@@ -274,10 +280,7 @@ export default async function OdemePage({ params, searchParams }: Props) {
           {!alreadySubmitted && (
             <div className="flex items-start gap-2.5 bg-[#f8f4ea] border border-[#e2d7c3] rounded-xl px-4 py-3 text-xs text-[#6f766f] leading-5">
               <span className="text-base shrink-0 mt-px">🕐</span>
-              <p>
-                Saat <strong className="text-[#1f2d27]">18:00</strong>&apos;dan sonra yapılan
-                ödemeler bir sonraki iş günü onaylanır. Sorun yaşarsanız bizimle iletişime geçin.
-              </p>
+              <p>{t.lateNote}</p>
             </div>
           )}
 
@@ -288,14 +291,14 @@ export default async function OdemePage({ params, searchParams }: Props) {
               className="inline-flex w-full items-center justify-center gap-2 bg-white hover:bg-[#f8f4ea] text-[#3d453f] font-medium py-3 rounded-xl transition-colors text-sm border border-[#e2d7c3]"
             >
               <Phone className="h-4 w-4" />
-              Sorun mu Yaşıyorsunuz? İletişime Geçin
+              {t.contactCta}
             </Link>
             <Link
               href="/"
               className="flex items-center justify-center gap-2 text-sm text-[#8a8478] hover:text-[#6f766f] transition-colors py-2"
             >
               <Home className="h-3.5 w-3.5" />
-              Ana Sayfaya Dön
+              {t.homeCta}
             </Link>
           </div>
 
