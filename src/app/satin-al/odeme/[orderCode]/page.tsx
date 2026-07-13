@@ -2,10 +2,11 @@ import type { Metadata } from 'next'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import BrandLogo from '@/components/BrandLogo'
-import { CheckCircle2, ArrowRight, Phone, Home, MessageCircle, Clock } from 'lucide-react'
+import { CheckCircle2, ArrowRight, Phone, Home, MessageCircle, Clock, CreditCard, AlertTriangle } from 'lucide-react'
 import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { buildWhatsAppChatLink, buildWhatsAppPaymentSubmittedLink } from '@/lib/whatsapp'
-import { markPaymentSubmitted } from '../actions'
+import { markPaymentSubmitted, initiateBogPayment } from '../actions'
+import { getBogSettings } from '@/lib/bog'
 
 export const metadata: Metadata = {
   title: 'Ödeme',
@@ -36,12 +37,12 @@ const SUBMITTED_STATUSES = new Set([
 
 interface Props {
   params: Promise<{ orderCode: string }>
-  searchParams: Promise<{ type?: string; name?: string; wa?: string; pending_email?: string }>
+  searchParams: Promise<{ type?: string; name?: string; wa?: string; pending_email?: string; bog?: string }>
 }
 
 export default async function OdemePage({ params, searchParams }: Props) {
   const { orderCode: paymentId } = await params
-  const { name, wa, pending_email } = await searchParams
+  const { name, wa, pending_email, bog } = await searchParams
 
   const supabase = await createClient()
   const service = await createServiceClient()
@@ -82,14 +83,17 @@ export default async function OdemePage({ params, searchParams }: Props) {
   const queryString = passthroughParams.toString() ? `?${passthroughParams.toString()}` : ''
 
   const boundMarkPaid = markPaymentSubmitted.bind(null, payment.id, queryString)
+  const boundInitiateBog = initiateBogPayment.bind(null, payment.id)
 
   let bankSettings: Record<string, string> = {}
+  let cardPaymentAvailable = false
   if (!alreadySubmitted) {
-    const { data: settingsRows } = await service
-      .from('platform_settings')
-      .select('key, value')
-      .in('key', ['bank_iban', 'bank_name', 'bank_recipient'])
+    const [{ data: settingsRows }, bogSettings] = await Promise.all([
+      service.from('platform_settings').select('key, value').in('key', ['bank_iban', 'bank_name', 'bank_recipient']),
+      getBogSettings(),
+    ])
     bankSettings = Object.fromEntries((settingsRows ?? []).map((r) => [r.key, r.value]))
+    cardPaymentAvailable = bogSettings.enabled && ['GEL', 'USD', 'EUR', 'GBP'].includes(payment.currency)
   }
 
   return (
@@ -133,6 +137,14 @@ export default async function OdemePage({ params, searchParams }: Props) {
             </div>
           </div>
 
+          {/* BOG'dan başarısız dönüş */}
+          {bog === 'fail' && !alreadySubmitted && (
+            <div className="flex items-start gap-2.5 bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-sm text-red-800 leading-6">
+              <AlertTriangle className="h-4 w-4 shrink-0 mt-0.5" />
+              <p>Kart ödemesi tamamlanamadı. Tekrar deneyebilir veya aşağıdaki banka havalesi seçeneğini kullanabilirsiniz.</p>
+            </div>
+          )}
+
           {alreadySubmitted ? (
             <div className="bg-white border border-[#c9dfc9] rounded-2xl p-5 shadow-sm">
               <p className="text-xs text-emerald-700 uppercase tracking-wider font-semibold mb-3 flex items-center gap-2">
@@ -164,6 +176,29 @@ export default async function OdemePage({ params, searchParams }: Props) {
             </div>
           ) : (
             <>
+              {/* Kartla ödeme — BOG aktifse birincil seçenek */}
+              {cardPaymentAvailable && (
+                <>
+                  <form action={boundInitiateBog}>
+                    <button
+                      type="submit"
+                      className="inline-flex w-full items-center justify-center gap-2 bg-[#173d31] hover:bg-[#0f2822] text-white font-semibold py-3.5 rounded-xl transition-colors text-sm"
+                    >
+                      <CreditCard className="h-4 w-4" />
+                      Kartla Öde ({payment.amount} {payment.currency})
+                    </button>
+                    <p className="text-xs text-[#8a8478] text-center mt-2">
+                      Visa, Mastercard, Google Pay — güvenli ödeme, anında onay
+                    </p>
+                  </form>
+                  <div className="flex items-center gap-3 py-1">
+                    <div className="h-px flex-1 bg-[#e6dccb]" />
+                    <span className="text-xs text-[#a39a86] uppercase tracking-wider">veya</span>
+                    <div className="h-px flex-1 bg-[#e6dccb]" />
+                  </div>
+                </>
+              )}
+
               {/* Banka bilgisi */}
               <div className="bg-white border border-[#e6dccb] rounded-2xl p-5 shadow-sm">
                 <p className="text-xs text-[#8a8478] uppercase tracking-wider font-semibold mb-4">

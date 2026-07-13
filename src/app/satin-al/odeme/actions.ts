@@ -5,6 +5,51 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { sendEmail } from '@/lib/email'
 import { paymentVerificationPendingEmail, paymentVerificationPendingEmailSubject } from '@/lib/email/templates'
+import { createBogOrder, getBogSettings } from '@/lib/bog'
+
+// Form action olarak kullanıldığı için (void döner) hata durumlarında return
+// yerine ödeme sayfasına ?bog=fail ile geri yönlendiriyoruz.
+export async function initiateBogPayment(paymentId: string) {
+  const service = await createServiceClient()
+  const failUrl = `/satin-al/odeme/${paymentId}?bog=fail`
+
+  const { data: payment } = await service
+    .from('payments')
+    .select('id, order_code, amount, currency, status, order_locale, notes')
+    .eq('id', paymentId)
+    .maybeSingle()
+
+  if (!payment) redirect(failUrl)
+
+  const settings = await getBogSettings()
+  if (!settings.enabled) redirect(failUrl)
+
+  if (payment.currency !== 'GEL' && payment.currency !== 'USD' && payment.currency !== 'EUR' && payment.currency !== 'GBP') {
+    redirect(failUrl)
+  }
+
+  let bogOrder
+  try {
+    bogOrder = await createBogOrder({
+      paymentId: payment.id,
+      orderCode: payment.order_code,
+      amount: Number(payment.amount),
+      currency: payment.currency,
+      description: `The Eternal Memory — ${payment.order_code}`,
+      locale: payment.order_locale === 'ka' ? 'ka' : 'en',
+    })
+  } catch (e) {
+    console.error('[initiateBogPayment] BOG sipariş oluşturma hatası:', e)
+    redirect(failUrl)
+  }
+
+  await service
+    .from('payments')
+    .update({ external_payment_id: bogOrder.orderId, payment_method: 'bog_card', updated_at: new Date().toISOString() })
+    .eq('id', paymentId)
+
+  redirect(bogOrder.redirectUrl)
+}
 
 export async function markPaymentSubmitted(paymentId: string, redirectQuery: string) {
   const service = await createServiceClient()

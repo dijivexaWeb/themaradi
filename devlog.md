@@ -3,6 +3,43 @@
 > Her oturum sonunda Claude bu dosyayı günceller.
 > Format: tarih → ne yapıldı → nerede kalındı → sıradaki adım.
 
+## 2026-07-13 — Oturum 169 (devam): GSC 404/favicon + Pricing JSON-LD fix + BOG Kartla Ödeme Entegrasyonu
+
+### Yapılanlar
+- **GSC "Bulunamadı (404)" takibi**: Kullanıcı `/icon` URL'ini paylaştı. Kontrol edildi: sitede `/icon`'a giden hiçbir link yok (kod/HTML'de referans yok), ama `/favicon.ico` ve `/apple-touch-icon.png` GERÇEKTEN 404 veriyordu — taray��cılar bunları `<link>` etiketine bakmadan otomatik prob ediyor. `src/app/favicon.ico` eklendi (mevcut logo-mark.png'den sharp ile 64x64'e küçültülüp Next.js convention path'ine yazıldı). Push GCM'de takıldığı için henüz deploy edilmedi (kullanıcı manuel push edecek).
+- **Pricing sayfası Product JSON-LD hatası**: GSC "2 geçersiz öğe" uyarısı gösterdi — kritik: "image" alanı eksik. İncelerken ikinci, daha önemli bir bug bulundu: **fiyat her zaman normal fiyatı (299₾/796₾) gösteriyordu**, kampanya aktifken (şu an gerçek satış fiyatı 99₾/249₾) gerçek fiyatı yansıtmıyordu — Google'a yanlış fiyat bildirmek structured data politikalarına aykırı. `src/app/pricing/page.tsx`: image+brand eklendi, fiyat artık `campaignActive` durumuna göre doğru hesaplanıyor, `priceValidUntil` (kampanya bitiş) ve `hasMerchantReturnPolicy` (30 gün iade, mevcut kopyayla tutarlı) eklendi.
+- **BOG (Bank of Georgia) kartla ödeme entegrasyonu başlatıldı**: Kullanıcı BOG'dan public/secret key onayı aldığını bildirdi, `api.bog.ge/docs` dokümantasyonu okunup akış çıkarıldı (OAuth client_credentials token → sipariş oluştur → kullanıcıyı BOG'un hosted ödeme sayfasına yönlendir → imzalı server-to-server callback ile sonucu al). Kullanıcı kararları: (1) kart ödemesi banka havalesinin **yanına** eklensin, ikisi birlikte sunulsun — havale tamamen kaldırılmadı; (2) Google Pay otomatik geliyor (BOG Business Manager'dan aktif edilince ekstra kod gerekmiyor), Apple Pay ayrı bir merchant kaydı gerektiriyor (kullanıcı `ecommercemerchants@bog.ge`'ye domain+public key ile mail atmalı, sonra domain doğrulama dosyası bana verilip host edilecek — 2. faz); (3) public/secret key'ler zaten var olan admin panel altyapısına (`platform_settings` → "BOG Pay" provider seçeneği, `_PaymentGatewayForm.tsx`) girilecek, ek kod gerekmedi.
+  - `src/lib/bog.ts`: OAuth token alma+cache, sipariş oluşturma (`createBogOrder`), ödeme detayı sorgulama (`getBogPaymentDetails`), **callback imza doğrulama** (BOG'un sabit public key'i ile RSA-SHA256, raw body üzerinde — JSON.parse'tan ÖNCE).
+  - `src/app/api/bog/callback/route.ts`: BOG'un server-to-server bildirimini karşılıyor, imzayı doğruluyor, `order_status.key === 'completed'` ise `payments.status='paid'` yapıp onay maili gönderiyor (mevcut `updatePaymentStatus` admin action'ındaki pattern'in aynısı).
+  - `src/app/satin-al/odeme/actions.ts`: `initiateBogPayment(paymentId)` — BOG'da sipariş açar, `payments.external_payment_id`'ye BOG order id'sini yazar (yeni migration gerekmedi, mevcut kolon reuse edildi), kullanıcıyı BOG'un ödeme sayfasına yönlendirir. Hata durumlarında `?bog=fail` ile ödeme sayfasına geri döner (form action void dönmeli, `redirect()` bu yüzden her yolda çağrılıyor).
+  - `src/app/satin-al/odeme/[orderCode]/page.tsx`: BOG aktifse (admin panelden "BOG Pay" seçilip enable edilince) banka havalesinin ÜSTÜNDE birincil "Kartla Öde" butonu; `?bog=fail` geldiğinde kırmızı uyarı banner'ı.
+  - `npx tsc --noEmit`, `npm run build` temiz. Local'de: BOG kapalıyken (şu anki gerçek durum) ödeme sayfası hatasız render oluyor, kart butonu doğru gizleniyor doğrulandı (gerçek bir test siparişiyle, sonra temizlendi). BOG **henüz gerçek anahtarlarla uçtan uca test edilmedi** — kullanıcı admin panelden anahtarları girip enable ettikten sonra gerçek bir kart denemesiyle test edilmeli.
+
+### Proje Durumu
+- [x] favicon.ico eklendi (kod tarafında tamam, commit'lendi, push bekliyor)
+- [x] Pricing JSON-LD image/fiyat/return-policy fix (kod tarafında tamam, commit edilmedi)
+- [x] BOG entegrasyonu — kod tarafında uçtan uca yazıldı (auth, sipariş, callback, UI), local'de "kapalı" senaryosu doğrulandı
+- [ ] **Commit/push/deploy bekliyor** — git push GCM'de takılıyor, kullanıcı kendi tarafında `git push origin master` çalıştırmalı
+- [ ] Kullanıcı admin panelden (`/admin/settings`) "BOG Pay" sağlayıcısını seçip public/secret key'leri girip enable etmeli
+- [ ] Enable edildikten sonra gerçek bir kartla uçtan uca test edilmeli (küçük bir tutarla)
+- [ ] Apple Pay: kullanıcı `ecommercemerchants@bog.ge`'ye domain+public key ile merchant kaydı için mail atmalı, sonra domain doğrulama dosyasını bana iletmeli
+
+### Kritik Kararlar / Notlar
+- Banka havalesi/WhatsApp akışı **kaldırılmadı** — kart ödemesi ek/birincil seçenek olarak eklendi, kullanıcı ikisinden birini seçebiliyor.
+- BOG callback imza doğrulaması ZORUNLU ve raw body üzerinde yapılıyor — imza geçmezse 401 dönüp hiçbir şey güncellenmiyor (sahte callback'lere karşı koruma).
+- Sadece `order_status.key === 'completed'` durumunda ödeme "paid" işaretleniyor; diğer durumlarda (`processing`, `rejected` vb.) sipariş `pending` kalıyor, kullanıcı tekrar deneyebiliyor — agresif "failed" işaretlemesi yapılmadı.
+- `payments.external_payment_id` kolonu (zaten var olan) BOG order id'sini tutmak için reuse edildi, yeni migration gerekmedi.
+
+### Nerede Kaldık
+BOG entegrasyonu kod tarafında tamamlandı ama gerçek anahtarlarla hiç test edilmedi (kullanıcı henüz admin panelden girmedi). Favicon ve pricing JSON-LD fix'leri de commit edildi ama push bekliyor.
+
+### Sıradaki Adım
+1. Kullanıcı `git push origin master` çalıştırsın (GCM sorunu)
+2. Kullanıcı admin panelden BOG public/secret key'leri girip "BOG Pay"i enable etsin
+3. Küçük bir tutarla gerçek kart testi yapılsın (mümkünse BOG'un sağladığı bir test kartıyla önce)
+4. Callback'in gerçekten çalıştığı (ödeme sonrası payments.status='paid' olması) canlıda doğrulanmalı
+5. Apple Pay için kullanıcı BOG'a merchant kaydı maili atsın
+
 ## 2026-07-13 — Oturum 169 (devam): SEO Denetimi + Kritik Metadata/Canonical Bug Fix
 
 ### Yapılanlar
