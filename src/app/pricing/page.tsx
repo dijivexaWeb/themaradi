@@ -3,6 +3,7 @@ import PricingClient from './PricingClient'
 import { fetchPricingConfig } from '@/lib/pricing'
 import { buildAlternateLanguages, buildCanonical } from '@/lib/i18n/hreflang'
 import { getTranslation } from '@/i18n/server'
+import { getBogSettings } from '@/lib/bog'
 
 export const revalidate = 3600
 
@@ -21,7 +22,7 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function PricingPage() {
-  const pricing = await fetchPricingConfig()
+  const [pricing, bogSettings] = await Promise.all([fetchPricingConfig(), getBogSettings()])
 
   // Google'a bildirilen fiyat gerçek ödeme akışındaki fiyatla birebir eşleşmeli —
   // kampanya aktifken indirimli fiyat kullanılmazsa Google structured data
@@ -89,7 +90,7 @@ export default async function PricingPage() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(productsLd) }}
       />
-      <PricingClient pricing={pricing} />
+      <PricingClient pricing={pricing} cardPaymentAvailable={bogSettings.enabled} />
     </>
   )
 }

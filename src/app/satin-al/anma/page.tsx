@@ -3,6 +3,7 @@ import { fetchPricingConfig } from '@/lib/pricing'
 import { resolveAmount, getRenewal } from '@/lib/currency'
 import { getTranslation } from '@/i18n/server'
 import { buildAlternateLanguages } from '@/lib/i18n/hreflang'
+import { getBogSettings } from '@/lib/bog'
 import AnmaFormClient from './_AnmaFormClient'
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://theeternalmemory.com'
@@ -25,7 +26,7 @@ export const metadata: Metadata = {
 export default async function AnmaSatinAlPage() {
   const { lang } = await getTranslation()
 
-  const pricing = await fetchPricingConfig()
+  const [pricing, bogSettings] = await Promise.all([fetchPricingConfig(), getBogSettings()])
 
   const { amount, currency } = resolveAmount(lang, {
     campaignActive: pricing.campaignActive,
@@ -36,5 +37,5 @@ export default async function AnmaSatinAlPage() {
 
   const { renewalPrice, renewalSymbol } = getRenewal(pricing, lang)
 
-  return <AnmaFormClient amount={amount} currency={currency} renewalPrice={renewalPrice} renewalSymbol={renewalSymbol} />
+  return <AnmaFormClient amount={amount} currency={currency} renewalPrice={renewalPrice} renewalSymbol={renewalSymbol} cardPaymentAvailable={bogSettings.enabled} />
 }

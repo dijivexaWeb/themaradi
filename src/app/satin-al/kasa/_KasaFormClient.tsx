@@ -5,19 +5,23 @@ import { purchaseVaultAction } from '../actions'
 import Link from 'next/link'
 import BrandLogo from '@/components/BrandLogo'
 import { useLang } from '@/i18n/context'
+import PaymentBrandRow from '@/components/PaymentBrandIcons'
 
 export default function KasaFormClient({
   setupAmount,
   monthlyAmount,
   currency,
+  cardPaymentAvailable,
 }: {
   setupAmount: number
   monthlyAmount: number
   currency: string
+  cardPaymentAvailable?: boolean
 }) {
   const { t } = useLang()
   const f = t.purchasePage.kasa
   const c = t.purchasePage.common
+  const cardTrustNote = t.paymentPage.cardTrustNote
   const [state, action, pending] = useActionState(purchaseVaultAction, null)
 
   const inp = 'w-full bg-white border border-[#e2d7c3] text-[#1f2d27] placeholder-[#a89f8c] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#b08340]'
@@ -156,6 +160,12 @@ export default function KasaFormClient({
                   className="w-full bg-[#b08340] hover:bg-[#96692f] disabled:opacity-50 text-white font-semibold py-3 rounded-xl transition-colors text-sm">
                   {pending ? f.submitPending : c.submitCta}
                 </button>
+                {cardPaymentAvailable && (
+                  <div className="flex items-center justify-center gap-2 mt-1">
+                    <PaymentBrandRow size="sm" />
+                    <span className="text-[10px] text-[#a39a86]">{cardTrustNote}</span>
+                  </div>
+                )}
                 <p className="text-xs text-[#8a8478] text-center leading-5">{c.consents.implicitConsentNote}</p>
               </form>
 

@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { useEffect } from 'react'
 import { ArrowRight, Eye } from 'lucide-react'
 import { trackEvent } from '@/lib/analytics'
+import PaymentBrandRow from '@/components/PaymentBrandIcons'
 import type { CampaignStats } from '@/lib/campaign'
 
 const G = {
@@ -22,11 +23,15 @@ export default function CampaignBox({
   stats,
   campaignPriceText,
   regularPriceText,
+  cardPaymentAvailable,
+  cardTrustNote,
   copy,
 }: {
   stats: CampaignStats
   campaignPriceText: string
   regularPriceText: string
+  cardPaymentAvailable?: boolean
+  cardTrustNote?: string
   copy: {
     badge: string
     slotsRemaining: string
@@ -93,6 +98,13 @@ export default function CampaignBox({
           </span>
         )}
       </div>
+
+      {cardPaymentAvailable && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 14 }}>
+          <PaymentBrandRow size="sm" />
+          {cardTrustNote && <span style={{ fontSize: 10, color: G.textMuted, fontFamily: G.sans }}>{cardTrustNote}</span>}
+        </div>
+      )}
 
       {/* Kontenjan mesajı */}
       <p style={{ fontFamily: G.sans, fontSize: 14.5, fontWeight: 500, color: soldOut ? G.textMuted : G.text, margin: '0 0 12px' }}>

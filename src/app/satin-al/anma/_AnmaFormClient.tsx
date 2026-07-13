@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { useLang } from '@/i18n/context'
 import BrandLogo from '@/components/BrandLogo'
 import { ShieldCheck, Image as ImageIcon, Link2, PenLine, RotateCcw } from 'lucide-react'
+import PaymentBrandRow from '@/components/PaymentBrandIcons'
 
 const TRUST_ICONS = [ShieldCheck, ImageIcon, Link2, PenLine, RotateCcw]
 
@@ -14,15 +15,18 @@ export default function AnmaFormClient({
   currency,
   renewalPrice,
   renewalSymbol,
+  cardPaymentAvailable,
 }: {
   amount: number
   currency: string
   renewalPrice: string
   renewalSymbol: string
+  cardPaymentAvailable?: boolean
 }) {
   const { t } = useLang()
   const f = t.purchasePage.anma
   const c = t.purchasePage.common
+  const cardTrustNote = t.paymentPage.cardTrustNote
   const [state, action, pending] = useActionState(purchaseMemorialAction, null)
   const hostingLine2 = f.hostingLine2.replace('{price}', `${renewalPrice} ${renewalSymbol}`)
 
@@ -176,6 +180,12 @@ export default function AnmaFormClient({
                   className="w-full bg-[#b08340] hover:bg-[#96692f] disabled:opacity-50 text-white font-semibold py-3 rounded-xl transition-colors text-sm">
                   {pending ? f.submitPending : c.submitCta}
                 </button>
+                {cardPaymentAvailable && (
+                  <div className="flex items-center justify-center gap-2 mt-1">
+                    <PaymentBrandRow size="sm" />
+                    <span className="text-[10px] text-[#a39a86]">{cardTrustNote}</span>
+                  </div>
+                )}
                 <p className="text-xs text-[#8a8478] text-center leading-5">{c.consents.implicitConsentNote}</p>
               </form>
 

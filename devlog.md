@@ -3,6 +3,35 @@
 > Her oturum sonunda Claude bu dosyayı günceller.
 > Format: tarih → ne yapıldı → nerede kalındı → sıradaki adım.
 
+## 2026-07-14 — Oturum 169 (devam): Kart Ödemesi Güven Rozetleri Her Yere Eklendi
+
+### Yapılanlar
+- Kullanıcı fark etti: hero bölümünde kartla ödemeyle ilgili hiçbir görsel ipucu yok. Plan onaylandıktan sonra uygulandı.
+- `src/components/PaymentBrandIcons.tsx`: **Amex** logosu eklendi (Google Pay'in yerine — artık varsayılan satır Visa/Mastercard/Amex, gerçek kart ağları), `size="sm"` varyantı eklendi (hero gibi dar alanlarda soluk/küçük görünüm için).
+- Rozet + "Bank of Georgia güvencesiyle" notu şu 5 yere eklendi, hepsi **sadece BOG aktifken** (`getBogSettings().enabled`) görünüyor:
+  1. Anasayfa hero — ana CTA butonlarının altı (`LocalizedLanding.tsx`)
+  2. Kampanya kutusu — fiyatın hemen altı (`CampaignBox.tsx`)
+  3. Pricing sayfası — hem Anma Profili hem Yaşam Kasası kartlarının CTA'sı altı (`PricingClient.tsx`)
+  4. 3 satın alma formu — Anma/Aile/Kasa, gönder butonunun altı (`_AnmaFormClient.tsx`, `_AileFormClient.tsx`, `_KasaFormClient.tsx`)
+  5. Ödeme sayfası — zaten önceki oturumda eklenmişti, dokunulmadı
+- Her sayfa server component'i (`page.tsx`) artık `getBogSettings()`'i de fetch edip `cardPaymentAvailable` prop'u olarak client component'lere geçiriyor — BOG kapatılırsa rozetler otomatik kayboluyor (yanıltıcı olmasın diye).
+- `npx tsc --noEmit`, `npm run build` temiz. Local'de görsel doğrulandı: anasayfa hero + kampanya kutusu + pricing sayfası (her iki kart) ekran görüntüsüyle kontrol edildi, rozetler küçük/göze batmayan boyutta doğru yerlerde.
+- **Yan not**: Doğrulama sırasında `/pricing`, `/satin-al/*`, `/miras` local'de 404 vermeye başladı — kod hatası değil, günün içinde dev server'ı ~10 kez restart etmekten kaynaklanan bozuk `.next` cache'iydi. `rm -rf .next` + temiz restart ile düzeldi, production'ı etkilemez.
+
+### Proje Durumu
+- [x] Kart ödemesi güven rozetleri 5 konuma eklendi, local'de doğrulandı
+- [ ] **Commit/push/deploy bekliyor**
+
+### Kritik Kararlar / Notlar
+- Rozet seti Google Pay'den Visa/Mastercard/Amex'e değiştirildi — kullanıcı bu oturumda özellikle "visa master amex" istedi, tutarlılık için tüm konumlarda aynı üçlü kullanıldı (ödeme sayfasındaki eski Google Pay rozeti de bu üçlüyle değiştirildi).
+- Tüm rozetler `cardPaymentAvailable` koşuluna bağlı — BOG admin panelden kapatılırsa hiçbir yerde görünmeyecek, yanlış vaat verilmeyecek.
+
+### Nerede Kaldık
+Rozetler kod tarafında tamamlandı ve local'de doğrulandı, commit/push bekliyor.
+
+### Sıradaki Adım
+1. Push et, deploy sonrası kullanıcı canlıda hero/pricing/formları gözden geçirsin
+
 ## 2026-07-13 — Oturum 169 (devam): Kartla Ödemede Otomatik Panel Açma + Ödeme Sayfası Tam i18n
 
 ### Yapılanlar

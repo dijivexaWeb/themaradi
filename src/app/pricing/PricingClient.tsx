@@ -18,14 +18,16 @@ import {
 } from 'lucide-react'
 import { useLang } from '@/i18n/context'
 import BrandLogo from '@/components/BrandLogo'
+import PaymentBrandRow from '@/components/PaymentBrandIcons'
 
 const paymentIcons = [CreditCard, Sparkles, Sparkles, FileText] as const
 
 import type { PricingConfig } from '@/lib/pricing'
 
-export default function PricingClient({ pricing }: { pricing: PricingConfig }) {
+export default function PricingClient({ pricing, cardPaymentAvailable }: { pricing: PricingConfig; cardPaymentAvailable?: boolean }) {
   const { t } = useLang()
   const p = t.pricing
+  const cardTrustNote = t.paymentPage.cardTrustNote
 
   // Live prices from DB — override dict defaults
   const memorialPrice = pricing.memorialPrice
@@ -216,6 +218,12 @@ export default function PricingClient({ pricing }: { pricing: PricingConfig }) {
                 {p.memorial.cta}
                 <ArrowRight className="h-4 w-4" />
               </Link>
+              {cardPaymentAvailable && (
+                <div className="mt-2.5 flex items-center justify-center gap-2">
+                  <PaymentBrandRow size="sm" />
+                  <span className="text-[10px] text-[#a39a86]">{cardTrustNote}</span>
+                </div>
+              )}
             </div>
 
             {/* LIFE VAULT */}
@@ -292,6 +300,12 @@ export default function PricingClient({ pricing }: { pricing: PricingConfig }) {
                 {p.vault.cta}
                 <ArrowRight className="h-4 w-4" />
               </Link>
+              {cardPaymentAvailable && (
+                <div className="mt-2.5 flex items-center justify-center gap-2">
+                  <PaymentBrandRow size="sm" />
+                  <span className="text-[10px] text-[#a39a86]">{cardTrustNote}</span>
+                </div>
+              )}
             </div>
           </div>
 

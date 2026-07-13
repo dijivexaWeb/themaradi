@@ -3,6 +3,7 @@ import { fetchPricingConfig } from '@/lib/pricing'
 import { resolveAmount } from '@/lib/currency'
 import { getTranslation } from '@/i18n/server'
 import { buildAlternateLanguages } from '@/lib/i18n/hreflang'
+import { getBogSettings } from '@/lib/bog'
 import AileFormClient from './_AileFormClient'
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || 'https://theeternalmemory.com'
@@ -25,7 +26,7 @@ export const metadata: Metadata = {
 export default async function AileSatinAlPage() {
   const { lang } = await getTranslation()
 
-  const pricing = await fetchPricingConfig()
+  const [pricing, bogSettings] = await Promise.all([fetchPricingConfig(), getBogSettings()])
 
   const { amount, currency } = resolveAmount(lang, {
     campaignActive: pricing.campaignActive,
@@ -34,5 +35,5 @@ export default async function AileSatinAlPage() {
     fallbackGel: Number(pricing.familyGel || 399),
   })
 
-  return <AileFormClient amount={amount} currency={currency} />
+  return <AileFormClient amount={amount} currency={currency} cardPaymentAvailable={bogSettings.enabled} />
 }

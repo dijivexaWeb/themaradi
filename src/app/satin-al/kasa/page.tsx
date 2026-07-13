@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 import { fetchPricingConfig } from '@/lib/pricing'
 import { resolveAmount } from '@/lib/currency'
 import { getTranslation } from '@/i18n/server'
+import { getBogSettings } from '@/lib/bog'
 import KasaFormClient from './_KasaFormClient'
 
 export const metadata: Metadata = {
@@ -11,7 +12,7 @@ export const metadata: Metadata = {
 
 export default async function KasaSatinAlPage() {
   const { lang } = await getTranslation()
-  const pricing = await fetchPricingConfig()
+  const [pricing, bogSettings] = await Promise.all([fetchPricingConfig(), getBogSettings()])
 
   const setup = resolveAmount(lang, {
     campaignActive: pricing.campaignActive,
@@ -26,5 +27,5 @@ export default async function KasaSatinAlPage() {
     fallbackGel: Number(pricing.vaultMonthly),
   })
 
-  return <KasaFormClient setupAmount={setup.amount} monthlyAmount={monthly.amount} currency={setup.currency} />
+  return <KasaFormClient setupAmount={setup.amount} monthlyAmount={monthly.amount} currency={setup.currency} cardPaymentAvailable={bogSettings.enabled} />
 }

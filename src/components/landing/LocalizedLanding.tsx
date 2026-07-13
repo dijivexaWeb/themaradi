@@ -19,6 +19,7 @@ import RecentMemorialsCarousel, { type RecentMemorial } from './RecentMemorialsC
 import TestimonialSection, { type TestimonialMemorial } from './TestimonialSection'
 import ApprovedProfilesPreview from './ApprovedProfilesPreview'
 import CampaignBox from './CampaignBox'
+import PaymentBrandRow from '@/components/PaymentBrandIcons'
 import { buildCurrencyView } from '@/lib/currency'
 import { buildWhatsAppChatLink } from '@/lib/whatsapp'
 import type { PricingConfig } from '@/lib/pricing'
@@ -132,8 +133,8 @@ function FooterColumn({ title, links }: { title: string; links: { href: string; 
 }
 
 /* ─── Main component ─────────────────────────────────────── */
-export default function LocalizedLanding({ pricing, heroMemorials, recentMemorials, testimonialMemorials, campaignStats }: {
-  pricing: PricingConfig; heroMemorials: HeroMemorial[]; recentMemorials: RecentMemorial[]; testimonialMemorials: TestimonialMemorial[]; campaignStats: CampaignStats
+export default function LocalizedLanding({ pricing, heroMemorials, recentMemorials, testimonialMemorials, campaignStats, cardPaymentAvailable }: {
+  pricing: PricingConfig; heroMemorials: HeroMemorial[]; recentMemorials: RecentMemorial[]; testimonialMemorials: TestimonialMemorial[]; campaignStats: CampaignStats; cardPaymentAvailable: boolean
 }) {
   useReveal()
   const { t, lang } = useLang()
@@ -187,6 +188,8 @@ export default function LocalizedLanding({ pricing, heroMemorials, recentMemoria
                 stats={campaignStats}
                 campaignPriceText={campaignPriceText}
                 regularPriceText={regularPriceText}
+                cardPaymentAvailable={cardPaymentAvailable}
+                cardTrustNote={t.paymentPage.cardTrustNote}
                 copy={{
                   badge: s.hero.campaignBadge,
                   slotsRemaining: s.hero.campaignSlotsRemaining,
@@ -242,6 +245,12 @@ export default function LocalizedLanding({ pricing, heroMemorials, recentMemoria
               <p style={{ textAlign: 'center', fontSize: 12.5, fontWeight: 300, color: S.textMuted, margin: '10px 0 0', fontFamily: S.sans }}>
                 {s.hero.ctaTrustLine}
               </p>
+              {cardPaymentAvailable && (
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, marginTop: 10 }}>
+                  <PaymentBrandRow size="sm" />
+                  <span style={{ fontSize: 10.5, color: S.textFaint, fontFamily: S.sans }}>{t.paymentPage.cardTrustNote}</span>
+                </div>
+              )}
             </div>
 
             {/* ── Right: Phone showcase ───────────────────────────── */}

@@ -41,12 +41,25 @@ export function GooglePayMark({ className }: { className?: string }) {
   )
 }
 
-export default function PaymentBrandRow({ className }: { className?: string }) {
+export function AmexMark({ className }: { className?: string }) {
   return (
-    <div className={`flex items-center gap-1.5 ${className ?? ''}`}>
-      <VisaMark className="h-5 w-auto" />
-      <MastercardMark className="h-5 w-auto" />
-      <GooglePayMark className="h-5 w-auto" />
+    <svg viewBox="0 0 48 16" className={className} aria-label="American Express" role="img">
+      <rect width="48" height="16" rx="3" fill="#006FCF" />
+      <text x="24" y="11.5" textAnchor="middle" fontFamily="Arial, sans-serif" fontWeight="700" fontSize="7.5" fill="#fff">
+        AMEX
+      </text>
+    </svg>
+  )
+}
+
+// size: 'sm' -> hero gibi dar/dikkat çekmemesi gereken alanlar için daha küçük ve soluk.
+export default function PaymentBrandRow({ className, size = 'md' }: { className?: string; size?: 'sm' | 'md' }) {
+  const h = size === 'sm' ? 'h-4' : 'h-5'
+  return (
+    <div className={`flex items-center gap-1.5 ${size === 'sm' ? 'opacity-80' : ''} ${className ?? ''}`}>
+      <VisaMark className={`${h} w-auto`} />
+      <MastercardMark className={`${h} w-auto`} />
+      <AmexMark className={`${h} w-auto`} />
     </div>
   )
 }

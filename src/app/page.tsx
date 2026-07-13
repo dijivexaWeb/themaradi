@@ -10,6 +10,7 @@ import { getFamilyThankYouQuote } from '@/lib/testimonialQuotes'
 import { buildAlternateLanguages, buildCanonical } from '@/lib/i18n/hreflang'
 import { getCampaignStats } from '@/lib/campaign'
 import { getTranslation } from '@/i18n/server'
+import { getBogSettings } from '@/lib/bog'
 
 export const revalidate = 3600
 
@@ -30,9 +31,10 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function LandingPage() {
   const supabase = await createServiceClient()
 
-  const [pricing, campaignStats, { data: recentMemorials }, { data: testimonialCandidates }] = await Promise.all([
+  const [pricing, campaignStats, bogSettings, { data: recentMemorials }, { data: testimonialCandidates }] = await Promise.all([
     fetchPricingConfig(),
     getCampaignStats(),
+    getBogSettings(),
     supabase
       .from('vaults')
       .select('id, display_name, slug, tagline, birth_date, death_date, cover_photo_url, cover_video_url, birth_place, published_at')
@@ -122,6 +124,7 @@ export default async function LandingPage() {
         <LocalizedLanding
           pricing={pricing}
           campaignStats={campaignStats}
+          cardPaymentAvailable={bogSettings.enabled}
           heroMemorials={heroMemorials}
           recentMemorials={(recentMemorials ?? []).map(m => ({ ...m, family: familyMap[m.id] ?? null })) as RecentMemorial[]}
           testimonialMemorials={testimonialMemorials}
