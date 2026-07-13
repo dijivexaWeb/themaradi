@@ -61,6 +61,7 @@ export async function approveVault(vaultId: string): Promise<ActionResult> {
 
   revalidatePath('/admin/verifications')
   revalidatePath('/admin/memorials')
+  revalidatePath('/')
   return { success: true }
 }
 
@@ -850,6 +851,34 @@ export async function saveHideObjection(vaultId: string, hide: boolean): Promise
 
   revalidatePath(`/admin/memorials/${vaultId}`)
   if (vault?.slug) revalidatePath(`/memorial/${vault.slug}`)
+  return { success: true }
+}
+
+// ─── Kampanya Kontenjan Sayacı ──────────────────────────────────────────────
+
+export async function saveCountsTowardCampaign(vaultId: string, counts: boolean): Promise<ActionResult> {
+  const { user, profile } = await requireAdmin()
+  if (!z.string().uuid().safeParse(vaultId).success) return { success: false, error: 'Geçersiz vault ID' }
+
+  const supabase = await createServiceClient()
+  const { error } = await supabase
+    .from('vaults')
+    .update({ counts_toward_campaign: counts, updated_at: new Date().toISOString() })
+    .eq('id', vaultId)
+
+  if (error) return { success: false, error: error.message }
+
+  await logAdminAction({
+    adminId: user.id,
+    adminEmail: user.email ?? profile.email ?? '',
+    action: 'campaign_counting_updated',
+    entityType: 'vault',
+    entityId: vaultId,
+    newValue: { counts_toward_campaign: counts },
+  })
+
+  revalidatePath(`/admin/memorials/${vaultId}`)
+  revalidatePath('/')
   return { success: true }
 }
 

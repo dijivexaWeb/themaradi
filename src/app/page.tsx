@@ -8,6 +8,7 @@ import type { HeroMemorial } from '@/components/landing/HeroPhoneShowcase'
 import type { TestimonialMemorial } from '@/components/landing/TestimonialSection'
 import { getFamilyThankYouQuote } from '@/lib/testimonialQuotes'
 import { buildAlternateLanguages } from '@/lib/i18n/hreflang'
+import { getCampaignStats } from '@/lib/campaign'
 
 export const revalidate = 3600
 
@@ -32,8 +33,9 @@ export const metadata: Metadata = {
 export default async function LandingPage() {
   const supabase = await createServiceClient()
 
-  const [pricing, { data: recentMemorials }, { data: testimonialCandidates }] = await Promise.all([
+  const [pricing, campaignStats, { data: recentMemorials }, { data: testimonialCandidates }] = await Promise.all([
     fetchPricingConfig(),
+    getCampaignStats(),
     supabase
       .from('vaults')
       .select('id, display_name, slug, tagline, birth_date, death_date, cover_photo_url, cover_video_url, birth_place, published_at')
@@ -122,6 +124,7 @@ export default async function LandingPage() {
         <LandingNav />
         <LocalizedLanding
           pricing={pricing}
+          campaignStats={campaignStats}
           heroMemorials={heroMemorials}
           recentMemorials={(recentMemorials ?? []).map(m => ({ ...m, family: familyMap[m.id] ?? null })) as RecentMemorial[]}
           testimonialMemorials={testimonialMemorials}

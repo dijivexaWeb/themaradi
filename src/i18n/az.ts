@@ -37,6 +37,11 @@ const az: LangDict = {
       subLine: 'Xatirə profilini 15 dəqiqəyə yaradın, QR lövhəni məzar daşına əlavə edin, ailə xatirələrini bir yerdə toplayın.',
       ctaTrustLine: 'QR Lövhə Daxildir • İlk 3 İl Hostinq Pulsuz • 30 Gün Pul Qaytarma Zəmanəti',
       watchVideo: 'İzlə (30 san)',
+      campaignBadge: 'İlk 100 ailə üçün xüsusi',
+      campaignSlotsRemaining: 'Cəmi {slots} ailəlik yer qalıb',
+      campaignSlotsSoldOut: 'İlk 100 ailə kampaniyası tamamlandı',
+      campaignProgressLabel: '{count} ailə kampaniyadan faydalandı',
+      campaignSub: 'Profil yaradılması, daimi keçid və QR kod daxildir.',
     },
 
     profilePreview: {

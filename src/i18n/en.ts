@@ -35,6 +35,11 @@ const en = {
       subLine: 'Create the memorial profile in 15 minutes, add the QR plate to the gravestone, and gather family memories in one place.',
       ctaTrustLine: 'QR Plate Included • First 3 Years Hosting Free • 30-Day Money-Back Guarantee',
       watchVideo: 'Watch (30s)',
+      campaignBadge: 'Exclusive for the first 100 families',
+      campaignSlotsRemaining: 'Only {slots} family spots left',
+      campaignSlotsSoldOut: 'The First 100 Families campaign is complete',
+      campaignProgressLabel: '{count} families joined the campaign',
+      campaignSub: 'Profile creation, a permanent link and QR code included.',
     },
 
     profilePreview: {

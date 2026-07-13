@@ -37,6 +37,11 @@ const tr: LangDict = {
       subLine: '15 dakikada anma profilinizi oluşturun, QR plakayı mezar taşına ekleyin, aile anılarını tek yerde toplayın.',
       ctaTrustLine: 'QR Plaka Dahil • İlk 3 Yıl Hosting Ücretsiz • 30 Gün İade Garantisi',
       watchVideo: 'İzle (30 sn)',
+      campaignBadge: 'İlk 100 aileye özel',
+      campaignSlotsRemaining: 'Yalnızca {slots} ailelik yer kaldı',
+      campaignSlotsSoldOut: 'İlk 100 aile kampanyası tamamlandı',
+      campaignProgressLabel: '{count} aile kampanyadan yararlandı',
+      campaignSub: 'Profil oluşturma, kalıcı bağlantı ve QR kod dahildir.',
     },
 
     profilePreview: {

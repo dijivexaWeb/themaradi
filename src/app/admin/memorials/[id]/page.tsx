@@ -5,6 +5,7 @@ import StatusBadge from '../../_components/StatusBadge'
 import VaultStatusForm from './_VaultStatusForm'
 import NotableForm from './_NotableForm'
 import ObjectionToggleForm from './_ObjectionToggleForm'
+import CampaignToggleForm from './_CampaignToggleForm'
 import ShippingAddressForm from './_ShippingAddressForm'
 import Link from 'next/link'
 
@@ -76,6 +77,11 @@ export default async function VaultDetailPage({ params }: { params: Promise<{ id
           <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
             <h2 className="font-semibold text-slate-800 mb-3">Durum Değiştir</h2>
             <VaultStatusForm vaultId={vault.id} currentStatus={vault.status ?? ''} />
+          </div>
+
+          <div className="bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
+            <h2 className="font-semibold text-slate-800 mb-3">İlk 100 Aile Kampanyası</h2>
+            <CampaignToggleForm vaultId={vault.id} initialCounts={vault.counts_toward_campaign ?? false} />
           </div>
         </div>
       </div>

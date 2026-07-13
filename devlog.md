@@ -3,6 +3,42 @@
 > Her oturum sonunda Claude bu dosyayı günceller.
 > Format: tarih → ne yapıldı → nerede kalındı → sıradaki adım.
 
+## 2026-07-13 — Oturum 169: Trafik/Satış Teşhisi + "İlk 100 Aile" Kampanya Sayacı
+
+### Yapılanlar
+- **Teşhis**: GA4 export'ları (`analizler/*.csv`) incelendi — 28 günde 2793 aktif kullanıcı (%81 Facebook Ads), ama satış yok. Huni analizi: anasayfa %88 hemen çıkma, form_start→form_submit'te %86 kayıp, ödeme başlatma (103) → gerçek satış (5) arası %95 kayıp. Kök neden ilk aşamada "checkout tamamen bozuk" sanıldı (1 Temmuz'dan beri `auth.users`'a yeni kayıt yok) ama **canlıda gerçek test yapılınca çürütüldü** — hem masaüstü hem simüle edilmiş FB mobil tarayıcıda 3 test siparişi sorunsuz oluşturuldu (EM-2026-0028/0029/0030, sonra temizlendi). Sonuç: teknik arıza yok, sürtünme/dönüşüm sorunu var (şifre-önce-form, sadece banka havalesi ödeme akışı).
+- **Kullanıcı kararı**: Fiyat 299→99₾ (admin panelden kendisi ayarladı), "İlk 100 Aile" kampanyasına geçildi. Ödeme altyapısı (banka havalesi/WhatsApp) BOG (Bank of Georgia) onayı gelene kadar **bilinçli olarak değiştirilmedi**.
+- **Yeni: Dinamik "İlk 100 Aile" kampanya sayacı** — sabit kodlanmadı, gerçek veriden hesaplanıyor:
+  - `vaults.counts_toward_campaign` (boolean, default false) migration'ı eklendi (`add_campaign_counting_to_vaults`). Backfill: `status='public_memorial' AND is_notable=false AND product_type='memorial_profile'` olan profiller varsayılan `true` — bu **9 profil** veriyor (kullanıcının tahmini "7" değil; 2 gerçek ödemeli müşteri + 7 demo/showcase profil dahil edildi, admin panelden istenmeyenler kapatılabilir).
+  - `src/lib/campaign.ts`: `getCampaignStats()` — `remainingSlots = max(0, 100 - eligibleCount)`, hata durumunda fallback 7/93.
+  - `src/components/landing/CampaignBox.tsx`: hero'da rozet + fiyat (kampanya/normal üstü çizili) + dinamik "Yalnızca N ailelik yer kaldı" + ilerleme çubuğu + "Anma Sayfası Oluştur"/"Canlı Örneği Gör" CTA'ları. Kontenjan 0 olunca otomatik "kampanya tamamlandı" mesajına ve normal fiyata geçiyor.
+  - 7 dilin hepsine (`src/i18n/*.ts`) yeni kampanya metinleri eklendi (`campaignBadge`, `campaignSlotsRemaining`, `campaignSlotsSoldOut`, `campaignProgressLabel`, `campaignSub`) — mevcut kullanılmayan `promoLine1/2`/`ctaSecondary` alanları yerine yeni, temiz key'ler tercih edildi.
+  - Admin panelde her profil için "100 Aile Kampanyası Sayacına Dahil Et" toggle'ı eklendi (`_CampaignToggleForm.tsx` + `saveCountsTowardCampaign` action) — demo/aile/tarihî profiller sayacı yanlışlıkla düşürmesin diye.
+  - `approveVault`/`changeVaultStatus` action'larına `revalidatePath('/')` eklendi/doğrulandı — bir profil yayınlanınca anasayfa cache'i anında invalide oluyor, sayaç güncelleniyor (Realtime yerine bu yol seçildi, daha az karmaşık).
+  - GA4 event'leri eklendi: `campaign_view`, `campaign_primary_cta_click`, `campaign_demo_click` (`src/lib/analytics.ts` üzerinden, çerez rızası yoksa sessizce no-op).
+  - `npx tsc --noEmit` ve `npm run build` temiz geçti. Yerel dev server'da (`localhost:3000`) EN/TR görsel olarak doğrulandı — masaüstü ve mobilde (390px) tasarım tutarlı, sayılar gerçek DB'den geliyor (test sırasında 91 kalan / 9 katılan doğru hesaplandı).
+
+### Proje Durumu
+- [x] Trafik/satış teşhisi tamamlandı — sorun checkout değil, dönüşüm sürtünmesi
+- [x] Kampanya sayaç sistemi (DB + UI + admin toggle + GA4) kod tarafında tamamlandı, local'de test edildi
+- [ ] **Deploy edilmedi / commit edilmedi** — kullanıcı onayı bekleniyor
+- [ ] Kullanıcının admin panelden gerçek "7" sayısına ulaşmak için 2 demo/showcase profili sayaçtan kapatması gerekebilir (şu an 9 dahil)
+- [ ] BOG onayından sonra ödeme altyapısı komple değişecek (ayrı, gelecekteki bir iş)
+
+### Kritik Kararlar / Notlar
+- Ödeme akışına (banka havalesi/WhatsApp) hiç dokunulmadı — kullanıcının açık talimatı.
+- Kampanya kontenjanı varsayılan olarak 9 profili sayıyor, kullanıcının belirttiği 7 değil — bilinçli bir tahmin yapılmadı, admin toggle ile kullanıcı kendi karar versin diye.
+- 32 gün önceki "DB schema değişikliği yasak" hatırası artık geçersiz/eski (o tarihten sonra onlarca migration yapılmış) — bu oturumda göz ardı edildi.
+
+### Nerede Kaldık
+Kampanya sayacı özelliği uçtan uca kodlandı ve local'de doğrulandı, commit/deploy edilmedi. Trafik/satış teşhisi tamamlandı ve kullanıcıyla paylaşıldı.
+
+### Sıradaki Adım
+1. Kullanıcı local'de/preview'da kampanya kutusunu incelesin, onaylarsa commit + deploy
+2. Admin panelden `/admin/memorials` üzerinden istenmeyen 2 demo profili "100 Aile Kampanyası" sayacından kapatıp gerçek sayıyı 7'ye çeksin (isterse)
+3. WhatsApp'a gelen 8 mesajın neden satışa dönmediğini ekip yazışma geçmişinden incelemeli (teknik olarak engel yok)
+4. BOG onayı gelince ödeme altyapısı komple yenilenecek
+
 ## 2026-07-06 — Oturum 168 (devam 17): Güvenlik Denetimi Kapatıldı — Push + Leaked Password Protection
 
 ### Yapılanlar

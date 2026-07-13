@@ -37,6 +37,11 @@ const he: LangDict = {
       subLine: 'צרו את פרופיל ההנצחה תוך 15 דקות, הוסיפו את שלט ה-QR למצבה ואספו את זיכרונות המשפחה במקום אחד.',
       ctaTrustLine: 'כולל שלט QR • אחסון חינם ל-3 השנים הראשונות • החזר כספי מלא תוך 30 יום',
       watchVideo: 'צפו (30 שנ׳)',
+      campaignBadge: 'בלעדי ל-100 המשפחות הראשונות',
+      campaignSlotsRemaining: 'נותרו {slots} מקומות בלבד',
+      campaignSlotsSoldOut: 'מבצע 100 המשפחות הראשונות הסתיים',
+      campaignProgressLabel: '{count} משפחות כבר הצטרפו למבצע',
+      campaignSub: 'כולל יצירת פרופיל, קישור קבוע וקוד QR.',
     },
 
     profilePreview: {

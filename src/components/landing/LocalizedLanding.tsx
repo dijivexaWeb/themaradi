@@ -18,9 +18,11 @@ import TeamSection from './TeamSection'
 import RecentMemorialsCarousel, { type RecentMemorial } from './RecentMemorialsCarousel'
 import TestimonialSection, { type TestimonialMemorial } from './TestimonialSection'
 import ApprovedProfilesPreview from './ApprovedProfilesPreview'
+import CampaignBox from './CampaignBox'
 import { buildCurrencyView } from '@/lib/currency'
 import { buildWhatsAppChatLink } from '@/lib/whatsapp'
 import type { PricingConfig } from '@/lib/pricing'
+import type { CampaignStats } from '@/lib/campaign'
 
 const stepIcons = [QrCode, BookOpen, Users, ShieldCheck] as const
 const securityIcons = [LockKeyhole, Database, Server, Key, QrCode, ShieldCheck] as const
@@ -130,8 +132,8 @@ function FooterColumn({ title, links }: { title: string; links: { href: string; 
 }
 
 /* ─── Main component ─────────────────────────────────────── */
-export default function LocalizedLanding({ pricing, heroMemorials, recentMemorials, testimonialMemorials }: {
-  pricing: PricingConfig; heroMemorials: HeroMemorial[]; recentMemorials: RecentMemorial[]; testimonialMemorials: TestimonialMemorial[]
+export default function LocalizedLanding({ pricing, heroMemorials, recentMemorials, testimonialMemorials, campaignStats }: {
+  pricing: PricingConfig; heroMemorials: HeroMemorial[]; recentMemorials: RecentMemorial[]; testimonialMemorials: TestimonialMemorial[]; campaignStats: CampaignStats
 }) {
   useReveal()
   const { t, lang } = useLang()
@@ -179,6 +181,22 @@ export default function LocalizedLanding({ pricing, heroMemorials, recentMemoria
               <p style={{ fontFamily: S.sans, fontSize: 'clamp(13px,1.6vw,16px)', fontWeight: 500, color: S.gold, margin: '0 0 20px', lineHeight: 1.5 }}>
                 {s.hero.subLine}
               </p>
+
+              {/* İlk 100 Aile kampanya kutusu — gerçek, dinamik kontenjan sayacı */}
+              <CampaignBox
+                stats={campaignStats}
+                campaignPriceText={campaignPriceText}
+                regularPriceText={regularPriceText}
+                copy={{
+                  badge: s.hero.campaignBadge,
+                  slotsRemaining: s.hero.campaignSlotsRemaining,
+                  slotsSoldOut: s.hero.campaignSlotsSoldOut,
+                  progressLabel: s.hero.campaignProgressLabel,
+                  sub: s.hero.campaignSub,
+                  ctaPrimary: s.hero.ctaPrimary,
+                  ctaSecondary: s.hero.ctaSecondary,
+                }}
+              />
 
               {/* Video — Cloudflare Stream (adaptive bitrate, auto-compressed) */}
               <div style={{ borderRadius: 16, overflow: 'hidden', border: '1px solid rgba(201,169,110,.18)', boxShadow: '0 24px 60px rgba(0,0,0,.55)', marginBottom: 20, background: '#0a0a10', position: 'relative', aspectRatio: '16/9' }}>
