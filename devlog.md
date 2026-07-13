@@ -3,6 +3,34 @@
 > Her oturum sonunda Claude bu dosyayı günceller.
 > Format: tarih → ne yapıldı → nerede kalındı → sıradaki adım.
 
+## 2026-07-13 — Oturum 169 (devam): BOG Canlı Doğrulama + Race Condition Fix
+
+### Yapılanlar
+- Kullanıcı admin panelden BOG public/secret key'leri girip "Kartla Ödeme Durumu"nu **aktif etti** (canlı DB, gerçek müşterilere de yansıyor).
+- Anahtarlar gerçek bir OAuth token isteğiyle doğrulandı (local script, `.env.local`'daki service role ile) — 200 OK, gerçek Bearer token alındı.
+- Kullanıcı gerçek bir **2 GEL'lik canlı ödeme** yaptı (test kartı olmadığı için gerçek işlem): sipariş oluşturuldu (EM-2026-0034), BOG'un ödeme sayfasına yönlendirildi, kartla ödedi, geri döndü.
+- **Bulgu**: Ödeme sonrası ekranda hâlâ eski ("Kartla Öde" butonlu, ödenmemiş) görünüm kaldı. DB kontrolü: `payments.status` aslında doğru şekilde `paid` olmuştu (callback tetiklenmiş, imza doğrulanmış, `paid_at` doğru) — sorun backend'de değil, **yarış durumuydu**: BOG'un kullanıcıyı geri yönlendirmesi, server-to-server callback'in DB'yi güncellemesinden birkaç yüz ms önce/eşzamanlı gerçekleşebiliyor, sayfa callback tamamlanmadan render olabiliyor.
+- **Fix**: `src/app/satin-al/odeme/[orderCode]/page.tsx` — `?bog=success` ile gelindiğinde ve durum henüz "ödendi" görünmüyorsa, callback'e şans tanımak için durum en fazla 4 kez (1 saniye arayla) tekrar sorgulanıyor.
+- `npx tsc --noEmit`, `npm run build` temiz. Test siparişleri (EM-2026-0028/29/30/31, test hesapları) temizlendi; **EM-2026-0034 (gerçek 2 GEL işlem) kullanıcının kendi gerçek siparişi olduğu için silinmedi, olduğu gibi bırakıldı**.
+
+### Proje Durumu
+- [x] BOG entegrasyonu canlıda uçtan uca doğrulandı — gerçek para, gerçek callback, gerçek DB güncellemesi çalışıyor
+- [x] Redirect/callback yarış durumu fix'i yazıldı, local'de build/tsc temiz
+- [ ] **Bu son fix commit/push/deploy edilmedi** — kullanıcı onayı bekleniyor (veya otomatik push denenecek)
+- [ ] Apple Pay merchant kaydı hâlâ kullanıcının atması gereken bir mail (ecommercemerchants@bog.ge)
+
+### Kritik Kararlar / Notlar
+- BOG entegrasyonu artık **canlıda gerçek müşteriler için aktif** — bundan sonraki her "Kartla Öde" denemesi gerçek para hareketi.
+- Yarış durumu düzeltmesi sunucu tarafında (page render'ı sırasında) yapıldı, client-side polling/JS gerekmedi — basit ve güvenilir.
+
+### Nerede Kaldık
+BOG entegrasyonu tamamen çalışır durumda ve canlı, tek bir küçük UX iyileştirmesi (redirect race condition fix) commit/push bekliyor.
+
+### Sıradaki Adım
+1. Race condition fix'ini push et, deploy sonrası kullanıcı tekrar küçük bir işlemle (ya da aynı 2 GEL'lik akışla) sayfanın artık doğrudan doğru ekranı gösterdiğini doğrulasın
+2. Apple Pay için kullanıcı merchant kaydı mailini atsın
+3. EM-2026-0034 gerçek bir sipariş — kullanıcı isterse admin panelden iade/iptal edebilir (2 GEL'lik test tutarı)
+
 ## 2026-07-13 — Oturum 169 (devam): GSC 404/favicon + Pricing JSON-LD fix + BOG Kartla Ödeme Entegrasyonu
 
 ### Yapılanlar

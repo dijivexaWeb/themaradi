@@ -56,6 +56,17 @@ export default async function OdemePage({ params, searchParams }: Props) {
 
   if (!payment) notFound()
 
+  // BOG'dan "?bog=success" ile geri dönüldüğünde, kullanıcının tarayıcı yönlendirmesi
+  // BOG'un bize gönderdiği server-to-server callback'ten önce varabiliyor (yarış durumu).
+  // Callback'e kısa bir süre şans tanımak için durumu birkaç kez tekrar kontrol ediyoruz.
+  if (bog === 'success' && !SUBMITTED_STATUSES.has(payment.status)) {
+    for (let attempt = 0; attempt < 4 && !SUBMITTED_STATUSES.has(payment.status); attempt++) {
+      await new Promise((r) => setTimeout(r, 1000))
+      const { data: refreshed } = await service.from('payments').select('status').eq('id', paymentId).maybeSingle()
+      if (refreshed) payment.status = refreshed.status
+    }
+  }
+
   const { data: { user } } = await supabase.auth.getUser()
   if (user && payment.user_id !== user.id) notFound()
 
