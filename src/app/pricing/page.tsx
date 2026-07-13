@@ -23,6 +23,27 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function PricingPage() {
   const pricing = await fetchPricingConfig()
 
+  // Google'a bildirilen fiyat gerçek ödeme akışındaki fiyatla birebir eşleşmeli —
+  // kampanya aktifken indirimli fiyat kullanılmazsa Google structured data
+  // politikalarına aykırı düşer (rich result reddi riski).
+  const memorialActivePrice = pricing.campaignActive && pricing.campaignMemorial
+    ? pricing.campaignMemorial
+    : pricing.memorialPrice
+  const familyActivePrice = pricing.campaignActive && pricing.campaignFamilyGel
+    ? pricing.campaignFamilyGel
+    : pricing.familyGel
+
+  const PRODUCT_IMAGE = 'https://pub-4e99edb14c604383a844cb7f05d69b9b.r2.dev/landing/qr.png'
+  const BRAND = { '@type': 'Brand', name: 'The Eternal Memory' }
+  const RETURN_POLICY = {
+    '@type': 'MerchantReturnPolicy',
+    applicableCountry: 'GE',
+    returnPolicyCategory: 'https://schema.org/MerchantReturnFiniteReturnWindow',
+    merchantReturnDays: 30,
+    returnMethod: 'https://schema.org/ReturnByMail',
+    returnFees: 'https://schema.org/FreeReturn',
+  }
+
   const productsLd = {
     '@context': 'https://schema.org',
     '@type': 'ItemList',
@@ -31,24 +52,32 @@ export default async function PricingPage() {
         '@type': 'Product',
         name: 'Anma Profili',
         description: 'QR mezar taşı dahil dijital anma profili — tek seferlik ödeme, ömür boyu erişim.',
+        image: PRODUCT_IMAGE,
+        brand: BRAND,
         offers: {
           '@type': 'Offer',
-          price: pricing.memorialPrice,
+          price: memorialActivePrice,
           priceCurrency: 'GEL',
           url: `${APP_URL}/satin-al/anma`,
           availability: 'https://schema.org/InStock',
+          priceValidUntil: pricing.campaignActive ? pricing.campaignEndsAt || undefined : undefined,
+          hasMerchantReturnPolicy: RETURN_POLICY,
         },
       },
       {
         '@type': 'Product',
         name: 'Aile Paketi',
         description: '4 üyeli aile anma paketi — ortak aile sayfası ve QR mezar taşı dahil.',
+        image: PRODUCT_IMAGE,
+        brand: BRAND,
         offers: {
           '@type': 'Offer',
-          price: pricing.familyGel,
+          price: familyActivePrice,
           priceCurrency: 'GEL',
           url: `${APP_URL}/satin-al/aile`,
           availability: 'https://schema.org/InStock',
+          priceValidUntil: pricing.campaignActive ? pricing.campaignEndsAt || undefined : undefined,
+          hasMerchantReturnPolicy: RETURN_POLICY,
         },
       },
     ],
