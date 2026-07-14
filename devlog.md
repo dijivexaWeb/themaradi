@@ -3,6 +3,50 @@
 > Her oturum sonunda Claude bu dosyayı günceller.
 > Format: tarih → ne yapıldı → nerede kalındı → sıradaki adım.
 
+## 2026-07-14 — Oturum 169 (devam): GTM Container ID Güncellendi
+
+### Yapılanlar
+- Kullanıcı yeni bir GTM kurulum snippet'i paylaştı (`GTM-NS3RMTMH`) — sitede zaten eski bir container (`GTM-MD53BTFC`, geçen hafta eklenmiş) yüklüydü. Kullanıcıya sorup eskisinin YERİNE geçmesi gerektiğini teyit ettim.
+- `src/app/layout.tsx`: `GTM-MD53BTFC` → `GTM-NS3RMTMH` (hem `<GoogleTagManager gtmId>` hem `<noscript>` iframe'i, tek yerden `replace_all` ile). Site zaten `@next/third-parties/google`'ın `GoogleTagManager` bileşenini kullanıyordu — Google'ın istediği head/body script yapısı bu bileşen tarafından otomatik üretiliyor, elle `<script>` eklemeye gerek yok.
+- Kod tabanında başka hiçbir yerde eski ID geçmiyordu (tek kontrol noktası).
+- `npx tsc --noEmit`, `npm run build` temiz.
+
+### Proje Durumu
+- [x] GTM container ID güncellendi
+- [ ] **Commit/push/deploy bekliyor**
+
+### Nerede Kaldık
+GTM ID değişikliği tamamlandı, commit/push bekliyor.
+
+### Sıradaki Adım
+1. Push et, deploy sonrası GTM önizleme modunda (Preview) container'ın doğru yüklendiğini kullanıcı teyit edebilir
+
+## 2026-07-14 — Oturum 169 (devam): Facebook Pixel Purchase Event Hiç Ateşlenmiyormuş — Düzeltildi
+
+### Yapılanlar
+- Kullanıcı Gürcistan'da günlük ~250₺ bütçeyle Facebook reklamı açacağını, hangi kampanya amacını seçmesi gerektiğini sordu. "Satış" (Sales) hedefini önerdim ama önce Pixel'in gerçekten Purchase verisi üretip üretmediğini kontrol ettim.
+- **Kritik bulgu**: `src/components/MetaPixel.tsx`'teki Purchase event'i sadece URL'de `?purchased=1` varsa ateşleniyordu — kod tabanında **hiçbir yer bu parametreyi hiç set etmiyordu**. Yani bugüne kadar Facebook'a tek bir gerçek satın alma sinyali gitmemiş; "Satış" hedefiyle kampanya açılsa bile Meta'nın algoritmasının öğreneceği hiçbir veri yoktu.
+- **Fix**: Yeni `src/components/MetaPixelPurchase.tsx` — ödeme sayfasında (`/satin-al/odeme/[orderCode]`) `isPaid` (gerçekten onaylanmış) durumdayken gerçek tutar/para birimiyle `fbq('track','Purchase', ...)` gönderiyor. `localStorage` ile sipariş başına TEK SEFER ateşleniyor (sayfa yenileme/tekrar ziyaret sahte satış saydırmıyor). MetaPixel'in kendi `<Script>` etiketi asenkron yüklendiği için küçük bir yarış durumu vardı — 250ms aralıklarla `fbq` hazır olana kadar (max 5 sn) yoklama eklendi.
+- Kapsam: kartla ödeme (BOG, anında paid) → kullanıcı sayfadayken hemen ateşleniyor. Banka havalesi (admin sonradan onaylıyor, kullanıcı o an sitede değil) → kullanıcı sonraki ziyaretinde (örn. onay mailindeki linke tıklayınca) sayfaya gelince ateşleniyor — gerçek zamanlı değil ama en azından hiç gitmemekten iyi. Tam gerçek zamanlı banka havalesi trackingi için ileride server-side Meta Conversions API gerekir (bu oturumda yapılmadı).
+- `npx tsc --noEmit`, `npm run build` temiz. Local'de gerçek ödenmiş sipariş (EM-2026-0034) ile doğrulandı: `localStorage`'a `fb_purchase_tracked_{paymentId}` bayrağı doğru set edildi (fbq çağrısının gerçekten çalıştığının kanıtı), tekrar yenilemede tekrar ateşlenmedi (dedup çalışıyor).
+
+### Proje Durumu
+- [x] Purchase event bug'ı bulundu ve düzeltildi (kart ödemesi için gerçek zamanlı, banka havalesi için gecikmeli ama çalışan)
+- [ ] **Commit/push/deploy bekliyor**
+- [ ] Kullanıcı Meta piksel ayarlarına bakacağını söyledi (Business Manager tarafı, kod dışı)
+
+### Kritik Kararlar / Notlar
+- Bu, kullanıcının reklam kampanyası açma kararından ÖNCE bulunup düzeltildi — düzeltilmeden "Satış" hedefiyle kampanya açılsaydı, Meta'nın optimizasyon algoritması körlemesine çalışacaktı (özellikle küçük bütçede çok riskli).
+- Banka havalesi akışı için gerçek zamanlı tracking istenirse (kullanıcı admin onayı anında sitede olmadığı için client-side pixel yetersiz kalıyor), Meta Conversions API (server-side) entegrasyonu ayrı bir iş olarak değerlendirilebilir.
+
+### Nerede Kaldık
+Purchase event fix'i kod tarafında tamamlandı ve local'de doğrulandı, commit/push bekliyor.
+
+### Sıradaki Adım
+1. Push et, deploy sonrası kullanıcı Meta Events Manager'da (Test Events veya canlı) gerçek bir Purchase event'i göreceğini teyit etsin
+2. Kullanıcı Meta piksel/Business Manager ayarlarını kendi tarafında incelesin
+3. "Satış" kampanya hedefiyle reklamı başlatabilir — artık optimizasyon için gerçek veri birikecek
+
 ## 2026-07-14 — Oturum 169 (devam): Kart Ödemesi Güven Rozetleri Her Yere Eklendi
 
 ### Yapılanlar

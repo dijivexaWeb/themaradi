@@ -8,6 +8,7 @@ import { buildWhatsAppChatLink, buildWhatsAppPaymentSubmittedLink } from '@/lib/
 import { markPaymentSubmitted, initiateBogPayment } from '../actions'
 import { getBogSettings } from '@/lib/bog'
 import PaymentBrandRow from '@/components/PaymentBrandIcons'
+import MetaPixelPurchase from '@/components/MetaPixelPurchase'
 import { dictionaries, type Lang } from '@/i18n'
 
 export const metadata: Metadata = {
@@ -159,6 +160,14 @@ export default async function OdemePage({ params, searchParams }: Props) {
 
           {alreadySubmitted ? (
             <div className="bg-white border border-[#c9dfc9] rounded-2xl p-5 shadow-sm">
+              {isPaid && (
+                <MetaPixelPurchase
+                  paymentId={payment.id}
+                  amount={Number(payment.amount)}
+                  currency={payment.currency}
+                  contentName={productLabel}
+                />
+              )}
               <p className="text-xs text-emerald-700 uppercase tracking-wider font-semibold mb-3 flex items-center gap-2">
                 {isPaid ? <CheckCircle2 className="h-3.5 w-3.5" /> : <Clock className="h-3.5 w-3.5" />}
                 {isPaid ? t.paidTitle : t.pendingTitle}

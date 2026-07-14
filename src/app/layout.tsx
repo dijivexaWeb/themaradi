@@ -87,11 +87,11 @@ export default async function RootLayout({
       lang={lang}
       className={`${geistSans.variable} ${cormorantGaramond.variable} ${outfit.variable} h-full antialiased`}
     >
-      <GoogleTagManager gtmId="GTM-MD53BTFC" />
+      <GoogleTagManager gtmId="GTM-NS3RMTMH" />
       <body className="min-h-full flex flex-col bg-zinc-950 text-zinc-100">
         <noscript>
           <iframe
-            src="https://www.googletagmanager.com/ns.html?id=GTM-MD53BTFC"
+            src="https://www.googletagmanager.com/ns.html?id=GTM-NS3RMTMH"
             height="0"
             width="0"
             style={{ display: 'none', visibility: 'hidden' }}
