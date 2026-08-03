@@ -18,8 +18,15 @@ export async function userLogin(
   error?: string
   errorType?: 'unconfirmed' | 'captcha' | 'generic'
 }> {
-  const email = (formData.get('email') as string || '').trim().toLowerCase()
+  const rawIdentifier = (formData.get('email') as string || '').trim().toLowerCase()
   const password = formData.get('password') as string
+  // Toplu içe aktarımdan gelen kullanıcılar gerçek email değil, kendilerine
+  // verilen kullanıcı adını girer (örn. "ahmet.yilmaz"). Supabase Auth email
+  // zorunlu tuttuğu için arka planda görünmez bir teknik email'e çevriliyor.
+  // Gerçek email ile giren organik kullanıcılar bundan hiç etkilenmez.
+  const email = rawIdentifier.includes('@')
+    ? rawIdentifier
+    : `${rawIdentifier}@claim.theeternalmemory.com`
 
   // 1. Verify Turnstile if token is present
   const turnstileToken = formData.get('cf-turnstile-response') as string | null
@@ -30,7 +37,7 @@ export async function userLogin(
     }
   }
 
-  if (!email || !password) {
+  if (!rawIdentifier || !password) {
     return { success: false, errorType: 'generic', error: 'Lütfen tüm alanları doldurun.' }
   }
 

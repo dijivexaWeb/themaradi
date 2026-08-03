@@ -253,7 +253,10 @@ export default function LoginPageClient({ siteKey, callbackError }: { siteKey: s
         <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-7 backdrop-blur-sm shadow-sm">
           <form onSubmit={handleSubmit} className="space-y-3">
             <input
-              type="email"
+              type="text"
+              inputMode="email"
+              autoCapitalize="none"
+              autoCorrect="off"
               name="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}

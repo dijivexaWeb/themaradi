@@ -8,6 +8,7 @@ import {
   Settings, ArrowRight, CheckCircle2, Clock, Eye,
 } from 'lucide-react'
 import { ACTION_ICON_MAP } from '@/lib/memorial-style-templates'
+import ClaimGate from './_ClaimGate'
 
 interface Props {
   params: Promise<{ id: string }>
@@ -32,6 +33,10 @@ export default async function AnmaPaneliPage({ params, searchParams }: Props) {
     .single()
 
   if (!vault) notFound()
+
+  if (vault.vault_origin === 'bulk_import' && vault.status === 'unclaimed') {
+    return <ClaimGate vaultId={id} displayName={vault.display_name} />
+  }
 
   if (!vault.onboarding_completed_at) {
     redirect(`/anma-paneli/${id}/onboarding`)

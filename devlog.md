@@ -3,6 +3,53 @@
 > Her oturum sonunda Claude bu dosyayı günceller.
 > Format: tarih → ne yapıldı → nerede kalındı → sıradaki adım.
 
+## 2026-08-02 — Oturum: Toplu Vefat Listesi → Anma Profili → Kargo Sistemi (Fazlar 1-4)
+
+### Yapılanlar
+- Canlı doğrulama: gerçek domain `theeternalmemory.com` (themaradi.com artık kullanılmıyor, DNS çözülmüyor). GTM (`GTM-NS3RMTMH`), Meta Pixel, ödeme rozetleri prod'da doğrulandı. `.env.local`'daki eski `NEXT_PUBLIC_SITE_URL` düzeltildi (yalnızca local dosya, Vercel prod env zaten doğruydu).
+- Tam plan `docs/bulk-import-plan.md` içinde yazılı — detaylar orada.
+- **DB migration**: `bulk_import_batches` tablosu; `vaults`'a `login_username`(unique), `national_id`, `phone`, `bulk_batch_id`, `qr_label_printed`/`waybill_printed`/`letter_printed`/`guide_printed`, `claimed_at`; `status` CHECK'e `unclaimed`, `vault_origin` CHECK'e `bulk_import` eklendi.
+- **`/admin/bulk-import`**: ham Excel/CSV yükleme (esnek başlık eşleşmesi), tabloda inceleme/satır silme, "Oluştur" → her satır için kullanıcı adı (ad.soyad, çakışırsa numaralı) + rastgele şifre (`TEM-XXXX`) + synthetic email (`@claim.theeternalmemory.com`, Supabase Auth zorunluluğu için, hiçbir yerde görünmüyor) ile hesap + `vault_origin='bulk_import'`, `status='unclaimed'` profil — doğrulama akışı hiç tetiklenmiyor.
+- **QR/etiket + irsaliye + mektup + kılavuz**: `pdfkit` + `qrcode` ile PDF üretimi (`src/lib/labels/`), toplu (`/api/admin/bulk-import/{labels,waybill,letter,guide}?batchId=`) ve tekil (`?vaultId=`, isimle arama `/api/admin/bulk-import/search`) indirme. Mektup/kılavuz metinleri Claude tarafından taslak yazıldı.
+- **Takip ekranı**: `/admin/bulk-import/takip` (parti listesi) → `/admin/bulk-import/takip/[batchId]` (kişi bazlı checklist: QR/İrsaliye/Mektup/Kılavuz — indirme anında otomatik işaretlenir, admin sadece "geri al"abilir; kargo durumu `/admin/kargo`'dan salt-okunur gösterilir; "Yayınla" butonu).
+- **Sahiplen akışı**: `/anma-paneli/[id]` sayfasında `vault_origin='bulk_import' && status='unclaimed'` ise `_ClaimGate.tsx` tam ekran onay popup'ı gösteriyor (onboarding kontrolünden önce). `claimVaultAction` tek yönlü — `unclaimed → public_memorial`, geri dönüş yok. `getLoginRedirectUrl` sahiplenilmemiş bulk profili varsa doğrudan oraya yönlendiriyor.
+- **Login güncellemesi**: `src/app/login/actions.ts` — girilen değerde `@` yoksa arka planda `@claim.theeternalmemory.com`'a çevriliyor. `_LoginPageClient.tsx`'te input `type="email"` → `type="text"` (tarayıcı native email validasyonu düz kullanıcı adını reddediyordu). Organik email girişi hiç etkilenmedi.
+- Güvenlik notu: `xlsx` npm paketinin düzeltilmemiş açıkları vardı → SheetJS'in kendi CDN'inden yamalı sürüm (`0.20.3`) kuruldu.
+- `npx tsc --noEmit` ve `npm run build` her fazdan sonra temiz.
+
+### Proje Durumu
+- [x] Faz 1: DB + yükleme/temizleme + toplu oluşturma
+- [x] Faz 2: QR/etiket tasarımı + toplu/tekil indirme
+- [x] Faz 3: İrsaliye + mektup + kılavuz
+- [x] Faz 4: Takip ekranı + Sahiplen akışı + login güncellemesi
+- [ ] **Gerçek bir dosyayla uçtan uca canlı/local test yapılmadı** (kod yazıldı + build/typecheck temiz, ama tarayıcıda deneme yok)
+- [ ] Commit/push/deploy bekliyor
+
+### Kritik Kararlar / Notlar
+- Bulk-import kökenli (`vault_origin='bulk_import'`) profiller mevcut doğrulama/tanık/itiraz sistemine hiç girmiyor — zaten resmi listeden ölü olduğu bilindiği için. Organik satın alma akışı (`/satin-al/anma`) ve mevcut doğrulama sistemi tamamen dokunulmadı.
+- Kullanıcı adı çakışması DB `UNIQUE` constraint ile garanti altına alındı — iki farklı kişi asla aynı kullanıcı adını alamaz (yanlış hesaba giriş riski sıfırlandı).
+- Mektup/kılavuz metinleri ilk taslak — kullanıcı onayından geçmedi, içerik değişebilir.
+- 53 gün önceki "DB/storage'a dokunma" kısıtlaması bu özellik için kullanıcı tarafından bilinçli olarak aşıldı (bu görev doğası gereği şema gerektiriyordu).
+
+### Nerede Kaldık
+Kod tarafında 4 faz da tamamlandı, build/typecheck temiz. Gerçek bir Excel dosyasıyla local'de uçtan uca hiç denenmedi (yükleme → oluşturma → PDF indirme → login/sahiplenme). Commit atılmadı.
+
+### Sıradaki Adım
+1. Gerçek/örnek bir liste dosyasıyla `/admin/bulk-import` akışını local'de uçtan uca test et
+2. Üretilen PDF'leri (etiket/irsaliye/mektup/kılavuz) görsel olarak kontrol et
+3. Bir test kullanıcısıyla login → Sahiplen akışını dene
+4. Mektup/kılavuz metinlerini kullanıcı gözden geçirip onaylasın/düzeltsin
+5. Sorun yoksa commit/push
+
+### Ek — Plan Kontrolü ve Düzeltmeler (aynı gün, devam)
+Plana karşı satır satır kontrol istendi, 5 eksik bulundu ve hepsi düzeltildi:
+- Takip ekranına durum filtresi eklendi (çıktısı eksik / kargoya verilmedi / kargoda / teslim edildi / sahiplenilmedi / yayında)
+- `/admin/bulk-import/takip` artık bugünün partisine otomatik yönleniyor (`?all=1` ile tüm partiler listesi)
+- Oluşturma sonucu ekranına ilgili partinin takip sayfasına direkt link eklendi
+- Yükleme önizleme tablosuna Mezarlık kolonu eklendi (daha önce veri toplanıyordu ama görünmüyordu)
+- Takip tablosuna "Sistem" checklist sütunu eklendi
+- `tsc`/`build` temiz. Yukarıdaki "Sıradaki Adım" listesi hâlâ geçerli, henüz uçtan uca test yapılmadı.
+
 ## 2026-07-14 — Oturum 169 (devam): GTM Container ID Güncellendi
 
 ### Yapılanlar

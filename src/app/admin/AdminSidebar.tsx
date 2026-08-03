@@ -25,10 +25,12 @@ import {
   Package,
   HardDrive,
   Send,
+  UploadCloud,
 } from 'lucide-react'
 
 const NAV_ITEMS = [
   { href: '/admin', label: 'Dashboard', icon: LayoutDashboard },
+  { href: '/admin/bulk-import', label: 'Toplu İçe Aktarım', icon: UploadCloud },
   { href: '/admin/storage', label: 'Depolama', icon: HardDrive },
   { href: '/admin/verifications', label: 'Doğrulama', icon: ShieldCheck },
   { href: '/admin/kasa', label: 'Kasa / Ödemeler', icon: Wallet },

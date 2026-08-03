@@ -831,3 +831,37 @@ export async function saveMemorialStyleAction(
   revalidatePath(`/anma-paneli/${vaultId}/anma-tarzi`)
   return { success: true }
 }
+
+// ─── Bulk-import: Sahiplen (claim) ─────────────────────────────────────────
+// Toplu içe aktarımdan gelen (vault_origin='bulk_import') profiller 'unclaimed'
+// durumda başlar. Alıcı kendisine verilen kullanıcı adı/şifreyle giriş yapıp
+// bu action'ı çağırdığında profil kalıcı olarak yayına alınır — tek yönlü,
+// geri alınamaz bir işlem.
+export async function claimVaultAction(vaultId: string): Promise<{ success: boolean; error?: string }> {
+  const supabase = await createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return { success: false, error: 'Oturum bulunamadı.' }
+
+  const { data: vault } = await supabase
+    .from('vaults')
+    .select('id, status, vault_origin')
+    .eq('id', vaultId)
+    .eq('owner_id', user.id)
+    .single()
+
+  if (!vault) return { success: false, error: 'Profil bulunamadı.' }
+  if (vault.vault_origin !== 'bulk_import' || vault.status !== 'unclaimed') {
+    return { success: false, error: 'Bu profil sahiplenilmeyi bekliyor durumda değil.' }
+  }
+
+  const now = new Date().toISOString()
+  const { error } = await supabase
+    .from('vaults')
+    .update({ status: 'public_memorial', claimed_at: now, published_at: now })
+    .eq('id', vaultId)
+
+  if (error) return { success: false, error: error.message }
+
+  revalidatePath(`/anma-paneli/${vaultId}`)
+  return { success: true }
+}
