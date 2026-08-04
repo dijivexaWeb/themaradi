@@ -18,10 +18,14 @@ export async function GET(request: NextRequest) {
   let query = supabase
     .from('vaults')
     .select('display_name, qr_id, login_username, bulk_batch_id')
-    .eq('vault_origin', 'bulk_import')
+    .not('qr_id', 'is', null)
     .order('display_name', { ascending: true })
 
-  query = batchId ? query.eq('bulk_batch_id', batchId) : query.eq('id', vaultId as string)
+  // batches only exist for bulk-imported rows; a single vaultId may point at
+  // any origin (bulk import or a regular family-created vault) — same label design either way
+  query = batchId
+    ? query.eq('vault_origin', 'bulk_import').eq('bulk_batch_id', batchId)
+    : query.eq('id', vaultId as string)
 
   const { data: vaults, error } = await query
 

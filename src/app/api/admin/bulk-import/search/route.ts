@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
   const { data, error } = await supabase
     .from('vaults')
     .select('id, display_name, login_username, qr_id, status, shipping_address, bulk_batch_id')
-    .eq('vault_origin', 'bulk_import')
+    .not('qr_id', 'is', null)
     .ilike('display_name', `%${q}%`)
     .order('display_name', { ascending: true })
     .limit(50)
